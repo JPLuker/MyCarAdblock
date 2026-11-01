@@ -144,7 +144,10 @@ Rispondi sempre in **italiano**.
   il token di Xonos; lo scatto parte con Xonos fermo, che il ponte risveglia.
   Impostazioni del telefono: `phone-settings` (l'anteprima dell'auto in cima, aperta e chiusa, il gruppo
   "Car screen" con la finestra di una scelta, una pagina della Home aperta coi formati e cosa può andare in
-  una parte, e "Voice"); `phone-music` (la sezione Musica, l'accesso a Spotify, "Add a service"). Servizi
+  una parte, e "Voice"); `phone-music` (la sezione Musica, l'accesso a Spotify, "Add a service"; dentro le pagine d'accesso di
+  Spotify e Deezer `.github/signin-probe.py` guarda, attraverso il socket devtools della build debug
+  inoltrato con adb, altezze di html/body/main e se un tocco al centro del primo campo lo raggiunge:
+  "sign-in field: reachable"). Servizi
   musicali web (`--es webMusic <id>`, `--ez webMusicPlay true`, `--es webMusicSearch <parole>`, solo debug):
   `music-<servizio>` (pagina, user agent, Widevine, Media Session nel log), `music-spotify-800x480`,
   `music-<servizio>-play`, `music-<servizio>-search`, `music-grid`.
@@ -464,6 +467,11 @@ Tutti i token in un solo posto, `car/design/`:
   WebView può essere rifiutato (YouTube Music senza account); Apple Music, Amazon Music, TIDAL e Qobuz
   vogliono un abbonamento; restrizioni per paese; i popup (`window.open`) non hanno una gestione loro.
   Non provato: con un account, l'audio verso l'auto, gli appunti sul telefono vero, in auto.
+  0.6.7: l'accesso a Spotify sul telefono era nero (vedi "WebView dentro Compose"); Incolla chiudeva la
+  tastiera perché la schermata trasparente degli appunti toglie il fuoco alla pagina dell'auto e il campo
+  mandava `focusout`: ora il campo lasciato si dice dopo 250 ms e solo se nessun campo è attivo
+  (`FOCUS_TRACKING_JS`). Accesso fatto sul telefono a viaggio in corso: la pagina in auto si ricarica
+  (`WebMusicPlayer.signedIn`); pagina creata senza rete: il primo tasto la ricarica.
 - **Schermo condiviso**: con la musica accesa il player sta da solo accanto alla mappa
   (`CarNavigator.sidePanel` parte da `CONTROLS`), come nella vecchia barra in basso; la X lo
   chiude per il viaggio, un tocco sul brano nel dock lo riporta o lo toglie, tenerlo premuto apre
@@ -1006,6 +1014,46 @@ Tutti i token in un solo posto, `car/design/`:
   sopra il fondo di browser, Plancia e app (svanire come sulla mappa, o una striscia riservata).
   Lasciati: il conto alla rovescia di "Start" che continua con la mappa fuori vista (scelta di
   design), le schede di `TabTemplate` senza scorrimento (non visto con un'app vera).
+- **WebView dentro Compose: altezza esplicita** (0.6.7). In un `AndroidView` la view riceve
+  `WRAP_CONTENT` (`ViewGroup.generateDefaultLayoutParams` di `AndroidViewHolder`), e il WebView con
+  altezza `WRAP_CONTENT` impagina la pagina alta 0 px (`AwLayoutSizer` → `setForceZeroLayoutHeight`):
+  contenitore iniziale e `100vh` a 0, barre `position: fixed` in fondo fuori schermo. Era la pagina
+  d'accesso di Spotify nera sul telefono (il suo `<main>` è `position: absolute; inset: 0; overflow: auto`,
+  restava alto solo il suo margine) e, in auto, browser e Cinema (la barra in basso di YouTube spariva).
+  Ogni WebView creato in un `AndroidView` ha `layoutParams = MATCH_PARENT` (sign-in, `WebApp`,
+  `CinemaApp`); Plancia e i servizi musicali in auto stanno già in un `FrameLayout` con MATCH_PARENT.
+  Trovato in CI con CDP dentro la build debug (Chrome 113 su Android 14 e 145 su Android 17: stessa cosa).
+- **Setaccio 5** (notte, 0.6.7, branch `fix/music-sign-in`; richiesta dell'utente: "cerca e risolvi
+  eventuali bug, soprattutto nel collegamento automatico e nella trasmissione audio... la user experience è
+  fondamentale"): dieci letture del codice in parallelo (workflow con agenti, ogni punto poi controllato da
+  scettici e da me nel codice prima di correggerlo), una revisione indipendente dei commit. Collegamento:
+  wake lock a tempo mentre un avvio aspetta l'auto (`WirelessLink.stayAwake`, fino all'immagine, non
+  nell'ascolto dopo il viaggio), prove TCP per almeno un minuto sempre a 1 s (`TCP_WINDOW_MS`: una porta
+  rifiutata risponde subito e le 12 prove finivano in 12 s), ascolto dopo il viaggio che ricomincia
+  silenzioso, Indietro che non lo chiude (`WirelessLink.busy`), "Consenti" di Android chiuso senza
+  risposta che non conta come no (solo `RESULT_USER_REJECTED`, Android 14+), Wi-Fi del telefono spento
+  detto subito (`saidWhy`, niente ripartenze), Android 17 senza rete locale (chiesta dalla Home se c'è
+  un'auto che si collega da sola, detta alla fine delle prove), "Usa myCar in auto" spento che non apre
+  myCar, avvio rifiutato dall'auto senza fili chiuso dopo 30 s, controllo dei tempi su `elapsedRealtime`,
+  niente pausa della musica per un collegamento finito prima dell'immagine. Audio: "Chiedi di nuovo"
+  dopo un no (`CarAudio.askAgain`, avviso nel lettore `MusicNotReaching`, scheda sulla Home
+  `AudioDeniedCard`; aprendo musica/Cinema/browser una volta per viaggio, `askAgainOnce`), assistente e
+  messaggi letti sul canale delle indicazioni quando niente è catturato (`DirectionsVoice.speakForAssistant`),
+  la coda di 2 s di Xonos che finisce appena la cattura ha suono vero (`DirectFeed.endTailFor`), pausa
+  dell'app di prima passando a Xonos/servizi web, chiamata breve che non sposta Automatico su myCar,
+  indicazioni vocali accese a mano rispettate in Bluetooth, avviso Bluetooth ricontrollato al cambio di
+  strada, 20 s di margine per Xonos prima del ripiego, toast del tasto dell'audio. Auto: svolta nel dock
+  per tutta la chiamata, Novità solo da fermi e mai sopra una chiamata, Indietro nel Browse, Play del
+  volante che non ferma un film, app accanto alla mappa ricordata quando suona, "metti X su Spotify" su
+  Spotify Web. Prestazioni: modelli vocali caricati 20 s dopo il collegamento (`SPEECH_WARM_AFTER_MS`,
+  niente col riconoscimento del telefono), aree della mappa mandate solo quando cambiano, meno log dei
+  template. **Lasciati apposta**: la finestra delle conferme video che parte con `lastAckAt = 0` (al
+  secondo fotogramma si azzera e poi resta un fotogramma in più in volo: correggerla cambierebbe il ritmo
+  delle auto che oggi vanno), ByeBye col cavo alla chiusura, la cattura tenuta tra due sessioni dello
+  stesso viaggio (la domanda di Android a ogni ricollegamento: servirebbe "parcheggiare" la proiezione),
+  il margine di `AudioUnderflow` tenuto tra due Start, il servizio in primo piano preso al tocco di
+  Connetti, un'auto che se ne va prima che parta l'ascolto dopo il viaggio, la fascia del seek nel lettore
+  accanto alla mappa (cambierebbe l'aspetto scelto). Non provato in un'auto vera.
 - **Prima connessione** (`ui/SetupScreen.kt`, `setup/`): una lista sola, "Set up myCar", al primo
   avvio (al posto di `CertSetupScreen` + le pagine di `SetupGuideScreen`, ancora nel codice finché
   la nuova non è provata sul telefono) e ogni volta che si torna con "Take me back to the initial
@@ -1090,6 +1138,10 @@ Tutti i token in un solo posto, `car/design/`:
   (privato, `FLAG_NEVER_BLANK` in `VirtualDisplayAdapter`), la `Presentation` non dipende dalla
   schermata di myCar (token suo). Serve il log di un viaggio così (Impostazioni > Aiuto e strumenti >
   Log in tempo reale > Precedenti > Condividi).
+- **Audio tramite myCar a ogni ricollegamento**: la domanda di Android si rifà a ogni sessione nuova dello
+  stesso viaggio (Wi-Fi che cade, l'auto che riavvia Android Auto). Idea della revisione: a fine sessione
+  "parcheggiare" la proiezione (servizio in primo piano tenuto ~2 minuti, lettura ferma, telefono non più
+  muto) e riprenderla se un'auto torna, invece di chiederla di nuovo.
 - Scatti `lang-*` per controllare le lingue.
 - Fatto nella 0.6.0: impostazioni del telefono in gruppi (`SettingsPage` in `ui/SettingsScreen.kt`;
   dalla 0.6.6, sotto la scheda dell'anteprima: Generali, Schermo dell'auto, Musica, Connessione, Voce,
