@@ -179,7 +179,15 @@ object WirelessAuto {
         watch(context, address)
     }
 
-    /** The driver said no, or closed the dialog: this car isn't asked about again until the switch goes off and on. */
+    /**
+     * Android's dialog closed with no answer: nothing is saved, and the car is asked about again at
+     * a wireless drive after this one (not in this one: see [UNANSWERED_MS]).
+     */
+    fun unanswered(code: Int) {
+        log.i("auto-connect: Android's dialog closed without an answer ($code) - asking again at a later drive")
+    }
+
+    /** The driver said no: this car isn't asked about again until the switch goes off and on. */
     fun declined(context: Context, address: String) {
         log.w("auto-connect: not allowed in Android's dialog")
         answered(context, address)

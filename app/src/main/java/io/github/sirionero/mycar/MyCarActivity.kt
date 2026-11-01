@@ -160,8 +160,17 @@ class MyCarActivity : ComponentActivity(), Projection {
     ) { result ->
         val address = approvingCar ?: return@registerForActivityResult
         approvingCar = null
-        if (result.resultCode == RESULT_OK) io.github.sirionero.mycar.wireless.WirelessAuto.approved(this, address)
-        else io.github.sirionero.mycar.wireless.WirelessAuto.declined(this, address)
+        when {
+            result.resultCode == RESULT_OK -> io.github.sirionero.mycar.wireless.WirelessAuto.approved(this, address)
+            // Only "Don't allow" is a no. The dialog closed another way - Back, the phone turned,
+            // Android closing it - answers nothing, and the car is asked at a later drive: before,
+            // that too kept the car from ever connecting by itself, while Settings said it would.
+            // Android 13 and earlier don't tell the two apart.
+            android.os.Build.VERSION.SDK_INT < 34 ||
+                result.resultCode == android.companion.CompanionDeviceManager.RESULT_USER_REJECTED ->
+                io.github.sirionero.mycar.wireless.WirelessAuto.declined(this, address)
+            else -> io.github.sirionero.mycar.wireless.WirelessAuto.unanswered(result.resultCode)
+        }
     }
 
     /** Setting myCar as the phone's caller ID and spam app - what lets it decline a ringing call. */
