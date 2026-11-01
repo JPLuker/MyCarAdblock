@@ -168,4 +168,6 @@
     <string name="car_web_select_chosen">Selezionato</string>
     <string name="car_player_sound_bluetooth">Audio in Bluetooth. Tocca per farlo passare da myCar</string>
     <string name="car_player_sound_mycar">Audio tramite myCar. Tocca per mandarlo in Bluetooth</string>
+    <string name="car_player_sound_now_mycar">Ora il suono passa da myCar, per quest\'auto</string>
+    <string name="car_player_sound_now_bluetooth">Ora il suono va in Bluetooth, per quest\'auto</string>
 </resources>

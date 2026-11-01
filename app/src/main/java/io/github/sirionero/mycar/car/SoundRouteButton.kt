@@ -10,6 +10,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import io.github.sirionero.mycar.R
+import androidx.car.app.CarToast
+import io.github.sirionero.mycar.Words
 import io.github.sirionero.mycar.audio.AudioRoute
 
 /**
@@ -20,7 +22,16 @@ import io.github.sirionero.mycar.audio.AudioRoute
 internal fun SoundRouteButton(size: Dp) {
     val throughMyCar by CarSettings.pipeAudio.collectAsState()
     PlainButton(
-        onClick = { CarSettings.setAudioRoute(if (throughMyCar) AudioRoute.BLUETOOTH else AudioRoute.CAR_LINK) },
+        onClick = {
+            val toMyCar = !throughMyCar
+            CarSettings.setAudioRoute(if (toMyCar) AudioRoute.CAR_LINK else AudioRoute.BLUETOOTH)
+            // One tap moves the sound, and it stays that way for this car: the car says where it goes now.
+            CarToasts.show(
+                SoundRoute,
+                Words.get(if (toMyCar) R.string.car_player_sound_now_mycar else R.string.car_player_sound_now_bluetooth),
+                CarToast.LENGTH_SHORT,
+            )
+        },
         description = stringResource(if (throughMyCar) R.string.car_player_sound_mycar else R.string.car_player_sound_bluetooth),
         size = size,
     ) {
@@ -31,3 +42,6 @@ internal fun SoundRouteButton(size: Dp) {
         )
     }
 }
+
+/** Who the route's toast belongs to, for [CarToasts]. */
+private object SoundRoute

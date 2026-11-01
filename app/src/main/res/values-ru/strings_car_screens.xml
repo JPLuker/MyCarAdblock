@@ -168,4 +168,6 @@
     <string name="car_web_select_chosen">Выбрано</string>
     <string name="car_player_sound_bluetooth">Звук по Bluetooth. Нажмите, чтобы пустить его через myCar</string>
     <string name="car_player_sound_mycar">Звук через myCar. Нажмите, чтобы пустить его по Bluetooth</string>
+    <string name="car_player_sound_now_mycar">Теперь звук идёт через myCar, для этого автомобиля</string>
+    <string name="car_player_sound_now_bluetooth">Теперь звук идёт по Bluetooth, для этого автомобиля</string>
 </resources>
