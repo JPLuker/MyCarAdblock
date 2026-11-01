@@ -49,7 +49,10 @@ internal object InsideOrApp {
         val app = context.applicationContext
         Xonos.refresh(app)
         val plancia = TakeOver()
-        val xonos = TakeOver()
+        // Xonos tries its home address first, for up to 8 s, then the one away from home: a drive
+        // that starts away from home took longer than 10 s to connect, and the Xonos app took its
+        // place for the whole drive.
+        val xonos = TakeOver(startGraceMs = 20_000)
         var appsCheckedAt = 0L
         var planciaThere = false
         var xonosThere = false
