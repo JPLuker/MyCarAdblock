@@ -71,6 +71,14 @@
     <string name="car_keyboard_space">espaço</string>
     <string name="car_keyboard_hide">Ocultar teclado</string>
     <string name="car_keyboard_submit">Enviar</string>
+    <string name="car_keyboard_paste">Colar</string>
+    <string name="car_keyboard_copy">Copiar</string>
+    <string name="car_clipboard_copied">Copiado para o telefone.</string>
+    <string name="car_clipboard_nothing">Nada para copiar.</string>
+    <string name="car_clipboard_password">Senhas não são copiadas.</string>
+    <string name="car_clipboard_empty">A área de transferência do telefone não tem texto.</string>
+    <string name="car_clipboard_locked">Desbloqueie o telefone e toque em “Colar” de novo.</string>
+    <string name="car_clipboard_denied">O Android não deixou o myCar ler a área de transferência. Abra o myCar no telefone e toque em “Colar” de novo.</string>
 
     <string name="car_player_previous">Anterior</string>
     <string name="car_player_play">Tocar</string>

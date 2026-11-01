@@ -71,6 +71,14 @@
     <string name="car_keyboard_space">空格</string>
     <string name="car_keyboard_hide">隐藏键盘</string>
     <string name="car_keyboard_submit">提交</string>
+    <string name="car_keyboard_paste">粘贴</string>
+    <string name="car_keyboard_copy">复制</string>
+    <string name="car_clipboard_copied">已复制到手机。</string>
+    <string name="car_clipboard_nothing">没有可复制的内容。</string>
+    <string name="car_clipboard_password">密码不会被复制。</string>
+    <string name="car_clipboard_empty">手机剪贴板中没有文字。</string>
+    <string name="car_clipboard_locked">请解锁手机，然后再点按“粘贴”。</string>
+    <string name="car_clipboard_denied">Android 未允许 myCar 读取剪贴板。请在手机上打开 myCar，然后再点按“粘贴”。</string>
 
     <string name="car_player_previous">上一首</string>
     <string name="car_player_play">播放</string>

@@ -71,6 +71,14 @@
     <string name="car_keyboard_space">leerzeichen</string>
     <string name="car_keyboard_hide">Tastatur ausblenden</string>
     <string name="car_keyboard_submit">Bestätigen</string>
+    <string name="car_keyboard_paste">Einfügen</string>
+    <string name="car_keyboard_copy">Kopieren</string>
+    <string name="car_clipboard_copied">Auf das Telefon kopiert.</string>
+    <string name="car_clipboard_nothing">Nichts zu kopieren.</string>
+    <string name="car_clipboard_password">Passwörter werden nicht kopiert.</string>
+    <string name="car_clipboard_empty">In der Zwischenablage des Telefons ist kein Text.</string>
+    <string name="car_clipboard_locked">Entsperre das Telefon und tippe dann noch einmal auf „Einfügen“.</string>
+    <string name="car_clipboard_denied">Android hat myCar die Zwischenablage nicht lesen lassen. Öffne myCar auf dem Telefon und tippe dann noch einmal auf „Einfügen“.</string>
 
     <string name="car_player_previous">Vorheriger Titel</string>
     <string name="car_player_play">Abspielen</string>

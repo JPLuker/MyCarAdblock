@@ -71,6 +71,14 @@
     <string name="car_keyboard_space">κενό</string>
     <string name="car_keyboard_hide">Απόκρυψη πληκτρολογίου</string>
     <string name="car_keyboard_submit">Υποβολή</string>
+    <string name="car_keyboard_paste">Επικόλληση</string>
+    <string name="car_keyboard_copy">Αντιγραφή</string>
+    <string name="car_clipboard_copied">Αντιγράφηκε στο τηλέφωνο.</string>
+    <string name="car_clipboard_nothing">Δεν υπάρχει κάτι για αντιγραφή.</string>
+    <string name="car_clipboard_password">Οι κωδικοί πρόσβασης δεν αντιγράφονται.</string>
+    <string name="car_clipboard_empty">Το πρόχειρο του τηλεφώνου δεν έχει κείμενο.</string>
+    <string name="car_clipboard_locked">Ξεκλειδώστε το τηλέφωνο και πατήστε ξανά «Επικόλληση».</string>
+    <string name="car_clipboard_denied">Το Android δεν επέτρεψε στο myCar να διαβάσει το πρόχειρο. Ανοίξτε το myCar στο τηλέφωνο και πατήστε ξανά «Επικόλληση».</string>
 
     <string name="car_player_previous">Προηγούμενο</string>
     <string name="car_player_play">Αναπαραγωγή</string>

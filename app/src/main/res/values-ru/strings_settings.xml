@@ -27,6 +27,7 @@
     <string name="settings_help_connect_detail">Какие автомобили подходят и что ещё нужно настроить</string>
     <string name="settings_help_preview">Предпросмотр экрана автомобиля</string>
     <string name="settings_help_preview_detail">Экран автомобиля на вашем телефоне</string>
+    <string name="settings_preview_busy">Доступен, когда автомобиль не подключён</string>
     <string name="settings_help_logs">Журнал в реальном времени</string>
     <string name="settings_help_logs_detail">О чём myCar и автомобиль говорят друг с другом</string>
 
@@ -293,12 +294,17 @@
     <string name="settings_group_general_detail">Язык, тема, обновления</string>
     <string name="settings_group_connection_detail">Без проводов, звук в автомобиле, сертификат</string>
     <string name="settings_group_voice">Голос</string>
-    <string name="settings_group_voice_detail">Речевые модели для помощника</string>
+    <string name="settings_group_voice_detail">Голосовой помощник и речевые модели</string>
     <string name="settings_group_plancia_detail">Home Assistant в автомобиле</string>
     <string name="settings_group_xonos_detail">Music Assistant в автомобиле</string>
     <string name="settings_group_cinema_detail">Видеосайты и списки ТВ</string>
-    <string name="settings_group_help_detail">Как подключиться, журналы, предпросмотр автомобиля</string>
+    <string name="settings_group_help_detail">Как подключиться, журналы</string>
     <string name="settings_group_about_detail">Версия, лицензии, поддержать myCar</string>
+    <string name="settings_group_car">Экран автомобиля</string>
+    <string name="settings_group_car_detail">Главная, страницы, вид, обои, предупреждения</string>
+    <string name="settings_car_pages_header">Ваши страницы по обе стороны от карты на главном экране автомобиля. Измените их здесь или в автомобиле карандашом рядом с точками.</string>
+    <string name="settings_car_pages_ready_text">Ваши страницы заменятся готовыми: погода и расписание слева от карты, а справа — Plancia рядом с браузером, если Plancia есть в myCar или на телефоне.</string>
+    <string name="settings_car_fit_offline">Подключитесь к автомобилю, чтобы подогнать его экран: автомобиль сразу показывает каждое изменение.</string>
     <string name="theme_title">Тема</string>
     <string name="theme_footer">Как myCar выглядит на телефоне. У экрана автомобиля своя тема — в настройках автомобиля.</string>
     <string name="theme_phone">Как в телефоне</string>
@@ -306,4 +312,26 @@
     <string name="theme_dark">Тёмная</string>
     <string name="theme_black">Чёрная (AMOLED)</string>
     <string name="settings_audio_per_car">Когда автомобиль подключён, выбор сохраняется для этого автомобиля, и его меняет также кнопка звука в плеере. Без подключённого автомобиля он действует для всех автомобилей.</string>
+    <string name="settings_group_music">Музыка</string>
+    <string name="settings_group_music_detail">Xonos, Spotify и другая музыка в автомобиле</string>
+    <string name="music_in_the_car">В автомобиле</string>
+    <string name="music_xonos_on">Music Assistant на экране автомобиля, как одно из его музыкальных приложений</string>
+    <string name="music_xonos_off">Выключено: Xonos нет на экране автомобиля, как и приложения Xonos</string>
+    <string name="music_service_on">В сетке приложений автомобиля; играет через myCar</string>
+    <string name="music_service_off">Выключено: нет на экране автомобиля</string>
+    <string name="music_sign_in">Войти на телефоне</string>
+    <string name="music_sign_in_detail">С клавиатуры телефона: вход сохранится и в автомобиле</string>
+    <string name="music_sign_in_title">%1$s: вход</string>
+    <string name="music_sign_out">Выйти</string>
+    <string name="music_sign_out_detail">Из этого сервиса в myCar, на телефоне и в автомобиле</string>
+    <string name="music_sign_out_title">Выйти из %1$s?</string>
+    <string name="music_sign_out_text">myCar забудет вход в %1$s и то, что сохранили его страницы. Ваш аккаунт останется как есть.</string>
+    <string name="music_add">Добавить сервис</string>
+    <string name="music_add_footer">Другие музыкальные сервисы, каждый со своим веб-плеером внутри myCar: их звук идёт в автомобиль через myCar, как у Cinema.</string>
+    <string name="music_add_note">Каждый отмеченный появится здесь и в сетке приложений автомобиля.</string>
+    <string name="music_needs_google">Google может не разрешить вход внутри приложения: тогда YouTube Music играет без входа.</string>
+    <string name="music_needs_apple">Нужна подписка Apple Music.</string>
+    <string name="music_needs_amazon">Нужен Amazon Prime или Amazon Music Unlimited.</string>
+    <string name="music_needs_tidal">Нужна подписка TIDAL.</string>
+    <string name="music_needs_qobuz">Нужна подписка Qobuz.</string>
 </resources>

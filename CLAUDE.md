@@ -142,6 +142,12 @@ Rispondi sempre in **italiano**.
   integrato sul Music Assistant del telefono: `ServerCheckActivity --ez xonos true` di Xonos scarica il
   pacchetto e prepara server, account e album di toni, poi myCar con `--es maUrl http://127.0.0.1:8095` e
   il token di Xonos; lo scatto parte con Xonos fermo, che il ponte risveglia.
+  Impostazioni del telefono: `phone-settings` (l'anteprima dell'auto in cima, aperta e chiusa, il gruppo
+  "Car screen" con la finestra di una scelta, una pagina della Home aperta coi formati e cosa può andare in
+  una parte, e "Voice"); `phone-music` (la sezione Musica, l'accesso a Spotify, "Add a service"). Servizi
+  musicali web (`--es webMusic <id>`, `--ez webMusicPlay true`, `--es webMusicSearch <parole>`, solo debug):
+  `music-<servizio>` (pagina, user agent, Widevine, Media Session nel log), `music-spotify-800x480`,
+  `music-<servizio>-play`, `music-<servizio>-search`, `music-grid`.
   Ogni esecuzione sovrascrive `ci/car-preview`: con più branch in CI, scaricarlo appena finisce.
 - Prova della release in CI: il workflow **Release check** (`.github/workflows/release-check.yml` +
   `.github/release-check.sh`, `.github/tailscale.sh`) installa una release pubblicata (o il branch
@@ -192,14 +198,15 @@ Modulo unico `:app` (cartella `app/`), package `io.github.sirionero.mycar`. UI *
 | Package | Ruolo |
 |---|---|
 | radice | Protocollo AA: `MyCarRunner` (sessione, canali, video/audio), `SessionService` (servizio in primo piano del viaggio), `Tailnet` (Tailscale/VPN per i messaggi di Plancia e Xonos), `Framing`, `Protobuf`, `PhoneTls`, `ServiceDiscovery`, `CertProvider` / `CertDownloader`, `VideoSource` (encoder), `ScreenProjector` (VirtualDisplay + `Presentation` con Compose → encoder → auto), `MyCarActivity` (possiede la sessione USB/wireless), `PermissionActivity` (la domanda di Android sul telefono per un tocco sull'auto), `MyCarLog`, `AppLanguage` (la lingua di myCar) e `Words` (i suoi testi fuori dalle schermate), `MyCarApplication` |
-| `car/` | **UI mostrata sull'auto**: `CarUi` (root: tema, navigazione, overlay, transizioni), `CarDock` (dock a sinistra), `CarHomeScreen` (mappa + player), `HomePager` / `HomePages` / `HomeWidgets` (pagine della Home ai lati della mappa, widget meteo e agenda), `GlassPlayer` (player accanto alla mappa), `CarLauncher` (griglia app a pagine), `PhoneAssistants` (assistente vocale a scelta), `AssistantLanguage` + frasari (l'assistente nella lingua di myCar), `AssistantBrain` (quello che non è un comando va a Home Assistant), `WallpaperPicker`, `MediaScreen`, `PhoneDialerScreen` / `PhoneRecents` (Telefono: Recenti, contatti, tastierino), `QuickReplyTexts` (risposte rapide nella lingua di myCar), `CallOverlay`, `CarDashboardScreen`, `CarSettingsScreen`, `PlanciaApp` / `PlanciaWeb` / `PlanciaScripts` (Plancia integrata), `CinemaApp` / `CinemaShelves` / `CinemaPlayer` / `CinemaContinue` (Cinema in auto), `CarDriving` (stato di guida detto dall'auto, per il video), `CarWebContext` (il contesto di ogni WebView sullo schermo dell'auto), `WebSelect` (menu a tendina delle pagine), `AppLinks` (link alle app nelle pagine), `TemplateBack` / `BackCloses` (tasto Indietro dell'auto), `CarNavigator` (stack schermate `CarScreen`), template Car App Library (`Template*`) |
+| `car/` | **UI mostrata sull'auto**: `CarUi` (root: tema, navigazione, overlay, transizioni), `CarDock` (dock a sinistra), `CarHomeScreen` (mappa + player), `HomePager` / `HomePages` / `HomeWidgets` (pagine della Home ai lati della mappa, widget meteo e agenda), `GlassPlayer` (player accanto alla mappa), `CarLauncher` (griglia app a pagine), `PhoneAssistants` (assistente vocale a scelta), `AssistantLanguage` + frasari (l'assistente nella lingua di myCar), `AssistantBrain` (quello che non è un comando va a Home Assistant), `WallpaperPicker`, `MediaScreen`, `PhoneDialerScreen` / `PhoneRecents` (Telefono: Recenti, contatti, tastierino), `QuickReplyTexts` (risposte rapide nella lingua di myCar), `CallOverlay`, `CarDashboardScreen`, `CarSettingsScreen`, `PlanciaApp` / `PlanciaWeb` / `PlanciaScripts` (Plancia integrata), `CinemaApp` / `CinemaShelves` / `CinemaPlayer` / `CinemaContinue` (Cinema in auto), `CarDriving` (stato di guida detto dall'auto, per il video), `CarWebContext` (il contesto di ogni WebView sullo schermo dell'auto), `WebSelect` (menu a tendina delle pagine), `AppLinks` (link alle app nelle pagine), `TemplateBack` / `BackCloses` (tasto Indietro dell'auto), `WebMusicApp` / `WebMusicPage` / `WebMusicScripts` (i lettori web dei servizi musicali), `CarClipboard` (appunti tra telefono e auto nella tastiera dell'auto), `CarNavigator` (stack schermate `CarScreen`), template Car App Library (`Template*`) |
 | `car/theme/` | Design system attuale dei controlli: `GsTheme` / `ControlLook` (temi Flat/Tactile/Keycap), `GsControls` (`GsButton`, `GsIconButton`, `gsColors`), `GsSeekBar`, `GsSwitch` |
-| `ui/` | **UI sul telefono**: onboarding (`IntroScreen` col veliero `PirateShip`, `SetupScreen`; le vecchie `CertSetupScreen` / `SetupGuideScreen`), `UpdateSplash` (la bandiera dopo ogni aggiornamento), `HomeScreen`, `SettingsScreen`, `LanguageSettings` (la lingua), `IntroLanguage` (la pagina della lingua nell'introduzione), `PlanciaSettings` (account di Home Assistant per Plancia), `XonosSettings` (account di Music Assistant per Xonos), `CinemaSettings` (siti di Cinema e "Video only when parked"), `MyCarTheme` (Material You), `AboutLinks` (link, donazioni, avvisi di licenza) |
+| `ui/` | **UI sul telefono**: onboarding (`IntroScreen` col veliero `PirateShip`, `SetupScreen`; le vecchie `CertSetupScreen` / `SetupGuideScreen`), `UpdateSplash` (la bandiera dopo ogni aggiornamento), `HomeScreen`, `SettingsScreen`, `LanguageSettings` (la lingua), `IntroLanguage` (la pagina della lingua nell'introduzione), `CarScreenSettings` (le impostazioni dell'auto sul telefono, coi pezzi `Pick`/`PickRow`/`PickDialog`/`SwitchRow`), `CarPagesSettings` (le pagine accanto alla mappa dal telefono), `AssistantSettings` (l'assistente vocale, in Voce), `MusicSettings` (la sezione Musica: Xonos, Spotify e gli altri servizi), `PlanciaSettings` (account di Home Assistant per Plancia), `XonosSettings` (account di Music Assistant per Xonos, nella sezione Musica), `CinemaSettings` (siti di Cinema e "Video only when parked"), `MyCarTheme` (Material You), `AboutLinks` (link, donazioni, avvisi di licenza) |
 | `host/` | Host Car App Library per app di terze parti (`CarAppConnection`, `KnownApps`) |
 | `cinema/` | Cinema: `Cinema` (i siti, "solo a macchina ferma", `MORE` suggeriti), `SiteIcons` (l'icona che ogni sito dà di sé, scaricata e tenuta sul telefono), `PhoneVideos` (video del telefono), `TvLists` + `M3u` (liste IPTV), `ChannelLogos` |
 | `home/` | Home Assistant di Plancia integrata: `HomeAssistant` (account, collegamento per tutto il viaggio, plance, import dall'app Plancia), `HaClient` (WebSocket, OkHttp), `Panels` (plance e titoli), `Assist` + `AssistPlan` (le domande all'assistente vocale di Home Assistant) |
 | `audio/` | Audio verso l'auto (`AudioLink`, cattura `AudioCaptureService`, `DirectFeed` per la musica di myCar stesso, `CarMic`) |
 | `bridge/` | Il ponte verso le app Plancia e Xonos per myCar lasciata fuori da Tailscale: `AppBridge` (legame e richiesta di una connessione), `Bridges` (quali connessioni passano dal ponte), `BridgedSockets` (`BridgeDns`, `BridgeSocketFactory` per OkHttp), `BridgeProxy` (la pagina di Plancia: proxy SOCKS5 nel WebView) |
+| `webmusic/` | Servizi musicali web dentro myCar: `WebMusic` (catalogo, interruttori), `WebMusicMediaService` (lettore Media3 per servizio), `WebMusicPlayer`, `WebPlayerState`, `WebMusicSignIn` (accesso sul telefono) |
 | `xonos/` | Xonos integrato: `Xonos` (account, connessione, libreria), `XonosAccount` (import dall'app Xonos), il motore di Xonos (`data/`, `sendspin/`, `playback/`: Music Assistant, Sendspin, lettore Media3 `PlaybackService`), `sendspin/CarLinkOutput` (uscita dritta verso l'auto) |
 | `call/` | Chiamate: `CarCalls` (stato da `TelephonyCallback` + numero dal broadcast `PHONE_STATE`; risponde/rifiuta/chiude con `TelecomManager`, serve `ANSWER_PHONE_CALLS`), `MyCarCallScreening` (filtro facoltativo: trattiene le chiamate da numeri fuori rubrica solo con l'auto collegata; ignora quelle in uscita) |
 | `media/`, `notify/`, `speech/`, `mirror/`, `wireless/`, `update/`, `stats/` | Media, notifiche, voce (sherpa-onnx), mirroring, AA wireless (`WirelessLink`; collegamento da solo: `WirelessAuto`, `CarPresenceService`), auto-aggiornamento da GitHub, statistiche d'uso opt-in |
@@ -333,6 +340,7 @@ Tutti i token in un solo posto, `car/design/`:
   indirizzo, utente e password → un token suo, la password non si tiene) o dall'app Xonos (da 0.1.39:
   `content://it.xonos.ma.account`, metodo `account`, risponde solo a myCar firmata col suo
   certificato), da sola a ogni viaggio finché myCar non ha un account (`XonosAccount.adoptIfUnset`).
+  Dalla 0.6.6 sta nella sezione Musica del telefono con un interruttore (vedi "Musica: i servizi web").
   **Audio**: con l'audio tramite myCar il PCM va dritto nel canale musicale di Android Auto
   (`CarLinkOutput` → `CarAudio.openDirect` → `audio/DirectFeed.kt`): pezzi da 20 ms al ritmo
   dell'orologio del telefono, 60 ms avanti, 250 ms in coda, silenzio quando non c'è musica (come la
@@ -411,6 +419,51 @@ Tutti i token in un solo posto, `car/design/`:
   si ferma per sempre (perdita del focus, come con ogni lettore); uscendo da Cinema la musica che
   suonava quando si è aperta riparte da sola (`car/CinemaMusic.kt`: mezzo secondo dopo, se ferma, se
   l'app musicale dell'auto è ancora quella e collegata).
+- **Musica: i servizi web dentro myCar** (0.6.6; richiesta dell'utente: l'app Spotify non lascia
+  catturare il suo audio e sulla Tayron il Bluetooth porta solo le chiamate, "fai l'app" con Spotify Web
+  preinstallato, poi "nel menu fai la sezione Music"; `webmusic/`, `car/WebMusicPage.kt`,
+  `car/WebMusicScripts.kt`, `car/WebMusicApp.kt`, `ui/MusicSettings.kt`). Sul telefono la sezione
+  **Musica** (`SettingsPage.MUSIC`, dopo "Car screen", al posto del gruppo Xonos): Xonos con un
+  interruttore (chiave `xonos_in_the_car`; spento di predefinito ma acceso alla prima apertura se Xonos è
+  configurato in myCar o l'app Xonos è installata, così chi lo usava non lo perde; spento, in auto non c'è
+  né Xonos dentro myCar né l'app Xonos e il viaggio non si collega a Music Assistant; cambiato a viaggio
+  iniziato: `CarServices.xonosSwitched`), Spotify con un interruttore e "Add a service" (YouTube Music,
+  Apple Music, Amazon Music, Deezer, TIDAL, SoundCloud, Qobuz; chiavi `web_music_added`, `web_music_on`;
+  tutto spento di predefinito). Acceso, un servizio ha "Sign in on the phone" (`WebMusicSignInActivity`:
+  lo stesso motore web dell'auto, cookie scritti subito) e "Sign out" (cookie dei suoi domini, storage
+  delle sue origini; per YouTube Music anche google.com, quindi anche YouTube in Cinema), e in auto è
+  un'app musicale come le altre: riquadro "<nome> · Web" con l'icona del sito (`SiteIcons`), lettore di
+  myCar, dock, tasti del volante, assistente, accanto alla mappa; spento non c'è, anche a viaggio
+  iniziato. **Una pagina per servizio per tutto il viaggio** (`WebMusicPages`: fatta alla prima apertura
+  o al primo tasto, anche fuori vista, mai in pausa; va via con lo schermo dell'auto, quindi con
+  condivisione schermo ed encoder nuovo, come Plancia), user agent da computer, larga quanto il suo posto
+  (minimo 800 px css), nera prima di disegnare; di myCar solo un piccolo Indietro in alto a sinistra
+  (prima indietro nella pagina; per lui la barra di Spotify, YouTube Music, Apple Music e Amazon Music si
+  sposta di 52 px), la tastiera dell'auto e, per un video a schermo intero in movimento, la copertura di
+  Cinema. **Lettore**: per servizio un `MediaLibraryService` Media3 non esportato e senza notifica
+  (`webmusic/WebMusicMediaService.kt`, una classe per servizio perché l'auto distingue le app per
+  componente) con un `SimpleBasePlayer` che mostra quello che la pagina dice e le manda i tasti
+  (`WebMusicPlayer`); senza titolo il brano ha il nome del servizio. Nella pagina uno script dall'inizio
+  (`addDocumentStartJavaScript` + `addWebMessageListener` "MyCarMusic", solo sulle origini del servizio):
+  **il WebView di Android non ha `navigator.mediaSession`** (visto in CI), quindi myCar ne mette uno
+  sostitutivo prima degli script della pagina; dove la pagina non dice niente, la barra del servizio
+  (Spotify: `data-testid`) o i suoi elementi audio. "Metti X": la sessione non offre la ricerca nella
+  libreria (Media3 non risponderebbe mai e `playBestMatch` aspettava), arriva come `playFromSearch` →
+  `handleSetMediaItems`; la pagina apre la ricerca del servizio e preme il Play del primo risultato
+  (`firstPlay`, segni indipendenti dalla lingua, poi `ANY_PLAY`); myCar aspetta 15 s
+  (`CarMedia.WEB_SEARCH_WAIT_MS`). Una pagina che suona diventa la musica dell'auto e mette in pausa le
+  altre e Xonos. Audio catturato come Cinema (`CarAudio.captureNow`). Nel log niente parole cercate né
+  titoli delle pagine (solo nella build di prova). **Appunti** (`car/CarClipboard.kt`): Incolla e Copia
+  nella tastiera dell'auto in tutte le pagine (browser, Cinema, servizi); Android lascia leggere gli
+  appunti solo all'app col fuoco, quindi una schermata trasparente sul display del telefono
+  (`CarClipboardActivity`) li legge e si chiude; bloccato o negato: avviso in auto e riga nel log.
+  Verificato in CI senza account: le otto pagine col user agent da computer e Widevine
+  (`com.widevine.alpha`); "metti lofi" su YouTube Music arriva al lettore accanto alla mappa (copertina,
+  comandi, dock); su SoundCloud e Spotify la ricerca arriva al Play, poi il servizio chiede di accedere;
+  TIDAL e YouTube Music fermano il runner con un controllo anti-bot. Avvertenze: l'accesso Google nel
+  WebView può essere rifiutato (YouTube Music senza account); Apple Music, Amazon Music, TIDAL e Qobuz
+  vogliono un abbonamento; restrizioni per paese; i popup (`window.open`) non hanno una gestione loro.
+  Non provato: con un account, l'audio verso l'auto, gli appunti sul telefono vero, in auto.
 - **Schermo condiviso**: con la musica accesa il player sta da solo accanto alla mappa
   (`CarNavigator.sidePanel` parte da `CONTROLS`), come nella vecchia barra in basso; la X lo
   chiude per il viaggio, un tocco sul brano nel dock lo riporta o lo toglie, tenerlo premuto apre
@@ -1006,6 +1059,24 @@ Tutti i token in un solo posto, `car/design/`:
   data di scadenza). jsDelivr come terza fonte non
   usato: non raggiungibile dalla sessione cloud per verificarlo. Senza fili non riprova da solo col
   successivo: va provato in auto.
+- **Impostazioni dell'auto sul telefono** (0.6.6, richiesta dell'utente: "tutte le impostazioni sullo
+  schermo in auto devono poter essere settate anche sul telefono"; "la preview di myCar deve essere fuori
+  dai sottomenu come prima possibilità di scelta in alto"): gruppo "Car screen" (`SettingsPage.CAR`,
+  `ui/CarScreenSettings.kt`) con ogni impostazione della schermata Impostazioni dell'auto, sulle stesse
+  chiavi di `CarSettings` e delle scelte accanto (`SidePaneChoice`, `HomePages`, `WallpaperSetting`): una
+  modifica da una parte si vede subito dall'altra, anche durante un viaggio. Le scelte come sul telefono:
+  il nome, la scelta sotto, e un tocco apre l'elenco (`PickRow` / `PickDialog`, riusati dalla sezione
+  Musica); gli sfondi come campioni disegnati nel tema dell'auto (`MyCarCarTheme`); la pagina del
+  browser con la tastiera del telefono; l'adattamento dello schermo solo con l'immagine di un'auto
+  (`SessionStatus` PROJECTING), come in auto. Le **pagine accanto alla mappa** si cambiano dal telefono
+  (`ui/CarPagesSettings.kt`, sulle funzioni pure di `HomePages`): ogni pagina col disegno del formato
+  (`LayoutDiagram`, che ora accende una parte), formato, cosa mostra ogni parte (una sola app per auto a
+  pagina), sposta, elimina, aggiungi, pagine pronte (con conferma). L'assistente vocale e il
+  riconoscimento del telefono in "Voice" (`ui/AssistantSettings.kt`); l'audio in auto resta in
+  "Connection". L'**anteprima dell'auto** è una scheda in cima alle Impostazioni, sopra i gruppi (non più
+  in "Aiuto e strumenti"); con un'auto collegata resta lì, spenta, e dice che si apre senza auto.
+  Verificato (scatto `phone-settings`): anteprima in cima, gruppo, scelte, pagina aperta con le parti,
+  formati, sfondi, Voce, nessun crash.
 - Dipendenze approvate dall'utente: OkHttp e androidx.webkit (Plancia integrata), Media3 `session`
   e `common` (Xonos integrato: Apache 2.0, nessuna telemetria).
 - Sfondi "stile umbrelOS" ma **nostri**: le immagini di umbrelOS hanno una licenza non libera.
@@ -1020,9 +1091,10 @@ Tutti i token in un solo posto, `car/design/`:
   schermata di myCar (token suo). Serve il log di un viaggio così (Impostazioni > Aiuto e strumenti >
   Log in tempo reale > Precedenti > Condividi).
 - Scatti `lang-*` per controllare le lingue.
-- Fatto nella 0.6.0 (non ancora visto in un'anteprima): impostazioni del telefono in gruppi
-  (`SettingsPage` in `ui/SettingsScreen.kt`: Generali, Connessione, Voce, Plancia, Xonos, Cinema, Aiuto
-  e strumenti, Informazioni; `SettingsAt` apre il gruppo giusto, Indietro torna all'elenco) e temi del
+- Fatto nella 0.6.0: impostazioni del telefono in gruppi (`SettingsPage` in `ui/SettingsScreen.kt`;
+  dalla 0.6.6, sotto la scheda dell'anteprima: Generali, Schermo dell'auto, Musica, Connessione, Voce,
+  Plancia, Cinema, Aiuto e strumenti, Informazioni; `SettingsAt` apre il gruppo giusto, Indietro torna
+  all'elenco; visti negli scatti `phone-settings` e `phone-music`) e temi del
   telefono (`ui/PhoneTheme.kt`, chiave `phone_theme`: come il telefono, chiaro, scuro, nero AMOLED,
   Monokai; barre di sistema col tema, `phoneDark()` al posto di `isSystemInDarkTheme`).
 - I bagliori del veliero e della bandiera sono immagini dipinte una volta (`ui/Glow.kt`): come

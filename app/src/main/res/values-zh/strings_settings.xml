@@ -27,6 +27,7 @@
     <string name="settings_help_connect_detail">哪些汽车可以使用，以及还需要设置什么</string>
     <string name="settings_help_preview">车机预览</string>
     <string name="settings_help_preview_detail">在手机上查看车机屏幕</string>
+    <string name="settings_preview_busy">未连接车辆时可用</string>
     <string name="settings_help_logs">实时日志</string>
     <string name="settings_help_logs_detail">myCar 和汽车之间正在交流的内容</string>
 
@@ -287,12 +288,17 @@
     <string name="settings_group_general_detail">语言、主题、更新</string>
     <string name="settings_group_connection_detail">无线、车载音频、证书</string>
     <string name="settings_group_voice">语音</string>
-    <string name="settings_group_voice_detail">语音助手的语音模型</string>
+    <string name="settings_group_voice_detail">语音助手和语音模型</string>
     <string name="settings_group_plancia_detail">车上的 Home Assistant</string>
     <string name="settings_group_xonos_detail">车上的 Music Assistant</string>
     <string name="settings_group_cinema_detail">视频网站和电视列表</string>
-    <string name="settings_group_help_detail">如何连接、日志、车机预览</string>
+    <string name="settings_group_help_detail">如何连接、日志</string>
     <string name="settings_group_about_detail">版本、许可、支持 myCar</string>
+    <string name="settings_group_car">车机屏幕</string>
+    <string name="settings_group_car_detail">主页、页面、外观、壁纸、提醒</string>
+    <string name="settings_car_pages_header">车机主页上地图两侧的页面。可在这里修改，也可在车上用圆点旁的铅笔修改。</string>
+    <string name="settings_car_pages_ready_text">你的页面将被预设页面替换：地图左侧是天气和日程；如果已设置或安装 Plancia，右侧是 Plancia 和浏览器。</string>
+    <string name="settings_car_fit_offline">连接车辆后即可适配其屏幕：每次修改都会立即显示在车机上。</string>
     <string name="theme_title">主题</string>
     <string name="theme_footer">myCar 在手机上的外观。车机屏幕有自己的外观，在车机设置中。</string>
     <string name="theme_phone">跟随手机</string>
@@ -300,4 +306,26 @@
     <string name="theme_dark">深色</string>
     <string name="theme_black">纯黑 (AMOLED)</string>
     <string name="settings_audio_per_car">连接车辆时，这个选择会为该车辆保留，播放器中的声音按钮也可以更改它。未连接车辆时，它适用于所有车辆。</string>
+    <string name="settings_group_music">音乐</string>
+    <string name="settings_group_music_detail">车上的 Xonos、Spotify 和更多音乐</string>
+    <string name="music_in_the_car">在车上</string>
+    <string name="music_xonos_on">Music Assistant 显示在车机上，作为其中一个音乐应用</string>
+    <string name="music_xonos_off">已关闭：Xonos 不会出现在车机上，Xonos 应用也不会</string>
+    <string name="music_service_on">显示在车机的应用网格中；通过 myCar 播放</string>
+    <string name="music_service_off">已关闭：不会出现在车机上</string>
+    <string name="music_sign_in">在手机上登录</string>
+    <string name="music_sign_in_detail">用手机键盘登录：车上也会保持登录</string>
+    <string name="music_sign_in_title">%1$s：登录</string>
+    <string name="music_sign_out">退出登录</string>
+    <string name="music_sign_out_detail">在 myCar 中退出此服务，手机和车上都会退出</string>
+    <string name="music_sign_out_title">要退出 %1$s 吗？</string>
+    <string name="music_sign_out_text">myCar 会忘记 %1$s 的登录信息以及其页面保存的内容。你的账号不受影响。</string>
+    <string name="music_add">添加服务</string>
+    <string name="music_add_footer">其他音乐服务，各自在 myCar 中使用自己的网页播放器：声音会像 Cinema 一样通过 myCar 传到车上。</string>
+    <string name="music_add_note">你勾选的服务会出现在这里，也会出现在车机的应用网格中。</string>
+    <string name="music_needs_google">Google 可能不允许在应用内登录：这时 YouTube Music 会以未登录状态播放。</string>
+    <string name="music_needs_apple">需要订阅 Apple Music。</string>
+    <string name="music_needs_amazon">需要 Amazon Prime 或 Amazon Music Unlimited。</string>
+    <string name="music_needs_tidal">需要订阅 TIDAL。</string>
+    <string name="music_needs_qobuz">需要订阅 Qobuz。</string>
 </resources>

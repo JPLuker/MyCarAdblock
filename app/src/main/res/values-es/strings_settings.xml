@@ -27,6 +27,7 @@
     <string name="settings_help_connect_detail">Qué coches funcionan y qué falta por configurar</string>
     <string name="settings_help_preview">Vista previa del coche</string>
     <string name="settings_help_preview_detail">Ve la pantalla del coche en tu teléfono</string>
+    <string name="settings_preview_busy">Disponible cuando no hay ningún coche conectado</string>
     <string name="settings_help_logs">Registros en directo</string>
     <string name="settings_help_logs_detail">Lo que se dicen myCar y el coche</string>
 
@@ -289,12 +290,17 @@
     <string name="settings_group_general_detail">Idioma, tema, actualizaciones</string>
     <string name="settings_group_connection_detail">Inalámbrico, audio del coche, certificado</string>
     <string name="settings_group_voice">Voz</string>
-    <string name="settings_group_voice_detail">Modelos de voz para el asistente</string>
+    <string name="settings_group_voice_detail">Asistente de voz y modelos de voz</string>
     <string name="settings_group_plancia_detail">Home Assistant en el coche</string>
     <string name="settings_group_xonos_detail">Music Assistant en el coche</string>
     <string name="settings_group_cinema_detail">Sitios de vídeo y listas de TV</string>
-    <string name="settings_group_help_detail">Cómo conectar, registros, vista previa del coche</string>
+    <string name="settings_group_help_detail">Cómo conectar, registros</string>
     <string name="settings_group_about_detail">Versión, licencias, apoyar myCar</string>
+    <string name="settings_group_car">Pantalla del coche</string>
+    <string name="settings_group_car_detail">Inicio, páginas, aspecto, fondo de pantalla, avisos</string>
+    <string name="settings_car_pages_header">Tus páginas a los lados del mapa, en el Inicio del coche. Cámbialas aquí, o en el coche con el lápiz junto a los puntos.</string>
+    <string name="settings_car_pages_ready_text">Tus páginas dejan su sitio a las predefinidas: el tiempo y la agenda a la izquierda del mapa y, a su derecha, Plancia junto al navegador, si Plancia está configurada o instalada.</string>
+    <string name="settings_car_fit_offline">Conéctate al coche para ajustar su pantalla: el coche muestra cada cambio mientras lo haces.</string>
     <string name="theme_title">Tema</string>
     <string name="theme_footer">El aspecto de myCar en el teléfono. La pantalla del coche tiene el suyo, en los ajustes del coche.</string>
     <string name="theme_phone">Como el teléfono</string>
@@ -302,4 +308,26 @@
     <string name="theme_dark">Oscuro</string>
     <string name="theme_black">Negro (AMOLED)</string>
     <string name="settings_audio_per_car">Con un coche conectado, la elección se guarda para ese coche, y el botón de sonido del reproductor también la cambia. Sin coche conectado, vale para todos los coches.</string>
+    <string name="settings_group_music">Música</string>
+    <string name="settings_group_music_detail">Xonos, Spotify y más música en el coche</string>
+    <string name="music_in_the_car">En el coche</string>
+    <string name="music_xonos_on">Music Assistant en la pantalla del coche, como una de sus apps de música</string>
+    <string name="music_xonos_off">Desactivado: Xonos no está en la pantalla del coche, ni la app Xonos</string>
+    <string name="music_service_on">En la cuadrícula de apps del coche; suena a través de myCar</string>
+    <string name="music_service_off">Desactivado: no está en la pantalla del coche</string>
+    <string name="music_sign_in">Iniciar sesión en el teléfono</string>
+    <string name="music_sign_in_detail">Con el teclado del teléfono: sigues con la sesión iniciada también en el coche</string>
+    <string name="music_sign_in_title">%1$s: iniciar sesión</string>
+    <string name="music_sign_out">Cerrar sesión</string>
+    <string name="music_sign_out_detail">De este servicio en myCar, en el teléfono y en el coche</string>
+    <string name="music_sign_out_title">¿Cerrar sesión en %1$s?</string>
+    <string name="music_sign_out_text">myCar olvida la sesión de %1$s y lo que guardaron sus páginas. Tu cuenta sigue igual.</string>
+    <string name="music_add">Añadir un servicio</string>
+    <string name="music_add_footer">Otros servicios de música, cada uno con su reproductor web dentro de myCar: su sonido llega al coche a través de myCar, como el de Cinema.</string>
+    <string name="music_add_note">Cada uno que marques aparece aquí y en la cuadrícula de apps del coche.</string>
+    <string name="music_needs_google">Puede que Google no te deje iniciar sesión dentro de una app: entonces YouTube Music suena sin sesión.</string>
+    <string name="music_needs_apple">Necesita una suscripción a Apple Music.</string>
+    <string name="music_needs_amazon">Necesita Amazon Prime o Amazon Music Unlimited.</string>
+    <string name="music_needs_tidal">Necesita una suscripción a TIDAL.</string>
+    <string name="music_needs_qobuz">Necesita una suscripción a Qobuz.</string>
 </resources>

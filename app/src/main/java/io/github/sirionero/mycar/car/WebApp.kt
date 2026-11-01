@@ -144,6 +144,9 @@ internal fun WebApp(content: String, tile: WebTile?) {
                         fieldText = null
                         web?.evaluateJavascript(BLUR_FIELD_JS, null)
                     },
+                    // The phone's clipboard: a password, an address copied on the phone.
+                    clipboard = true,
+                    onCopy = { web?.let(CarClipboard::copyFromPage) },
                 )
             }
         }

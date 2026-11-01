@@ -38,8 +38,38 @@ object Xonos {
 
     /** Idempotent; any context will do. */
     fun init(context: Context) {
-        if (!::app.isInitialized) app = context.applicationContext
+        if (!::app.isInitialized) {
+            app = context.applicationContext
+            readSwitch()
+        }
         Bridges.init(app)
+    }
+
+    private val enabledFlow = MutableStateFlow(false)
+
+    /**
+     * Xonos on in the car (the phone's settings, Music): only then is it anywhere on the car's
+     * screen - Xonos inside myCar and the Xonos app alike. Off to start with; on, the first time this
+     * is read, for a phone already using Xonos (an account in myCar, or the Xonos app on the phone),
+     * so an update doesn't take it from the car.
+     */
+    val enabled: StateFlow<Boolean> = enabledFlow.asStateFlow()
+
+    fun setEnabled(context: Context, on: Boolean) {
+        init(context)
+        enabledFlow.value = on
+        AppSettings.putString(app, KEY_ON, on.toString())
+    }
+
+    private fun readSwitch() {
+        val saved = AppSettings.getString(app, KEY_ON, "")
+        enabledFlow.value = if (saved.isNotEmpty()) {
+            saved == "true"
+        } else {
+            val inUse = settings.load().isComplete || runCatching { app.packageManager.getPackageInfo(APP_PACKAGE, 0) }.isSuccess
+            AppSettings.putString(app, KEY_ON, inUse.toString())
+            inUse
+        }
     }
 
     val settings: Settings by lazy { Settings(app) }
@@ -105,10 +135,10 @@ object Xonos {
     /** Whether [component] is Xonos inside myCar rather than an installed app. */
     fun isInside(component: ComponentName) = component.className == PlaybackService::class.java.name
 
-    /** Xonos as one of the car's music apps, once it's set up; null until then, and while the app takes over. */
+    /** Xonos as one of the car's music apps, once it's set up and on; null otherwise, and while the app takes over. */
     fun mediaApp(context: Context): MediaApp? {
         refresh(context)
-        return if (_setUp.value && !appTakesOver.value) MediaApp(component(context), LABEL, Process.myUid()) else null
+        return if (enabledFlow.value && _setUp.value && !appTakesOver.value) MediaApp(component(context), LABEL, Process.myUid()) else null
     }
 
     /** Xonos's icon as an adaptive one, so it's framed exactly as the Xonos app's was. */
@@ -124,4 +154,5 @@ object Xonos {
 
     private const val ICON_BACKGROUND = 0xFF0E1420.toInt()
     private const val KEY_IMPORT_OFF = "xonos_import_off"
+    private const val KEY_ON = "xonos_in_the_car"
 }

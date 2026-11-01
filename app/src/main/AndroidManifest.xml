@@ -208,6 +208,19 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!--
+          See-through, up on the phone for a moment: Android lets myCar read the phone's clipboard,
+          for a Paste on the car's keyboard, only while one of its screens has the focus
+          (car/CarClipboard.kt). Its own task, so the app that was in front comes back after it.
+        -->
+        <activity
+            android:name=".car.CarClipboardActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <!--
           Answers the car's USB connection on MyCarActivity's behalf. Kept apart from the
           activity so Settings can switch off just this (AppSettings.setMyCarEnabled) and leave
           the head unit to Android Auto, without disabling the screen the switch is on.
@@ -285,6 +298,31 @@
             android:name=".xonos.playback.ArtworkProvider"
             android:authorities="${applicationId}.xonos.art"
             android:exported="false" />
+
+        <!--
+          The music services' web players inside myCar (webmusic/), as the car's music apps: a player
+          each, which only myCar opens. No notification, and never in the foreground on their own: the
+          page plays in myCar, which the drive's own service keeps going.
+        -->
+        <service android:name=".webmusic.SpotifyMusicService" android:exported="false" />
+        <service android:name=".webmusic.YouTubeMusicService" android:exported="false" />
+        <service android:name=".webmusic.AppleMusicService" android:exported="false" />
+        <service android:name=".webmusic.AmazonMusicService" android:exported="false" />
+        <service android:name=".webmusic.DeezerMusicService" android:exported="false" />
+        <service android:name=".webmusic.TidalMusicService" android:exported="false" />
+        <service android:name=".webmusic.SoundCloudMusicService" android:exported="false" />
+        <service android:name=".webmusic.QobuzMusicService" android:exported="false" />
+
+        <!--
+          A music service's sign-in on the phone, in a page of myCar's own: the same web engine as the
+          car's page, so that one is signed in too (webmusic/WebMusicSignIn.kt). Kept through a turn of
+          the phone, with what was typed.
+        -->
+        <activity
+            android:name=".webmusic.WebMusicSignInActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode" />
 
         <!--
           Touch on the car screen is replayed onto the phone through this service.

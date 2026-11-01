@@ -41,6 +41,7 @@
     <string name="settings_help_connect_detail">Which cars work, and what\'s left to set up</string>
     <string name="settings_help_preview">Car preview</string>
     <string name="settings_help_preview_detail">See the car screen on your phone</string>
+    <string name="settings_preview_busy">Available when no car is connected</string>
     <string name="settings_help_logs">Live logs</string>
     <string name="settings_help_logs_detail">What myCar and the car are saying to each other</string>
 
@@ -399,12 +400,17 @@
     <string name="settings_group_general_detail">Language, theme, updates</string>
     <string name="settings_group_connection_detail">Wireless, car audio, certificate</string>
     <string name="settings_group_voice">Voice</string>
-    <string name="settings_group_voice_detail">Speech models for the voice assistant</string>
+    <string name="settings_group_voice_detail">Voice assistant and speech models</string>
     <string name="settings_group_plancia_detail">Home Assistant in the car</string>
     <string name="settings_group_xonos_detail">Music Assistant in the car</string>
     <string name="settings_group_cinema_detail">Video sites and TV lists</string>
-    <string name="settings_group_help_detail">How to connect, logs, car preview</string>
+    <string name="settings_group_help_detail">How to connect, logs</string>
     <string name="settings_group_about_detail">Version, licenses, support myCar</string>
+    <string name="settings_group_car">Car screen</string>
+    <string name="settings_group_car_detail">Home, pages, look, wallpaper, warnings</string>
+    <string name="settings_car_pages_header">Your pages either side of the map on the car\'s Home. Change them here, or in the car with the pencil beside the dots.</string>
+    <string name="settings_car_pages_ready_text">Your pages give way to the ready-made ones: the weather and the agenda left of the map, and on its right Plancia beside the browser, when Plancia is set up or installed.</string>
+    <string name="settings_car_fit_offline">Connect to the car to fit its screen: the car shows each change as you make it.</string>
     <string name="theme_title">Theme</string>
     <string name="theme_footer">How myCar looks on the phone. The car\'s screen has its own, in the car\'s settings.</string>
     <string name="theme_phone">Like the phone</string>
@@ -412,4 +418,30 @@
     <string name="theme_dark">Dark</string>
     <string name="theme_black">Black (AMOLED)</string>
     <string name="settings_audio_per_car">With a car connected, the choice is kept for that car, and the player\'s sound button changes it too. With no car connected, it\'s for every car.</string>
+
+    <!-- Music (ui/MusicSettings.kt): Xonos, Spotify and the other music services' web players in the car, each on or off -->
+    <string name="settings_group_music">Music</string>
+    <string name="settings_group_music_detail">Xonos, Spotify and more music in the car</string>
+    <string name="music_in_the_car">In the car</string>
+    <string name="music_xonos_on">Music Assistant on the car\'s screen, as one of its music apps</string>
+    <string name="music_xonos_off">Off: Xonos isn\'t on the car\'s screen, nor is the Xonos app</string>
+    <string name="music_service_on">On the car\'s app grid; it plays through myCar</string>
+    <string name="music_service_off">Off: not on the car\'s screen</string>
+    <string name="music_sign_in">Sign in on the phone</string>
+    <string name="music_sign_in_detail">With the phone\'s keyboard: you stay signed in in the car too</string>
+    <!-- The title of the page that signs in on the phone. %1$s: the service, e.g. Spotify -->
+    <string name="music_sign_in_title">%1$s: sign in</string>
+    <string name="music_sign_out">Sign out</string>
+    <string name="music_sign_out_detail">Of this service in myCar, on the phone and in the car</string>
+    <string name="music_sign_out_title">Sign out of %1$s?</string>
+    <string name="music_sign_out_text">myCar forgets its sign-in to %1$s and what its pages kept. Your account stays as it is.</string>
+    <string name="music_add">Add a service</string>
+    <string name="music_add_footer">Other music services, each its own web player inside myCar: their sound reaches the car through myCar, as Cinema\'s does.</string>
+    <string name="music_add_note">Each one ticked shows here, and on the car\'s app grid.</string>
+    <!-- What a service needs, under its settings -->
+    <string name="music_needs_google">Google may not let you sign in inside an app: then YouTube Music plays signed out.</string>
+    <string name="music_needs_apple">Needs an Apple Music subscription.</string>
+    <string name="music_needs_amazon">Needs Amazon Prime or Amazon Music Unlimited.</string>
+    <string name="music_needs_tidal">Needs a TIDAL subscription.</string>
+    <string name="music_needs_qobuz">Needs a Qobuz subscription.</string>
 </resources>

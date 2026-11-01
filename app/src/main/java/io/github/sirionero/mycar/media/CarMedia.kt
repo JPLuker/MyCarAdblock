@@ -23,6 +23,7 @@ import android.os.SystemClock
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.host.KnownApps
 import io.github.sirionero.mycar.notify.MyCarNotificationListener
+import io.github.sirionero.mycar.webmusic.WebMusic
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -572,7 +573,9 @@ class CarMedia(private val context: Context) {
         _search.value = Search(query)
         MyCarLog.i("media: -> playFromSearch")
         c.transportControls.playFromSearch(query, Bundle())
-        main.postDelayed(searchTimeout, SEARCH_WAIT_MS)
+        // A music service's web player loads its search's page first: more time.
+        val web = searchComponent?.let { WebMusic.isInside(it) } == true
+        main.postDelayed(searchTimeout, if (web) WEB_SEARCH_WAIT_MS else SEARCH_WAIT_MS)
     }
 
     /**
@@ -834,6 +837,7 @@ class CarMedia(private val context: Context) {
         const val SESSION_RETRIES_LAUNCHED = 16
         /** How long an app gets to start playing a search before myCar says it didn't. */
         const val SEARCH_WAIT_MS = 6_000L
+        const val WEB_SEARCH_WAIT_MS = 15_000L
         const val SEARCH_NOTICE_MS = 6_000L
         /** How soon after an app went away to connect to it again. */
         const val RELINK_WAIT_MS = 1_000L

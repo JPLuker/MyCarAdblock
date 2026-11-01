@@ -12,6 +12,7 @@ import io.github.sirionero.mycar.host.TemplateApp
 import io.github.sirionero.mycar.media.CarMedia
 import io.github.sirionero.mycar.media.MediaApp
 import io.github.sirionero.mycar.media.MediaCatalog
+import io.github.sirionero.mycar.webmusic.WebMusic
 import io.github.sirionero.mycar.notify.MyCarNotificationListener
 import io.github.sirionero.mycar.xonos.Xonos
 import io.github.sirionero.mycar.xonos.XonosAccount
@@ -89,6 +90,9 @@ object CarServices {
      */
     private var holders = 0
 
+    /** Whether this drive keeps Xonos connected to Music Assistant: Xonos was on when it started. */
+    private var xonosHeld = false
+
     fun init(appContext: Context) {
         context = appContext.applicationContext
         if (holders++ > 0) return
@@ -103,14 +107,16 @@ object CarServices {
         VoiceReply.init(appContext)
         // Plancia stays connected to Home Assistant through the drive, ready before it's opened.
         io.github.sirionero.mycar.home.HomeAssistant.acquire()
-        // Xonos inside myCar takes the Xonos app's account if it has none yet; and while it's the
-        // car's music, which it plays into the car by itself, Android isn't asked to share the audio.
-        XonosAccount.adoptIfUnset(appContext)
+        // Xonos inside myCar, when it's on in the car, takes the Xonos app's account if it has none
+        // yet; and while it's the car's music, which it plays into the car by itself, Android isn't
+        // asked to share the audio.
+        Xonos.init(appContext)
+        if (Xonos.enabled.value) XonosAccount.adoptIfUnset(appContext)
         CarAudio.consentWaits = ::xonosIsTheMusic
         // Connected through the drive too, like Plancia: ready when it's opened, and known to reach
         // Music Assistant or not before the drive's music is picked.
-        Xonos.init(appContext)
-        Xonos.repo.acquire()
+        xonosHeld = Xonos.enabled.value
+        if (xonosHeld) Xonos.repo.acquire()
         // The Plancia and Xonos apps in place of the ones inside myCar, if those can't connect.
         InsideOrApp.start(appContext)
         // Loaded now, while nothing's waiting on it, so the first reply isn't slower than the rest.
@@ -118,6 +124,24 @@ object CarServices {
             appContext,
             io.github.sirionero.mycar.speech.VoiceLanguages.effective(appContext, CarSettings.systemSpeech.value),
         )
+    }
+
+    /**
+     * Xonos switched on or off on the phone in the middle of a drive: connected to Music Assistant
+     * now, as at a drive's start - not connected, it'd soon be taken for one that can't, and the
+     * Xonos app put in its place - or let go, and out of the car's music if it was. On the main thread.
+     */
+    fun xonosSwitched(on: Boolean) {
+        val appContext = context ?: return
+        if (holders == 0 || on == xonosHeld) return
+        xonosHeld = on
+        if (on) {
+            XonosAccount.adoptIfUnset(appContext)
+            Xonos.repo.acquire()
+        } else {
+            if (_mediaApp.value?.component?.let(Xonos::isInside) == true) closeMedia()
+            Xonos.repo.release()
+        }
     }
 
     // --- map -----------------------------------------------------------------------------
@@ -220,11 +244,14 @@ object CarServices {
             return
         }
 
-        // Xonos inside myCar, left for another music app: paused here. Without the audio focus
-        // (refused in the background on Android 17) nothing else tells it, and straight into the
-        // car's channel it kept the car's sound from the new app.
+        // myCar's own players - Xonos and the music services' web players inside myCar - left for
+        // another music app: paused here. Without the audio focus (refused in the background on
+        // Android 17) nothing else tells Xonos, and straight into the car's channel it kept the car's
+        // sound from the new app; a web player in myCar's own process might play on too.
         val previous = _mediaApp.value
-        if (previous != null && Xonos.isInside(previous.component) && media.now.value.playing) media.togglePlay()
+        if (previous != null && (Xonos.isInside(previous.component) || WebMusic.isInside(previous.component)) && media.now.value.playing) {
+            media.togglePlay()
+        }
 
         _mediaApp.value = app
         autoplayPending = autoplay
@@ -316,7 +343,7 @@ object CarServices {
      * or none yet, with Xonos the music app there is.
      */
     private fun xonosIsTheMusic(): Boolean {
-        if (!Xonos.setUp.value || Xonos.appTakesOver.value) return false
+        if (!Xonos.enabled.value || !Xonos.setUp.value || Xonos.appTakesOver.value) return false
         val app = _mediaApp.value?.component
             ?: CarSettings.lastMedia.value?.let(ComponentName::unflattenFromString)
             ?: return true
@@ -412,7 +439,8 @@ object CarServices {
         CarAssistant.cancel()
         io.github.sirionero.mycar.home.HomeAssistant.release()
         InsideOrApp.stop()
-        Xonos.repo.release()
+        if (xonosHeld) Xonos.repo.release()
+        xonosHeld = false
         // The way Plancia's page came through the Plancia app, this drive.
         io.github.sirionero.mycar.bridge.BridgeProxy.stop()
         // About 900 MB that nothing needs once the car's gone.

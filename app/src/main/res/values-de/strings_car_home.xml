@@ -25,6 +25,7 @@
     <string name="car_apps_phone">Telefon</string>
     <string name="car_apps_vehicle_data">Fahrzeugdaten</string>
     <string name="car_apps_exit">Beenden</string>
+    <string name="car_apps_web_label">%1$s · Web</string>
     <string name="car_apps_browse_label">%1$s · Stöbern</string>
     <string name="car_apps_browse">Stöbern</string>
     <string name="car_apps_partial">Funktioniert nur teilweise mit myCar</string>

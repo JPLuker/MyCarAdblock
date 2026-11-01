@@ -49,9 +49,10 @@ import kotlinx.coroutines.withContext
  * Xonos, Music Assistant inside myCar, set up here on the phone, never in the car: the address at
  * home, the one away, and a sign-in. myCar keeps a token of its own, never the password. With the
  * Xonos app on the phone, its account comes over with one tap - and on its own the first time.
+ * [top]: rows that come first in its card (Xonos's switch, in Music).
  */
 @Composable
-internal fun XonosSection() {
+internal fun XonosSection(top: (@Composable () -> Unit)? = null) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     remember { Xonos.refresh(context) }
@@ -98,6 +99,10 @@ internal fun XonosSection() {
         "Xonos",
         footer = stringResource(R.string.settings_xonos_footer),
     ) {
+        top?.let {
+            it()
+            SettingsDivider()
+        }
         if (setUp) LocalNetworkRow(saved.urls)
         if (setUp) TailscaleCableRow(saved.urls, "Music Assistant", "Xonos", xonosThere, xonosBridge)
         if (xonosApp) {

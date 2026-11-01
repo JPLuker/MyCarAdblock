@@ -80,7 +80,9 @@ internal object InsideOrApp {
             val ma = Xonos.repo.connection.value
             val maUp = ma is Connection.Connected
             val maUrls = Xonos.settings.load().urls
-            val maOut = !maUp && Xonos.setUp.value && xonosThere && Tailnet.outOfReach(app, maUrls) &&
+            // Only while Xonos is on in the car: off, it's nowhere there to take the place of.
+            val xonosInside = Xonos.enabled.value && Xonos.setUp.value
+            val maOut = !maUp && xonosInside && xonosThere && Tailnet.outOfReach(app, maUrls) &&
                 !Bridges.xonos.available(app)
             // Music Assistant inside the Xonos app (127.0.0.1): the app would play from that same server,
             // which a woken app takes a few seconds to start. Nothing to take over: Xonos waits for it.
@@ -88,7 +90,7 @@ internal object InsideOrApp {
                 runCatching { URI(url).host }.getOrNull()?.let(Bridges::onThePhone) == true
             }
             if (!Xonos.appTakesOver.value &&
-                xonos.update(now, Xonos.setUp.value, xonosThere && !maOnThePhone, maUp, online, maOut, (ma as? Connection.Failed)?.problem in MISSET)
+                xonos.update(now, xonosInside, xonosThere && !maOnThePhone, maUp, online, maOut, (ma as? Connection.Failed)?.problem in MISSET)
             ) {
                 log.i("the Xonos app takes Xonos's place for this drive ($ma; ${Tailnet.describe(app)})")
                 Xonos.appTakesOver.value = true

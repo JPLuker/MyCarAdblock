@@ -71,6 +71,14 @@
     <string name="car_keyboard_space">пробел</string>
     <string name="car_keyboard_hide">Скрыть клавиатуру</string>
     <string name="car_keyboard_submit">Ввод</string>
+    <string name="car_keyboard_paste">Вставить</string>
+    <string name="car_keyboard_copy">Копировать</string>
+    <string name="car_clipboard_copied">Скопировано на телефон.</string>
+    <string name="car_clipboard_nothing">Нечего копировать.</string>
+    <string name="car_clipboard_password">Пароли не копируются.</string>
+    <string name="car_clipboard_empty">В буфере обмена телефона нет текста.</string>
+    <string name="car_clipboard_locked">Разблокируйте телефон и снова нажмите «Вставить».</string>
+    <string name="car_clipboard_denied">Android не дал myCar прочитать буфер обмена. Откройте myCar на телефоне и снова нажмите «Вставить».</string>
 
     <string name="car_player_previous">Предыдущий</string>
     <string name="car_player_play">Воспроизвести</string>

@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_42">
+        <item>Nova seção Música nas configurações do telefone: Xonos e Spotify têm cada um um interruptor, e “Adicionar um serviço” oferece YouTube Music, Apple Music, Amazon Music, Deezer, TIDAL, SoundCloud e Qobuz. No carro ficam só os serviços ligados; o Xonos fica ligado se você já o usava.</item>
+        <item>O Spotify e os outros serviços tocam dentro do myCar pelo próprio player web, com o layout de computador: o som chega ao carro pelo myCar, mesmo quando o app do serviço não deixa outros apps gravá-lo.</item>
+        <item>Funcionam como qualquer app de música: a faixa ao lado do mapa e no dock, os botões do volante e o assistente: peça o que tocar e ele busca no serviço e toca o primeiro resultado.</item>
+        <item>Entre uma vez no telefone, com o teclado e o gerenciador de senhas dele: no carro você continua conectado.</item>
+        <item>O teclado do carro cola o que você copiou no telefone, e copia da página, no navegador, no Cinema e nos serviços de música.</item>
+        <item>Todas as configurações da tela do carro estão também no telefone, em Configurações &gt; Tela do carro, com os mesmos valores do carro: mude uma de um lado e o outro acompanha na hora, inclusive durante uma viagem.</item>
+        <item>As páginas ao lado do mapa também podem ser alteradas pelo telefone: layout, o que cada parte mostra, a ordem, páginas novas, ou voltar às prontas.</item>
+        <item>A prévia do carro é a primeira opção no alto das Configurações do telefone.</item>
+    </string-array>
     <string-array name="changelog_41">
         <item>Conexão sem fio automática: enquanto o telefone espera o carro, agora ele chama de novo o Android Auto do carro a cada 8 segundos. Um carro que ainda estava ligando não respondia à primeira chamada, e o myCar depois só ficava esperando.</item>
         <item>Se uma etapa seguinte falhar (o Wi-Fi do carro, a conexão), a tentativa iniciada pelo Bluetooth do carro recomeça sozinha, até três vezes, como você fazia à mão com “Desconectar” e “Conectar sem fio”.</item>

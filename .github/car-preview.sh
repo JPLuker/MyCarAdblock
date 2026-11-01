@@ -223,6 +223,39 @@ for site in https://www.youtube.com https://www.raiplay.it https://www.twitch.tv
     echo "cinema site $site: $(curl -s -o /dev/null -L --max-time 20 -w '%{http_code} %{url_effective}' "$site")"
 done
 
+# The music services' web players inside myCar (webmusic/, car/WebMusicPage.kt), each on its own in
+# the car (--es webMusic, debug only) and opened a few seconds in as the car's music, with the car's
+# media key: the service's own page, as on a computer. No account in CI: the pages are signed out, so
+# nothing plays. myCar's log says how each loaded: its address, the user agent the page sees, whether
+# the web engine takes protected audio (Widevine) and whether the page said what plays (its Media
+# Session); the debug build adds the page's parts a few seconds later, to fit it better.
+MUSIC_SERVICES="spotify youtube-music apple-music amazon-music deezer tidal soundcloud qobuz"
+for service in $MUSIC_SERVICES; do
+    EXTRA="--es webMusic $service" shoot "music-$service" 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+done
+EXTRA="--es webMusic spotify" shoot music-spotify-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+# Playing, signed out, where a service lets you: its page's first "Play" pressed a few seconds in
+# (--ez webMusicPlay, debug only), then the map, with myCar's player beside it showing what the page
+# plays, and its song in the dock - the page's Media Session through myCar's stand-in, as in a car.
+for service in soundcloud youtube-music; do
+    EXTRA="--es webMusic $service --ez webMusicPlay true" shoot "music-$service-play" 1920 720 240 \
+        "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$DOCK_MAP;$WAIT;$WAIT"
+done
+# "Play lofi" for the voice assistant (--es webMusicSearch, debug only: asked of the car's music app
+# 14 s in, as the assistant does): the service's own search, then the Play of what it finds first.
+for service in soundcloud youtube-music spotify; do
+    EXTRA="--es webMusic $service --es webMusicSearch lofi" shoot "music-$service-search" 1920 720 240 \
+        "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$DOCK_MAP;$WAIT;$WAIT"
+done
+# Spotify's tile on the app grid, beside the other music apps ("Spotify", "Web" under it).
+EXTRA="--es webMusic spotify" shoot music-grid 1920 720 240 "$WAIT;$WAIT;$GRID_BUTTON;$WAIT"
+echo "--- the music services' web players ---"
+for d in previews/music-*; do
+    [ -d "$d" ] || continue
+    echo "[$(basename "$d")]"
+    grep -h "music:\|media:\|cinema: no\|clipboard:\|the car's player" "$d/log.txt" "$d/stream.txt" 2>/dev/null | cut -c1-1500 | head -60
+done
+
 # Plancia and Xonos inside myCar set up on addresses that don't answer (as Tailscale ones do when
 # myCar is left out of it), the Plancia and Xonos apps on the phone: a few seconds in, the apps take
 # their places for the drive (car/InsideOrApp). The grid, shot as it changes, then the page right
@@ -573,6 +606,86 @@ scroll_to() {
     done
     echo "setup-phone: $1 never came into sight"; return 1
 }
+# The phone's Settings: the car preview first at the top (opened, and back), then "Car screen" - the
+# car's settings on the phone - with a choice's dialog, a page of Home opened out with its layouts
+# and what a part can show, the rest of the group scrolled through, and the voice assistant in
+# "Voice". Before setup-phone, which wipes myCar's data.
+phone_settings() {
+    case " ${ONLY:-phone-settings} " in *" phone-settings "*) ;; *) return ;; esac
+    local d=previews/phone-settings i
+    mkdir -p $d
+    adb shell am force-stop "$PKG"
+    adb logcat -c
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen settings >/dev/null
+    sleep 4; adb exec-out screencap -p > $d/01-top.png
+    tap_text "Car preview"; sleep 5; adb exec-out screencap -p > $d/02-preview.png
+    adb shell input keyevent 4; sleep 2; adb exec-out screencap -p > $d/03-back.png
+    tap_text "Car screen"; sleep 3; adb exec-out screencap -p > $d/04-car.png
+    tap_text "Open on connect"; sleep 1.5; adb exec-out screencap -p > $d/05-open-on-connect.png
+    tap_text "Close"; sleep 1
+    scroll_to "Page 1" && tap_text "Page 1"; sleep 1.5
+    # The page opened out below the fold: brought up, so its parts can be tapped.
+    adb shell input swipe 160 520 160 200 400; sleep 1.5; adb exec-out screencap -p > $d/06-page.png
+    tap_text "Layout"; sleep 1.5; adb exec-out screencap -p > $d/07-layouts.png
+    tap_text "Close"; sleep 1
+    tap_text "Weather"; sleep 1.5; adb exec-out screencap -p > $d/08-part.png
+    tap_text "Close"; sleep 1
+    for i in 1 2 3 4 5 6 7; do
+        adb shell input swipe 160 520 160 220 400; sleep 1.5; adb exec-out screencap -p > $d/09-car-$i.png
+    done
+    adb shell input keyevent 4; sleep 2
+    tap_text "Voice"; sleep 3; adb exec-out screencap -p > $d/10-voice.png
+    adb shell input swipe 160 520 160 220 400; sleep 1.5; adb exec-out screencap -p > $d/11-voice.png
+    adb logcat -d -s myCar > $d/log.txt
+    adb logcat -d -b crash > $d/crash.txt 2>&1
+    echo "--- phone settings ---"
+    grep -h "FATAL\|AndroidRuntime" $d/crash.txt || echo "phone-settings: no crash"
+}
+phone_settings
+
+# Music on the phone (ui/MusicSettings.kt): Xonos's switch and settings, Spotify turned on (its
+# sign-in on the phone, the page in myCar's own web engine), "Add a service" with Deezer ticked.
+phone_music() {
+    case " ${ONLY:-phone-music} " in *" phone-music "*) ;; *) return ;; esac
+    local d=previews/phone-music
+    mkdir -p $d
+    adb shell am force-stop "$PKG"
+    adb logcat -c
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen settings >/dev/null
+    sleep 4
+    tap_text "Music"; sleep 3; adb exec-out screencap -p > $d/01-music.png
+    # Spotify's switch, under Xonos's settings: its line says it's off (an apostrophe in it, which the
+    # screen's dump may write otherwise, so it's found by its start).
+    local i
+    for i in 1 2 3 4 5 6 7 8; do
+        adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1
+        adb shell cat /sdcard/ui.xml | grep -qF "Off: not on the car" && break
+        adb shell input swipe 160 380 160 260 400; sleep 1
+    done
+    tap_match "Off: not on the car"; sleep 2
+    adb exec-out screencap -p > $d/02-spotify-on.png
+    scroll_to "Sign in on the phone" && tap_text "Sign in on the phone"; sleep 12
+    adb exec-out screencap -p > $d/03-sign-in.png
+    # The service's sign-in page can be slow on the emulator: again later, with what the page shows
+    # (a web page's text is in the screen's tree too).
+    sleep 20; adb exec-out screencap -p > $d/03b-sign-in-later.png
+    adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb shell cat /sdcard/ui.xml > $d/03-sign-in-ui.xml
+    adb shell input keyevent 4; sleep 2
+    adb exec-out screencap -p > $d/04-back.png
+    scroll_to "Add a service" && tap_text "Add a service"; sleep 2; adb exec-out screencap -p > $d/05-add.png
+    tap_text "Deezer"; sleep 1; adb exec-out screencap -p > $d/06-deezer.png
+    tap_text "Done"; sleep 2
+    for i in 1 2 3 4; do
+        adb shell input swipe 160 520 160 220 400; sleep 1.5; adb exec-out screencap -p > $d/07-music-$i.png
+    done
+    adb logcat -d -s myCar > $d/log.txt
+    adb logcat -d -b crash > $d/crash.txt 2>&1
+    echo "--- music on the phone ---"
+    grep -h "music:" $d/log.txt | head -20
+    grep -h "FATAL\|AndroidRuntime" $d/crash.txt || echo "phone-music: no crash"
+}
+phone_music
+
 setup_phone() {
     case " ${ONLY:-setup-phone} " in *" setup-phone "*) ;; *) return ;; esac
     local d=previews/setup-phone i

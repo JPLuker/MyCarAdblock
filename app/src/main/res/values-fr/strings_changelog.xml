@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_42">
+        <item>Nouvelle section Musique dans les paramètres du téléphone : Xonos et Spotify ont chacun un interrupteur, et « Ajouter un service » propose YouTube Music, Apple Music, Amazon Music, Deezer, TIDAL, SoundCloud et Qobuz. Dans la voiture, seuls les services activés sont là ; Xonos est activé si vous l’utilisiez déjà.</item>
+        <item>Spotify et les autres services jouent dans myCar avec leur propre lecteur web, disposé comme sur un ordinateur : leur son arrive dans la voiture par myCar, même quand l’app du service empêche les autres apps de l’enregistrer.</item>
+        <item>Ils fonctionnent comme toute app de musique : le morceau à côté de la carte et dans le dock, les boutons du volant et l’assistant : demandez quoi écouter, il cherche dans le service et lance le premier résultat.</item>
+        <item>Connectez-vous une fois sur le téléphone, avec son clavier et son gestionnaire de mots de passe : dans la voiture, vous restez connecté.</item>
+        <item>Le clavier de la voiture colle ce que vous avez copié sur le téléphone, et copie depuis la page, dans le navigateur, Cinema et les services de musique.</item>
+        <item>Tous les paramètres de l’écran de la voiture sont aussi sur le téléphone, dans Paramètres &gt; Écran de la voiture, avec les mêmes valeurs que dans la voiture : changez-en un d’un côté, l’autre suit aussitôt, même pendant un trajet.</item>
+        <item>Les pages à côté de la carte se modifient aussi depuis le téléphone : disposition, ce que montre chaque partie, leur ordre, de nouvelles pages, ou retour aux pages toutes prêtes.</item>
+        <item>L’aperçu de la voiture est en premier, en haut des Paramètres du téléphone.</item>
+    </string-array>
     <string-array name="changelog_41">
         <item>Connexion sans fil automatique : pendant que le téléphone attend la voiture, il rappelle maintenant l’Android Auto de la voiture toutes les 8 secondes. Une voiture encore en train de démarrer ne répondait pas au premier appel, et myCar ne faisait ensuite qu’attendre.</item>
         <item>Si une étape suivante échoue (le Wi-Fi de la voiture, la connexion), une tentative lancée par le Bluetooth de la voiture recommence d’elle-même, jusqu’à trois fois, comme vous le faisiez à la main avec « Déconnecter » et « Connexion sans fil ».</item>

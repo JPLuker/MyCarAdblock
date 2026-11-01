@@ -25,6 +25,7 @@
     <string name="car_apps_phone">Телефон</string>
     <string name="car_apps_vehicle_data">Данные авто</string>
     <string name="car_apps_exit">Выход</string>
+    <string name="car_apps_web_label">%1$s · Веб</string>
     <string name="car_apps_browse_label">%1$s · Обзор</string>
     <string name="car_apps_browse">Обзор</string>
     <string name="car_apps_partial">Работает с myCar лишь частично</string>

@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_42">
+        <item>Nuova sezione Musica nelle impostazioni del telefono: Xonos e Spotify hanno ognuno un interruttore, e «Aggiungi un servizio» propone YouTube Music, Apple Music, Amazon Music, Deezer, TIDAL, SoundCloud e Qobuz. In auto ci sono solo i servizi accesi; Xonos è acceso se lo usavi già.</item>
+        <item>Spotify e gli altri servizi suonano dentro myCar dal loro lettore web, impaginati come su un computer: il suono arriva in auto tramite myCar, anche quando l\'app del servizio non si lascia registrare dalle altre app.</item>
+        <item>Funzionano come ogni app musicale: il brano accanto alla mappa e nel dock, i tasti del volante e l\'assistente: chiedi cosa suonare, lo cerca nel servizio e suona il primo risultato.</item>
+        <item>Accedi una volta sul telefono, con la sua tastiera e il gestore delle password: in auto resti dentro.</item>
+        <item>La tastiera dell\'auto incolla quello che hai copiato sul telefono, e copia dalla pagina, nel browser, in Cinema e nei servizi musicali.</item>
+        <item>Tutte le impostazioni dello schermo dell\'auto sono anche sul telefono, in Impostazioni &gt; Schermo dell\'auto, con gli stessi valori dell\'auto: cambiane una da una parte e l\'altra la segue subito, anche durante un viaggio.</item>
+        <item>Le pagine accanto alla mappa si cambiano anche dal telefono: formato, cosa mostra ogni parte, l\'ordine, pagine nuove, o di nuovo quelle pronte.</item>
+        <item>L\'anteprima dell\'auto è la prima voce in cima alle Impostazioni del telefono.</item>
+    </string-array>
     <string-array name="changelog_41">
         <item>Collegamento senza fili da solo: mentre il telefono aspetta l\'auto, ora richiama l\'Android Auto dell\'auto ogni 8 secondi. Un\'auto che si stava ancora avviando non rispondeva alla prima chiamata, e myCar poi restava solo ad aspettare.</item>
         <item>Se un passo dopo non riesce (il Wi-Fi dell\'auto, il collegamento), il tentativo partito dal Bluetooth dell\'auto ricomincia da solo, fino a tre volte, come facevi a mano con «Scollega» e «Collega senza fili».</item>
