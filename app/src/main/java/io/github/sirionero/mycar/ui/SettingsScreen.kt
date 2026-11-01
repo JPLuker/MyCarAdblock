@@ -171,12 +171,16 @@ fun SettingsScreen(
                         ThemeSection()
                         SettingsSection(stringResource(R.string.settings_updates_title)) { UpdateRow() }
                     }
+                    SettingsPage.CAR -> CarScreenSettings()
                     SettingsPage.CONNECTION -> {
                         ConnectionSection()
                         CarAudioSection()
                         CertificateSection(Modifier.onGloballyPositioned { certificateY = it.positionInParent().y.toInt() })
                     }
-                    SettingsPage.VOICE -> VoiceModelSection()
+                    SettingsPage.VOICE -> {
+                        AssistantSection()
+                        VoiceModelSection()
+                    }
                     SettingsPage.PLANCIA -> PlanciaSection()
                     SettingsPage.XONOS -> XonosSection()
                     SettingsPage.CINEMA -> {
@@ -210,7 +214,7 @@ fun SettingsScreen(
 }
 
 /** The groups of Settings, in the order listed. */
-enum class SettingsPage { GENERAL, CONNECTION, VOICE, PLANCIA, XONOS, CINEMA, HELP, ABOUT }
+enum class SettingsPage { GENERAL, CAR, CONNECTION, VOICE, PLANCIA, XONOS, CINEMA, HELP, ABOUT }
 
 private fun startPage(at: SettingsAt): SettingsPage? = when (at) {
     SettingsAt.TOP -> null
@@ -222,6 +226,7 @@ private fun startPage(at: SettingsAt): SettingsPage? = when (at) {
 @Composable
 private fun pageTitle(page: SettingsPage): String = when (page) {
     SettingsPage.GENERAL -> stringResource(R.string.settings_group_general)
+    SettingsPage.CAR -> stringResource(R.string.settings_group_car)
     SettingsPage.CONNECTION -> stringResource(R.string.settings_connection_title)
     SettingsPage.VOICE -> stringResource(R.string.settings_group_voice)
     SettingsPage.PLANCIA -> "Plancia"
@@ -235,6 +240,7 @@ private fun pageTitle(page: SettingsPage): String = when (page) {
 private fun pageDetail(page: SettingsPage): String = stringResource(
     when (page) {
         SettingsPage.GENERAL -> R.string.settings_group_general_detail
+        SettingsPage.CAR -> R.string.settings_group_car_detail
         SettingsPage.CONNECTION -> R.string.settings_group_connection_detail
         SettingsPage.VOICE -> R.string.settings_group_voice_detail
         SettingsPage.PLANCIA -> R.string.settings_group_plancia_detail
@@ -248,6 +254,7 @@ private fun pageDetail(page: SettingsPage): String = stringResource(
 @Composable
 private fun pageIcon(page: SettingsPage): ImageVector = when (page) {
     SettingsPage.GENERAL -> ImageVector.vectorResource(R.drawable.sym_settings)
+    SettingsPage.CAR -> ImageVector.vectorResource(R.drawable.sym_view_cozy)
     SettingsPage.CONNECTION -> ImageVector.vectorResource(R.drawable.sym_directions_car)
     SettingsPage.VOICE -> ImageVector.vectorResource(R.drawable.sym_mic)
     SettingsPage.PLANCIA -> ImageVector.vectorResource(R.drawable.sym_space_dashboard)

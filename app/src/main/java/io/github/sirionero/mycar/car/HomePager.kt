@@ -379,12 +379,12 @@ private fun PagePart(
 }
 
 /** The car app [content] names, if it's one that can sit in a part of a page. */
-private fun carAppIn(content: String?, entries: List<Entry>): TemplateApp? =
+internal fun carAppIn(content: String?, entries: List<Entry>): TemplateApp? =
     content?.let { id -> entries.find { it.componentId == id && it.fitsBesideMap }?.template }
 
 /** What a part holds, in a word or two, for the card that covers it while the page is changed. */
 @Composable
-private fun partName(content: String?, entries: List<Entry>): String = when (content) {
+internal fun partName(content: String?, entries: List<Entry>): String = when (content) {
     null -> stringResource(R.string.car_pages_nothing_yet)
     PageContent.WEATHER -> stringResource(R.string.car_weather_title)
     PageContent.AGENDA -> stringResource(R.string.car_pages_agenda)
