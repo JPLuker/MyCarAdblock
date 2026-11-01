@@ -119,12 +119,28 @@ object CarServices {
         if (xonosHeld) Xonos.repo.acquire()
         // The Plancia and Xonos apps in place of the ones inside myCar, if those can't connect.
         InsideOrApp.start(appContext)
-        // Loaded now, while nothing's waiting on it, so the first reply isn't slower than the rest.
+        // Loaded ahead of the first command, so the first reply isn't slower than the rest - but not
+        // while the car's first picture is being made: up to some 700 MB of voice models read and set
+        // up took the phone's cores and storage at the very moment the car connected. Not at all when
+        // the phone's own speech recognition does the listening.
+        speechWarm.removeCallbacks(warmSpeech)
+        // Which models there are, at once: a command before the loading finds them, as before.
+        io.github.sirionero.mycar.speech.SpeechModels.init(appContext)
+        val phoneListens = CarSettings.systemSpeech.value && android.speech.SpeechRecognizer.isRecognitionAvailable(appContext)
+        if (!phoneListens) speechWarm.postDelayed(warmSpeech, SPEECH_WARM_AFTER_MS)
+    }
+
+    private val speechWarm = android.os.Handler(android.os.Looper.getMainLooper())
+    private val warmSpeech = Runnable {
+        val app = context ?: return@Runnable
         io.github.sirionero.mycar.speech.SpeechEngine.warm(
-            appContext,
-            io.github.sirionero.mycar.speech.VoiceLanguages.effective(appContext, CarSettings.systemSpeech.value),
+            app,
+            io.github.sirionero.mycar.speech.VoiceLanguages.effective(app, CarSettings.systemSpeech.value),
         )
     }
+
+    /** How long after the car connects the voice models start loading. */
+    private const val SPEECH_WARM_AFTER_MS = 20_000L
 
     /**
      * Xonos switched on or off on the phone in the middle of a drive: connected to Music Assistant
@@ -451,7 +467,8 @@ object CarServices {
         xonosHeld = false
         // The way Plancia's page came through the Plancia app, this drive.
         io.github.sirionero.mycar.bridge.BridgeProxy.stop()
-        // About 900 MB that nothing needs once the car's gone.
+        // About 900 MB that nothing needs once the car's gone - and not loaded after it either.
+        speechWarm.removeCallbacks(warmSpeech)
         io.github.sirionero.mycar.speech.SpeechEngine.unload()
         CarAudio.release()
         _mediaApp.value = null
