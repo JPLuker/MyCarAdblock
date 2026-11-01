@@ -590,7 +590,9 @@ phone_settings() {
     tap_text "Car screen"; sleep 3; adb exec-out screencap -p > $d/04-car.png
     tap_text "Open on connect"; sleep 1.5; adb exec-out screencap -p > $d/05-open-on-connect.png
     tap_text "Close"; sleep 1
-    scroll_to "Page 1" && tap_text "Page 1"; sleep 1.5; adb exec-out screencap -p > $d/06-page.png
+    scroll_to "Page 1" && tap_text "Page 1"; sleep 1.5
+    # The page opened out below the fold: brought up, so its parts can be tapped.
+    adb shell input swipe 160 520 160 200 400; sleep 1.5; adb exec-out screencap -p > $d/06-page.png
     tap_text "Layout"; sleep 1.5; adb exec-out screencap -p > $d/07-layouts.png
     tap_text "Close"; sleep 1
     tap_text "Weather"; sleep 1.5; adb exec-out screencap -p > $d/08-part.png
