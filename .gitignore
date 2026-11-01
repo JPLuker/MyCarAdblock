@@ -38,3 +38,6 @@ stats-worker/
 *.pem
 *.crt
 *.key
+
+# Python bytecode (the CI scripts in .github/)
+__pycache__/
