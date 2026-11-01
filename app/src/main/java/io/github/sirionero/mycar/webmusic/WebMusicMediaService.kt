@@ -17,6 +17,7 @@ import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaLibraryService.LibraryParams
 import androidx.media3.session.MediaLibraryService.MediaLibrarySession
 import androidx.media3.session.MediaSession
+import androidx.media3.session.SessionCommand
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
@@ -72,11 +73,21 @@ abstract class WebMusicMediaService(private val serviceId: String) : MediaLibrar
 
     private inner class Callback : MediaLibrarySession.Callback {
         // Only myCar itself can connect (the service isn't exported): every button, not just looking.
+        // No library search: the page searches ("play X" comes as a search to play, see WebPlayer);
+        // offered, a library search would never answer, and myCar's voice "play X" waited on it.
         override fun onConnectAsync(
             session: MediaSession,
             controller: MediaSession.ControllerInfo,
-        ): ListenableFuture<MediaSession.ConnectionResult> =
-            Futures.immediateFuture(MediaSession.ConnectionResult.AcceptedResultBuilder(session).build())
+        ): ListenableFuture<MediaSession.ConnectionResult> = Futures.immediateFuture(
+            MediaSession.ConnectionResult.AcceptedResultBuilder(session)
+                .setAvailableSessionCommands(
+                    MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon()
+                        .remove(SessionCommand.COMMAND_CODE_LIBRARY_SEARCH)
+                        .remove(SessionCommand.COMMAND_CODE_LIBRARY_GET_SEARCH_RESULT)
+                        .build(),
+                )
+                .build(),
+        )
 
         override fun onGetLibraryRoot(
             session: MediaLibrarySession,
