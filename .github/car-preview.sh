@@ -654,14 +654,14 @@ tap_last_text() {
     set -- $b
     adb shell input tap $(( ($1 + $3) / 2 )) $(( ($2 + $4) / 2 ))
 }
-# What myCar's pages hold, from the web engine itself: a debug build lets adb into its pages.
-page_probe() {
+# Spotify's sign-in page, tried several ways in myCar's web engine: a debug build lets adb into its pages.
+signin_probe() {
     local pid
     pid=$(adb shell pidof "$PKG" | tr -d '\r' | awk '{print $1}')
     [ -n "$pid" ] || { echo "no myCar process"; return; }
     adb forward tcp:9333 "localabstract:webview_devtools_remote_$pid" >/dev/null
     python3 -m pip install --quiet --user websocket-client >/dev/null 2>&1
-    python3 .github/page-probe.py http://127.0.0.1:9333 2>&1
+    python3 .github/signin-probe.py http://127.0.0.1:9333 "$1" 2>&1
     adb forward --remove tcp:9333 >/dev/null 2>&1
 }
 phone_music() {
@@ -689,7 +689,7 @@ phone_music() {
     # (a web page's text is in the screen's tree too).
     sleep 20; adb exec-out screencap -p > $d/03b-sign-in-later.png
     adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb shell cat /sdcard/ui.xml > $d/03-sign-in-ui.xml
-    page_probe > $d/03-sign-in-probe.txt
+    signin_probe "$d/03-cdp" > $d/03-sign-in-probe.txt
     adb shell input keyevent 4; sleep 2
     adb exec-out screencap -p > $d/04-back.png
     scroll_to "Add a service" && tap_text "Add a service"; sleep 2; adb exec-out screencap -p > $d/05-add.png
@@ -701,7 +701,6 @@ phone_music() {
     # Deezer's sign-in too, the last "Sign in on the phone" of the list: is it Spotify's page alone?
     tap_last_text "Sign in on the phone"; sleep 15
     adb exec-out screencap -p > $d/08-deezer-sign-in.png
-    page_probe > $d/08-deezer-sign-in-probe.txt
     adb shell input keyevent 4; sleep 2
     adb logcat -d -s myCar > $d/log.txt
     # The pages' own messages (errors and warnings in their scripts) go to the log as "chromium".
