@@ -3,7 +3,18 @@ myCar 0.6.5-alpha: connecting wirelessly by itself keeps trying the way a tap on
 ## Connecting wirelessly by itself
 - When the car comes up over Bluetooth, myCar first calls the car's own Android Auto. A car still starting up doesn't answer yet; myCar then published the phone's service and only waited for the car to call - and a car that waits to be called never did. Nothing happened until Disconnect and Connect, which then worked at once. Now, while the phone waits, it calls the car's service again every 8 seconds, and whichever side gets through first carries on.
 - A start-up the car's Bluetooth began that fails at a later step - the car's Wi-Fi didn't come, no connection to the car, the car closed the Bluetooth channel before a drive - starts over by itself after 3 seconds, up to three times, as Disconnect and Connect did by hand. Not behind a VPN, which no start-over gets past; a tap, the cable or Disconnect stops it.
-- The log says when the car's own service answers, and each start-over with its reason.
+- A Bluetooth channel on which the car says nothing that leads to its Wi-Fi is closed after 30 seconds and the start-up begins again. Before, it stayed on "talking to the car" for good, holding the drive's service, and every arrival of the car after it was taken for a drive still under way - only Disconnect cleared it.
+- Some cars close the Bluetooth channel once the phone has joined their Wi-Fi: the join and the connection attempts now go on to the end instead of being cut short.
+- The drive's foreground service has two holders, the drive and the start-up, instead of one switch: the end of a drive no longer stops the service a start-up has just taken, and a start-up's service is always given back, so the car's next arrival isn't ignored.
+- A start-up also starts over when the session ends before the car shows myCar (the car not ready yet, a certificate turned down - then with the next one), and from the listening after a drive. A Bluetooth channel that closes with nothing to follow now says the car didn't connect, instead of "talking to the car" forever.
+- After a drive myCar also listens for a car that waits to be called, calling its service every 15 seconds, and stops as soon as the car's Bluetooth goes.
+
+## The car's screen
+- A car that says again that it shows myCar, as one still waiting for a picture does, gets the video's codec config and a full frame again (at most every 3 seconds). Before, it was ignored, and a car that had missed the start stayed black until something on the screen moved.
+- The full frame asked for every 5 seconds never came with a still screen: the screen is now drawn again so it goes out.
+- Over Wi-Fi, a session that makes no progress in its start for 30 seconds, or a car that pinged and then says nothing for 20 seconds, ends the connection: such a session kept myCar busy and the car's next arrival was ignored. A session that stops itself (the encoder giving up) closes the connection too.
+- A car picture that doesn't start (the display refused, a car that gives no density) is tried again twice instead of staying black for the whole drive.
+- A myCar screen closed from the recents while the car opens myCar again no longer stops the new screen's wireless start-up.
 
 Not tried in a real car yet.
 
