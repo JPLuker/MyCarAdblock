@@ -27,6 +27,7 @@
     <string name="settings_help_connect_detail">Welche Autos funktionieren und was noch einzurichten ist</string>
     <string name="settings_help_preview">Auto-Vorschau</string>
     <string name="settings_help_preview_detail">Den Bildschirm des Autos auf dem Telefon sehen</string>
+    <string name="settings_preview_busy">Verfügbar, wenn kein Auto verbunden ist</string>
     <string name="settings_help_logs">Live-Protokoll</string>
     <string name="settings_help_logs_detail">Was myCar und das Auto einander sagen</string>
 
@@ -289,12 +290,17 @@
     <string name="settings_group_general_detail">Sprache, Design, Updates</string>
     <string name="settings_group_connection_detail">Kabellos, Audio im Auto, Zertifikat</string>
     <string name="settings_group_voice">Sprachsteuerung</string>
-    <string name="settings_group_voice_detail">Sprachmodelle für den Assistenten</string>
+    <string name="settings_group_voice_detail">Sprachassistent und Sprachmodelle</string>
     <string name="settings_group_plancia_detail">Home Assistant im Auto</string>
     <string name="settings_group_xonos_detail">Music Assistant im Auto</string>
     <string name="settings_group_cinema_detail">Videoseiten und TV-Listen</string>
-    <string name="settings_group_help_detail">Verbinden, Protokolle, Vorschau des Autos</string>
+    <string name="settings_group_help_detail">Verbinden, Protokolle</string>
     <string name="settings_group_about_detail">Version, Lizenzen, myCar unterstützen</string>
+    <string name="settings_group_car">Bildschirm des Autos</string>
+    <string name="settings_group_car_detail">Startbildschirm, Seiten, Aussehen, Hintergrund, Warnungen</string>
+    <string name="settings_car_pages_header">Deine Seiten links und rechts der Karte auf dem Startbildschirm des Autos. Ändere sie hier oder im Auto mit dem Stift neben den Punkten.</string>
+    <string name="settings_car_pages_ready_text">Deine Seiten weichen den fertigen: Wetter und Termine links der Karte und rechts Plancia neben dem Browser, wenn Plancia eingerichtet oder installiert ist.</string>
+    <string name="settings_car_fit_offline">Verbinde dich mit dem Auto, um seinen Bildschirm anzupassen: Das Auto zeigt jede Änderung, während du sie machst.</string>
     <string name="theme_title">Design</string>
     <string name="theme_footer">So sieht myCar auf dem Telefon aus. Der Bildschirm des Autos hat sein eigenes, in den Einstellungen des Autos.</string>
     <string name="theme_phone">Wie das Telefon</string>

@@ -27,6 +27,7 @@
     <string name="settings_help_connect_detail">Какие автомобили подходят и что ещё нужно настроить</string>
     <string name="settings_help_preview">Предпросмотр экрана автомобиля</string>
     <string name="settings_help_preview_detail">Экран автомобиля на вашем телефоне</string>
+    <string name="settings_preview_busy">Доступен, когда автомобиль не подключён</string>
     <string name="settings_help_logs">Журнал в реальном времени</string>
     <string name="settings_help_logs_detail">О чём myCar и автомобиль говорят друг с другом</string>
 
@@ -293,12 +294,17 @@
     <string name="settings_group_general_detail">Язык, тема, обновления</string>
     <string name="settings_group_connection_detail">Без проводов, звук в автомобиле, сертификат</string>
     <string name="settings_group_voice">Голос</string>
-    <string name="settings_group_voice_detail">Речевые модели для помощника</string>
+    <string name="settings_group_voice_detail">Голосовой помощник и речевые модели</string>
     <string name="settings_group_plancia_detail">Home Assistant в автомобиле</string>
     <string name="settings_group_xonos_detail">Music Assistant в автомобиле</string>
     <string name="settings_group_cinema_detail">Видеосайты и списки ТВ</string>
-    <string name="settings_group_help_detail">Как подключиться, журналы, предпросмотр автомобиля</string>
+    <string name="settings_group_help_detail">Как подключиться, журналы</string>
     <string name="settings_group_about_detail">Версия, лицензии, поддержать myCar</string>
+    <string name="settings_group_car">Экран автомобиля</string>
+    <string name="settings_group_car_detail">Главная, страницы, вид, обои, предупреждения</string>
+    <string name="settings_car_pages_header">Ваши страницы по обе стороны от карты на главном экране автомобиля. Измените их здесь или в автомобиле карандашом рядом с точками.</string>
+    <string name="settings_car_pages_ready_text">Ваши страницы заменятся готовыми: погода и расписание слева от карты, а справа — Plancia рядом с браузером, если Plancia есть в myCar или на телефоне.</string>
+    <string name="settings_car_fit_offline">Подключитесь к автомобилю, чтобы подогнать его экран: автомобиль сразу показывает каждое изменение.</string>
     <string name="theme_title">Тема</string>
     <string name="theme_footer">Как myCar выглядит на телефоне. У экрана автомобиля своя тема — в настройках автомобиля.</string>
     <string name="theme_phone">Как в телефоне</string>

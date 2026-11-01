@@ -74,50 +74,58 @@ internal val PageLayout.label: Int
  * them out, so the picture can't disagree with the page.
  */
 @Composable
-internal fun LayoutDiagram(layout: PageLayout, color: Color, modifier: Modifier, gap: Dp = 2.dp) {
-    val block: @Composable (Modifier) -> Unit = { m -> Box(m.clip(RoundedCornerShape(gap + 1.dp)).background(color)) }
+internal fun LayoutDiagram(layout: PageLayout, color: Color, modifier: Modifier, gap: Dp = 2.dp) =
+    LayoutDiagram(layout, { color }, modifier, gap)
+
+/**
+ * The same picture with each part in a colour of its own: [colorOf] a part's index, in the order
+ * its page lays the parts out (the phone's settings light the part being changed).
+ */
+@Composable
+internal fun LayoutDiagram(layout: PageLayout, colorOf: (Int) -> Color, modifier: Modifier, gap: Dp = 2.dp) {
+    val block: @Composable (Int, Modifier) -> Unit = { part, m -> Box(m.clip(RoundedCornerShape(gap + 1.dp)).background(colorOf(part))) }
     val across = Arrangement.spacedBy(gap)
     when (layout) {
-        PageLayout.FULL, PageLayout.MAP -> block(modifier)
+        PageLayout.FULL, PageLayout.MAP -> block(0, modifier)
         PageLayout.HALVES -> Row(modifier, horizontalArrangement = across) {
-            block(Modifier.weight(1f).fillMaxHeight())
-            block(Modifier.weight(1f).fillMaxHeight())
+            block(0, Modifier.weight(1f).fillMaxHeight())
+            block(1, Modifier.weight(1f).fillMaxHeight())
         }
         PageLayout.GRID -> Column(modifier, verticalArrangement = across) {
-            repeat(2) {
+            repeat(2) { row ->
                 Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = across) {
-                    block(Modifier.weight(1f).fillMaxHeight())
-                    block(Modifier.weight(1f).fillMaxHeight())
+                    block(row * 2, Modifier.weight(1f).fillMaxHeight())
+                    block(row * 2 + 1, Modifier.weight(1f).fillMaxHeight())
                 }
             }
         }
         PageLayout.HALF_QUARTERS -> Row(modifier, horizontalArrangement = across) {
-            block(Modifier.weight(1f).fillMaxHeight())
+            block(0, Modifier.weight(1f).fillMaxHeight())
             Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = across) {
-                block(Modifier.weight(1f).fillMaxWidth())
-                block(Modifier.weight(1f).fillMaxWidth())
+                block(1, Modifier.weight(1f).fillMaxWidth())
+                block(2, Modifier.weight(1f).fillMaxWidth())
             }
         }
         PageLayout.QUARTERS_HALF -> Row(modifier, horizontalArrangement = across) {
             Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = across) {
-                block(Modifier.weight(1f).fillMaxWidth())
-                block(Modifier.weight(1f).fillMaxWidth())
+                block(0, Modifier.weight(1f).fillMaxWidth())
+                block(1, Modifier.weight(1f).fillMaxWidth())
             }
-            block(Modifier.weight(1f).fillMaxHeight())
+            block(2, Modifier.weight(1f).fillMaxHeight())
         }
         PageLayout.STRIP_QUARTERS -> Column(modifier, verticalArrangement = across) {
-            block(Modifier.weight(1f).fillMaxWidth())
+            block(0, Modifier.weight(1f).fillMaxWidth())
             Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = across) {
-                block(Modifier.weight(1f).fillMaxHeight())
-                block(Modifier.weight(1f).fillMaxHeight())
+                block(1, Modifier.weight(1f).fillMaxHeight())
+                block(2, Modifier.weight(1f).fillMaxHeight())
             }
         }
         PageLayout.QUARTERS_STRIP -> Column(modifier, verticalArrangement = across) {
             Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = across) {
-                block(Modifier.weight(1f).fillMaxHeight())
-                block(Modifier.weight(1f).fillMaxHeight())
+                block(0, Modifier.weight(1f).fillMaxHeight())
+                block(1, Modifier.weight(1f).fillMaxHeight())
             }
-            block(Modifier.weight(1f).fillMaxWidth())
+            block(2, Modifier.weight(1f).fillMaxWidth())
         }
     }
 }

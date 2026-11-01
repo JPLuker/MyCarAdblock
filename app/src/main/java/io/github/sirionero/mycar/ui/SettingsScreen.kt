@@ -151,16 +151,19 @@ fun SettingsScreen(
             ) {
                 Spacer(Modifier.height(0.dp))
                 when (page) {
-                    null -> SettingsCard {
-                        SettingsPage.entries.forEachIndexed { i, group ->
-                            if (i > 0) SettingsDivider()
-                            SettingsRow(
-                                pageTitle(group),
-                                Modifier.clickable { page = group },
-                                subtitle = pageDetail(group),
-                                icon = pageIcon(group),
-                                trailing = { Arrow() },
-                            )
+                    null -> {
+                        CarPreviewCard(onOpenCarPreview)
+                        SettingsCard {
+                            SettingsPage.entries.forEachIndexed { i, group ->
+                                if (i > 0) SettingsDivider()
+                                SettingsRow(
+                                    pageTitle(group),
+                                    Modifier.clickable { page = group },
+                                    subtitle = pageDetail(group),
+                                    icon = pageIcon(group),
+                                    trailing = { Arrow() },
+                                )
+                            }
                         }
                     }
                     SettingsPage.GENERAL -> {
@@ -168,12 +171,16 @@ fun SettingsScreen(
                         ThemeSection()
                         SettingsSection(stringResource(R.string.settings_updates_title)) { UpdateRow() }
                     }
+                    SettingsPage.CAR -> CarScreenSettings()
                     SettingsPage.CONNECTION -> {
                         ConnectionSection()
                         CarAudioSection()
                         CertificateSection(Modifier.onGloballyPositioned { certificateY = it.positionInParent().y.toInt() })
                     }
-                    SettingsPage.VOICE -> VoiceModelSection()
+                    SettingsPage.VOICE -> {
+                        AssistantSection()
+                        VoiceModelSection()
+                    }
                     SettingsPage.PLANCIA -> PlanciaSection()
                     SettingsPage.XONOS -> XonosSection()
                     SettingsPage.CINEMA -> {
@@ -181,7 +188,7 @@ fun SettingsScreen(
                         CinemaTvSection()
                     }
                     SettingsPage.HELP -> {
-                        HelpSection(onOpenHelp, onOpenCarPreview, onOpenLogs)
+                        HelpSection(onOpenHelp, onOpenLogs)
                         if (SHOW_RECOMMENDED_APPS) AppsSection(onOpenRecommendedApps)
                     }
                     SettingsPage.ABOUT -> {
@@ -207,7 +214,7 @@ fun SettingsScreen(
 }
 
 /** The groups of Settings, in the order listed. */
-enum class SettingsPage { GENERAL, CONNECTION, VOICE, PLANCIA, XONOS, CINEMA, HELP, ABOUT }
+enum class SettingsPage { GENERAL, CAR, CONNECTION, VOICE, PLANCIA, XONOS, CINEMA, HELP, ABOUT }
 
 private fun startPage(at: SettingsAt): SettingsPage? = when (at) {
     SettingsAt.TOP -> null
@@ -219,6 +226,7 @@ private fun startPage(at: SettingsAt): SettingsPage? = when (at) {
 @Composable
 private fun pageTitle(page: SettingsPage): String = when (page) {
     SettingsPage.GENERAL -> stringResource(R.string.settings_group_general)
+    SettingsPage.CAR -> stringResource(R.string.settings_group_car)
     SettingsPage.CONNECTION -> stringResource(R.string.settings_connection_title)
     SettingsPage.VOICE -> stringResource(R.string.settings_group_voice)
     SettingsPage.PLANCIA -> "Plancia"
@@ -232,6 +240,7 @@ private fun pageTitle(page: SettingsPage): String = when (page) {
 private fun pageDetail(page: SettingsPage): String = stringResource(
     when (page) {
         SettingsPage.GENERAL -> R.string.settings_group_general_detail
+        SettingsPage.CAR -> R.string.settings_group_car_detail
         SettingsPage.CONNECTION -> R.string.settings_group_connection_detail
         SettingsPage.VOICE -> R.string.settings_group_voice_detail
         SettingsPage.PLANCIA -> R.string.settings_group_plancia_detail
@@ -245,6 +254,7 @@ private fun pageDetail(page: SettingsPage): String = stringResource(
 @Composable
 private fun pageIcon(page: SettingsPage): ImageVector = when (page) {
     SettingsPage.GENERAL -> ImageVector.vectorResource(R.drawable.sym_settings)
+    SettingsPage.CAR -> ImageVector.vectorResource(R.drawable.sym_view_cozy)
     SettingsPage.CONNECTION -> ImageVector.vectorResource(R.drawable.sym_directions_car)
     SettingsPage.VOICE -> ImageVector.vectorResource(R.drawable.sym_mic)
     SettingsPage.PLANCIA -> ImageVector.vectorResource(R.drawable.sym_space_dashboard)
@@ -314,12 +324,32 @@ private fun ConnectionSection() {
     }
 }
 
-/** Connection help, and the tools for checking what myCar does. */
+/**
+ * The car preview, first at the top of Settings, outside the groups: the car screen drawn on the
+ * phone. It waits until no car is using that screen, and says so.
+ */
 @Composable
-private fun HelpSection(onOpenHelp: () -> Unit, onOpenCarPreview: () -> Unit, onOpenLogs: () -> Unit) {
-    val context = LocalContext.current
+private fun CarPreviewCard(onOpenCarPreview: () -> Unit) {
     val status by SessionStatus.state.collectAsState()
     val live = status.phase == SessionStatus.Phase.CONNECTING || status.phase == SessionStatus.Phase.PROJECTING
+    val dim = MaterialTheme.colorScheme.onSurfaceVariant
+    SettingsCard {
+        SettingsRow(
+            stringResource(R.string.settings_help_preview),
+            if (live) Modifier else Modifier.clickable(onClick = onOpenCarPreview),
+            subtitle = stringResource(if (live) R.string.settings_preview_busy else R.string.settings_help_preview_detail),
+            icon = Icons.Filled.PlayArrow,
+            tint = if (live) dim else MaterialTheme.colorScheme.primary,
+            titleColor = if (live) dim else MaterialTheme.colorScheme.onSurface,
+            trailing = if (live) null else { { Arrow() } },
+        )
+    }
+}
+
+/** Connection help, and the tools for checking what myCar does. */
+@Composable
+private fun HelpSection(onOpenHelp: () -> Unit, onOpenLogs: () -> Unit) {
+    val context = LocalContext.current
     SettingsSection(stringResource(R.string.settings_help_title)) {
         SettingsRow(
             stringResource(R.string.settings_help_connect),
@@ -328,17 +358,6 @@ private fun HelpSection(onOpenHelp: () -> Unit, onOpenCarPreview: () -> Unit, on
             icon = Icons.Filled.Info,
             trailing = { Arrow() },
         )
-        // The preview draws the car screen on the phone, so it waits until no car is using it.
-        if (!live) {
-            SettingsDivider()
-            SettingsRow(
-                stringResource(R.string.settings_help_preview),
-                Modifier.clickable(onClick = onOpenCarPreview),
-                subtitle = stringResource(R.string.settings_help_preview_detail),
-                icon = Icons.Filled.PlayArrow,
-                trailing = { Arrow() },
-            )
-        }
         SettingsDivider()
         SettingsRow(
             stringResource(R.string.settings_help_logs),
