@@ -100,7 +100,8 @@ internal fun CinemaPlayer(media: CinemaMedia, onClose: () -> Unit) {
     var touched by remember { mutableLongStateOf(0L) }
 
     // Another app's sound has to reach the car: myCar's own player is one, as the sites are.
-    LaunchedEffect(Unit) { CarAudio.captureNow() }
+    // Opened by the driver: a "no" earlier in the drive is asked once more.
+    LaunchedEffect(Unit) { CarAudio.askAgain(); CarAudio.captureNow() }
     DisposableEffect(playback) {
         playback.open()
         onDispose { playback.release() }

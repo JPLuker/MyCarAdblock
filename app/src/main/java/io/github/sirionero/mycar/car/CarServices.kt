@@ -258,7 +258,12 @@ object CarServices {
         media.connect(app)
         // Not torn down and rebuilt per app: the capture covers whatever the phone plays, so
         // switching media apps never costs the driver another consent dialog.
-        if (CarSettings.pipeAudio.value) CarAudio.request()
+        if (CarSettings.pipeAudio.value) {
+            // Picked by the driver: a "no" to Android's question earlier in the drive is asked once
+            // more, as this music reaches the car only through the capture. Not the drive's own pick.
+            if (!auto) CarAudio.askAgain()
+            CarAudio.request()
+        }
     }
 
     /**

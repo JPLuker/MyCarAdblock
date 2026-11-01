@@ -75,7 +75,8 @@ internal fun WebMusicScreen(service: WebMusicService) {
     val videoAllowed = !parkedOnly || rememberVideoAllowed()
 
     // Its sound has to reach the car: the capture starts now, if it waited for Xonos (as Cinema's).
-    LaunchedEffect(Unit) { CarAudio.captureNow() }
+    // Opened by the driver: a "no" earlier in the drive is asked once more.
+    LaunchedEffect(Unit) { CarAudio.askAgain(); CarAudio.captureNow() }
     // The car's Back: a video full screen first, then a page back in the service, then out.
     DisposableEffect(page) {
         navigator.backInterceptor = { page.exitFullScreen() || page.goBack() }
