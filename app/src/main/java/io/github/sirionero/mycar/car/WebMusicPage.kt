@@ -425,6 +425,16 @@ internal class WebMusicPage(
             at = SystemClock.elapsedRealtime(),
             canSeek = o.optBoolean("seek"),
         )
+        val before = WebMusicPlayer.state(service.id).value
+        if (state.key != before.key || state.playing != before.playing) {
+            // What the page says, without its words: whether there's a song, and if it plays.
+            MyCarLog.i(
+                "music: ${service.id} says: " + (if (state.hasTrack) "a song" else "no song") +
+                    (if (state.playing) ", playing" else ", not playing") +
+                    (if (state.artUrl.isNotEmpty()) ", with its cover" else "") +
+                    (if (state.durationMs > 0) ", ${state.durationMs / 1000} s long" else ""),
+            )
+        }
         WebMusicPlayer.report(service.id, state)
         if (!heard) {
             heard = true
