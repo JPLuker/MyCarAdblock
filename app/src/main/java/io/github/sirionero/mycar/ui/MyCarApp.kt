@@ -166,7 +166,7 @@ fun MyCarApp(onDisconnect: () -> Unit, onRequestCallScreening: () -> Unit) {
                     onOpenRecommendedApps = { settingsAt = SettingsAt.HELP; screen = Screen.RECOMMENDED_APPS },
                     onOpenWhatsNew = { settingsAt = SettingsAt.ABOUT; backTo = Screen.SETTINGS; screen = Screen.WHATS_NEW },
                     onOpenHelp = { settingsAt = SettingsAt.HELP; backTo = Screen.SETTINGS; screen = Screen.HELP },
-                    onOpenCarPreview = { settingsAt = SettingsAt.HELP; screen = Screen.CAR_PREVIEW },
+                    onOpenCarPreview = { settingsAt = SettingsAt.TOP; screen = Screen.CAR_PREVIEW },
                     onOpenLogs = { settingsAt = SettingsAt.HELP; screen = Screen.LOGS },
                     onReplayTutorial = {
                         settingsAt = SettingsAt.ABOUT

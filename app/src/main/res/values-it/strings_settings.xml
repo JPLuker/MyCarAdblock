@@ -27,6 +27,7 @@
     <string name="settings_help_connect_detail">Quali auto funzionano e cosa resta da configurare</string>
     <string name="settings_help_preview">Anteprima dell\'auto</string>
     <string name="settings_help_preview_detail">Vedi lo schermo dell\'auto sul telefono</string>
+    <string name="settings_preview_busy">Disponibile quando nessuna auto è collegata</string>
     <string name="settings_help_logs">Log in tempo reale</string>
     <string name="settings_help_logs_detail">Cosa si dicono myCar e l\'auto</string>
 
@@ -293,7 +294,7 @@
     <string name="settings_group_plancia_detail">Home Assistant in auto</string>
     <string name="settings_group_xonos_detail">Music Assistant in auto</string>
     <string name="settings_group_cinema_detail">Siti video e liste TV</string>
-    <string name="settings_group_help_detail">Come collegarsi, log, anteprima dell\'auto</string>
+    <string name="settings_group_help_detail">Come collegarsi, log</string>
     <string name="settings_group_about_detail">Versione, licenze, sostieni myCar</string>
     <string name="theme_title">Tema</string>
     <string name="theme_footer">L\'aspetto di myCar sul telefono. Lo schermo dell\'auto ha il suo, nelle impostazioni dell\'auto.</string>

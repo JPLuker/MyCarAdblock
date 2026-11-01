@@ -41,6 +41,7 @@
     <string name="settings_help_connect_detail">Which cars work, and what\'s left to set up</string>
     <string name="settings_help_preview">Car preview</string>
     <string name="settings_help_preview_detail">See the car screen on your phone</string>
+    <string name="settings_preview_busy">Available when no car is connected</string>
     <string name="settings_help_logs">Live logs</string>
     <string name="settings_help_logs_detail">What myCar and the car are saying to each other</string>
 
@@ -403,7 +404,7 @@
     <string name="settings_group_plancia_detail">Home Assistant in the car</string>
     <string name="settings_group_xonos_detail">Music Assistant in the car</string>
     <string name="settings_group_cinema_detail">Video sites and TV lists</string>
-    <string name="settings_group_help_detail">How to connect, logs, car preview</string>
+    <string name="settings_group_help_detail">How to connect, logs</string>
     <string name="settings_group_about_detail">Version, licenses, support myCar</string>
     <string name="theme_title">Theme</string>
     <string name="theme_footer">How myCar looks on the phone. The car\'s screen has its own, in the car\'s settings.</string>

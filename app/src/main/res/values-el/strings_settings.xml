@@ -27,6 +27,7 @@
     <string name="settings_help_connect_detail">Ποια αυτοκίνητα λειτουργούν και τι μένει να ρυθμιστεί</string>
     <string name="settings_help_preview">Προεπισκόπηση αυτοκινήτου</string>
     <string name="settings_help_preview_detail">Δείτε την οθόνη του αυτοκινήτου στο τηλέφωνό σας</string>
+    <string name="settings_preview_busy">Διαθέσιμη όταν δεν είναι συνδεδεμένο αυτοκίνητο</string>
     <string name="settings_help_logs">Ζωντανά αρχεία καταγραφής</string>
     <string name="settings_help_logs_detail">Τι λένε μεταξύ τους το myCar και το αυτοκίνητο</string>
 
@@ -293,7 +294,7 @@
     <string name="settings_group_plancia_detail">Το Home Assistant στο αυτοκίνητο</string>
     <string name="settings_group_xonos_detail">Το Music Assistant στο αυτοκίνητο</string>
     <string name="settings_group_cinema_detail">Ιστότοποι βίντεο και λίστες TV</string>
-    <string name="settings_group_help_detail">Σύνδεση, αρχεία καταγραφής, προεπισκόπηση αυτοκινήτου</string>
+    <string name="settings_group_help_detail">Σύνδεση, αρχεία καταγραφής</string>
     <string name="settings_group_about_detail">Έκδοση, άδειες, υποστήριξη του myCar</string>
     <string name="theme_title">Θέμα</string>
     <string name="theme_footer">Η εμφάνιση του myCar στο τηλέφωνο. Η οθόνη του αυτοκινήτου έχει τη δική της, στις ρυθμίσεις του αυτοκινήτου.</string>

@@ -27,6 +27,7 @@
     <string name="settings_help_connect_detail">Какие автомобили подходят и что ещё нужно настроить</string>
     <string name="settings_help_preview">Предпросмотр экрана автомобиля</string>
     <string name="settings_help_preview_detail">Экран автомобиля на вашем телефоне</string>
+    <string name="settings_preview_busy">Доступен, когда автомобиль не подключён</string>
     <string name="settings_help_logs">Журнал в реальном времени</string>
     <string name="settings_help_logs_detail">О чём myCar и автомобиль говорят друг с другом</string>
 
@@ -297,7 +298,7 @@
     <string name="settings_group_plancia_detail">Home Assistant в автомобиле</string>
     <string name="settings_group_xonos_detail">Music Assistant в автомобиле</string>
     <string name="settings_group_cinema_detail">Видеосайты и списки ТВ</string>
-    <string name="settings_group_help_detail">Как подключиться, журналы, предпросмотр автомобиля</string>
+    <string name="settings_group_help_detail">Как подключиться, журналы</string>
     <string name="settings_group_about_detail">Версия, лицензии, поддержать myCar</string>
     <string name="theme_title">Тема</string>
     <string name="theme_footer">Как myCar выглядит на телефоне. У экрана автомобиля своя тема — в настройках автомобиля.</string>

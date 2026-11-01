@@ -151,16 +151,19 @@ fun SettingsScreen(
             ) {
                 Spacer(Modifier.height(0.dp))
                 when (page) {
-                    null -> SettingsCard {
-                        SettingsPage.entries.forEachIndexed { i, group ->
-                            if (i > 0) SettingsDivider()
-                            SettingsRow(
-                                pageTitle(group),
-                                Modifier.clickable { page = group },
-                                subtitle = pageDetail(group),
-                                icon = pageIcon(group),
-                                trailing = { Arrow() },
-                            )
+                    null -> {
+                        CarPreviewCard(onOpenCarPreview)
+                        SettingsCard {
+                            SettingsPage.entries.forEachIndexed { i, group ->
+                                if (i > 0) SettingsDivider()
+                                SettingsRow(
+                                    pageTitle(group),
+                                    Modifier.clickable { page = group },
+                                    subtitle = pageDetail(group),
+                                    icon = pageIcon(group),
+                                    trailing = { Arrow() },
+                                )
+                            }
                         }
                     }
                     SettingsPage.GENERAL -> {
@@ -181,7 +184,7 @@ fun SettingsScreen(
                         CinemaTvSection()
                     }
                     SettingsPage.HELP -> {
-                        HelpSection(onOpenHelp, onOpenCarPreview, onOpenLogs)
+                        HelpSection(onOpenHelp, onOpenLogs)
                         if (SHOW_RECOMMENDED_APPS) AppsSection(onOpenRecommendedApps)
                     }
                     SettingsPage.ABOUT -> {
@@ -314,12 +317,32 @@ private fun ConnectionSection() {
     }
 }
 
-/** Connection help, and the tools for checking what myCar does. */
+/**
+ * The car preview, first at the top of Settings, outside the groups: the car screen drawn on the
+ * phone. It waits until no car is using that screen, and says so.
+ */
 @Composable
-private fun HelpSection(onOpenHelp: () -> Unit, onOpenCarPreview: () -> Unit, onOpenLogs: () -> Unit) {
-    val context = LocalContext.current
+private fun CarPreviewCard(onOpenCarPreview: () -> Unit) {
     val status by SessionStatus.state.collectAsState()
     val live = status.phase == SessionStatus.Phase.CONNECTING || status.phase == SessionStatus.Phase.PROJECTING
+    val dim = MaterialTheme.colorScheme.onSurfaceVariant
+    SettingsCard {
+        SettingsRow(
+            stringResource(R.string.settings_help_preview),
+            if (live) Modifier else Modifier.clickable(onClick = onOpenCarPreview),
+            subtitle = stringResource(if (live) R.string.settings_preview_busy else R.string.settings_help_preview_detail),
+            icon = Icons.Filled.PlayArrow,
+            tint = if (live) dim else MaterialTheme.colorScheme.primary,
+            titleColor = if (live) dim else MaterialTheme.colorScheme.onSurface,
+            trailing = if (live) null else { { Arrow() } },
+        )
+    }
+}
+
+/** Connection help, and the tools for checking what myCar does. */
+@Composable
+private fun HelpSection(onOpenHelp: () -> Unit, onOpenLogs: () -> Unit) {
+    val context = LocalContext.current
     SettingsSection(stringResource(R.string.settings_help_title)) {
         SettingsRow(
             stringResource(R.string.settings_help_connect),
@@ -328,17 +351,6 @@ private fun HelpSection(onOpenHelp: () -> Unit, onOpenCarPreview: () -> Unit, on
             icon = Icons.Filled.Info,
             trailing = { Arrow() },
         )
-        // The preview draws the car screen on the phone, so it waits until no car is using it.
-        if (!live) {
-            SettingsDivider()
-            SettingsRow(
-                stringResource(R.string.settings_help_preview),
-                Modifier.clickable(onClick = onOpenCarPreview),
-                subtitle = stringResource(R.string.settings_help_preview_detail),
-                icon = Icons.Filled.PlayArrow,
-                trailing = { Arrow() },
-            )
-        }
         SettingsDivider()
         SettingsRow(
             stringResource(R.string.settings_help_logs),

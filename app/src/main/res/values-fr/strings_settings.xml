@@ -27,6 +27,7 @@
     <string name="settings_help_connect_detail">Les voitures compatibles, et ce qu’il reste à configurer</string>
     <string name="settings_help_preview">Aperçu de la voiture</string>
     <string name="settings_help_preview_detail">Voir l’écran de la voiture sur votre téléphone</string>
+    <string name="settings_preview_busy">Disponible quand aucune voiture n’est connectée</string>
     <string name="settings_help_logs">Journaux en direct</string>
     <string name="settings_help_logs_detail">Ce que myCar et la voiture se disent</string>
 
@@ -293,7 +294,7 @@
     <string name="settings_group_plancia_detail">Home Assistant dans la voiture</string>
     <string name="settings_group_xonos_detail">Music Assistant dans la voiture</string>
     <string name="settings_group_cinema_detail">Sites vidéo et listes TV</string>
-    <string name="settings_group_help_detail">Se connecter, journaux, aperçu de la voiture</string>
+    <string name="settings_group_help_detail">Se connecter, journaux</string>
     <string name="settings_group_about_detail">Version, licences, soutenir myCar</string>
     <string name="theme_title">Thème</string>
     <string name="theme_footer">L’apparence de myCar sur le téléphone. L’écran de la voiture a la sienne, dans les paramètres de la voiture.</string>

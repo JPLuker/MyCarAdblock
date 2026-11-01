@@ -27,6 +27,7 @@
     <string name="settings_help_connect_detail">Qué coches funcionan y qué falta por configurar</string>
     <string name="settings_help_preview">Vista previa del coche</string>
     <string name="settings_help_preview_detail">Ve la pantalla del coche en tu teléfono</string>
+    <string name="settings_preview_busy">Disponible cuando no hay ningún coche conectado</string>
     <string name="settings_help_logs">Registros en directo</string>
     <string name="settings_help_logs_detail">Lo que se dicen myCar y el coche</string>
 
@@ -293,7 +294,7 @@
     <string name="settings_group_plancia_detail">Home Assistant en el coche</string>
     <string name="settings_group_xonos_detail">Music Assistant en el coche</string>
     <string name="settings_group_cinema_detail">Sitios de vídeo y listas de TV</string>
-    <string name="settings_group_help_detail">Cómo conectar, registros, vista previa del coche</string>
+    <string name="settings_group_help_detail">Cómo conectar, registros</string>
     <string name="settings_group_about_detail">Versión, licencias, apoyar myCar</string>
     <string name="theme_title">Tema</string>
     <string name="theme_footer">El aspecto de myCar en el teléfono. La pantalla del coche tiene el suyo, en los ajustes del coche.</string>
