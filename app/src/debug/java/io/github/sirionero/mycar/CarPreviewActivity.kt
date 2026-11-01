@@ -133,6 +133,9 @@ class CarPreviewActivity : ComponentActivity() {
         io.github.sirionero.mycar.AppSettings.setStartupUrl(this, intent.getStringExtra("startUrl").orEmpty())
         // Xonos on in the car every run (Music, on the phone): the shots tap it where it is on the grid.
         io.github.sirionero.mycar.xonos.Xonos.setEnabled(this, true)
+        // --ez webMusicPlay true: a music service's page presses its first "Play" a few seconds in (no
+        // account plays here). Set every run.
+        io.github.sirionero.mycar.car.WebMusicPreview.play = intent.getBooleanExtra("webMusicPlay", false)
         // --es webMusic spotify: that music service's web player on in the car, alone, and opened as
         // the car's music a moment in, with the car's media key: its page loads as in a drive. Set
         // every run, so other shots have none.

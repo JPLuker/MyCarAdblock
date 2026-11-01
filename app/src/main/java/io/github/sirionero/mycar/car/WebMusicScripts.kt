@@ -13,8 +13,10 @@ internal object WebMusicScripts {
      *   as in a computer's window that wide, then fitted to the car's screen;
      * - what plays, for myCar's player, dock and the car's buttons: the page's own Media Session
      *   (what the service tells a computer's media keys) is kept as it's set - its song, its state, its
-     *   position and its handlers - and said to myCar (`MyCarMusic`) when it changes. Where the page
-     *   says nothing there, its media elements and its player bar ([WebMusicService.bar]) stand in;
+     *   position and its handlers - and said to myCar (`MyCarMusic`) when it changes. Android's web
+     *   engine has none (seen in the car preview): then a stand-in, there before the page's scripts,
+     *   takes what they say. Where the page says nothing there, its media elements and its player
+     *   bar ([WebMusicService.bar]) stand in;
      * - `__mycarMusicAct(action, seconds)`: a button from the car, through the page's own handler as
      *   a computer's media key would, or else the service's own button on the page.
      */
@@ -78,6 +80,43 @@ internal object WebMusicScripts {
   // --- What plays, for myCar's player, dock and the car's buttons ---
   // The page's own Media Session (what it tells a computer's media keys): its handlers are kept,
   // and its song, state and position read as it sets them.
+  // Android's web engine has no Media Session (what a computer's media keys and its system player
+  // use), and these players tell it what plays: a stand-in, there before the page's own scripts,
+  // takes what they say - the song, the state, the position, the buttons - for myCar.
+  if (!navigator.mediaSession) {
+    if (!window.MediaMetadata) {
+      window.MediaMetadata = function MediaMetadata(init) {
+        init = init || {};
+        this.title = String(init.title || '');
+        this.artist = String(init.artist || '');
+        this.album = String(init.album || '');
+        this.artwork = Array.prototype.map.call(init.artwork || [], function (a) {
+          return { src: String(a.src || ''), sizes: String(a.sizes || ''), type: String(a.type || '') };
+        });
+      };
+    }
+    var said = { metadata: null, playbackState: 'none' };
+    var standIn = {
+      setActionHandler: function () {},
+      setPositionState: function () {},
+      setCameraActive: function () {},
+      setMicrophoneActive: function () {}
+    };
+    ['metadata', 'playbackState'].forEach(function (name) {
+      Object.defineProperty(standIn, name, {
+        configurable: true,
+        enumerable: true,
+        get: function () { return said[name]; },
+        set: function (value) { said[name] = value; schedule(); }
+      });
+    });
+    Object.defineProperty(standIn, '__mycar', { value: true });
+    try {
+      Object.defineProperty(Navigator.prototype, 'mediaSession', { configurable: true, enumerable: true, get: function () { return standIn; } });
+    } catch (e) {
+      try { Object.defineProperty(navigator, 'mediaSession', { configurable: true, value: standIn }); } catch (e2) {}
+    }
+  }
   var session = navigator.mediaSession || null;
   var handlers = {};
   var position = null;
@@ -97,7 +136,7 @@ internal object WebMusicScripts {
       return setPosition.apply(session, arguments);
     };
     var proto = Object.getPrototypeOf(session);
-    ['metadata', 'playbackState'].forEach(function (name) {
+    if (!session.__mycar) ['metadata', 'playbackState'].forEach(function (name) {
       var d = proto && Object.getOwnPropertyDescriptor(proto, name);
       if (!d || !d.get || !d.set) return;
       Object.defineProperty(session, name, {
@@ -268,7 +307,7 @@ internal object WebMusicScripts {
   var session = navigator.mediaSession;
   var out = { type: 'probe', url: location.href, title: document.title, ua: navigator.userAgent,
     mobile: hints ? hints.mobile : null, platform: hints ? hints.platform : null,
-    mediaSession: !!session, metadata: !!(session && session.metadata),
+    mediaSession: !session ? 'none' : session.__mycar ? 'myCar stand-in' : 'native', metadata: !!(session && session.metadata),
     width: innerWidth, height: innerHeight, ratio: devicePixelRatio };
   function send(widevine) { out.widevine = widevine; car.postMessage(JSON.stringify(out)); }
   if (!navigator.requestMediaKeySystemAccess) send('no EME');
@@ -288,8 +327,14 @@ internal object WebMusicScripts {
     document.querySelectorAll('a[aria-label], button[aria-label]').forEach(function (el) {
       if (labels.length < 60) labels.push(el.tagName + ':' + el.getAttribute('aria-label'));
     });
+    // What myCar's Back sits over, in the top corner: from the element there up to the page.
+    var under = [];
+    for (var el = document.elementFromPoint(24, 24); el && under.length < 6; el = el.parentElement) {
+      under.push(el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (el.getAttribute('data-testid') ? '[data-testid=' + el.getAttribute('data-testid') + ']' : '') +
+        (el.getAttribute('aria-label') ? '[aria-label=' + el.getAttribute('aria-label') + ']' : '') + (el.className && el.className.baseVal === undefined ? '.' + String(el.className).split(' ').slice(0, 2).join('.') : ''));
+    }
     car.postMessage(JSON.stringify({ type: 'layout', url: location.href, metadata: !!(session && session.metadata),
-      ids: ids.slice(0, 250), links: links.slice(0, 12), labels: labels }));
+      under: under, ids: ids.slice(0, 120), links: links.slice(0, 8), labels: labels.slice(0, 30) }));
   }, 12000);
 })();
 """

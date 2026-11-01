@@ -136,7 +136,7 @@ private fun signInWebView(context: Context, service: WebMusicService): WebView =
             CookieManager.getInstance().flush()
         }
     }
-    loadUrl(service.url)
+    loadUrl(service.signIn ?: service.url)
 }
 
 /** A service signed out of myCar's web engine, on the phone and in the car alike. */

@@ -102,6 +102,7 @@ internal class WebMusicPage(
     private var viewport = 0
     private var widthScript: ScriptHandler? = null
     private var probed = false
+    private var pressedPlay = false
 
     /** The page has spoken since it loaded: its own buttons and handlers are there for the car's. */
     private var heard = false
@@ -406,6 +407,12 @@ internal class WebMusicPage(
                 probed = true
                 view.evaluateJavascript(WebMusicScripts.probe(BuildConfig.DEBUG), null)
             }
+            if (WebMusicPreview.play && !pressedPlay && ours(url)) {
+                pressedPlay = true
+                main.postDelayed({
+                    web?.evaluateJavascript(PLAY_SOMETHING_JS) { MyCarLog.i("music: preview pressed ${service.id}'s first Play: $it") }
+                }, PREVIEW_PLAY_MS)
+            }
             // A page that never speaks (another address, a web engine without the script): the
             // buttons go to it all the same after a moment.
             main.postDelayed({
@@ -462,5 +469,23 @@ internal class WebMusicPage(
         const val MAX_URL = 2_000
 
         const val CLEAR_STORAGE_JS = "try { localStorage.clear(); sessionStorage.clear(); } catch (e) {}"
+
+        const val PREVIEW_PLAY_MS = 8_000L
+
+        /** The page's first "Play" button in sight, pressed: for the car preview ([WebMusicPreview]). */
+        const val PLAY_SOMETHING_JS = """
+(function () {
+  var all = Array.prototype.slice.call(document.querySelectorAll('button[aria-label^="Play"], a[aria-label^="Play"], [role="button"][aria-label^="Play"]'));
+  var shown = all.filter(function (e) { var r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
+  if (!shown.length) return 'nothing to play';
+  shown[0].click();
+  return shown[0].getAttribute('aria-label');
+})()
+"""
     }
+}
+
+/** For the car preview (debug builds), where no account plays: a page presses its first "Play" a few seconds in. */
+internal object WebMusicPreview {
+    @Volatile var play = false
 }

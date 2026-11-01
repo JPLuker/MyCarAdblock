@@ -25,6 +25,8 @@ class WebMusicService(
     val name: String,
     /** Where its player starts. */
     val url: String,
+    /** Where its sign-in starts, for "Sign in on the phone"; null for [url], where the page has its own. */
+    val signIn: String? = null,
     /** The addresses its player lives on: myCar's scripts and messages are for these only. */
     val origins: List<String>,
     /** Where its sign-in lives: signing out takes every cookie of these, and their pages' storage. */
@@ -67,6 +69,7 @@ object WebMusic {
 
     val SPOTIFY = WebMusicService(
         "spotify", "Spotify", "https://open.spotify.com/",
+        signIn = "https://accounts.spotify.com/login?continue=https%3A%2F%2Fopen.spotify.com%2F",
         origins = listOf("https://open.spotify.com"),
         domains = listOf("spotify.com"),
         bar = WebMusicService.Bar(
@@ -79,6 +82,8 @@ object WebMusic {
             title = "context-item-info-title",
             artist = "context-item-info-artist",
         ),
+        // "Install App" in its bar: the app is right here.
+        css = "[data-testid=\"global-nav-bar\"] a[href=\"/download\"] { display: none !important; }",
     )
 
     private val AMAZON = listOf("com", "de", "co.uk", "it", "fr", "es", "ca", "com.br", "com.mx", "co.jp", "in", "com.au")
@@ -88,6 +93,7 @@ object WebMusic {
         SPOTIFY,
         WebMusicService(
             "youtube-music", "YouTube Music", "https://music.youtube.com/",
+            signIn = "https://accounts.google.com/ServiceLogin?service=youtube&continue=https%3A%2F%2Fmusic.youtube.com%2F",
             origins = listOf("https://music.youtube.com"),
             domains = listOf("youtube.com", "google.com"),
             needs = R.string.music_needs_google,
@@ -106,6 +112,7 @@ object WebMusic {
         ),
         WebMusicService(
             "deezer", "Deezer", "https://www.deezer.com/",
+            signIn = "https://account.deezer.com/login/",
             origins = listOf("https://www.deezer.com"),
             domains = listOf("deezer.com"),
         ),
@@ -117,11 +124,13 @@ object WebMusic {
         ),
         WebMusicService(
             "soundcloud", "SoundCloud", "https://soundcloud.com/",
+            signIn = "https://soundcloud.com/signin",
             origins = listOf("https://soundcloud.com"),
             domains = listOf("soundcloud.com"),
         ),
         WebMusicService(
             "qobuz", "Qobuz", "https://play.qobuz.com/",
+            signIn = "https://play.qobuz.com/login",
             origins = listOf("https://play.qobuz.com"),
             domains = listOf("qobuz.com"),
             needs = R.string.music_needs_qobuz,

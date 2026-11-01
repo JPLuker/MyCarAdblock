@@ -234,13 +234,20 @@ for service in $MUSIC_SERVICES; do
     EXTRA="--es webMusic $service" shoot "music-$service" 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 done
 EXTRA="--es webMusic spotify" shoot music-spotify-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+# Playing, signed out, where a service lets you: its page's first "Play" pressed a few seconds in
+# (--ez webMusicPlay, debug only), then the map, with myCar's player beside it showing what the page
+# plays, and its song in the dock - the page's Media Session through myCar's stand-in, as in a car.
+for service in soundcloud youtube-music; do
+    EXTRA="--es webMusic $service --ez webMusicPlay true" shoot "music-$service-play" 1920 720 240 \
+        "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$DOCK_MAP;$WAIT;$WAIT"
+done
 # Spotify's tile on the app grid, beside the other music apps ("Spotify", "Web" under it).
 EXTRA="--es webMusic spotify" shoot music-grid 1920 720 240 "$WAIT;$WAIT;$GRID_BUTTON;$WAIT"
 echo "--- the music services' web players ---"
 for d in previews/music-*; do
     [ -d "$d" ] || continue
     echo "[$(basename "$d")]"
-    grep -h "music:\|cinema: no\|clipboard:" "$d/log.txt" "$d/stream.txt" 2>/dev/null | cut -c1-1500 | head -30
+    grep -h "music:\|media:\|cinema: no\|clipboard:" "$d/log.txt" "$d/stream.txt" 2>/dev/null | cut -c1-1500 | head -40
 done
 
 # Plancia and Xonos inside myCar set up on addresses that don't answer (as Tailscale ones do when
@@ -653,7 +660,7 @@ phone_music() {
     adb exec-out screencap -p > $d/02-spotify-on.png
     scroll_to "Sign in on the phone" && tap_text "Sign in on the phone"; sleep 12
     adb exec-out screencap -p > $d/03-sign-in.png
-    adb shell input keyevent 4; sleep 2; adb shell input keyevent 4; sleep 2
+    adb shell input keyevent 4; sleep 2
     adb exec-out screencap -p > $d/04-back.png
     scroll_to "Add a service" && tap_text "Add a service"; sleep 2; adb exec-out screencap -p > $d/05-add.png
     tap_text "Deezer"; sleep 1; adb exec-out screencap -p > $d/06-deezer.png
