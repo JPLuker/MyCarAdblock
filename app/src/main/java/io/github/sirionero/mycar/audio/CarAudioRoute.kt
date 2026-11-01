@@ -114,6 +114,10 @@ object CarAudioRoute {
                 // moving the sound at once opened the car's music channel and put Android's
                 // question up mid-drive. Moved only if it stays gone, once no call is on.
                 log.i("the Bluetooth music connection dropped - waiting ${DROP_MS / 1000}s before moving the sound")
+                // Dropped for a call: noted now. A call shorter than the wait was over by the check,
+                // which then moved the sound to myCar for the rest of the drive, seconds before the
+                // car brought its Bluetooth music back.
+                if (inCall()) sawCall = true
                 main.removeCallbacksAndMessages(settling)
                 main.postDelayed({ checkDropped() }, settling, DROP_MS)
             }
