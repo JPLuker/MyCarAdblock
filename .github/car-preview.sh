@@ -666,6 +666,10 @@ phone_music() {
     adb exec-out screencap -p > $d/02-spotify-on.png
     scroll_to "Sign in on the phone" && tap_text "Sign in on the phone"; sleep 12
     adb exec-out screencap -p > $d/03-sign-in.png
+    # The service's sign-in page can be slow on the emulator: again later, with what the page shows
+    # (a web page's text is in the screen's tree too).
+    sleep 20; adb exec-out screencap -p > $d/03b-sign-in-later.png
+    adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb shell cat /sdcard/ui.xml > $d/03-sign-in-ui.xml
     adb shell input keyevent 4; sleep 2
     adb exec-out screencap -p > $d/04-back.png
     scroll_to "Add a service" && tap_text "Add a service"; sleep 2; adb exec-out screencap -p > $d/05-add.png
