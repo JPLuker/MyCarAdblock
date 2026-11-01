@@ -358,6 +358,15 @@ class MyCarActivity : ComponentActivity(), Projection {
         super.onDestroy()
         // Handed its intent to the first screen: nothing of the drive is this one's.
         if (handedOver) return
+        // Gone while a newer screen holds myCar's hooks (closed from the recents as the car opened
+        // myCar again): it ended the newer one's wireless start-up. Only its own session, if any, ends.
+        val newer = current?.get()?.takeIf { it !== this && !it.isFinishing && !it.isDestroyed }
+        if (newer != null) {
+            runCatching { unregisterReceiver(detachReceiver) }
+            if (runner != null) closeAccessory(stopWireless = false)
+            MyCarLog.flush()
+            return
+        }
         // A screen that went while a newer one was already up (closed, then opened again at once)
         // ends its own drive but leaves the hooks to the newer one.
         if (current?.get() === this) {
@@ -518,8 +527,20 @@ class MyCarActivity : ComponentActivity(), Projection {
         val target = surface ?: return
         if (screenProjector != null) return
         val projector = ScreenProjector(this).also { screenProjector = it }
-        projector.start(target, frameWidth, frameHeight, frameDensity) { CarUi() }
+        // A car that gives no density got 0, which Android refuses for a display.
+        val density = frameDensity.takeIf { it > 0 } ?: android.util.DisplayMetrics.DENSITY_DEFAULT
+        val shown = runCatching { projector.start(target, frameWidth, frameHeight, density) { CarUi() } }
+            .onFailure { MyCarLog.e("the car's picture couldn't start", it) }
+            .isSuccess && projector.displayId != null
+        if (shown) return
+        // Left in place, nothing tried again and the car stayed black for the whole drive.
+        runCatching { projector.stop() }
+        screenProjector = null
+        if (projectionTries++ < 2) mainHandler.postDelayed({ if (surface === target) showCarUi() }, 1_000)
     }
+
+    /** Tries at the car's picture on this surface; see [showCarUi]. */
+    private var projectionTries = 0
 
     /** Whether the touch under way went down on the mirrored phone, rather than on the bars. */
     private var mirrorTouchOnPhone = false
@@ -675,6 +696,17 @@ class MyCarActivity : ComponentActivity(), Projection {
 
     /** A wireless session: the same runner, on the socket [WirelessLink] opened to the car. */
     private fun startWireless(socket: java.net.Socket) {
+        try {
+            startWirelessSession(socket)
+        } finally {
+            // The start-up held the drive's service for the car's Wi-Fi: the drive holds it from
+            // here, or, if it didn't start, no one does. Left held, every arrival of the car after it
+            // was read as a drive under way.
+            SessionService.stop(this, SessionService.STARTUP)
+        }
+    }
+
+    private fun startWirelessSession(socket: java.net.Socket) {
         // Closed by a stop that came first (the cable plugged in, Connect tapped again): starting
         // would end the session that replaced it, and reading a closed socket threw, closing myCar.
         if (socket.isClosed) {
@@ -697,6 +729,7 @@ class MyCarActivity : ComponentActivity(), Projection {
             vehicleProfileFor = { info -> VehicleProfiles.find(VehicleProfiles.load(this), info) },
             wireless = true,
             onCertVerdict = { identity, verdict -> CertRotation.report(applicationContext, identity, verdict) },
+            closeTransport = { socket.close() },
         )
         this.runner = runner
         worker = runSession(runner)
@@ -745,6 +778,7 @@ class MyCarActivity : ComponentActivity(), Projection {
                 }
             }
             this.surface = surface
+            projectionTries = 0
             frameWidth = width
             frameHeight = height
             frameDensity = densityDpi
