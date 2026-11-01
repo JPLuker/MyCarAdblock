@@ -131,6 +131,19 @@ class CarPreviewActivity : ComponentActivity() {
         // --es startUrl http://10.0.2.2:8002/select.html: the car's browser starts on that page. Set
         // every run, so other shots start on the usual one.
         io.github.sirionero.mycar.AppSettings.setStartupUrl(this, intent.getStringExtra("startUrl").orEmpty())
+        // Xonos on in the car every run (Music, on the phone): the shots tap it where it is on the grid.
+        io.github.sirionero.mycar.xonos.Xonos.setEnabled(this, true)
+        // --es webMusic spotify: that music service's web player on in the car, alone, and opened as
+        // the car's music a moment in, with the car's media key: its page loads as in a drive. Set
+        // every run, so other shots have none.
+        val webMusic = intent.getStringExtra("webMusic")?.let { io.github.sirionero.mycar.webmusic.WebMusic.byId(it) }
+        io.github.sirionero.mycar.webmusic.WebMusic.only(webMusic?.id)
+        if (webMusic != null) {
+            CarSettings.setLastMedia(io.github.sirionero.mycar.webmusic.WebMusic.mediaApp(this, webMusic).component.flattenToString())
+            main.postDelayed({
+                io.github.sirionero.mycar.car.CarKeys.onKey(io.github.sirionero.mycar.car.CarKeys.KEYCODE_MEDIA, down = true, longPress = false)
+            }, 3_000)
+        }
         // --es wallpaper waves: that wallpaper. Set every run, so other shots keep the default.
         io.github.sirionero.mycar.car.design.WallpaperSetting.set(
             intent.getStringExtra("wallpaper") ?: io.github.sirionero.mycar.car.design.Wallpapers.DEFAULT,
