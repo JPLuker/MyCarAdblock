@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebStorage
@@ -117,6 +118,10 @@ private fun SignInScreen(service: WebMusicService, onWeb: (WebView) -> Unit, onC
 
 @SuppressLint("SetJavaScriptEnabled")
 private fun signInWebView(context: Context, service: WebMusicService): WebView = WebView(context).apply {
+    // As tall as its place, said outright. In an AndroidView a WebView gets WRAP_CONTENT, and then
+    // WebView lays the page out 0 px tall (setForceZeroLayoutHeight): a page that fills the window
+    // from its edges - Spotify's sign-in - came out black, nothing on it to see or touch.
+    layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     settings.javaScriptEnabled = true
     settings.domStorageEnabled = true
     settings.useWideViewPort = true
