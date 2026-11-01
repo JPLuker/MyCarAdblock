@@ -126,6 +126,7 @@ internal class WebMusicPage(
     /** A voice search under way, until its first Play is pressed or isn't found. */
     private var searching = false
     private var searchTries = 0
+    private var searchedAt = 0L
 
     /** Where the page starts when it's made: a search asked before it was, or the service's start. */
     private var startAt: String? = null
@@ -216,8 +217,9 @@ internal class WebMusicPage(
     }
 
     override fun act(action: String, seconds: Double?) {
-        // A voice search plays what it finds: the Play sent with it isn't for the song before.
-        if (searching && action == "play") return
+        // A voice search plays what it finds: the Play sent with it isn't for the song before. A
+        // search whose page never comes doesn't hold the car's Play for long.
+        if (searching && action == "play" && SystemClock.uptimeMillis() - searchedAt < SEARCH_HOLD_MS) return
         send(action, seconds, retries = if (heard) 0 else RETRIES)
     }
 
@@ -226,6 +228,7 @@ internal class WebMusicPage(
         val url = service.searchUrl(query) ?: return
         pending = null
         searching = true
+        searchedAt = SystemClock.uptimeMillis()
         searchTries = SEARCH_TRIES
         main.removeCallbacks(pressFirst)
         MyCarLog.i("music: ${service.id} searching, as the driver asked")
@@ -551,6 +554,7 @@ internal class WebMusicPage(
         const val SEARCH_FIRST_MS = 1_500L
         const val SEARCH_RETRY_MS = 1_000L
         const val SEARCH_TRIES = 12
+        const val SEARCH_HOLD_MS = 20_000L
 
         /** The page's first "Play" button in sight, pressed: for the car preview ([WebMusicPreview]). */
         const val PLAY_SOMETHING_JS = """
