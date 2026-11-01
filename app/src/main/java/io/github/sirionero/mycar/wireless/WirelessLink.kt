@@ -489,6 +489,9 @@ object WirelessLink {
     /** The car's Bluetooth channel, and whether the car opened it ([inbound]) or the phone did. */
     private class Channel(val socket: BluetoothSocket, val inbound: Boolean)
 
+    /** A wait that has ended: a channel the phone's call gets after it is closed, not left open. */
+    private object WaitOver
+
     /**
      * Publishes the Android Auto service on the phone, the way Android Auto itself does, and waits
      * for the car to connect to it. A car looks for the service when the phone connects over
@@ -519,8 +522,8 @@ object WirelessLink {
         }
         if (!quiet) SessionStatus.connecting(R.string.wireless_link_bt_waiting, name)
         log.i("Bluetooth: Android Auto service published, waiting ${listenMs / 1000}s for $name")
-        // The first channel either way wins; the other is closed.
-        val won = java.util.concurrent.atomic.AtomicReference<Channel?>(null)
+        // The first channel either way wins; the other is closed. [WaitOver] once the wait has ended.
+        val won = java.util.concurrent.atomic.AtomicReference<Any?>(null)
         val knocker = if (quiet) null else Thread({
             var knocks = 0
             while (mine == startRun && listener === server && won.get() == null) {
@@ -553,16 +556,18 @@ object WirelessLink {
             val accepted = server.accept(listenMs)
             val from = runCatching { accepted.remoteDevice.name }.getOrNull() ?: "a device"
             log.i("Bluetooth: $from connected to the Android Auto service")
-            if (won.compareAndSet(null, Channel(accepted, inbound = true))) {
-                won.get()
+            val ours = Channel(accepted, inbound = true)
+            if (won.compareAndSet(null, ours)) {
+                ours
             } else {
                 // The phone's own call got through in the same moment: that one is the channel.
                 runCatching { accepted.close() }
-                won.get()
+                won.get() as Channel
             }
         } catch (e: IOException) {
-            // The car's own service answered the phone's call, which closed the wait.
-            won.get()?.let { return it }
+            // The car's own service answered the phone's call, which closed the wait. Claimed at
+            // once: a call that gets through after this finds the wait over and hangs up.
+            (won.getAndSet(WaitOver) as? Channel)?.let { return it }
             // Stopped, or replaced by a newer start-up: that one says what's going on.
             if (mine != startRun || listener !== server) return null
             log.w("Bluetooth: no car connected within ${listenMs / 1000}s (${e.message})")
@@ -574,6 +579,8 @@ object WirelessLink {
             )
             null
         } finally {
+            // However the wait ended, a call that gets through from now on hangs up.
+            won.compareAndSet(null, WaitOver)
             knocker?.interrupt()
             runCatching { server.close() }
             // Only this one's: a newer start-up may have published its own by now.
