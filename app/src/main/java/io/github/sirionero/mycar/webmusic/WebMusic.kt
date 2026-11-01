@@ -83,6 +83,9 @@ class WebMusicService(
  */
 object WebMusic {
 
+    /** Room at the left of a page's top bar for myCar's Back, which sits in that corner. */
+    private const val BACK_ROOM = "52px"
+
     val SPOTIFY = WebMusicService(
         "spotify", "Spotify", "https://open.spotify.com/",
         signIn = "https://accounts.spotify.com/login?continue=https%3A%2F%2Fopen.spotify.com%2F",
@@ -98,8 +101,9 @@ object WebMusic {
             title = "context-item-info-title",
             artist = "context-item-info-artist",
         ),
-        // "Install App" in its bar: the app is right here.
-        css = "[data-testid=\"global-nav-bar\"] a[href=\"/download\"] { display: none !important; }",
+        // "Install App" in its bar: the app is right here. Its logo moves aside for myCar's Back.
+        css = "[data-testid=\"global-nav-bar\"] a[href=\"/download\"] { display: none !important; } " +
+            "[data-testid=\"global-nav-bar\"] { padding-left: $BACK_ROOM !important; }",
         search = "https://open.spotify.com/search/{q}",
         firstPlay = listOf("[data-testid=\"top-result-card\"] [data-testid=\"play-button\"]", "[data-testid=\"tracklist-row\"] button"),
     )
@@ -115,6 +119,8 @@ object WebMusic {
             origins = listOf("https://music.youtube.com"),
             domains = listOf("youtube.com", "google.com"),
             needs = R.string.music_needs_google,
+            // Its menu button and logo move aside for myCar's Back.
+            css = "ytmusic-nav-bar #left-content { padding-left: $BACK_ROOM !important; }",
             search = "https://music.youtube.com/search?q={q}",
             firstPlay = listOf("ytmusic-card-shelf-renderer ytmusic-play-button-renderer", "ytmusic-shelf-renderer ytmusic-play-button-renderer"),
         ),
@@ -123,6 +129,8 @@ object WebMusic {
             origins = listOf("https://music.apple.com"),
             domains = listOf("apple.com"),
             needs = R.string.music_needs_apple,
+            // Its logo moves aside for myCar's Back.
+            css = "[data-testid=\"navigation\"] [data-testid=\"logo\"] { padding-left: $BACK_ROOM !important; }",
             search = "https://music.apple.com/search?term={q}",
         ),
         WebMusicService(
@@ -130,6 +138,8 @@ object WebMusic {
             origins = AMAZON.map { "https://music.amazon.$it" },
             domains = AMAZON.map { "amazon.$it" },
             needs = R.string.music_needs_amazon,
+            // Its logo moves aside for myCar's Back.
+            css = "#music-navbar { padding-left: $BACK_ROOM !important; }",
             search = "https://music.amazon.com/search/{q}",
         ),
         WebMusicService(
