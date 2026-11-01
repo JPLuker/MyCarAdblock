@@ -928,6 +928,13 @@ object WirelessLink {
             )
             return
         }
+        // Android 17 keeps myCar off local networks until it's allowed, the car's Wi-Fi among them:
+        // every try timed out, and no start-over mends that. Said as it is, with what to allow.
+        if (!io.github.sirionero.mycar.LocalNetwork.allowed(context)) {
+            log.w("TCP: Android doesn't let myCar reach local networks (Nearby devices) - the car's Wi-Fi is one")
+            SessionStatus.failed(Words.get(R.string.wireless_link_no_connection), io.github.sirionero.mycar.LocalNetwork.HINT)
+            return
+        }
         // Not behind a VPN, which no start-over gets past.
         if (run == tcpRun) startOver(context, mine, "no TCP to the car")
         SessionStatus.failed(
