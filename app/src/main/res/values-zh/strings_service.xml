@@ -47,6 +47,8 @@
     <string name="wireless_link_bt_no_car_detail">%1$s 没有与手机打开 Android Auto。请确认汽车设置中已开启无线 Android Auto，然后从汽车的蓝牙菜单中重新连接手机。</string>
     <string name="wireless_link_wifi_failed">无法加入汽车的 WLAN</string>
     <string name="wireless_link_wifi_failed_detail">Android 没有连接到 %1$s 的网络。如果出现了“连接到设备”提示，需要接受它。</string>
+    <string name="wireless_link_wifi_off">手机的 WLAN 已关闭</string>
+    <string name="wireless_link_wifi_off_detail">请打开手机的 WLAN：与汽车的无线连接要经过汽车的 WLAN。</string>
     <string name="wireless_link_vpn">VPN 阻止了与汽车的连接</string>
     <string name="wireless_link_vpn_detail">myCar 已加入 %1$s 的网络，但这部手机上的 VPN（例如 Tailscale）不让它连接汽车。请使用数据线连接、关闭 VPN，或在 VPN 的设置中把 myCar 排除在外——这样 myCar 中的 Plancia 和 Xonos 就无法使用 VPN 的地址，比如 Tailscale 名称。</string>
     <string name="wireless_link_no_connection">已加入汽车的 WLAN，但无法连接</string>

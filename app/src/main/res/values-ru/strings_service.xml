@@ -47,6 +47,8 @@
     <string name="wireless_link_bt_no_car_detail">%1$s не открыл Android Auto с телефоном. Убедитесь, что в настройках автомобиля включён беспроводной Android Auto, затем переподключите телефон через меню Bluetooth автомобиля.</string>
     <string name="wireless_link_wifi_failed">Не удалось подключиться к Wi-Fi автомобиля</string>
     <string name="wireless_link_wifi_failed_detail">Android не подключился к сети %1$s. Если появился запрос «Подключение к устройству», его нужно принять.</string>
+    <string name="wireless_link_wifi_off">Wi-Fi на телефоне выключен</string>
+    <string name="wireless_link_wifi_off_detail">Включите Wi-Fi на телефоне: беспроводное подключение к автомобилю идёт через Wi-Fi автомобиля.</string>
     <string name="wireless_link_vpn">VPN блокирует автомобиль</string>
     <string name="wireless_link_vpn_detail">myCar подключился к сети %1$s, но VPN на этом телефоне (например, Tailscale) не даёт ему связаться с автомобилем. Подключитесь кабелем, выключите VPN или исключите из него myCar в настройках VPN — тогда Plancia и Xonos внутри myCar не смогут использовать адреса VPN, например имена Tailscale.</string>
     <string name="wireless_link_no_connection">Wi-Fi автомобиля подключён, но соединения нет</string>

@@ -47,6 +47,8 @@
     <string name="wireless_link_bt_no_car_detail">Το %1$s δεν άνοιξε το Android Auto με το τηλέφωνο. Ελέγξτε ότι το ασύρματο Android Auto είναι ενεργό στις ρυθμίσεις του αυτοκινήτου και συνδέστε ξανά το τηλέφωνο από το μενού Bluetooth του αυτοκινήτου.</string>
     <string name="wireless_link_wifi_failed">Δεν ήταν δυνατή η σύνδεση στο Wi-Fi του αυτοκινήτου</string>
     <string name="wireless_link_wifi_failed_detail">Το Android δεν συνδέθηκε στο δίκτυο του %1$s. Αν εμφανίστηκε το μήνυμα «Σύνδεση σε συσκευή», πρέπει να το αποδεχτείτε.</string>
+    <string name="wireless_link_wifi_off">Το Wi-Fi του τηλεφώνου είναι απενεργοποιημένο</string>
+    <string name="wireless_link_wifi_off_detail">Ενεργοποιήστε το Wi-Fi του τηλεφώνου: η ασύρματη σύνδεση με το αυτοκίνητο περνά από το Wi-Fi του αυτοκινήτου.</string>
     <string name="wireless_link_vpn">Ένα VPN εμποδίζει το αυτοκίνητο</string>
     <string name="wireless_link_vpn_detail">Το myCar συνδέθηκε στο δίκτυο του %1$s, αλλά ένα VPN σε αυτό το τηλέφωνο (για παράδειγμα το Tailscale) δεν το αφήνει να φτάσει στο αυτοκίνητο. Συνδεθείτε με το καλώδιο, απενεργοποιήστε το VPN ή αφήστε το myCar έξω από αυτό στις ρυθμίσεις του – τότε το Plancia και το Xonos μέσα στο myCar δεν μπορούν να χρησιμοποιήσουν τις διευθύνσεις του VPN, όπως τα ονόματα του Tailscale.</string>
     <string name="wireless_link_no_connection">Συνδέθηκε στο Wi-Fi του αυτοκινήτου, αλλά χωρίς σύνδεση</string>

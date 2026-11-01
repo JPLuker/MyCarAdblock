@@ -47,6 +47,8 @@
     <string name="wireless_link_bt_no_car_detail">%1$s non ha aperto Android Auto con il telefono. Controlla che Android Auto senza fili sia attivo nelle impostazioni dell\'auto, poi ricollega il telefono dal menu Bluetooth dell\'auto.</string>
     <string name="wireless_link_wifi_failed">Impossibile entrare nel Wi-Fi dell\'auto</string>
     <string name="wireless_link_wifi_failed_detail">Android non si è collegato alla rete di %1$s. Se è comparsa la richiesta «Connetti al dispositivo», va accettata.</string>
+    <string name="wireless_link_wifi_off">Il Wi-Fi del telefono è spento</string>
+    <string name="wireless_link_wifi_off_detail">Accendi il Wi-Fi del telefono: il collegamento senza fili all\'auto passa dal Wi-Fi dell\'auto.</string>
     <string name="wireless_link_vpn">Una VPN blocca l\'auto</string>
     <string name="wireless_link_vpn_detail">myCar è entrata nella rete di %1$s, ma una VPN su questo telefono (Tailscale, per esempio) non le lascia raggiungere l\'auto. Collegati col cavo, spegni la VPN o lascia fuori myCar dalle sue impostazioni: in quel caso Plancia e Xonos dentro myCar non possono usare gli indirizzi della VPN, come i nomi Tailscale.</string>
     <string name="wireless_link_no_connection">Nel Wi-Fi dell\'auto, ma senza connessione</string>

@@ -146,6 +146,8 @@ object WirelessLink {
     @Volatile private var pictured = false
     /** The current start-up has the car's Wi-Fi details and address, and asked for the network. */
     @Volatile private var joined = false
+    /** The current start-up's failure is said already (the phone's Wi-Fi off): its channel's end says nothing more. */
+    @Volatile private var saidWhy = false
 
     /**
      * Keeps the phone awake while a start-up waits for the car, until the car shows myCar (the
@@ -215,6 +217,7 @@ object WirelessLink {
         if (!again) retriesLeft = AUTO_RETRIES
         pictured = false
         joined = false
+        saidWhy = false
         synchronized(ends) {
             channelOver = false
             releaseWithChannel = false
@@ -310,7 +313,7 @@ object WirelessLink {
                 listenAgain(context)
                 return
             }
-            if (!startOver(context, mine, "the car closed the Bluetooth channel before a drive") && !quiet) {
+            if (!startOver(context, mine, "the car closed the Bluetooth channel before a drive") && !quiet && !saidWhy) {
                 // Nothing follows: "talking to the car" stayed up for good, and only Disconnect cleared it.
                 car?.let { SessionStatus.failed(R.string.wireless_link_bt_no_car, R.string.wireless_link_bt_no_car_detail, name(it)) }
             }
@@ -701,6 +704,19 @@ object WirelessLink {
         // Stopped or replaced meanwhile: its service and network request would be no one's.
         if (mine != startRun) return
         joined = true
+        // The phone's Wi-Fi off: no app can turn it on, so the car's network never came - a minute's
+        // wait, a message about a prompt or a password, and minutes of start-overs. Said at once.
+        if (context.getSystemService(android.net.wifi.WifiManager::class.java)?.isWifiEnabled == false) {
+            log.w("Wi-Fi: the phone's Wi-Fi is off - the car's network can't come")
+            runCatching { send(output, MSG_CONNECTION_STATUS, Protobuf.varintField(1, -1)) }
+            SessionStatus.failed(R.string.wireless_link_wifi_off, R.string.wireless_link_wifi_off_detail)
+            // Over, without starting over (it would fail the same way) or saying anything else: the
+            // channel's end gives the drive's service back.
+            saidWhy = true
+            retriesLeft = 0
+            runCatching { rfcomm?.close() }
+            return
+        }
         SessionStatus.connecting(R.string.wireless_link_wifi_joining, name)
         val spec = WifiNetworkSpecifier.Builder().setSsid(ssid).apply {
             runCatching { MacAddress.fromString(bssid) }.getOrNull()
