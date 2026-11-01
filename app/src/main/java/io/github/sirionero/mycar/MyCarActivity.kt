@@ -844,8 +844,11 @@ class MyCarActivity : ComponentActivity(), Projection {
     }
 
     override fun onProjectionStopped() {
-        // Before the car UI goes, while the media connection is still up.
-        io.github.sirionero.mycar.car.CarServices.pausePhoneMedia()
+        // Before the car UI goes, while the media connection is still up. Only after a drive the
+        // car showed: a start-up that ended before the picture - the car's Android Auto not ready
+        // yet, a certificate turned down, and each start-over after them - paused the phone's
+        // music, often playing on the car's Bluetooth.
+        if (surface != null) io.github.sirionero.mycar.car.CarServices.pausePhoneMedia()
         runOnUiThread {
             PhoneMirror.requestStop()
             io.github.sirionero.mycar.car.CarKeys.focusSink = null
