@@ -274,8 +274,8 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, onClose: () -> Un
     var lastUrl by remember { mutableStateOf(startAt) }
 
     // Another app's sound has to reach the car: the capture starts now, if it waited for Xonos.
-    // Opened by the driver: a "no" earlier in the drive is asked once more.
-    LaunchedEffect(Unit) { CarAudio.askAgain(); CarAudio.captureNow() }
+    // Opened by the driver: a "no" earlier in the drive is asked once more (once a drive).
+    LaunchedEffect(Unit) { CarAudio.askAgainOnce(); CarAudio.captureNow() }
 
     DisposableEffect(web) {
         navigator.backInterceptor = {

@@ -280,7 +280,7 @@ object CarServices {
         if (CarSettings.pipeAudio.value) {
             // Picked by the driver: a "no" to Android's question earlier in the drive is asked once
             // more, as this music reaches the car only through the capture. Not the drive's own pick.
-            if (!auto) CarAudio.askAgain()
+            if (!auto) CarAudio.askAgainOnce()
             CarAudio.request()
         }
     }

@@ -171,6 +171,7 @@ object CarAudio {
     /** The car went away. Everything is torn down; the next connection asks again. */
     fun release() {
         wanted = false
+        askedAgain = false
         AudioCaptureService.stop()
         _capture.value = Capture.OFF
         feed?.let {
@@ -196,6 +197,20 @@ object CarAudio {
         _capture.value = Capture.OFF
         if (wanted) request()
     }
+
+    /**
+     * The driver opened something whose sound needs the capture (a music app, a web player,
+     * Cinema): after a "no", asked once more - once a drive, not at every app opened after it.
+     * The car's "Ask again" ([askAgain]) asks as often as tapped.
+     */
+    fun askAgainOnce() {
+        if (_capture.value != Capture.DENIED || askedAgain) return
+        askedAgain = true
+        askAgain()
+    }
+
+    /** [askAgainOnce] has asked this drive. */
+    @Volatile private var askedAgain = false
 
     /** The question can't be asked now (the phone's screen is shared): the next [request] asks it. */
     fun askLater() {
