@@ -19,6 +19,9 @@ class CarPresenceService : CompanionDeviceService() {
         WirelessAuto.carAppeared(applicationContext, address)
     }
 
+    // Android 13 and later reach this one too, through onDeviceDisappeared(AssociationInfo).
     @Deprecated("Deprecated in Java")
-    override fun onDeviceDisappeared(address: String) {}
+    override fun onDeviceDisappeared(address: String) {
+        WirelessLink.carGone(applicationContext, address)
+    }
 }

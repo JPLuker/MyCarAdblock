@@ -97,19 +97,32 @@ class SessionService : Service() {
         @Volatile var running = false
             private set
 
-        /** A car connected: called while myCar is on screen, as its arrival opens it. */
-        /** A drive wants the service; false once it has ended. */
-        @Volatile private var wanted = false
+        /** A drive holds the service, from its picture to its end. */
+        const val DRIVE = "drive"
+        /** A wireless start-up holds it from the car's Bluetooth channel, for the car's Wi-Fi (WirelessLink). */
+        const val STARTUP = "startup"
 
-        fun start(context: Context, wireless: Boolean = false) {
-            wanted = true
+        /**
+         * Who wants the service. It stops when no one does: with one flag for both, the end of a drive
+         * stopped the service a start-up had just taken for the car starting over, and a start-up's
+         * service taken after a drive was never given back.
+         */
+        private val holders = java.util.Collections.synchronizedSet(mutableSetOf<String>())
+
+        /** Someone wants the service; false once no one does. */
+        private val wanted get() = holders.isNotEmpty()
+
+        /** A car connected: called while myCar is on screen, as its arrival opens it. */
+        fun start(context: Context, wireless: Boolean = false, holder: String = DRIVE) {
+            holders += holder
             val intent = Intent(context, SessionService::class.java).putExtra(EXTRA_WIRELESS, wireless)
             runCatching { context.startForegroundService(intent) }
                 .onFailure { MyCarLog.w("session: Android won't start the drive's foreground service now - ${it.message}") }
         }
 
-        fun stop(context: Context) {
-            wanted = false
+        fun stop(context: Context, holder: String = DRIVE) {
+            holders -= holder
+            if (wanted) return
             // Stopped before it called startForeground, Android takes myCar down with it: a service
             // still starting stops itself in onStartCommand instead.
             if (!running) return
