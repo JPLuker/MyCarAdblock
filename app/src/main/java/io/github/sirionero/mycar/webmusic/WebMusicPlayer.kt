@@ -26,6 +26,9 @@ object WebMusicPlayer {
         /** Signed out on the phone: the page starts again, signed out. */
         fun signedOut()
 
+        /** Signed in on the phone: the page, still the one from before, starts again signed in. */
+        fun signedIn()
+
         /** The voice assistant's "play [query]": the service's search, and the Play of what it finds first. */
         fun search(query: String)
     }
@@ -104,6 +107,11 @@ object WebMusicPlayer {
     /** [id] signed out on the phone: its page in the car, if there's one, starts again. */
     fun signedOut(id: String) {
         attached[id]?.signedOut()
+    }
+
+    /** [id]'s sign-in on the phone closed: its page in the car, if there's one, starts again. */
+    fun signedIn(id: String) {
+        attached[id]?.signedIn()
     }
 
     private const val ANSWER_MS = 2_000L

@@ -45,6 +45,7 @@ import io.github.sirionero.mycar.ui.MyCarTheme
  */
 class WebMusicSignInActivity : ComponentActivity() {
     private var web: WebView? = null
+    private var serviceId: String? = null
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(AppLanguage.wrap(newBase))
@@ -57,6 +58,7 @@ class WebMusicSignInActivity : ComponentActivity() {
             finish()
             return
         }
+        serviceId = service.id
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val w = web
@@ -81,6 +83,8 @@ class WebMusicSignInActivity : ComponentActivity() {
         web?.destroy()
         web = null
         CookieManager.getInstance().flush()
+        // A drive under way: the car's page of the service starts again, signed in.
+        serviceId?.let(WebMusicPlayer::signedIn)
         super.onDestroy()
     }
 
