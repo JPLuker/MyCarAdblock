@@ -312,6 +312,18 @@
         <service android:name=".webmusic.TidalMusicService" android:exported="false" />
         <service android:name=".webmusic.SoundCloudMusicService" android:exported="false" />
         <service android:name=".webmusic.QobuzMusicService" android:exported="false" />
+
+        <!--
+          A music service's sign-in on the phone, in a page of myCar's own: the same web engine as the
+          car's page, so that one is signed in too (webmusic/WebMusicSignIn.kt). Kept through a turn of
+          the phone, with what was typed.
+        -->
+        <activity
+            android:name=".webmusic.WebMusicSignInActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode" />
+
         <!--
           Touch on the car screen is replayed onto the phone through this service.
           dispatchGesture is the only public way for an app to inject input into another app,
