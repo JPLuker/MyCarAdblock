@@ -15,6 +15,7 @@ import android.net.NetworkRequest
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import android.os.SystemClock
 import android.provider.Settings
 import io.github.sirionero.mycar.MyCarLog
@@ -146,6 +147,29 @@ object WirelessLink {
     /** The current start-up has the car's Wi-Fi details and address, and asked for the network. */
     @Volatile private var joined = false
 
+    /**
+     * Keeps the phone awake while a start-up waits for the car, until the car shows myCar (the
+     * drive's service keeps it awake from there) or the start-up ends. In a pocket, with the screen
+     * off, the phone went to sleep: the calls to the car every few seconds and a start-over's short
+     * wait count only the time awake, so they stopped until something else woke the phone - often
+     * the driver, taking it out to tap Disconnect and Connect. Not for the listening after a drive.
+     */
+    @Volatile private var awake: PowerManager.WakeLock? = null
+
+    private fun stayAwake(context: Context, ms: Long) {
+        val lock = awake ?: runCatching {
+            context.applicationContext.getSystemService(PowerManager::class.java)
+                .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "myCar:wireless-startup")
+                .apply { setReferenceCounted(false) }
+        }.getOrNull()?.also { awake = it } ?: return
+        // A new time replaces the one before.
+        runCatching { lock.acquire(ms) }
+    }
+
+    private fun sleepAgain() {
+        runCatching { awake?.takeIf { it.isHeld }?.release() }
+    }
+
     private fun holdService(context: Context) {
         ownsService = true
         io.github.sirionero.mycar.SessionService.start(context, wireless = true, holder = io.github.sirionero.mycar.SessionService.STARTUP)
@@ -197,6 +221,8 @@ object WirelessLink {
         }
         val app = context.applicationContext
         car = device
+        // The wait for the car, then its Wi-Fi (up to a minute) and the TCP tries (a minute).
+        if (!quiet) stayAwake(app, (if (byItself) AUTO_LISTEN_MS else LISTEN_MS) + 180_000L)
         // Taken here, not in the thread: a start-up stopped before its thread ran is old already.
         val mine = startRun
         worker = Thread({
@@ -206,6 +232,9 @@ object WirelessLink {
             } catch (e: Exception) {
                 log.e("wireless start-up failed", e)
                 SessionStatus.failed(Words.get(R.string.wireless_link_failed), "${e.javaClass.simpleName}: ${e.message}")
+            } finally {
+                // Over, unless a start-over is on its way: it keeps the phone awake for its wait.
+                if (mine == startRun && retryFor != mine) sleepAgain()
             }
         }, "mycar-wireless").apply { isDaemon = true; start() }
     }
@@ -213,6 +242,8 @@ object WirelessLink {
     /** The car's picture came up over Wi-Fi: it works without the cable, so it can connect by itself next time. */
     fun reachedCar(context: Context) {
         pictured = true
+        // The drive's service keeps the phone awake from here.
+        sleepAgain()
         car?.let { WirelessAuto.reached(context.applicationContext, it) }
     }
 
@@ -303,6 +334,7 @@ object WirelessLink {
         // The listening after a drive stays that: started over as a plain start-up it showed
         // "waiting for the car" on Home for 5 minutes, and ended with "the car didn't connect".
         val wasQuiet = quiet
+        if (!wasQuiet) stayAwake(app, RETRY_DELAY_MS + 5_000L)
         main.postDelayed({
             // Stopped, started anew or driving meanwhile (the cable, a tap, Disconnect): that one decides.
             if (mine != startRun || tcp != null) return@postDelayed
@@ -361,6 +393,7 @@ object WirelessLink {
         startRun++
         againFor = null
         giveBackService(context)
+        sleepAgain()
         val starting = worker != null && SessionStatus.state.value.phase == SessionStatus.Phase.CONNECTING
         worker?.interrupt()
         worker = null
