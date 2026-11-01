@@ -58,6 +58,34 @@ class Page:
                 f.write(base64.b64decode(data))
 
 
+LOOK = r"""(() => {
+  const field = document.querySelector('input');
+  if (!field) return 'no field';
+  const r = field.getBoundingClientRect();
+  const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+  const name = el => el ? (el.tagName + (el.id ? '#' + el.id : '') + (el.className && el.className.baseVal === undefined ? '.' + String(el.className).split(' ').slice(0, 2).join('.') : '')) : null;
+  const chain = [];
+  for (let el = field; el; el = el.parentElement) {
+    const s = getComputedStyle(el);
+    if (s.opacity !== '1' || s.visibility !== 'visible' || s.filter !== 'none' || s.display === 'none' || (s.transform !== 'none' && s.transform.indexOf('matrix(1, 0, 0, 1') !== 0) || s.clipPath !== 'none' || s.contentVisibility === 'hidden')
+      chain.push(name(el) + ' opacity ' + s.opacity + ' vis ' + s.visibility + ' filter ' + s.filter + ' transform ' + s.transform + ' clip ' + s.clipPath + ' cv ' + s.contentVisibility);
+  }
+  const h = document.querySelector('h1');
+  const hs = h ? getComputedStyle(h) : null;
+  const covers = [...document.querySelectorAll('body *')].filter(el => {
+    const s = getComputedStyle(el); if (s.position !== 'fixed' && s.position !== 'absolute') return false;
+    const b = el.getBoundingClientRect(); return b.width >= innerWidth * 0.9 && b.height >= innerHeight * 0.9;
+  }).map(el => name(el) + ' z ' + getComputedStyle(el).zIndex + ' bg ' + getComputedStyle(el).backgroundColor + ' op ' + getComputedStyle(el).opacity).slice(0, 6);
+  return JSON.stringify({
+    field: [r.left, r.top, r.width, r.height].map(Math.round), onTop: name(top), fieldIsOnTop: top === field || field.contains(top),
+    hidden: chain, h1: h ? [h.innerText.length, hs.color, hs.opacity, hs.visibility] : null,
+    fieldColors: [getComputedStyle(field).color, getComputedStyle(field).backgroundColor],
+    covers, dark: matchMedia('(prefers-color-scheme: dark)').matches, colorScheme: getComputedStyle(document.documentElement).colorScheme,
+    fonts: document.fonts ? document.fonts.status : null, htmlBg: getComputedStyle(document.documentElement).backgroundColor,
+  });
+})()"""
+
+
 def main(base, out):
     pages = [p for p in json.load(urllib.request.urlopen(base + "/json", timeout=20)) if p.get("type") == "page"]
     target = next((p for p in pages if "spotify" in p.get("url", "")), None)
@@ -68,24 +96,34 @@ def main(base, out):
     page.call("Page.enable")
     page.call("Network.enable")
     print("as myCar opens it:", page.value(PROBE))
+    print("why it doesn't show:", page.value(LOOK))
     page.shot(out + "-1-as-opened.png")
-    ua = page.value("navigator.userAgent") or ""
-    print("user agent:", ua)
-    phone = re.sub(r"\(X11; Linux x86_64\)", "(Linux; Android 14; K)", ua).replace("Safari/537.36", "Mobile Safari/537.36")
-    page.call("Network.setUserAgentOverride", {"userAgent": phone})
-    page.call("Page.reload", {"ignoreCache": True})
+    print("ua:", page.value("navigator.userAgent"))
+    # 1. Without the web engine's automatic dark mode.
+    print("auto dark off:", page.call("Emulation.setAutoDarkModeOverride", {"enabled": False}).get("error"))
+    time.sleep(3)
+    print("why, auto dark off:", page.value(LOOK))
+    page.shot(out + "-2-auto-dark-off.png")
+    page.call("Emulation.setAutoDarkModeOverride", {})
+    # 2. A light colour scheme asked of the page.
+    page.call("Emulation.setEmulatedMedia", {"features": [{"name": "prefers-color-scheme", "value": "light"}]})
+    time.sleep(3)
+    print("why, light scheme:", page.value(LOOK))
+    page.shot(out + "-3-light.png")
+    page.call("Emulation.setEmulatedMedia", {"features": []})
+    # 3. Laid out as wide as the car's page (a computer's window), then loaded again.
+    page.call("Emulation.setDeviceMetricsOverride", {"width": 1024, "height": 768, "deviceScaleFactor": 1, "mobile": False})
+    page.call("Page.reload", {"ignoreCache": False})
     time.sleep(15)
-    print("with a phone's user agent:", page.value(PROBE))
-    page.shot(out + "-2-phone-ua.png")
-    page.call("Network.setUserAgentOverride", {"userAgent": ua})
-    page.call("Page.navigate", {"url": "https://open.spotify.com/"})
+    print("wide:", page.value(PROBE))
+    print("why, wide:", page.value(LOOK))
+    page.shot(out + "-4-wide.png")
+    page.call("Emulation.clearDeviceMetricsOverride")
+    # 4. Loaded again as it is, after all that: the same?
+    page.call("Page.reload", {"ignoreCache": False})
     time.sleep(15)
-    print("the web player:", page.value(PROBE))
-    page.shot(out + "-3-player.png")
-    page.call("Page.navigate", {"url": "https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fopen.spotify.com%2F"})
-    time.sleep(15)
-    print("sign-in after the web player:", page.value(PROBE))
-    page.shot(out + "-4-after-player.png")
+    print("again as opened:", page.value(LOOK))
+    page.shot(out + "-5-again.png")
 
 
 if __name__ == "__main__":
