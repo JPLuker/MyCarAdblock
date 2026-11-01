@@ -126,6 +126,24 @@ object CarServices {
         )
     }
 
+    /**
+     * Xonos switched on or off on the phone in the middle of a drive: connected to Music Assistant
+     * now, as at a drive's start - not connected, it'd soon be taken for one that can't, and the
+     * Xonos app put in its place - or let go, and out of the car's music if it was. On the main thread.
+     */
+    fun xonosSwitched(on: Boolean) {
+        val appContext = context ?: return
+        if (holders == 0 || on == xonosHeld) return
+        xonosHeld = on
+        if (on) {
+            XonosAccount.adoptIfUnset(appContext)
+            Xonos.repo.acquire()
+        } else {
+            if (_mediaApp.value?.component?.let(Xonos::isInside) == true) closeMedia()
+            Xonos.repo.release()
+        }
+    }
+
     // --- map -----------------------------------------------------------------------------
 
     /**

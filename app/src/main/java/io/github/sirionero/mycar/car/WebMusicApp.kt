@@ -60,8 +60,14 @@ import kotlin.math.absoluteValue
 @Composable
 internal fun WebMusicScreen(service: WebMusicService) {
     val pages = LocalWebMusicPages.current ?: return
-    val page = remember(pages, service.id) { pages.page(service) }
     val navigator = LocalCarNavigator.current
+    // Turned off on the phone: out of the car, this screen too.
+    val on by WebMusic.on.collectAsState()
+    if (service.id !in on) {
+        LaunchedEffect(Unit) { navigator.back() }
+        return
+    }
+    val page = remember(pages, service.id) { pages.page(service) }
     val field by page.field.collectAsState()
     val video by page.fullScreen.collectAsState()
     val unreachable by page.unreachable.collectAsState()

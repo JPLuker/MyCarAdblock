@@ -55,16 +55,28 @@ internal val LocalWebMusicPages = staticCompositionLocalOf<WebMusicPages?> { nul
 internal class WebMusicPages(private val context: Context) : WebMusicPlayer.Pages {
     private val made = SystemClock.uptimeMillis()
     private val pages = mutableMapOf<String, WebMusicPage>()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     init {
         WebMusicPlayer.pages = this
+        // A service turned off on the phone leaves the car at once: its page goes, its music with it.
+        scope.launch {
+            WebMusic.on.collect { on ->
+                pages.keys.filter { it !in on }.forEach { id -> pages.remove(id)?.destroy() }
+                val music = CarServices.mediaApp.value?.component?.let(WebMusic::serviceFor)
+                if (music != null && music.id !in on) CarServices.closeMedia()
+            }
+        }
     }
 
     fun page(service: WebMusicService): WebMusicPage = pages.getOrPut(service.id) { WebMusicPage(context, service, made) }
 
-    override fun open(service: WebMusicService): WebMusicPlayer.Page = page(service).also { it.make() }
+    /** A page for the car's buttons, out of sight if need be: none for a service that's off. */
+    override fun open(service: WebMusicService): WebMusicPlayer.Page? =
+        if (service.id in WebMusic.on.value) page(service).also { it.make() } else null
 
     fun destroy() {
+        scope.cancel()
         if (WebMusicPlayer.pages === this) WebMusicPlayer.pages = null
         pages.values.forEach { it.destroy() }
         pages.clear()

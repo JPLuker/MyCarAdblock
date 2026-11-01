@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.car.CarServices
 import io.github.sirionero.mycar.webmusic.WebMusic
 import io.github.sirionero.mycar.webmusic.WebMusicAccounts
 import io.github.sirionero.mycar.webmusic.WebMusicService
@@ -63,7 +64,10 @@ private fun XonosPart() {
             stringResource(R.string.music_in_the_car),
             on,
             stringResource(if (on) R.string.music_xonos_on else R.string.music_xonos_off),
-        ) { Xonos.setEnabled(context, it) }
+        ) {
+            Xonos.setEnabled(context, it)
+            CarServices.xonosSwitched(it)
+        }
     }
     if (on) {
         XonosSection(top = switch)
