@@ -15,6 +15,7 @@ import android.net.NetworkRequest
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.provider.Settings
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.Protobuf
@@ -79,7 +80,10 @@ object WirelessLink {
     private const val AUTO_LISTEN_MS = 300_000
     /** After a drive with a car that calls the phone, how long the service stays published for it. */
     private const val AGAIN_LISTEN_MS = 600_000
-    private const val TCP_TRIES = 12 // about a minute: a car's projection listener can start well after its Wi-Fi
+    /** At least this many TCP tries, each up to 5 s when the car doesn't answer... */
+    private const val TCP_TRIES = 12
+    /** ...and for at least this long: a car's projection listener can start well after its Wi-Fi. */
+    private const val TCP_WINDOW_MS = 60_000L
     private const val WIFI_WAIT_MS = 60_000
     /** While the phone's service waits for the car, the car's own is called this often (see [waitForCar]). */
     private const val KNOCK_MS = 8_000L
@@ -813,7 +817,12 @@ object WirelessLink {
         // Set once Android refuses to bind to the car's network, which a VPN causes. Plain sockets
         // then go through the VPN, and VPNs that let local traffic past still reach the car.
         var bindRefused = false
-        repeat(TCP_TRIES) { attempt ->
+        // For about a minute, not only twelve tries: a port no one listens on yet is refused at
+        // once, so the tries a second apart were over in some 12 s, and the car, listening moments
+        // later, found no one - Disconnect and Connect then worked at once.
+        val until = SystemClock.elapsedRealtime() + TCP_WINDOW_MS
+        var attempt = -1
+        while (++attempt < TCP_TRIES || SystemClock.elapsedRealtime() < until) {
             if (run != tcpRun) {
                 log.i("TCP: stopping the tries on the old network - the car started over")
                 return
@@ -863,7 +872,8 @@ object WirelessLink {
                 return
             } catch (e: Exception) {
                 last = e
-                log.w("TCP: try ${attempt + 1} to $ip:$port failed: ${e.message}")
+                // Refused at once, the tries can be dozens: the first few and every tenth say so.
+                if (attempt < 3 || attempt % 10 == 9) log.w("TCP: try ${attempt + 1} to $ip:$port failed: ${e.message}")
                 if (!bindRefused && e.message?.contains("EPERM") == true) {
                     bindRefused = true
                     log.i("TCP: Android won't let myCar use the car's network directly; trying the phone's ordinary route")
