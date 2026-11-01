@@ -467,7 +467,11 @@ class CarAppConnection(private val context: Context) {
                 MyCarLog.w("host: getTemplate returned ${value?.javaClass?.name}")
                 return@call
             }
-            MyCarLog.i("host: template = ${template.javaClass.simpleName}")
+            val name = template.javaClass.simpleName
+            if (name != loggedTemplate) {
+                loggedTemplate = name
+                MyCarLog.i("host: template = $name")
+            }
             _template.value = template
             update { it.copy(template = template.javaClass.simpleName) }
             autoRoute.onTemplate(template)
@@ -599,6 +603,8 @@ class CarAppConnection(private val context: Context) {
         // template (see visibleAreaFor) and are reported by the UI via [reportAreas] once it
         // has measured. Until then the whole surface is fair game.
         val whole = Rect(0, 0, surface.width, surface.height)
+        // A new surface, maybe a new callback: told afresh.
+        reportedAreas = null
         reportAreas(whole, whole)
 
         MyCarLog.i(
@@ -619,8 +625,18 @@ class CarAppConnection(private val context: Context) {
     }
 
     /** Tells the app which part of its surface the driver can actually see. */
+    /** The areas last told to the app, see [reportAreas]. */
+    private var reportedAreas: Pair<Rect, Rect>? = null
+    /** The app's template updates so far, and the kind of template last written to the log. */
+    private val invalidations = java.util.concurrent.atomic.AtomicInteger()
+    private var loggedTemplate: String? = null
+
     fun reportAreas(visible: Rect, stable: Rect) {
         val callback = surfaceCallback ?: return
+        // During a route the app sends a template about once a second, and each one sent the same
+        // areas again: the app laid its map out anew every time, for nothing.
+        if (reportedAreas == (visible to stable)) return
+        reportedAreas = visible to stable
         runCatching { callback.onStableAreaChanged(stable, noop("onStableAreaChanged")) }
         runCatching { callback.onVisibleAreaChanged(visible, noop("onVisibleAreaChanged")) }
     }
@@ -651,7 +667,10 @@ class CarAppConnection(private val context: Context) {
 
     private fun createAppHost(owner: Any) = object : IAppHost.Stub() {
         override fun invalidate() {
-            MyCarLog.i("host: app invalidated its template")
+            // About once a second during a route: counted, with a line now and then, instead of a
+            // line each time (two with the template's, some 7,000 an hour of navigation).
+            val n = invalidations.incrementAndGet()
+            if (n % 100 == 1) MyCarLog.i("host: app invalidated its template (#$n)")
             main.post { requestTemplate() }
         }
 
