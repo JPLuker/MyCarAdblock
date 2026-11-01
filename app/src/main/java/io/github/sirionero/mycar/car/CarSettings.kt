@@ -345,6 +345,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
     internal fun useCarLink(on: Boolean) {
         if (pipeAudioFlow.value == on) return
         pipeAudioFlow.value = on
+        BluetoothAudioCheck.recheck()
         if (on) CarAudio.request() else CarAudio.release()
     }
 
