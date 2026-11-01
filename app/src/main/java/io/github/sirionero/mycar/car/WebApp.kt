@@ -334,11 +334,17 @@ internal const val FOCUS_TRACKING_JS = """
             var el = fieldOf(e);
             if (isEditable(el)) report(el);
         });
+        // The field left: told a moment later, and only if no field has the focus then. The page
+        // losing the phone's focus (the see-through screen that reads the clipboard for Paste, a
+        // dialog on the phone) blurs the field too, but leaves it the page's active element: that
+        // isn't the driver leaving it, and the keyboard stays - with the pasted text on its way.
         document.addEventListener('focusout', function(e) {
-            if (isEditable(fieldOf(e))) {
+            if (!isEditable(fieldOf(e))) return;
+            setTimeout(function() {
+                if (isEditable(deepActive())) return;
                 shown = null;
                 window.MyCarField.blurred();
-            }
+            }, 250);
         });
         // A field focused before this script ran (autofocus, a tap while the page loaded) gets
         // no new focusin when tapped: the tap brings the keyboard up instead.
