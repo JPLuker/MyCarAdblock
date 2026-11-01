@@ -230,17 +230,23 @@ object DirectionsVoice {
         }
     }
 
-    private fun play(text: String, id: Int) {
+    private fun play(text: String, id: Int, locale: Locale? = null, going: () -> Boolean = { true }, what: String = "a turn") {
         val engine = tts ?: return
         val context = appContext ?: return
         val sink = link ?: return
         if (!ttsReady) {
-            MyCarLog.w("guidance: text-to-speech isn't ready, a turn went unspoken")
+            MyCarLog.w("guidance: text-to-speech isn't ready, $what went unspoken")
             return
         }
-        speakIn(engine, context)
+        if (locale == null) {
+            speakIn(engine, context)
+        } else if (locale != voiceIn) {
+            // The assistant's voice: the next turn sets myCar's again (speakIn).
+            voiceIn = locale
+            runCatching { engine.setLanguage(locale) }
+        }
         val file = File(context.cacheDir, "directions.wav")
-        val utterance = "mycar-directions-$id"
+        val utterance = if (locale == null) "mycar-directions-$id" else "mycar-assistant-$id"
         val done = CountDownLatch(1)
         pending[utterance] = done
         if (engine.synthesizeToFile(text, Bundle(), file, utterance) != TextToSpeech.SUCCESS) {
@@ -249,16 +255,53 @@ object DirectionsVoice {
         }
         if (!done.await(SYNTH_TIMEOUT_S, TimeUnit.SECONDS)) {
             pending.remove(utterance)
-            MyCarLog.w("guidance: text-to-speech took too long, a turn went unspoken")
+            MyCarLog.w("guidance: text-to-speech took too long, $what went unspoken")
             return
         }
         val pcm = Wav.read(file)?.let { Wav.convert(it, sink.sampleRate, sink.channels) } ?: run {
             MyCarLog.w("guidance: text-to-speech gave audio myCar can't read")
             return
         }
-        stream(sink, pcm)
-        MyCarLog.i("guidance: spoke a turn (${pcm.size / (2 * sink.channels) * 1000 / sink.sampleRate} ms)")
+        stream(sink, pcm, going)
+        MyCarLog.i("guidance: spoke $what (${pcm.size / (2 * sink.channels) * 1000 / sink.sampleRate} ms)")
     }
+
+    /**
+     * The assistant's [text] on the car's channel for spoken prompts, in [locale], for when the
+     * phone's own sound doesn't reach the car: myCar's own music (Xonos) goes straight into it and
+     * nothing is captured, so the assistant's voice came out of the phone's speaker. False when the
+     * car gave no such channel or there's no voice: the assistant speaks as before. [done] once, on
+     * the main thread: true when cut short ([stopAssistant]).
+     */
+    fun speakForAssistant(text: String, locale: Locale, done: (cut: Boolean) -> Unit): Boolean {
+        val sink = link ?: return false
+        if (tts == null || !ttsReady) return false
+        val turn = ++assistantTurn
+        speaker.execute {
+            var cut = true
+            try {
+                if (turn == assistantTurn && link === sink) {
+                    play(text, turn, locale, going = { turn == assistantTurn }, what = "the assistant's reply")
+                    cut = turn != assistantTurn
+                }
+            } catch (e: Exception) {
+                MyCarLog.w("guidance: could not speak the assistant's reply: ${e.message}")
+                cut = false
+            } finally {
+                main.post { done(cut) }
+            }
+        }
+        return true
+    }
+
+    /** The assistant stopped speaking: its reply on the car's channel stops too. */
+    fun stopAssistant() {
+        assistantTurn++
+    }
+
+    /** The assistant's reply on the car's channel now; any other number, it's over or cut. */
+    @Volatile private var assistantTurn = 0
+    private val main = android.os.Handler(android.os.Looper.getMainLooper())
 
     /**
      * The turns are worded in myCar's language (Words): the voice speaks it too, in the phone's own
@@ -275,8 +318,8 @@ object DirectionsVoice {
         if (result < TextToSpeech.LANG_AVAILABLE) MyCarLog.w("guidance: the phone's speech engine has no voice for $locale ($result)")
     }
 
-    /** Start, the words in 20 ms chunks at about real time, a little silence, Stop. */
-    private fun stream(sink: AudioLink, pcm: ByteArray) {
+    /** Start, the words in 20 ms chunks at about real time, a little silence, Stop - while [going]. */
+    private fun stream(sink: AudioLink, pcm: ByteArray, going: () -> Boolean = { true }) {
         val frame = 2 * sink.channels
         val chunk = sink.sampleRate / 50 * frame
         val chunkMs = 20L
@@ -286,7 +329,7 @@ object DirectionsVoice {
             val began = System.currentTimeMillis()
             var offset = 0
             var sent = 0
-            while (offset < padded.size && link === sink) {
+            while (offset < padded.size && link === sink && going()) {
                 val size = minOf(chunk, padded.size - offset)
                 sink.write(padded.copyOfRange(offset, offset + size), size)
                 offset += size
