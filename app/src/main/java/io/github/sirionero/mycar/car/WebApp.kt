@@ -65,6 +65,15 @@ internal fun WebApp(content: String, tile: WebTile?) {
     var fieldText by remember { mutableStateOf<String?>(null) }
     // A new web view after the web engine's page process died (see LoggingClient.onRenderProcessGone).
     var generation by remember { mutableIntStateOf(0) }
+    // Opened full screen, for a video or a radio maybe: its sound reaches the car only through the
+    // capture, which waited while myCar's own music (Xonos) was the car's - and the browser stayed
+    // silent in the car. As Cinema does. Not a page's part on Home, which a swipe shows in passing.
+    if (tile == null) {
+        LaunchedEffect(Unit) {
+            io.github.sirionero.mycar.audio.CarAudio.askAgainOnce()
+            io.github.sirionero.mycar.audio.CarAudio.captureNow()
+        }
+    }
 
     DisposableEffect(web, tile) {
         if (tile != null) return@DisposableEffect onDispose { }
