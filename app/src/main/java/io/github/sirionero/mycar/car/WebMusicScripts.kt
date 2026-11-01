@@ -357,7 +357,9 @@ internal object WebMusicScripts {
   if (!car) return;
   var hints = navigator.userAgentData;
   var session = navigator.mediaSession;
-  var out = { type: 'probe', url: location.href, title: document.title, ua: navigator.userAgent,
+  // The address and the title only in debug builds: a page made for a voice search carries the
+  // words asked for in both.
+  var out = { type: 'probe', url: $layout ? location.href : location.origin, title: $layout ? document.title : '', ua: navigator.userAgent,
     mobile: hints ? hints.mobile : null, platform: hints ? hints.platform : null,
     mediaSession: !session ? 'none' : session.__mycar ? 'myCar stand-in' : 'native', metadata: !!(session && session.metadata),
     width: innerWidth, height: innerHeight, ratio: devicePixelRatio };
