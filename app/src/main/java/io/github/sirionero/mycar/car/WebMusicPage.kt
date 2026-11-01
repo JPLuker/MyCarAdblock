@@ -358,6 +358,12 @@ internal class WebMusicPage(
 
     private fun ours(url: String?): Boolean = url != null && service.origins.any { url == it || url.startsWith("$it/") }
 
+    private fun isSearch(url: String?): Boolean = url.orEmpty().contains("search", ignoreCase = true)
+
+    /** An address for the log: a search's without the words the driver said. */
+    private fun logged(url: String?): String =
+        if (isSearch(url)) url.orEmpty().substringBefore("search") + "search (words left out)" else url.orEmpty()
+
     @SuppressLint("SetJavaScriptEnabled")
     private fun createWebView(): WebView {
         val webView = WebView(themed)
@@ -474,7 +480,8 @@ internal class WebMusicPage(
             view.evaluateJavascript(FOCUS_TRACKING_JS, null)
             view.evaluateJavascript(focusRingJs(ring), null)
             CookieManager.getInstance().flush()
-            MyCarLog.i("music: ${service.id} page loaded: $url (${view.title})")
+            // The page's title only in debug builds: it can name the song, or the words searched for.
+            MyCarLog.i("music: ${service.id} page loaded: ${logged(url)}" + (if (BuildConfig.DEBUG && !isSearch(url)) " (${view.title})" else ""))
             if (!probed && ours(url)) {
                 probed = true
                 view.evaluateJavascript(WebMusicScripts.probe(BuildConfig.DEBUG), null)
@@ -486,7 +493,7 @@ internal class WebMusicPage(
                 }, PREVIEW_PLAY_MS)
             }
             // A voice search's page: its results come in a moment after, then their first Play.
-            if (searching && ours(url) && url.orEmpty().contains("search", ignoreCase = true)) {
+            if (searching && ours(url) && isSearch(url)) {
                 main.removeCallbacks(pressFirst)
                 main.postDelayed(pressFirst, SEARCH_FIRST_MS)
             }
@@ -504,7 +511,7 @@ internal class WebMusicPage(
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
             if (view !== web || !request.isForMainFrame) return
-            MyCarLog.w("music: ${request.url} didn't load - ${error.errorCode} ${error.description}")
+            MyCarLog.w("music: ${logged(request.url.toString())} didn't load - ${error.errorCode} ${error.description}")
             if (error.errorCode in NO_NETWORK) unreachable.value = true
         }
 
