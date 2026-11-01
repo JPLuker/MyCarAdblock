@@ -654,14 +654,15 @@ tap_last_text() {
     set -- $b
     adb shell input tap $(( ($1 + $3) / 2 )) $(( ($2 + $4) / 2 ))
 }
-# Spotify's sign-in page, tried several ways in myCar's web engine: a debug build lets adb into its pages.
+# A sign-in page in myCar's web engine, checked from inside (a debug build lets adb into its pages):
+# its first field laid out and the thing a touch at its centre reaches. signin_probe <out> <site>
 signin_probe() {
     local pid
     pid=$(adb shell pidof "$PKG" | tr -d '\r' | awk '{print $1}')
     [ -n "$pid" ] || { echo "no myCar process"; return; }
     adb forward tcp:9333 "localabstract:webview_devtools_remote_$pid" >/dev/null
     python3 -m pip install --quiet --user websocket-client >/dev/null 2>&1
-    python3 .github/signin-probe.py http://127.0.0.1:9333 "$1" 2>&1
+    python3 .github/signin-probe.py http://127.0.0.1:9333 "$1" "$2" 2>&1
     adb forward --remove tcp:9333 >/dev/null 2>&1
 }
 phone_music() {
@@ -689,23 +690,7 @@ phone_music() {
     # (a web page's text is in the screen's tree too).
     sleep 20; adb exec-out screencap -p > $d/03b-sign-in-later.png
     adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb shell cat /sdcard/ui.xml > $d/03-sign-in-ui.xml
-    signin_probe "$d/03-cdp" > $d/03-sign-in-probe.txt
-    # The same sign-in page in a real Chrome on the runner, as a computer and as an app's web view.
-    local chrome ua
-    chrome=$(command -v google-chrome || command -v chromium || command -v chromium-browser)
-    if [ -n "$chrome" ]; then
-        ua="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
-        timeout 60 "$chrome" --headless=new --no-sandbox --disable-gpu --hide-scrollbars --window-size=412,860 \
-            --virtual-time-budget=15000 --user-agent="$ua" --screenshot="$d/03-chrome-computer.png" \
-            "https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fopen.spotify.com%2F" >/dev/null 2>&1
-        ua="Mozilla/5.0 (Linux; Android 14; Pixel 7; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.0.0 Mobile Safari/537.36"
-        timeout 60 "$chrome" --headless=new --no-sandbox --disable-gpu --hide-scrollbars --window-size=412,860 \
-            --virtual-time-budget=15000 --user-agent="$ua" --screenshot="$d/03-chrome-webview-ua.png" \
-            "https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fopen.spotify.com%2F" >/dev/null 2>&1
-        echo "chrome: $("$chrome" --version 2>/dev/null)" >> $d/03-sign-in-probe.txt
-    else
-        echo "no Chrome on the runner" >> $d/03-sign-in-probe.txt
-    fi
+    signin_probe "$d/03-cdp" spotify > $d/03-sign-in-probe.txt
     adb shell input keyevent 4; sleep 2
     adb exec-out screencap -p > $d/04-back.png
     scroll_to "Add a service" && tap_text "Add a service"; sleep 2; adb exec-out screencap -p > $d/05-add.png
@@ -714,9 +699,10 @@ phone_music() {
     for i in 1 2 3 4; do
         adb shell input swipe 160 520 160 220 400; sleep 1.5; adb exec-out screencap -p > $d/07-music-$i.png
     done
-    # Deezer's sign-in too, the last "Sign in on the phone" of the list: is it Spotify's page alone?
+    # Deezer's sign-in too, the last "Sign in on the phone" of the list, checked the same way.
     tap_last_text "Sign in on the phone"; sleep 15
     adb exec-out screencap -p > $d/08-deezer-sign-in.png
+    signin_probe "$d/08-cdp" deezer > $d/08-sign-in-probe.txt
     adb shell input keyevent 4; sleep 2
     adb logcat -d -s myCar > $d/log.txt
     # The pages' own messages (errors and warnings in their scripts) go to the log as "chromium".
@@ -724,6 +710,7 @@ phone_music() {
     adb logcat -d -b crash > $d/crash.txt 2>&1
     echo "--- music on the phone ---"
     grep -h "music:" $d/log.txt | head -20
+    grep -h "sign-in field" $d/03-sign-in-probe.txt $d/08-sign-in-probe.txt 2>/dev/null
     grep -h "FATAL\|AndroidRuntime" $d/crash.txt || echo "phone-music: no crash"
 }
 phone_music
