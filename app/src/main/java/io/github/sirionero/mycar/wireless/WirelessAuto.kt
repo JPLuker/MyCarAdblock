@@ -227,6 +227,12 @@ object WirelessAuto {
             log.i("auto-connect: a car myCar knows connected over Bluetooth, but auto-connect is off")
             return
         }
+        // "Use myCar in the car" off, to leave the car to Android Auto: myCar's screen came up on the
+        // phone at every drive all the same, only to find it was off.
+        if (!io.github.sirionero.mycar.AppSettings.myCarEnabled(context)) {
+            log.i("auto-connect: a car myCar knows connected over Bluetooth, but myCar is switched off - not opening it")
+            return
+        }
         // A drive on already (the cable, most often): the car's Bluetooth coming up changes nothing,
         // and myCar's screen isn't brought up over whatever the phone shows.
         if (io.github.sirionero.mycar.SessionService.running) {
