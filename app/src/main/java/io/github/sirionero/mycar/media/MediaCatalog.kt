@@ -3,6 +3,7 @@ package io.github.sirionero.mycar.media
 import io.github.sirionero.mycar.host.AndroidAuto
 import io.github.sirionero.mycar.host.CarDescriptor
 import io.github.sirionero.mycar.host.KnownApps
+import io.github.sirionero.mycar.webmusic.WebMusic
 import io.github.sirionero.mycar.xonos.Xonos
 import android.content.ComponentName
 import android.content.Context
@@ -31,11 +32,12 @@ object MediaCatalog {
     fun installed(context: Context): List<MediaApp> {
         val manager = context.packageManager
         // Xonos inside myCar, once it's set up, takes the Xonos app's place: one Xonos in the car.
+        // With Xonos off in the car, neither is there.
         val xonos = Xonos.mediaApp(context)
         val found = manager.queryIntentServices(Intent(MediaBrowserService.SERVICE_INTERFACE), PackageManager.GET_META_DATA)
             .asSequence()
             .filter { it.serviceInfo.packageName != context.packageName }
-            .filterNot { xonos != null && it.serviceInfo.packageName == Xonos.APP_PACKAGE }
+            .filterNot { (xonos != null || !Xonos.enabled.value) && it.serviceInfo.packageName == Xonos.APP_PACKAGE }
             .filterNot { AndroidAuto.matches(it.serviceInfo.packageName, it.loadLabel(manager).toString()) }
             .filterNot { KnownApps.isHidden(it.serviceInfo.packageName) }
             .filter { declaresMedia(manager, it.serviceInfo) }
@@ -49,7 +51,8 @@ object MediaCatalog {
             }
             .distinctBy { it.component.packageName }
             .toList()
-        return (if (xonos == null) found else found + xonos).sortedBy { it.label.lowercase() }
+        // The music services' web players on in the car play inside myCar too (see webmusic/WebMusic).
+        return (found + listOfNotNull(xonos) + WebMusic.mediaApps(context)).sortedBy { it.label.lowercase() }
     }
 
     /** A descriptor that can't be read keeps the app, rather than dropping a real player over an odd manifest. */

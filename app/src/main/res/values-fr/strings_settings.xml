@@ -308,4 +308,26 @@
     <string name="theme_dark">Sombre</string>
     <string name="theme_black">Noir (AMOLED)</string>
     <string name="settings_audio_per_car">Avec une voiture connectée, le choix est gardé pour cette voiture, et le bouton du son dans le lecteur le change aussi. Sans voiture connectée, il vaut pour toutes les voitures.</string>
+    <string name="settings_group_music">Musique</string>
+    <string name="settings_group_music_detail">Xonos, Spotify et d’autres musiques dans la voiture</string>
+    <string name="music_in_the_car">Dans la voiture</string>
+    <string name="music_xonos_on">Music Assistant sur l’écran de la voiture, parmi ses apps de musique</string>
+    <string name="music_xonos_off">Désactivé : Xonos n’est pas sur l’écran de la voiture, ni l’app Xonos</string>
+    <string name="music_service_on">Dans la grille des apps de la voiture ; joué par myCar</string>
+    <string name="music_service_off">Désactivé : pas sur l’écran de la voiture</string>
+    <string name="music_sign_in">Se connecter sur le téléphone</string>
+    <string name="music_sign_in_detail">Avec le clavier du téléphone : vous restez aussi connecté dans la voiture</string>
+    <string name="music_sign_in_title">%1$s : se connecter</string>
+    <string name="music_sign_out">Se déconnecter</string>
+    <string name="music_sign_out_detail">De ce service dans myCar, sur le téléphone et dans la voiture</string>
+    <string name="music_sign_out_title">Se déconnecter de %1$s ?</string>
+    <string name="music_sign_out_text">myCar oublie la connexion à %1$s et ce que ses pages ont gardé. Votre compte reste tel quel.</string>
+    <string name="music_add">Ajouter un service</string>
+    <string name="music_add_footer">D’autres services de musique, chacun avec son lecteur web dans myCar : leur son arrive dans la voiture par myCar, comme celui de Cinema.</string>
+    <string name="music_add_note">Chaque service coché apparaît ici et dans la grille des apps de la voiture.</string>
+    <string name="music_needs_google">Google peut refuser la connexion dans une app : YouTube Music joue alors sans compte.</string>
+    <string name="music_needs_apple">Nécessite un abonnement Apple Music.</string>
+    <string name="music_needs_amazon">Nécessite Amazon Prime ou Amazon Music Unlimited.</string>
+    <string name="music_needs_tidal">Nécessite un abonnement TIDAL.</string>
+    <string name="music_needs_qobuz">Nécessite un abonnement Qobuz.</string>
 </resources>

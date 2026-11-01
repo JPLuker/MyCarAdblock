@@ -85,7 +85,9 @@ object AssistantCommands {
     private suspend fun allEntries(context: Context): List<Entry> {
         val vehicleData = CarSettings.experimentalFeaturesEnabled.value && CarSettings.carSensorsEnabled.value
         val builtIn = BuiltInApps.entries.filter { it.builtIn !== BuiltInApps.VehicleData || vehicleData }
-        return builtIn + (LauncherCache.entries ?: withContext(Dispatchers.IO) { LauncherCache.load(context) })
+        // The music services' web players turned on come before the apps: "open Spotify" opens the one
+        // the driver turned on in myCar, whose sound reaches the car.
+        return builtIn + webMusicEntries(context) + (LauncherCache.entries ?: withContext(Dispatchers.IO) { LauncherCache.load(context) })
     }
 
     /**

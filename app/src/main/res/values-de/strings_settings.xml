@@ -308,4 +308,26 @@
     <string name="theme_dark">Dunkel</string>
     <string name="theme_black">Schwarz (AMOLED)</string>
     <string name="settings_audio_per_car">Mit verbundenem Auto gilt die Wahl für dieses Auto, und die Ton-Taste im Player ändert sie auch. Ohne verbundenes Auto gilt sie für alle Autos.</string>
+    <string name="settings_group_music">Musik</string>
+    <string name="settings_group_music_detail">Xonos, Spotify und weitere Musik im Auto</string>
+    <string name="music_in_the_car">Im Auto</string>
+    <string name="music_xonos_on">Music Assistant auf dem Bildschirm des Autos, als eine seiner Musik-Apps</string>
+    <string name="music_xonos_off">Aus: Xonos ist nicht auf dem Bildschirm des Autos, die Xonos-App auch nicht</string>
+    <string name="music_service_on">In der App-Übersicht des Autos; spielt über myCar</string>
+    <string name="music_service_off">Aus: nicht auf dem Bildschirm des Autos</string>
+    <string name="music_sign_in">Auf dem Telefon anmelden</string>
+    <string name="music_sign_in_detail">Mit der Tastatur des Telefons: Auch im Auto bleibst du angemeldet</string>
+    <string name="music_sign_in_title">%1$s: anmelden</string>
+    <string name="music_sign_out">Abmelden</string>
+    <string name="music_sign_out_detail">Von diesem Dienst in myCar, auf dem Telefon und im Auto</string>
+    <string name="music_sign_out_title">Von %1$s abmelden?</string>
+    <string name="music_sign_out_text">myCar vergisst die Anmeldung bei %1$s und was seine Seiten gespeichert haben. Dein Konto bleibt, wie es ist.</string>
+    <string name="music_add">Dienst hinzufügen</string>
+    <string name="music_add_footer">Weitere Musikdienste, jeder mit seinem eigenen Web-Player in myCar: Ihr Ton kommt über myCar ins Auto, wie der von Cinema.</string>
+    <string name="music_add_note">Jeder, den du ankreuzt, erscheint hier und in der App-Übersicht des Autos.</string>
+    <string name="music_needs_google">Google lässt die Anmeldung in einer App vielleicht nicht zu: Dann spielt YouTube Music ohne Anmeldung.</string>
+    <string name="music_needs_apple">Braucht ein Apple-Music-Abo.</string>
+    <string name="music_needs_amazon">Braucht Amazon Prime oder Amazon Music Unlimited.</string>
+    <string name="music_needs_tidal">Braucht ein TIDAL-Abo.</string>
+    <string name="music_needs_qobuz">Braucht ein Qobuz-Abo.</string>
 </resources>

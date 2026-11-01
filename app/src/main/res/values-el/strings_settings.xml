@@ -308,4 +308,26 @@
     <string name="theme_dark">Σκούρο</string>
     <string name="theme_black">Μαύρο (AMOLED)</string>
     <string name="settings_audio_per_car">Με συνδεδεμένο αυτοκίνητο, η επιλογή μένει για εκείνο το αυτοκίνητο, και την αλλάζει και το κουμπί ήχου στο πρόγραμμα αναπαραγωγής. Χωρίς συνδεδεμένο αυτοκίνητο, ισχύει για όλα τα αυτοκίνητα.</string>
+    <string name="settings_group_music">Μουσική</string>
+    <string name="settings_group_music_detail">Xonos, Spotify και άλλη μουσική στο αυτοκίνητο</string>
+    <string name="music_in_the_car">Στο αυτοκίνητο</string>
+    <string name="music_xonos_on">Το Music Assistant στην οθόνη του αυτοκινήτου, ως μία από τις εφαρμογές μουσικής του</string>
+    <string name="music_xonos_off">Ανενεργό: το Xonos δεν εμφανίζεται στην οθόνη του αυτοκινήτου, ούτε η εφαρμογή Xonos</string>
+    <string name="music_service_on">Στο πλέγμα εφαρμογών του αυτοκινήτου· παίζει μέσω του myCar</string>
+    <string name="music_service_off">Ανενεργό: δεν εμφανίζεται στην οθόνη του αυτοκινήτου</string>
+    <string name="music_sign_in">Σύνδεση στο τηλέφωνο</string>
+    <string name="music_sign_in_detail">Με το πληκτρολόγιο του τηλεφώνου: παραμένετε συνδεδεμένοι και στο αυτοκίνητο</string>
+    <string name="music_sign_in_title">%1$s: σύνδεση</string>
+    <string name="music_sign_out">Αποσύνδεση</string>
+    <string name="music_sign_out_detail">Από αυτή την υπηρεσία στο myCar, στο τηλέφωνο και στο αυτοκίνητο</string>
+    <string name="music_sign_out_title">Αποσύνδεση από το %1$s;</string>
+    <string name="music_sign_out_text">Το myCar ξεχνά τη σύνδεση στο %1$s και ό,τι κράτησαν οι σελίδες του. Ο λογαριασμός σας μένει ως έχει.</string>
+    <string name="music_add">Προσθήκη υπηρεσίας</string>
+    <string name="music_add_footer">Άλλες υπηρεσίες μουσικής, η καθεμία με το δικό της πρόγραμμα αναπαραγωγής ιστού μέσα στο myCar: ο ήχος τους φτάνει στο αυτοκίνητο μέσω του myCar, όπως του Cinema.</string>
+    <string name="music_add_note">Όποια επιλέξετε εμφανίζεται εδώ και στο πλέγμα εφαρμογών του αυτοκινήτου.</string>
+    <string name="music_needs_google">Η Google μπορεί να μην επιτρέψει τη σύνδεση μέσα σε εφαρμογή: τότε το YouTube Music παίζει χωρίς σύνδεση.</string>
+    <string name="music_needs_apple">Απαιτεί συνδρομή στο Apple Music.</string>
+    <string name="music_needs_amazon">Απαιτεί Amazon Prime ή Amazon Music Unlimited.</string>
+    <string name="music_needs_tidal">Απαιτεί συνδρομή στο TIDAL.</string>
+    <string name="music_needs_qobuz">Απαιτεί συνδρομή στο Qobuz.</string>
 </resources>

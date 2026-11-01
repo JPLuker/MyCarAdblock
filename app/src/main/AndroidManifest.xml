@@ -300,6 +300,19 @@
             android:exported="false" />
 
         <!--
+          The music services' web players inside myCar (webmusic/), as the car's music apps: a player
+          each, which only myCar opens. No notification, and never in the foreground on their own: the
+          page plays in myCar, which the drive's own service keeps going.
+        -->
+        <service android:name=".webmusic.SpotifyMusicService" android:exported="false" />
+        <service android:name=".webmusic.YouTubeMusicService" android:exported="false" />
+        <service android:name=".webmusic.AppleMusicService" android:exported="false" />
+        <service android:name=".webmusic.AmazonMusicService" android:exported="false" />
+        <service android:name=".webmusic.DeezerMusicService" android:exported="false" />
+        <service android:name=".webmusic.TidalMusicService" android:exported="false" />
+        <service android:name=".webmusic.SoundCloudMusicService" android:exported="false" />
+        <service android:name=".webmusic.QobuzMusicService" android:exported="false" />
+        <!--
           Touch on the car screen is replayed onto the phone through this service.
           dispatchGesture is the only public way for an app to inject input into another app,
           and it is unavailable until the user enables myCar under Settings > Accessibility.

@@ -91,6 +91,8 @@ import io.github.sirionero.mycar.media.MediaCatalog
 import io.github.sirionero.mycar.notify.MessagingApp
 import io.github.sirionero.mycar.notify.MessagingCatalog
 import io.github.sirionero.mycar.xonos.Xonos
+import io.github.sirionero.mycar.webmusic.WebMusic
+import io.github.sirionero.mycar.webmusic.WebMusicService
 import io.github.sirionero.mycar.home.HomeAssistant
 import io.github.sirionero.mycar.R
 import kotlinx.coroutines.Dispatchers
@@ -116,6 +118,8 @@ internal class Entry(
     val media: MediaApp? = null,
     val builtIn: BuiltInApp? = null,
     val messaging: MessagingApp? = null,
+    /** A music service's web player inside myCar (see webmusic/WebMusic): a music app with [media] too. */
+    val webMusic: WebMusicService? = null,
 ) {
     /** What a pin or a nav-bar shortcut remembers this entry as; null for nothing pinnable. */
     val componentId: String?
@@ -133,6 +137,8 @@ internal class Entry(
      */
     val shownLabel: String
         @Composable get() = builtIn?.title?.let { stringResource(it) }
+            // "Spotify · Web": told apart from the Spotify app beside it.
+            ?: webMusic?.let { stringResource(R.string.car_apps_web_label, label) }
             ?: if (label.endsWith(BROWSE_SUFFIX)) stringResource(R.string.car_apps_browse_label, label.removeSuffix(BROWSE_SUFFIX)) else label
 }
 
@@ -155,17 +161,25 @@ internal object LauncherCache {
 
     val entries: List<Entry>? get() = flow.value
 
+    /** Whether Xonos was on in the car at the last scan: its app's tiles come and go with it. */
+    @Volatile var xonosOn: Boolean? = null
+        private set
+
     /** Returns the scan if there is one; [force] rescans. Synchronized so two callers share one scan. */
     @Synchronized
     fun load(context: Context, force: Boolean = false): List<Entry> {
         if (!force) entries?.let { return it }
+        Xonos.init(context)
+        xonosOn = Xonos.enabled.value
         // Square and edge to edge, for the squircle frame every icon in the car UI sits in.
         fun iconOf(pkg: String) = runCatching {
             squareAppIcon(context.packageManager.getApplicationIcon(pkg), ICON_PX).asImageBitmap()
         }.getOrNull()
 
-        val navApps = CarAppCatalog.installed(context)
-        val mediaApps = MediaCatalog.installed(context)
+        // With Xonos off in the car, the Xonos app isn't there either. The music services' web players
+        // come with their own icons, from their sites, as those arrive (see rememberAllEntries).
+        val navApps = CarAppCatalog.installed(context).filter { Xonos.enabled.value || it.component.packageName != Xonos.APP_PACKAGE }
+        val mediaApps = MediaCatalog.installed(context).filterNot { WebMusic.isInside(it.component) }
         // Some apps (Spotify among them) ship both a Car App Library template and a legacy
         // MediaBrowserService, which otherwise land as two identically-labeled tiles with no
         // way to tell them apart. They're genuinely different screens - browsing versus Now
@@ -209,15 +223,19 @@ internal fun rememberAllEntries(): List<Entry> {
     val planciaApp by io.github.sirionero.mycar.home.HomeAssistant.appTakesOver.collectAsState()
     val xonosSetUp by Xonos.setUp.collectAsState()
     val xonosApp by Xonos.appTakesOver.collectAsState()
-    val xonos = xonosSetUp && !xonosApp
-    LaunchedEffect(context, xonos) {
+    val xonosOn by Xonos.enabled.collectAsState()
+    val xonos = xonosOn && xonosSetUp && !xonosApp
+    val webMusic = rememberWebMusicEntries()
+    LaunchedEffect(context, xonos, xonosOn) {
         val entries = LauncherCache.entries
-        // Xonos set up on the phone, or removed, since the last scan: the music apps change.
-        val stale = entries != null && entries.any { it.media?.component?.let(Xonos::isInside) == true } != xonos
+        // Xonos set up on the phone, or removed, or turned on or off in the car, since the last scan:
+        // the music apps change.
+        val stale = entries != null &&
+            (entries.any { it.media?.component?.let(Xonos::isInside) == true } != xonos || LauncherCache.xonosOn != xonosOn)
         if (entries == null || stale) withContext(Dispatchers.IO) { LauncherCache.load(context, force = stale) }
     }
-    return remember(installed, home.isComplete, planciaApp) {
-        withPlancia(BuiltInApps.entries + installed.orEmpty(), home.isComplete && !planciaApp)
+    return remember(installed, home.isComplete, planciaApp, webMusic) {
+        withPlancia(BuiltInApps.entries + installed.orEmpty(), home.isComplete && !planciaApp) + webMusic
     }
 }
 
@@ -286,6 +304,8 @@ internal fun findEntry(id: String): Entry? =
             if (!HomeAssistant.appTakesOver.value) inside
             else LauncherCache.entries?.find { it.template?.component?.packageName == PLANCIA_PACKAGE } ?: inside
         }
+        // A music service's web player, while it's on in the car.
+        ?: webMusicEntry(id)
 
 /** Rescans the car and media apps now, replacing the cached list; the launcher keeps showing the old one meanwhile. */
 fun warmLauncherApps(context: Context) { LauncherCache.load(context, force = true) }

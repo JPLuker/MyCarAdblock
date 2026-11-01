@@ -25,6 +25,7 @@
     <string name="car_apps_phone">Τηλέφωνο</string>
     <string name="car_apps_vehicle_data">Αισθητήρες</string>
     <string name="car_apps_exit">Έξοδος</string>
+    <string name="car_apps_web_label">%1$s · Web</string>
     <string name="car_apps_browse_label">%1$s · Περιήγηση</string>
     <string name="car_apps_browse">Περιήγηση</string>
     <string name="car_apps_partial">Λειτουργεί μόνο εν μέρει με το myCar</string>

@@ -306,4 +306,26 @@
     <string name="theme_dark">深色</string>
     <string name="theme_black">纯黑 (AMOLED)</string>
     <string name="settings_audio_per_car">连接车辆时，这个选择会为该车辆保留，播放器中的声音按钮也可以更改它。未连接车辆时，它适用于所有车辆。</string>
+    <string name="settings_group_music">音乐</string>
+    <string name="settings_group_music_detail">车上的 Xonos、Spotify 和更多音乐</string>
+    <string name="music_in_the_car">在车上</string>
+    <string name="music_xonos_on">Music Assistant 显示在车机上，作为其中一个音乐应用</string>
+    <string name="music_xonos_off">已关闭：Xonos 不会出现在车机上，Xonos 应用也不会</string>
+    <string name="music_service_on">显示在车机的应用网格中；通过 myCar 播放</string>
+    <string name="music_service_off">已关闭：不会出现在车机上</string>
+    <string name="music_sign_in">在手机上登录</string>
+    <string name="music_sign_in_detail">用手机键盘登录：车上也会保持登录</string>
+    <string name="music_sign_in_title">%1$s：登录</string>
+    <string name="music_sign_out">退出登录</string>
+    <string name="music_sign_out_detail">在 myCar 中退出此服务，手机和车上都会退出</string>
+    <string name="music_sign_out_title">要退出 %1$s 吗？</string>
+    <string name="music_sign_out_text">myCar 会忘记 %1$s 的登录信息以及其页面保存的内容。你的账号不受影响。</string>
+    <string name="music_add">添加服务</string>
+    <string name="music_add_footer">其他音乐服务，各自在 myCar 中使用自己的网页播放器：声音会像 Cinema 一样通过 myCar 传到车上。</string>
+    <string name="music_add_note">你勾选的服务会出现在这里，也会出现在车机的应用网格中。</string>
+    <string name="music_needs_google">Google 可能不允许在应用内登录：这时 YouTube Music 会以未登录状态播放。</string>
+    <string name="music_needs_apple">需要订阅 Apple Music。</string>
+    <string name="music_needs_amazon">需要 Amazon Prime 或 Amazon Music Unlimited。</string>
+    <string name="music_needs_tidal">需要订阅 TIDAL。</string>
+    <string name="music_needs_qobuz">需要订阅 Qobuz。</string>
 </resources>

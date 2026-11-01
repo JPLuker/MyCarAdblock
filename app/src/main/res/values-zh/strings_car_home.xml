@@ -25,6 +25,7 @@
     <string name="car_apps_phone">电话</string>
     <string name="car_apps_vehicle_data">车辆数据</string>
     <string name="car_apps_exit">退出</string>
+    <string name="car_apps_web_label">%1$s · 网页版</string>
     <string name="car_apps_browse_label">%1$s · 浏览</string>
     <string name="car_apps_browse">浏览</string>
     <string name="car_apps_partial">与 myCar 部分兼容</string>

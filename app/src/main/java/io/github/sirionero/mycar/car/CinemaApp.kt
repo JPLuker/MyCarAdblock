@@ -484,7 +484,7 @@ private fun HomeNetworkCover(onRetry: () -> Unit) =
 
 /** Over a page that couldn't load: why, and a tap anywhere tries again. */
 @Composable
-private fun PageCover(title: String, text: String, onRetry: () -> Unit) {
+internal fun PageCover(title: String, text: String, onRetry: () -> Unit) {
     Column(
         Modifier
             .fillMaxSize()
@@ -505,7 +505,7 @@ private fun PageCover(title: String, text: String, onRetry: () -> Unit) {
 }
 
 /** The phone's own user agent, or, for a site's computer layout, a computer's with the same Chrome. */
-private fun userAgentFor(view: WebView, desktop: Boolean): String? {
+internal fun userAgentFor(view: WebView, desktop: Boolean): String? {
     if (!desktop) return null
     val chrome = CHROME_VERSION.find(android.webkit.WebSettings.getDefaultUserAgent(view.context))?.groupValues?.get(1) ?: "130.0.0.0"
     return "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$chrome Safari/537.36"
@@ -568,7 +568,7 @@ private class CinemaClient(
  * likely shows black in the car all the same; camera and microphone never. The site's own icon
  * is kept for its tile.
  */
-private class CinemaChrome(
+internal class CinemaChrome(
     private val onShow: (View, WebChromeClient.CustomViewCallback) -> Unit,
     private val onHide: () -> Unit,
     private val onIcon: (Bitmap) -> Unit,
@@ -591,12 +591,12 @@ private class CinemaChrome(
 private const val PHONE_SHELF = "phone"
 private val TileWidth = 168.dp
 private val IconSize = 112.dp
-private val InitialColors = listOf(
+internal val InitialColors = listOf(
     Color(0xFFD7263D), Color(0xFF6C63FF), Color(0xFF0F9D58), Color(0xFFF4511E), Color(0xFF3D8BFF), Color(0xFF8E24AA),
 )
 
 /** The web engine's errors that mean the page couldn't be reached at all. */
-private val NO_NETWORK = setOf(
+internal val NO_NETWORK = setOf(
     WebViewClient.ERROR_HOST_LOOKUP, WebViewClient.ERROR_CONNECT, WebViewClient.ERROR_TIMEOUT, WebViewClient.ERROR_IO,
 )
 
@@ -605,7 +605,7 @@ private val NO_NETWORK = setOf(
  * not for the network up already, which didn't reach the page a moment ago.
  */
 @Composable
-private fun ReloadWhenOnline(reload: () -> Unit) {
+internal fun ReloadWhenOnline(reload: () -> Unit) {
     val context = LocalContext.current
     val latest by rememberUpdatedState(reload)
     DisposableEffect(Unit) {

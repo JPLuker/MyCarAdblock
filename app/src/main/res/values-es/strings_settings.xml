@@ -308,4 +308,26 @@
     <string name="theme_dark">Oscuro</string>
     <string name="theme_black">Negro (AMOLED)</string>
     <string name="settings_audio_per_car">Con un coche conectado, la elección se guarda para ese coche, y el botón de sonido del reproductor también la cambia. Sin coche conectado, vale para todos los coches.</string>
+    <string name="settings_group_music">Música</string>
+    <string name="settings_group_music_detail">Xonos, Spotify y más música en el coche</string>
+    <string name="music_in_the_car">En el coche</string>
+    <string name="music_xonos_on">Music Assistant en la pantalla del coche, como una de sus apps de música</string>
+    <string name="music_xonos_off">Desactivado: Xonos no está en la pantalla del coche, ni la app Xonos</string>
+    <string name="music_service_on">En la cuadrícula de apps del coche; suena a través de myCar</string>
+    <string name="music_service_off">Desactivado: no está en la pantalla del coche</string>
+    <string name="music_sign_in">Iniciar sesión en el teléfono</string>
+    <string name="music_sign_in_detail">Con el teclado del teléfono: sigues con la sesión iniciada también en el coche</string>
+    <string name="music_sign_in_title">%1$s: iniciar sesión</string>
+    <string name="music_sign_out">Cerrar sesión</string>
+    <string name="music_sign_out_detail">De este servicio en myCar, en el teléfono y en el coche</string>
+    <string name="music_sign_out_title">¿Cerrar sesión en %1$s?</string>
+    <string name="music_sign_out_text">myCar olvida la sesión de %1$s y lo que guardaron sus páginas. Tu cuenta sigue igual.</string>
+    <string name="music_add">Añadir un servicio</string>
+    <string name="music_add_footer">Otros servicios de música, cada uno con su reproductor web dentro de myCar: su sonido llega al coche a través de myCar, como el de Cinema.</string>
+    <string name="music_add_note">Cada uno que marques aparece aquí y en la cuadrícula de apps del coche.</string>
+    <string name="music_needs_google">Puede que Google no te deje iniciar sesión dentro de una app: entonces YouTube Music suena sin sesión.</string>
+    <string name="music_needs_apple">Necesita una suscripción a Apple Music.</string>
+    <string name="music_needs_amazon">Necesita Amazon Prime o Amazon Music Unlimited.</string>
+    <string name="music_needs_tidal">Necesita una suscripción a TIDAL.</string>
+    <string name="music_needs_qobuz">Necesita una suscripción a Qobuz.</string>
 </resources>

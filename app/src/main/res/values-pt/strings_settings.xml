@@ -308,4 +308,26 @@
     <string name="theme_dark">Escuro</string>
     <string name="theme_black">Preto (AMOLED)</string>
     <string name="settings_audio_per_car">Com um carro conectado, a escolha fica guardada para esse carro, e o botão de som do player também a muda. Sem carro conectado, vale para todos os carros.</string>
+    <string name="settings_group_music">Música</string>
+    <string name="settings_group_music_detail">Xonos, Spotify e outras músicas no carro</string>
+    <string name="music_in_the_car">No carro</string>
+    <string name="music_xonos_on">Music Assistant na tela do carro, como um dos seus apps de música</string>
+    <string name="music_xonos_off">Desligado: o Xonos não aparece na tela do carro, nem o app Xonos</string>
+    <string name="music_service_on">Na grade de apps do carro; toca pelo myCar</string>
+    <string name="music_service_off">Desligado: não aparece na tela do carro</string>
+    <string name="music_sign_in">Entrar no telefone</string>
+    <string name="music_sign_in_detail">Com o teclado do telefone: você continua conectado também no carro</string>
+    <string name="music_sign_in_title">%1$s: entrar</string>
+    <string name="music_sign_out">Sair</string>
+    <string name="music_sign_out_detail">Deste serviço no myCar, no telefone e no carro</string>
+    <string name="music_sign_out_title">Sair do %1$s?</string>
+    <string name="music_sign_out_text">O myCar esquece o login no %1$s e o que as páginas dele guardaram. Sua conta continua como está.</string>
+    <string name="music_add">Adicionar um serviço</string>
+    <string name="music_add_footer">Outros serviços de música, cada um com seu player web dentro do myCar: o som deles chega ao carro pelo myCar, como o do Cinema.</string>
+    <string name="music_add_note">Cada um que você marcar aparece aqui e na grade de apps do carro.</string>
+    <string name="music_needs_google">O Google pode não deixar você entrar dentro de um app: aí o YouTube Music toca sem login.</string>
+    <string name="music_needs_apple">Precisa de uma assinatura do Apple Music.</string>
+    <string name="music_needs_amazon">Precisa do Amazon Prime ou do Amazon Music Unlimited.</string>
+    <string name="music_needs_tidal">Precisa de uma assinatura do TIDAL.</string>
+    <string name="music_needs_qobuz">Precisa de uma assinatura do Qobuz.</string>
 </resources>

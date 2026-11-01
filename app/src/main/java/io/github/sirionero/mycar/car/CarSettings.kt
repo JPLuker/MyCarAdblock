@@ -270,6 +270,9 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
         HomePages.init(app)
         io.github.sirionero.mycar.home.HomeAssistant.init(app)
         io.github.sirionero.mycar.cinema.Cinema.init(app)
+        // Which music is in the car: Xonos's switch, and the music services' web players turned on.
+        io.github.sirionero.mycar.xonos.Xonos.init(app)
+        io.github.sirionero.mycar.webmusic.WebMusic.init(app)
         CarAudioRoute.init(app)
     }
 

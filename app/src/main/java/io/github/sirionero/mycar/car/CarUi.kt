@@ -93,6 +93,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import io.github.sirionero.mycar.notify.CarNotifications
+import io.github.sirionero.mycar.webmusic.WebMusic
 import androidx.core.graphics.drawable.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -153,6 +154,10 @@ fun CarUi() {
     }
     val plancia = remember(homeSetUp && settled, dark) { if (homeSetUp && settled) PlanciaWeb(carContext, dark) else null }
     DisposableEffect(plancia) { onDispose { plancia?.destroy() } }
+    // The music services' web players: a page for each one opened this drive, kept until it ends,
+    // made only when wanted (see WebMusicPage).
+    val webMusic = remember { WebMusicPages(carContext) }
+    DisposableEffect(webMusic) { onDispose { webMusic.destroy() } }
     // Ask for the phone's sound as soon as the car connects, not only when a media app opens:
     // a video in the web browser or a map's voice needs it too. Asks once, after the car offers
     // somewhere to play it.
@@ -248,6 +253,7 @@ fun CarUi() {
         LocalMapControlsWake provides controlsWake,
         LocalGsTheme provides GsThemes.byId(uiThemeId),
         LocalPlanciaWeb provides plancia,
+        LocalWebMusicPages provides webMusic,
     ) {
         MyCarCarTheme(dark) {
           CompositionLocalProvider(LocalIndication provides FocusRingIndication(MaterialTheme.colorScheme.primary)) {
@@ -320,8 +326,14 @@ fun CarUi() {
                                     CarScreen.Apps -> CarLauncher()
                                     CarScreen.Media -> {
                                         val app = mediaApp
-                                        // No music app (closed from its menu): nothing to show, so back.
-                                        if (app != null) MediaScreen(app) { navigator.back() } else LaunchedEffect(Unit) { navigator.back() }
+                                        val web = app?.component?.let(WebMusic::serviceFor)
+                                        when {
+                                            // No music app (closed from its menu): nothing to show, so back.
+                                            app == null -> LaunchedEffect(Unit) { navigator.back() }
+                                            // A music service's web player: its own page is its full player.
+                                            web != null -> WebMusicScreen(web)
+                                            else -> MediaScreen(app) { navigator.back() }
+                                        }
                                     }
                                     CarScreen.Browse -> BrowseAppScreen(navigator)
                                     CarScreen.Settings -> CarSettingsScreen()
