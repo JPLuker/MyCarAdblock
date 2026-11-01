@@ -81,6 +81,15 @@ object WirelessLink {
     private const val AGAIN_LISTEN_MS = 600_000
     private const val TCP_TRIES = 12 // about a minute: a car's projection listener can start well after its Wi-Fi
     private const val WIFI_WAIT_MS = 60_000
+    /** While the phone's service waits for the car, the car's own is called this often (see [waitForCar]). */
+    private const val KNOCK_MS = 8_000L
+    /** The same after a drive ([quiet]): the car may be gone, so less often. */
+    private const val QUIET_KNOCK_MS = 15_000L
+    /** A Bluetooth channel on which the car says nothing that leads to its Wi-Fi this long is closed. */
+    private const val CHANNEL_QUIET_MS = 30_000L
+    /** A start-up the car's Bluetooth began starts over this many times when a later step fails. */
+    private const val AUTO_RETRIES = 3
+    private const val RETRY_DELAY_MS = 3_000L
 
     /** Set by the activity: starts a session on the car's socket. */
     @Volatile var onConnected: ((Socket) -> Unit)? = null
@@ -123,17 +132,28 @@ object WirelessLink {
     @Volatile private var quiet = false
     /** The drive's service was started here, for the car's Wi-Fi, and no drive has taken it over yet. */
     @Volatile private var ownsService = false
+    /** Started by the car's Bluetooth (not a tap, not the listening after a drive): it starts over by itself. */
+    @Volatile private var autoStart = false
+    @Volatile private var retriesLeft = 0
+    /** The start-up a start-over is already on its way for, so two failures don't post two. */
+    @Volatile private var retryFor = -1
+    /** The current start-up got as far as the car showing myCar ([reachedCar]); [drove] is only the TCP. */
+    @Volatile private var pictured = false
+    /** The current start-up has the car's Wi-Fi details and address, and asked for the network. */
+    @Volatile private var joined = false
 
     private fun holdService(context: Context) {
         ownsService = true
-        io.github.sirionero.mycar.SessionService.start(context, wireless = true)
+        io.github.sirionero.mycar.SessionService.start(context, wireless = true, holder = io.github.sirionero.mycar.SessionService.STARTUP)
     }
 
     /** A start-up that never got to a drive gives the drive's service back; a drive gives it back as it ends. */
     private fun giveBackService(context: Context) {
-        if (!ownsService || drove) return
+        // Not [drove]: after a drive the car can start over on the same channel, and the service
+        // taken for that was never given back - left on, every arrival of the car read as a drive.
+        if (!ownsService) return
         ownsService = false
-        io.github.sirionero.mycar.SessionService.stop(context)
+        io.github.sirionero.mycar.SessionService.stop(context, io.github.sirionero.mycar.SessionService.STARTUP)
     }
 
     /** Guards [channelOver] and [releaseWithChannel], set from the session's end and the channel's. */
@@ -153,12 +173,20 @@ object WirelessLink {
     @SuppressLint("MissingPermission")
     fun name(device: BluetoothDevice): String = device.name ?: device.address
 
-    /** [byItself]: the car came up over Bluetooth and myCar connects with no tap (see [WirelessAuto]). */
-    fun start(context: Context, device: BluetoothDevice, byItself: Boolean = false, quiet: Boolean = false) {
+    /**
+     * [byItself]: the car came up over Bluetooth and myCar connects with no tap (see [WirelessAuto]).
+     * [again]: a start-over of one of those ([startOver]), which keeps counting its tries.
+     */
+    fun start(context: Context, device: BluetoothDevice, byItself: Boolean = false, quiet: Boolean = false, again: Boolean = false) {
         stop(context)
         againFor = device
         drove = false
         this.quiet = quiet
+        // The listening after a drive too: a car that called and then failed at the Wi-Fi was left there.
+        autoStart = byItself
+        if (!again) retriesLeft = AUTO_RETRIES
+        pictured = false
+        joined = false
         synchronized(ends) {
             channelOver = false
             releaseWithChannel = false
@@ -180,6 +208,7 @@ object WirelessLink {
 
     /** The car's picture came up over Wi-Fi: it works without the cable, so it can connect by itself next time. */
     fun reachedCar(context: Context) {
+        pictured = true
         car?.let { WirelessAuto.reached(context.applicationContext, it) }
     }
 
@@ -217,10 +246,14 @@ object WirelessLink {
             tcp = null
             if (worker?.isAlive == true && !channelOver) {
                 releaseWithChannel = true
+                // Ended before the car showed myCar (its Android Auto not ready, a certificate
+                // turned down): the channel goes too, and the start-up begins again (channelEnded).
+                if (!pictured && autoStart) runCatching { rfcomm?.close() }
                 return
             }
             releaseNetwork(context)
             listenAgain(context)
+            if (!pictured) startOver(context, startRun, "the session ended before the car showed myCar")
         }
     }
 
@@ -233,9 +266,54 @@ object WirelessLink {
             if (mine != startRun) return
             channelOver = true
             if (releaseWithChannel && tcp == null) releaseNetwork(context)
-            if (tcp == null) giveBackService(context)
-            if (tcp == null) listenAgain(context)
+            if (tcp != null) return
+            // The car's Wi-Fi asked for and not over: some cars close the channel once the phone has
+            // joined, before its TCP. The join and the tries go on, and decide (onUnavailable, connectTcp).
+            if (network != null) return
+            giveBackService(context)
+            if (pictured) {
+                listenAgain(context)
+                return
+            }
+            if (!startOver(context, mine, "the car closed the Bluetooth channel before a drive") && !quiet) {
+                // Nothing follows: "talking to the car" stayed up for good, and only Disconnect cleared it.
+                car?.let { SessionStatus.failed(R.string.wireless_link_bt_no_car, R.string.wireless_link_bt_no_car_detail, name(it)) }
+            }
         }
+    }
+
+    /**
+     * A start-up the car's Bluetooth began went wrong after the car answered - its Wi-Fi didn't come,
+     * no TCP, the channel closed - and stayed there with "couldn't connect" until the driver tapped
+     * Disconnect and Connect, which then worked at once: the car had only needed a few more seconds.
+     * Now it starts over by itself, a few times.
+     */
+    private fun startOver(context: Context, mine: Int, why: String): Boolean {
+        val device = car ?: return false
+        if (retryFor == mine) return true
+        if (!autoStart || pictured || mine != startRun || retriesLeft <= 0) return false
+        retryFor = mine
+        retriesLeft--
+        log.i("auto-connect: $why - starting over in ${RETRY_DELAY_MS / 1000} s, as Connect would ($retriesLeft more after this)")
+        val app = context.applicationContext
+        main.postDelayed({
+            // Stopped, started anew or driving meanwhile (the cable, a tap, Disconnect): that one decides.
+            if (mine != startRun || tcp != null) return@postDelayed
+            start(app, device, byItself = true, again = true)
+        }, RETRY_DELAY_MS)
+        return true
+    }
+
+    /**
+     * The car's Bluetooth went (Android's companion watch, CarPresenceService): the listening after a
+     * drive stops, since the driver has left with the car. Other start-ups go on: a Bluetooth that
+     * flickers comes back within moments, and a car coming back starts them anew anyway.
+     */
+    fun carGone(context: Context, address: String) {
+        val device = car ?: return
+        if (!device.address.equals(address, ignoreCase = true) || !listeningQuietly) return
+        log.i("Bluetooth: ${name(device)} went - no more listening for it after the drive")
+        stop(context)
     }
 
     /**
@@ -247,10 +325,12 @@ object WirelessLink {
      */
     private fun listenAgain(context: Context) {
         val device = againFor ?: return
-        if (!drove) return
+        // A drive the car showed: one that ended before the picture starts over instead (startOver).
+        if (!pictured) return
         againFor = null
         val app = context.applicationContext
-        if (!WirelessAuto.callsPhone(app, device.address) || !WirelessAuto.mayConnect(app, device.address)) return
+        // A car that waits to be called too: its service is called now and then while it listens.
+        if (!WirelessAuto.mayConnect(app, device.address)) return
         val run = startRun
         main.post {
             // Started or stopped meanwhile (the cable, a tap, Disconnect): that one decides.
@@ -317,14 +397,15 @@ object WirelessLink {
         var inbound = callsUs
         val socket = if (callsUs) {
             log.i("Bluetooth: $name called the phone last time - waiting for it at once")
-            val accepted = waitForCar(context, name, mine, listenMs)
+            val accepted = waitForCar(context, device, name, mine, listenMs)
             if (accepted == null) {
                 // It didn't, this time: next time the phone tries the car first again. Not when the
                 // car's Bluetooth woke it or after a drive, when the car may simply not have started.
                 if (mine == startRun && !quiet && !byItself) WirelessAuto.rememberCalls(context, device.address, false)
                 return
             }
-            accepted
+            inbound = accepted.inbound
+            accepted.socket
         } else try {
             // A running scan slows the connect, but stopping one needs BLUETOOTH_SCAN on Android
             // 12+, which myCar doesn't ask for. myCar never scans, so skipping it is fine.
@@ -344,8 +425,9 @@ object WirelessLink {
             log.i("Bluetooth: $name has no Android Auto service to call (${e.message}); waiting for it to call us")
             // Replaced while its connect hung: the newer start-up does the waiting.
             if (mine != startRun) return
-            inbound = true
-            waitForCar(context, name, mine, listenMs) ?: return
+            val got = waitForCar(context, device, name, mine, listenMs) ?: return
+            inbound = got.inbound
+            got.socket
         }
         if (mine != startRun) {
             log.i("Bluetooth: a newer start-up took over - closing this one's channel")
@@ -360,6 +442,15 @@ object WirelessLink {
         holdService(context)
         log.i("Bluetooth: channel open")
         SessionStatus.connecting(R.string.wireless_link_bt_talking, name)
+        // A car whose Android Auto isn't ready yet can take the channel and say nothing: the start-up
+        // stayed on "talking to the car" for good, holding the drive's service, and every arrival of
+        // the car after it was taken for a drive under way. Closed, it starts over (channelEnded).
+        main.postDelayed({
+            if (mine == startRun && rfcomm === socket && !joined) {
+                log.w("Bluetooth: $name said nothing that leads to its Wi-Fi in ${CHANNEL_QUIET_MS / 1000}s - closing the channel")
+                runCatching { socket.close() }
+            }
+        }, CHANNEL_QUIET_MS)
 
         val input = DataInputStream(socket.inputStream)
         val output = socket.outputStream
@@ -421,7 +512,7 @@ object WirelessLink {
                             log.i("InfoResponse again for \"$ssid\", which the drive is on - ignoring it")
                             continue
                         }
-                        val join = { ip: String, port: Int -> joinWifi(context, output, name, ssid, password, bssid, ip, port) }
+                        val join = { ip: String, port: Int -> joinWifi(context, output, name, ssid, password, bssid, ip, port, mine) }
                         val known = target
                         if (known != null) {
                             join(known.first, known.second)
@@ -448,13 +539,24 @@ object WirelessLink {
         }
     }
 
+    /** The car's Bluetooth channel, and whether the car opened it ([inbound]) or the phone did. */
+    private class Channel(val socket: BluetoothSocket, val inbound: Boolean)
+
+    /** A wait that has ended: a channel the phone's call gets after it is closed, not left open. */
+    private object WaitOver
+
     /**
      * Publishes the Android Auto service on the phone, the way Android Auto itself does, and waits
      * for the car to connect to it. A car looks for the service when the phone connects over
      * Bluetooth, so the driver may have to reconnect the phone from the car's menu.
+     *
+     * Meanwhile the car's own service is called every [KNOCK_MS]. A car still booting has none yet
+     * when its Bluetooth comes up, so the first call failed and the phone only waited, for a car
+     * that waits to be called: nothing happened until Disconnect and Connect, which then worked at
+     * once. Not while listening after a drive ([quiet]), with the car maybe gone.
      */
     @SuppressLint("MissingPermission")
-    private fun waitForCar(context: Context, name: String, mine: Int, listenMs: Int): BluetoothSocket? {
+    private fun waitForCar(context: Context, device: BluetoothDevice, name: String, mine: Int, listenMs: Int): Channel? {
         val adapter = context.getSystemService(BluetoothManager::class.java)?.adapter ?: return null
         if (mine != startRun) return null
         val server = try {
@@ -473,12 +575,53 @@ object WirelessLink {
         }
         if (!quiet) SessionStatus.connecting(R.string.wireless_link_bt_waiting, name)
         log.i("Bluetooth: Android Auto service published, waiting ${listenMs / 1000}s for $name")
+        // The first channel either way wins; the other is closed. [WaitOver] once the wait has ended.
+        val won = java.util.concurrent.atomic.AtomicReference<Any?>(null)
+        val knockEvery = if (quiet) QUIET_KNOCK_MS else KNOCK_MS
+        val knocker = Thread({
+            var knocks = 0
+            while (mine == startRun && listener === server && won.get() == null) {
+                try {
+                    Thread.sleep(knockEvery)
+                } catch (e: InterruptedException) {
+                    return@Thread
+                }
+                if (mine != startRun || listener !== server || won.get() != null) return@Thread
+                knocks++
+                val socket = runCatching { device.createRfcommSocketToServiceRecord(AA_UUID) }.getOrNull() ?: continue
+                try {
+                    socket.connect()
+                } catch (e: IOException) {
+                    runCatching { socket.close() }
+                    if (knocks == 1) log.i("Bluetooth: $name's own service doesn't answer yet (${e.message}) - calling it again every ${knockEvery / 1000}s")
+                    continue
+                }
+                if (won.compareAndSet(null, Channel(socket, inbound = false))) {
+                    log.i("Bluetooth: $name's own Android Auto service answered (call ${knocks + 1})")
+                    // Ends the wait below.
+                    runCatching { server.close() }
+                } else {
+                    runCatching { socket.close() }
+                }
+                return@Thread
+            }
+        }, "mycar-wireless-knock").apply { isDaemon = true; start() }
         return try {
-            server.accept(listenMs).also {
-                val from = runCatching { it.remoteDevice.name }.getOrNull() ?: "a device"
-                log.i("Bluetooth: $from connected to the Android Auto service")
+            val accepted = server.accept(listenMs)
+            val from = runCatching { accepted.remoteDevice.name }.getOrNull() ?: "a device"
+            log.i("Bluetooth: $from connected to the Android Auto service")
+            val ours = Channel(accepted, inbound = true)
+            if (won.compareAndSet(null, ours)) {
+                ours
+            } else {
+                // The phone's own call got through in the same moment: that one is the channel.
+                runCatching { accepted.close() }
+                won.get() as Channel
             }
         } catch (e: IOException) {
+            // The car's own service answered the phone's call, which closed the wait. Claimed at
+            // once: a call that gets through after this finds the wait over and hangs up.
+            (won.getAndSet(WaitOver) as? Channel)?.let { return it }
             // Stopped, or replaced by a newer start-up: that one says what's going on.
             if (mine != startRun || listener !== server) return null
             log.w("Bluetooth: no car connected within ${listenMs / 1000}s (${e.message})")
@@ -490,6 +633,9 @@ object WirelessLink {
             )
             null
         } finally {
+            // However the wait ended, a call that gets through from now on hangs up.
+            won.compareAndSet(null, WaitOver)
+            knocker.interrupt()
             runCatching { server.close() }
             // Only this one's: a newer start-up may have published its own by now.
             if (listener === server) listener = null
@@ -510,8 +656,11 @@ object WirelessLink {
      */
     private fun joinWifi(
         context: Context, output: OutputStream, name: String,
-        ssid: String, password: String, bssid: String, ip: String, port: Int,
+        ssid: String, password: String, bssid: String, ip: String, port: Int, mine: Int,
     ) {
+        // Stopped or replaced meanwhile: its service and network request would be no one's.
+        if (mine != startRun) return
+        joined = true
         SessionStatus.connecting(R.string.wireless_link_wifi_joining, name)
         val spec = WifiNetworkSpecifier.Builder().setSsid(ssid).apply {
             runCatching { MacAddress.fromString(bssid) }.getOrNull()
@@ -538,7 +687,7 @@ object WirelessLink {
                     log.i("-> StartResponse (phone at $phoneIp), ConnectionStatus: success")
                 }.onFailure { log.w("Bluetooth: couldn't report the Wi-Fi join (${it.message})") }
                 val run = ++tcpRun
-                Thread({ connectTcp(context, output, name, net, ip, port, run) }, "mycar-wireless-tcp").start()
+                Thread({ connectTcp(context, output, name, net, ip, port, run, mine) }, "mycar-wireless-tcp").start()
             }
 
             override fun onUnavailable() {
@@ -551,6 +700,7 @@ object WirelessLink {
                     R.string.wireless_link_wifi_failed_detail,
                     name,
                 )
+                startOver(context, mine, "the car's Wi-Fi didn't come")
             }
 
             // Android can hold an app's traffic back on a network it has joined (battery or data
@@ -587,6 +737,7 @@ object WirelessLink {
                 return
             }
         }
+        if (mine != startRun) return
         network?.let { runCatching { manager.unregisterNetworkCallback(it) } }
         network = callback
         activeSsid = ssid
@@ -655,7 +806,7 @@ object WirelessLink {
         }
     }
 
-    private fun connectTcp(context: Context, output: OutputStream, name: String, net: Network, ip: String, port: Int, run: Int) {
+    private fun connectTcp(context: Context, output: OutputStream, name: String, net: Network, ip: String, port: Int, run: Int, mine: Int) {
         SessionStatus.connecting(R.string.wireless_link_wifi_reaching, name)
         lostNetwork = null
         var last: Exception? = null
@@ -705,6 +856,7 @@ object WirelessLink {
                 if (start == null) {
                     log.w("TCP: connected, but nothing is waiting for the socket")
                     socket.close()
+                    io.github.sirionero.mycar.SessionService.stop(context, io.github.sirionero.mycar.SessionService.STARTUP)
                 } else {
                     start(socket)
                 }
@@ -730,6 +882,8 @@ object WirelessLink {
             )
             return
         }
+        // Not behind a VPN, which no start-over gets past.
+        if (run == tcpRun) startOver(context, mine, "no TCP to the car")
         SessionStatus.failed(
             R.string.wireless_link_no_connection,
             R.string.wireless_link_no_connection_detail,

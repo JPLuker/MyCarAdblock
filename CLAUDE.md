@@ -796,7 +796,39 @@ Tutti i token in un solo posto, `car/design/`:
   Verificato nel codice di Android (mirror `aosp-mirror/platform_frameworks_base`): con Android 16 il
   sistema manda ancora `onDeviceAppeared(AssociationInfo)` accanto a `onDevicePresenceEvent`
   ("legacy callback", `DevicePresenceProcessor`), e `startObservingDevicePresence(String)` funziona.
-  Non provato con un'auto vera.
+  Dalla 0.6.5 (segnalato dall'utente dopo la 0.6.4: "l'app tenta a connettersi in automatico ma non ci
+  riesce; faccio disconnetti, connetti e seleziono e si connette subito"): mentre il servizio del telefono
+  aspetta l'auto (`waitForCar`), myCar richiama ogni 8 s quello dell'auto (`KNOCK_MS`, un thread a parte;
+  vince il primo canale, l'altro si chiude; `Channel.inbound` dice chi l'ha aperto per `rememberCalls`),
+  non durante l'ascolto dopo il viaggio (`quiet`). Prima, se al Bluetooth dell'auto il suo servizio non
+  c'era ancora (sistema dell'auto che si avvia), myCar aspettava soltanto, e un'auto che aspetta di essere
+  chiamata non faceva niente. Un avvio partito dal Bluetooth dell'auto (`autoStart`) che fallisce dopo
+  (Wi-Fi dell'auto non arrivato, TCP, canale chiuso prima di un viaggio) ricomincia da solo dopo 3 s, fino
+  a 3 volte (`startOver`, `retriesLeft`, `retryFor` contro i doppioni), non dietro una VPN; un tocco, il
+  cavo o Disconnetti lo fermano (`startRun`). Controllo completo prima di pubblicare la 0.6.5 (richiesta
+  dell'utente: "risolvere definitivamente i problemi di connessione"; due revisioni indipendenti, ogni
+  punto verificato nel codice): un canale Bluetooth su cui l'auto non dice niente che porti al suo Wi-Fi
+  si chiude dopo 30 s (`CHANNEL_QUIET_MS`, `joined`) e l'avvio ricomincia (prima "talking to the car"
+  per sempre, servizio preso, ogni arrivo dell'auto scambiato per un viaggio); `channelEnded` non
+  restituisce il servizio e non ricomincia mentre Wi-Fi o TCP sono in corso (`network != null`: alcune
+  auto chiudono il canale dopo il join); `SessionService` ha due titolari (`DRIVE`, `STARTUP`) invece di un
+  flag: l'avvio lo prende al canale, il viaggio dall'immagine, `startWireless` restituisce quello
+  dell'avvio, e nessuno dei due spegne o lascia acceso quello dell'altro (prima un servizio preso dopo un
+  viaggio restava acceso per sempre per via di `drove`); si ricomincia anche quando la sessione finisce
+  prima dell'immagine (`pictured`, segnato in `reachedCar`: auto non pronta, certificato rifiutato, allora
+  col successivo) e dall'ascolto dopo il viaggio (`autoStart = byItself`); un canale chiuso senza seguito
+  dice "l'auto non si è collegata"; dopo il viaggio si ascolta anche un'auto che aspetta di essere chiamata
+  (`listenAgain` per ogni auto permessa, chiamata ogni 15 s, `QUIET_KNOCK_MS`) e l'ascolto si ferma quando
+  il Bluetooth dell'auto se ne va (`CarPresenceService.onDeviceDisappeared` → `WirelessLink.carGone`, solo
+  per l'ascolto dopo il viaggio: un Bluetooth che sfarfalla non deve fermare gli altri avvii). Nella
+  sessione (`MyCarRunner`): un PROJECTED ripetuto dall'auto riceve di nuovo CodecConfig e un fotogramma
+  completo (`pictureAgain`, al massimo ogni 3 s); il fotogramma chiave chiesto ogni 5 s esce anche a schermo
+  fermo (`onRefresh` se non sono usciti fotogrammi); senza fili, avvio fermo 30 s o auto che pingava e tace
+  20 s (o 4 dei suoi intervalli) chiudono il socket (`closeTransport`, `giveUp`), e così anche `stop()`;
+  un'immagine che non parte si riprova due volte (`showCarUi`, densità 0 → 160); una schermata vecchia che
+  si chiude non ferma l'avvio della nuova (`onDestroy`). Lasciati: la richiesta di immagine ripetuta se
+  l'auto non risponde alla VideoFocusRequest e la chiusura sui rifiuti deterministici (canale video
+  rifiutato, risoluzione): un'auto che li fa li rifarebbe a ogni tentativo. Non provato con un'auto vera.
 - **Assistente che non resta fermo** (0.6.4, richiesta dell'utente: "o si rimuove completamente da solo
   o continua ad ascoltare, preferisco il primo"): `CarAssistant` ha un controllo dei tempi (`watchdog`,
   ogni secondo finché il riquadro è su) che lo chiude da solo: microfono non aperto in 10 s, ascolto oltre

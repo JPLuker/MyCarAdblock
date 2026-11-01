@@ -5,6 +5,14 @@
   "Settings >" are the app's own: translate them as the app's screens say them.
 -->
 <resources>
+    <!-- 0.6.5-alpha -->
+    <string-array name="changelog_41">
+        <item>Connecting wirelessly by itself: while the phone waits for the car, it now calls the car\'s own Android Auto again every 8 seconds. A car still starting up didn\'t answer the first call, and myCar then only waited.</item>
+        <item>When a later step fails (the car\'s Wi-Fi, the connection), a start-up the car\'s Bluetooth began starts over by itself, up to three times, as \"Disconnect\" and \"Connect wirelessly\" did by hand.</item>
+        <item>A start-up that stalls (the car taking the Bluetooth channel and saying nothing, or stopping halfway) no longer stays stuck: it closes and starts again, and the car coming back is no longer taken for a drive still under way.</item>
+        <item>After a drive, myCar listens for the car again even when the car waits to be called, and stops when the car\'s Bluetooth goes.</item>
+        <item>A car still waiting for the picture gets it again: no more black screen until something moves.</item>
+    </string-array>
     <!-- 0.6.4-alpha -->
     <string-array name="changelog_40">
         <item>The assistant no longer hangs after words it can\'t act on: it always closes by itself (after a question from Home Assistant too), and the microphone starts over at once. Home Assistant gets 15 seconds to answer.</item>

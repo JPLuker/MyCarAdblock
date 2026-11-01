@@ -48,6 +48,11 @@ class MyCarRunner(
     private val wireless: Boolean = false,
     /** What the car said of the certificate presented, once a session; see [CertRotation]. */
     private val onCertVerdict: (CertProvider.Identity, CertVerdict) -> Unit = { _, _ -> },
+    /**
+     * Closes the connection to the car, so the session ends the way it does when the car closes it
+     * (the Wi-Fi socket; a blocked read returns). Called when the session gives up or stops itself.
+     */
+    private val closeTransport: (() -> Unit)? = null,
 ) {
     private val log = MyCarLog.tagged("PROTO")
 
@@ -200,7 +205,24 @@ class MyCarRunner(
         CarEnvironment.setSensorNight(null) // back to the clock until a car says otherwise
         projection?.onProjectionStopped()
         SessionStatus.disconnected()
+        // Stopped from inside (the encoder gave up): the read went on, the car's pings went
+        // unanswered, and the drive stayed "connected" with nothing on the car's screen.
+        closeTransport?.let { runCatching { it() } }
     }
+
+    /** The car went quiet: the session ends as if it had closed the connection. */
+    private fun giveUp(why: String) {
+        if (gaveUp) return
+        gaveUp = true
+        log.w("$why - ending the session")
+        closeTransport?.let { runCatching { it() } }
+    }
+
+    @Volatile private var gaveUp = false
+    /** When the car last pinged, and the longest it went between two pings. */
+    @Volatile private var lastPingAt = 0L
+    @Volatile private var pingGap = 0L
+    @Volatile private var pictureAgainAt = 0L
 
     private fun handleFrame(frame: Frames.Frame) {
         // A rejected handshake cannot consume later messages as if authentication succeeded.
@@ -1225,7 +1247,10 @@ class MyCarRunner(
             startVideoSource()
             return
         }
-        if (projected == videoProjected) return
+        if (projected == videoProjected) {
+            if (projected) pictureAgain()
+            return
+        }
         videoProjected = projected
         CarFocus.set(projected)
         if (projected) {
@@ -1250,6 +1275,22 @@ class MyCarRunner(
             send(MSG_MEDIA_STOP, Protobuf.varintField(1, SESSION_ID.toLong()), encrypted = true, channel = videoChannelId)
             log.i("the car is showing its own screen - video stopped, audio carries on")
         }
+    }
+
+    /**
+     * The car said again that it shows myCar, as one still waiting for a picture does: a car whose
+     * decoder missed the start (reset as its Android Auto came up, or not ready for the first
+     * keyframe) stayed black until something on the screen moved. The codec config and a keyframe
+     * again, not more often than every few seconds. The same messages as ever, nothing new.
+     */
+    private fun pictureAgain() {
+        val now = SystemClock.elapsedRealtime()
+        if (now - pictureAgainAt < PICTURE_AGAIN_MS) return
+        pictureAgainAt = now
+        log.i("the car asked for the picture again - codec config and a keyframe")
+        lastCodecConfig?.let { send(MSG_MEDIA_CODEC_CONFIG, it, encrypted = true, channel = videoChannelId) }
+        videoSource?.requestSyncFrame()
+        projection?.onRefresh()
     }
 
     /** Android Auto's Exit: asks the car for its own interface, leaving the session running. */
@@ -1300,6 +1341,9 @@ class MyCarRunner(
         val data = Wire.bytes(fields, 3)?.let { Protobuf.bytesField(2, it) } ?: ByteArray(0)
         send(MSG_PING_RESPONSE, Protobuf.varintField(1, timestamp) + data, encrypted = tls.handshakeComplete)
         log.i("<- PingRequest(timestamp=$timestamp) / -> PingResponse (keeping the session alive)")
+        val now = SystemClock.elapsedRealtime()
+        if (lastPingAt > 0) pingGap = maxOf(pingGap, now - lastPingAt)
+        lastPingAt = now
     }
 
     private fun send(
@@ -1397,15 +1441,23 @@ class MyCarRunner(
                 Thread.sleep(5_000)
                 if (!running) break
 
+                val idle = System.currentTimeMillis() - lastProgress
                 if (state != State.DONE) {
-                    val idle = System.currentTimeMillis() - lastProgress
                     if (idle > 10_000) log.w("stalled in state $state for ${idle / 1000}s")
+                    // Over Wi-Fi a car that stopped in the middle of the start held the session for
+                    // good, and every arrival of the car after it was taken for a drive under way.
+                    if (wireless && idle > HANDSHAKE_GIVE_UP_MS) giveUp("stalled in state $state for ${idle / 1000}s")
+                } else if (wireless && pingGap > 0 && idle > maxOf(SILENCE_GIVE_UP_MS, pingGap * 4)) {
+                    // The same for a car gone quiet mid-drive without closing the connection (its
+                    // Wi-Fi still up). It pinged before, so this much silence means it's gone.
+                    giveUp("the car has said nothing for ${idle / 1000}s")
                 }
 
                 // Stream health. Without this a drive cannot tell "streaming fine" from
                 // "stalled after three frames" - the per-frame logging is deliberately sparse.
                 if (videoStarted) {
                     val sent = framesSent
+                    val still = sent == lastFrames
                     val fps = (sent - lastFrames) / 5.0
                     lastFrames = sent
                     // Time the encoder spent held back waiting for acks: near 5000ms means the
@@ -1427,6 +1479,10 @@ class MyCarRunner(
                     val idleSinceKeyframe = System.currentTimeMillis() - lastKeyframeSentAt
                     if (videoProjected && idleSinceKeyframe > PERIODIC_KEYFRAME_MS) {
                         videoSource?.requestSyncFrame()
+                        // A still screen makes no frames, so the keyframe asked for never came: a car
+                        // that missed the first stayed black until something moved (the dock's clock,
+                        // up to a minute on). Drawn again, the keyframe goes out.
+                        if (still) projection?.onRefresh()
                     }
                 }
             }
@@ -1500,5 +1556,11 @@ class MyCarRunner(
         const val AUDIO_TRACE_MESSAGES = 6
         const val GUIDANCE_SESSION_ID = 1
         const val PERIODIC_KEYFRAME_MS = 5_000L
+        /** Over Wi-Fi, a start that makes no progress this long is given up (see the watchdog). */
+        const val HANDSHAKE_GIVE_UP_MS = 30_000L
+        /** Over Wi-Fi, a car that pinged and then says nothing this long (or four of its gaps) is gone. */
+        const val SILENCE_GIVE_UP_MS = 20_000L
+        /** The car asking again for the picture gets it at most this often. */
+        const val PICTURE_AGAIN_MS = 3_000L
     }
 }

@@ -1,6 +1,24 @@
-myCar 0.6.4-alpha: a voice assistant that never hangs, phrases not cut short in other languages, and connecting by itself with the phone locked.
+myCar 0.6.5-alpha: connecting wirelessly by itself keeps trying the way a tap on Connect does.
 
-## Voice assistant
+## Connecting wirelessly by itself
+- When the car comes up over Bluetooth, myCar first calls the car's own Android Auto. A car still starting up doesn't answer yet; myCar then published the phone's service and only waited for the car to call - and a car that waits to be called never did. Nothing happened until Disconnect and Connect, which then worked at once. Now, while the phone waits, it calls the car's service again every 8 seconds, and whichever side gets through first carries on.
+- A start-up the car's Bluetooth began that fails at a later step - the car's Wi-Fi didn't come, no connection to the car, the car closed the Bluetooth channel before a drive - starts over by itself after 3 seconds, up to three times, as Disconnect and Connect did by hand. Not behind a VPN, which no start-over gets past; a tap, the cable or Disconnect stops it.
+- A Bluetooth channel on which the car says nothing that leads to its Wi-Fi is closed after 30 seconds and the start-up begins again. Before, it stayed on "talking to the car" for good, holding the drive's service, and every arrival of the car after it was taken for a drive still under way - only Disconnect cleared it.
+- Some cars close the Bluetooth channel once the phone has joined their Wi-Fi: the join and the connection attempts now go on to the end instead of being cut short.
+- The drive's foreground service has two holders, the drive and the start-up, instead of one switch: the end of a drive no longer stops the service a start-up has just taken, and a start-up's service is always given back, so the car's next arrival isn't ignored.
+- A start-up also starts over when the session ends before the car shows myCar (the car not ready yet, a certificate turned down - then with the next one), and from the listening after a drive. A Bluetooth channel that closes with nothing to follow now says the car didn't connect, instead of "talking to the car" forever.
+- After a drive myCar also listens for a car that waits to be called, calling its service every 15 seconds, and stops as soon as the car's Bluetooth goes.
+
+## The car's screen
+- A car that says again that it shows myCar, as one still waiting for a picture does, gets the video's codec config and a full frame again (at most every 3 seconds). Before, it was ignored, and a car that had missed the start stayed black until something on the screen moved.
+- The full frame asked for every 5 seconds never came with a still screen: the screen is now drawn again so it goes out.
+- Over Wi-Fi, a session that makes no progress in its start for 30 seconds, or a car that pinged and then says nothing for 20 seconds, ends the connection: such a session kept myCar busy and the car's next arrival was ignored. A session that stops itself (the encoder giving up) closes the connection too.
+- A car picture that doesn't start (the display refused, a car that gives no density) is tried again twice instead of staying black for the whole drive.
+- A myCar screen closed from the recents while the car opens myCar again no longer stops the new screen's wireless start-up.
+
+Not tried in a real car yet.
+
+## Also in 0.6.4-alpha
 - After words it couldn't act on, the assistant could sit on "…" for up to a minute with the microphone deaf: it waited up to 40 seconds for Home Assistant, and every new request queued behind that one. Now Home Assistant gets 15 seconds, a new request or Cancel drops the one still waiting, and the microphone pressed while it works starts over.
 - Whatever stalls - the microphone not opening, a phrase that doesn't end, words that never come, a speech engine that never says it's done - the assistant closes by itself after a while.
 - When Home Assistant asks something back, the microphone no longer opens by itself, and the next words no longer go to it no matter what: myCar's commands first, then Home Assistant, carrying on the conversation for five minutes.
@@ -8,14 +26,10 @@ myCar 0.6.4-alpha: a voice assistant that never hangs, phrases not cut short in 
 - In languages other than English, the end of a phrase was left to the live model, which knows English only: in Italian it could go a second without writing a word while the driver was still talking, and the phrase was cut there. Now its end counts once the microphone is quiet too (back to the car's own noise), at most 2.5 seconds later; and if it writes nothing at all, 1.2 seconds of quiet after speaking ends the phrase.
 - myCar in a language with no voice model for it on the phone listens in English: the car now says so over "Listening…", with the model to download.
 - The log says which language and model the assistant listens with, and how each phrase ended.
-
-## Connecting wirelessly by itself
 - The car coming up over Bluetooth reached myCar as an intent. To a myCar screen already open but stopped, with the screen on and the lock screen up (the car's Bluetooth wakes the phone), Android hands it over only once that screen is back in front - after the phone is unlocked. Now, with a myCar screen open, the connection starts straight from it.
 - Android's "Allow" for connecting by itself was asked only with myCar in front: with the phone in a pocket as the car's picture came up, it might never show. Now myCar remembers the car and asks as soon as its screen is up.
 - Settings > Connection shows the cars myCar connects to by itself.
 - The log says at start how many cars are allowed, and whether Android watches for them.
-
-Not tried in a real car yet.
 
 ## Also in 0.6.3-alpha
 - After a wireless drive with a car that calls the phone, myCar keeps the phone's Android Auto service published for ten more minutes, with nothing shown on the phone. After a short stop - the car's Bluetooth still connected, so Android never says the car came back - the car finds the service when its Android Auto starts again, and the drive comes back by itself instead of waiting for a tap.
