@@ -5,6 +5,18 @@
   "Settings >" are the app's own: translate them as the app's screens say them.
 -->
 <resources>
+    <!-- 0.6.7-alpha -->
+    <string-array name="changelog_43">
+        <item>Spotify\'s sign-in on the phone is no longer black: the page shows and can be filled in, as for every music service.</item>
+        <item>Paste in the car\'s keyboard works: the keyboard stays open and what you copied on the phone goes into the field.</item>
+        <item>The browser and Cinema show pages at their real height: YouTube\'s bottom bar, cookie notices and full-window pages appear as in a browser.</item>
+        <item>Connecting by itself: the phone in a pocket stays awake while it waits for the car, it tries to reach the car for a whole minute, and an \"Allow\" closed without an answer no longer turns it off for good.</item>
+        <item>With the phone\'s Wi-Fi off, myCar says so at once; on Android 17 it asks for the local network permission the car\'s Wi-Fi needs.</item>
+        <item>Music that doesn\'t reach the car after a \"no\" to Android\'s question: the player and the phone\'s Home say so, with \"Ask again\".</item>
+        <item>With Xonos as the car\'s music, the assistant\'s replies and messages read aloud play in the car, and what starts after Xonos is heard from its first second.</item>
+        <item>While driving: the next turn stays in the dock for a whole call, What\'s new waits until the car stops, Back goes up a folder in the music list, and the wheel\'s Play no longer stops a film.</item>
+        <item>A connection that fails no longer pauses the phone\'s music, and the voice models load after the car\'s first picture, for a lighter start.</item>
+    </string-array>
     <!-- 0.6.6-alpha -->
     <string-array name="changelog_42">
         <item>New Music section in the phone\'s settings: Xonos and Spotify each have a switch, and \"Add a service\" offers YouTube Music, Apple Music, Amazon Music, Deezer, TIDAL, SoundCloud and Qobuz. Only the services switched on are in the car; Xonos is on if you already used it.</item>

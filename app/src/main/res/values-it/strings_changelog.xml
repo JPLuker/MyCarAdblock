@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_43">
+        <item>L\'accesso a Spotify sul telefono non è più nero: la pagina si vede e si compila, come per ogni servizio musicale.</item>
+        <item>Incolla nella tastiera dell\'auto funziona: la tastiera resta aperta e quello che hai copiato sul telefono entra nel campo.</item>
+        <item>Il browser e Cinema mostrano le pagine alla loro altezza vera: la barra in basso di YouTube, gli avvisi dei cookie e le pagine a tutta finestra si vedono come in un browser.</item>
+        <item>Collegamento da solo: il telefono in tasca resta sveglio mentre aspetta l\'auto, prova a raggiungerla per un minuto intero, e un «Consenti» chiuso senza risposta non lo spegne più per sempre.</item>
+        <item>Col Wi-Fi del telefono spento myCar lo dice subito; su Android 17 chiede il permesso della rete locale che serve al Wi-Fi dell\'auto.</item>
+        <item>Musica che non arriva all\'auto dopo un «no» alla domanda di Android: il lettore e la Home del telefono lo dicono, con «Chiedi di nuovo».</item>
+        <item>Con Xonos come musica dell\'auto, le risposte dell\'assistente e i messaggi letti si sentono in auto, e quello che parte dopo Xonos si sente dal primo secondo.</item>
+        <item>In marcia: la prossima svolta resta nel dock per tutta la chiamata, le Novità aspettano che l\'auto sia ferma, Indietro risale di una cartella nell\'elenco della musica e il Play del volante non ferma più un film.</item>
+        <item>Un collegamento non riuscito non mette più in pausa la musica del telefono, e i modelli vocali si caricano dopo la prima immagine dell\'auto, per un avvio più leggero.</item>
+    </string-array>
     <string-array name="changelog_42">
         <item>Nuova sezione Musica nelle impostazioni del telefono: Xonos e Spotify hanno ognuno un interruttore, e «Aggiungi un servizio» propone YouTube Music, Apple Music, Amazon Music, Deezer, TIDAL, SoundCloud e Qobuz. In auto ci sono solo i servizi accesi; Xonos è acceso se lo usavi già.</item>
         <item>Spotify e gli altri servizi suonano dentro myCar dal loro lettore web, impaginati come su un computer: il suono arriva in auto tramite myCar, anche quando l\'app del servizio non si lascia registrare dalle altre app.</item>

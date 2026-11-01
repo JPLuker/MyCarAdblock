@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_43">
+        <item>手机上的 Spotify 登录页不再是黑屏：页面能正常显示和填写，所有音乐服务都一样。</item>
+        <item>车机键盘的粘贴可以用了：键盘保持打开，你在手机上复制的内容会进入输入框。</item>
+        <item>浏览器和 Cinema 按页面的真实高度显示：YouTube 底部栏、Cookie 提示和整窗页面都像在浏览器里一样显示。</item>
+        <item>自动连接：手机放在口袋里等车时保持唤醒，会用整整一分钟尝试连接汽车，没有作答就关闭的“允许”不再永久关闭它。</item>
+        <item>手机的 WLAN 关闭时，myCar 会立即说明；在 Android 17 上会请求汽车 WLAN 所需的本地网络权限。</item>
+        <item>对 Android 的询问说了“不”之后音乐到不了车上：播放器和手机主屏会提示，并提供“重新询问”。</item>
+        <item>Xonos 作为车上音乐时，助手的回答和朗读的消息在车上播放；Xonos 之后开始的内容从第一秒就能听到。</item>
+        <item>驾驶时：整个通话期间下一个转弯都留在停靠栏中，新功能介绍会等车停下再显示，返回键在音乐列表中返回上一级文件夹，方向盘上的播放键不再打断电影。</item>
+        <item>连接失败不再暂停手机音乐，语音模型在车上出现第一张画面之后才加载，启动更轻快。</item>
+    </string-array>
     <string-array name="changelog_42">
         <item>手机设置中新增“音乐”部分：Xonos 和 Spotify 各有一个开关，“添加服务”提供 YouTube Music、Apple Music、Amazon Music、Deezer、TIDAL、SoundCloud 和 Qobuz。车上只显示已开启的服务；如果你已在使用 Xonos，它会保持开启。</item>
         <item>Spotify 和其他服务在 myCar 中通过各自的网页播放器播放，布局与电脑版相同：声音经由 myCar 传到车上，即使该服务的应用不允许其他应用录制。</item>
