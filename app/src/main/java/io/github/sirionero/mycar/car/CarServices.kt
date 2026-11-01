@@ -247,9 +247,12 @@ object CarServices {
         // myCar's own players - Xonos and the music services' web players inside myCar - left for
         // another music app: paused here. Without the audio focus (refused in the background on
         // Android 17) nothing else tells Xonos, and straight into the car's channel it kept the car's
-        // sound from the new app; a web player in myCar's own process might play on too.
+        // sound from the new app; a web player in myCar's own process might play on too. The same
+        // when one of them is picked: Xonos straight into the car's channel takes no focus from the
+        // app before, which played on under it and came back in the car when Xonos stopped.
         val previous = _mediaApp.value
-        if (previous != null && (Xonos.isInside(previous.component) || WebMusic.isInside(previous.component)) && media.now.value.playing) {
+        val inside = { c: ComponentName -> Xonos.isInside(c) || WebMusic.isInside(c) }
+        if (previous != null && (inside(previous.component) || inside(app.component)) && media.now.value.playing) {
             media.togglePlay()
         }
 
