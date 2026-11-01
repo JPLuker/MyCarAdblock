@@ -245,8 +245,11 @@ class MyCarActivity : ComponentActivity(), Projection {
         // the session with it. Added before the screens' own Back handlers, which come first.
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // Also while a car is connecting: the wireless start-up lives with this screen.
-                if (runner != null || SessionStatus.state.value.phase == SessionStatus.Phase.CONNECTING) {
+                // Also while a car is connecting, or listened for after a drive: the wireless start-up
+                // lives with this screen, and a car's Bluetooth that opened it made Back close it.
+                if (runner != null || SessionStatus.state.value.phase == SessionStatus.Phase.CONNECTING ||
+                    io.github.sirionero.mycar.wireless.WirelessLink.busy
+                ) {
                     moveTaskToBack(true)
                     return
                 }
