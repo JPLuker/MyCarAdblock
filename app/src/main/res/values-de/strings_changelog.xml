@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_42">
+        <item>Neuer Bereich Musik in den Einstellungen des Telefons: Xonos und Spotify haben je einen Schalter, und „Dienst hinzufügen“ bietet YouTube Music, Apple Music, Amazon Music, Deezer, TIDAL, SoundCloud und Qobuz. Im Auto sind nur die eingeschalteten Dienste; Xonos ist an, wenn du es schon benutzt hast.</item>
+        <item>Spotify und die anderen Dienste spielen in myCar über ihren eigenen Web-Player, aufgebaut wie auf einem Computer: Ihr Ton kommt über myCar ins Auto, auch wenn die App des Dienstes anderen Apps die Aufnahme verwehrt.</item>
+        <item>Sie funktionieren wie jede Musik-App: der Titel neben der Karte und im Dock, die Lenkradtasten und der Assistent: Sag, was laufen soll, und er sucht im Dienst und spielt das erste Ergebnis.</item>
+        <item>Melde dich einmal auf dem Telefon an, mit seiner Tastatur und dem Passwortmanager: Im Auto bleibst du angemeldet.</item>
+        <item>Die Tastatur im Auto fügt ein, was du auf dem Telefon kopiert hast, und kopiert von der Seite – im Browser, in Cinema und in den Musikdiensten.</item>
+        <item>Alle Einstellungen des Bildschirms im Auto gibt es jetzt auch auf dem Telefon, unter Einstellungen &gt; Bildschirm des Autos, mit denselben Werten wie im Auto: Änderst du eine auf einer Seite, folgt die andere sofort, auch während der Fahrt.</item>
+        <item>Die Seiten neben der Karte lassen sich auch vom Telefon aus ändern: Layout, was jeder Teil zeigt, ihre Reihenfolge, neue Seiten oder zurück zu den fertigen.</item>
+        <item>Die Auto-Vorschau steht ganz oben in den Einstellungen des Telefons.</item>
+    </string-array>
     <string-array name="changelog_41">
         <item>Automatisch kabellos verbinden: Während das Telefon auf das Auto wartet, ruft es jetzt alle 8 Sekunden erneut das Android Auto des Autos an. Ein Auto, das noch hochfuhr, antwortete nicht auf den ersten Anruf, und myCar wartete danach nur noch.</item>
         <item>Wenn ein späterer Schritt scheitert (das WLAN des Autos, die Verbindung), beginnt ein Versuch, den das Bluetooth des Autos ausgelöst hat, von selbst neu, bis zu dreimal, wie du es von Hand mit „Trennen“ und „Kabellos verbinden“ gemacht hast.</item>

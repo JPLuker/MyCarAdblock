@@ -1,6 +1,24 @@
-myCar 0.6.5-alpha: connecting wirelessly by itself keeps trying the way a tap on Connect does.
+myCar 0.6.6-alpha: Spotify and other music services play inside myCar, a Music section on the phone, and every car setting on the phone too.
 
-## Connecting wirelessly by itself
+## Music
+- A new Music section in the phone's Settings, in place of the Xonos one. Xonos has a switch: on, its settings show under it; off, neither Xonos inside myCar nor the Xonos app is on the car's screen, and the drive doesn't connect to Music Assistant. Off to start with, but on at the first start of this version when Xonos is set up in myCar or the Xonos app is on the phone, so nobody loses it.
+- Spotify has a switch too, and "Add a service" offers YouTube Music, Apple Music, Amazon Music, Deezer, TIDAL, SoundCloud and Qobuz. All off to start with: only the services switched on are in the car, as "<name> · Web" tiles with each site's own icon, and one switched off leaves the car at once, during a drive too.
+- Each service plays inside myCar from its own web player, laid out as on a computer, one page per service kept for the whole drive: the music goes on while you're on the map or in another app. Its sound is myCar's own, so it reaches the car through myCar as Cinema's does - Spotify's too, whose app keeps other apps from capturing its sound, so with a car whose Bluetooth carries only calls its music never reached the car.
+- The services work like any music app: the song, artist and cover beside the map and in the dock, the steering-wheel buttons, and the voice assistant ("play..." searches the service and plays the first result). One plays at a time: starting one pauses the others and Xonos. Android's web engine has no Media Session of its own: myCar gives the pages one, and reads the service's own player bar where a page says nothing; a page that doesn't name the song shows the service's name.
+- "Sign in on the phone", under each service, opens it on the phone, with the phone's keyboard and password manager: the car's page shares the sign-in. "Sign out" forgets it, for that service's sites only (for YouTube Music Google's too, so YouTube in Cinema is signed out as well).
+- Apple Music, Amazon Music, TIDAL and Qobuz need a subscription, some services aren't in every country, and Google may not let you sign in inside an app, leaving YouTube Music signed out. The services protected with DRM need Widevine in Android's web engine.
+
+## The car's keyboard
+- Paste puts what you copied on the phone into the page's field (a password, an address), and Copy puts the page's text on the phone's clipboard: in the browser, Cinema and the music services. Android lets an app read the clipboard only while one of its screens has the focus, so myCar opens a see-through one on the phone for a moment; with the phone locked, or the clipboard refused, the car says so.
+
+## Settings on the phone
+- Every setting of the car's screen is on the phone too, in Settings > Car screen: open on connect, beside the map, the pages beside the map, size, theme, controls, map day/night, units, wallpaper, autoplay, spoken directions, the Bluetooth and location warnings, the browser's page, screen fit (with a car connected), what's new after updates and the experimental features. The voice assistant and the phone's speech recognition are under Voice. They're the car's own settings: a change on either side shows on the other at once, during a drive too.
+- The pages beside the map can be changed from the phone, as with the pencil in the car: the layout (with a picture of each), what each part shows (the part lit in the picture), move, delete, add, or back to the ready-made pages.
+- The car preview is first at the top of Settings, outside the groups. With a car connected it stays there, greyed, and says it opens when no car is.
+
+Checked in the emulator, without accounts: the eight services open in the car with the computer layout and Widevine; "play lofi" on YouTube Music reaches the player beside the map and the dock; the phone's Music section and Car screen settings. Not tried with an account, nor in a real car.
+
+## Also in 0.6.5-alpha
 - When the car comes up over Bluetooth, myCar first calls the car's own Android Auto. A car still starting up doesn't answer yet; myCar then published the phone's service and only waited for the car to call - and a car that waits to be called never did. Nothing happened until Disconnect and Connect, which then worked at once. Now, while the phone waits, it calls the car's service again every 8 seconds, and whichever side gets through first carries on.
 - A start-up the car's Bluetooth began that fails at a later step - the car's Wi-Fi didn't come, no connection to the car, the car closed the Bluetooth channel before a drive - starts over by itself after 3 seconds, up to three times, as Disconnect and Connect did by hand. Not behind a VPN, which no start-over gets past; a tap, the cable or Disconnect stops it.
 - A Bluetooth channel on which the car says nothing that leads to its Wi-Fi is closed after 30 seconds and the start-up begins again. Before, it stayed on "talking to the car" for good, holding the drive's service, and every arrival of the car after it was taken for a drive still under way - only Disconnect cleared it.
@@ -8,15 +26,12 @@ myCar 0.6.5-alpha: connecting wirelessly by itself keeps trying the way a tap on
 - The drive's foreground service has two holders, the drive and the start-up, instead of one switch: the end of a drive no longer stops the service a start-up has just taken, and a start-up's service is always given back, so the car's next arrival isn't ignored.
 - A start-up also starts over when the session ends before the car shows myCar (the car not ready yet, a certificate turned down - then with the next one), and from the listening after a drive. A Bluetooth channel that closes with nothing to follow now says the car didn't connect, instead of "talking to the car" forever.
 - After a drive myCar also listens for a car that waits to be called, calling its service every 15 seconds, and stops as soon as the car's Bluetooth goes.
-
-## The car's screen
 - A car that says again that it shows myCar, as one still waiting for a picture does, gets the video's codec config and a full frame again (at most every 3 seconds). Before, it was ignored, and a car that had missed the start stayed black until something on the screen moved.
 - The full frame asked for every 5 seconds never came with a still screen: the screen is now drawn again so it goes out.
 - Over Wi-Fi, a session that makes no progress in its start for 30 seconds, or a car that pinged and then says nothing for 20 seconds, ends the connection: such a session kept myCar busy and the car's next arrival was ignored. A session that stops itself (the encoder giving up) closes the connection too.
 - A car picture that doesn't start (the display refused, a car that gives no density) is tried again twice instead of staying black for the whole drive.
 - A myCar screen closed from the recents while the car opens myCar again no longer stops the new screen's wireless start-up.
-
-Not tried in a real car yet.
+- Not tried in a real car yet.
 
 ## Also in 0.6.4-alpha
 - After words it couldn't act on, the assistant could sit on "…" for up to a minute with the microphone deaf: it waited up to 40 seconds for Home Assistant, and every new request queued behind that one. Now Home Assistant gets 15 seconds, a new request or Cancel drops the one still waiting, and the microphone pressed while it works starts over.

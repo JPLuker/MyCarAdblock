@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_42">
+        <item>手机设置中新增“音乐”部分：Xonos 和 Spotify 各有一个开关，“添加服务”提供 YouTube Music、Apple Music、Amazon Music、Deezer、TIDAL、SoundCloud 和 Qobuz。车上只显示已开启的服务；如果你已在使用 Xonos，它会保持开启。</item>
+        <item>Spotify 和其他服务在 myCar 中通过各自的网页播放器播放，布局与电脑版相同：声音经由 myCar 传到车上，即使该服务的应用不允许其他应用录制。</item>
+        <item>它们像任何音乐应用一样工作：歌曲显示在地图旁和停靠栏中，可用方向盘按键和语音助手：说出想听的内容，它会在该服务中搜索并播放第一个结果。</item>
+        <item>在手机上登录一次，用手机的键盘和密码管理器：车上会保持登录。</item>
+        <item>车机键盘可以粘贴你在手机上复制的内容，也能从网页复制，适用于浏览器、Cinema 和音乐服务。</item>
+        <item>车机屏幕的所有设置现在也都在手机上：设置 &gt; 车机屏幕，数值与车上相同；在一边修改，另一边立即同步，行车途中也一样。</item>
+        <item>地图旁的页面也能在手机上修改：布局、每个部分显示的内容、顺序、新页面，或恢复预设页面。</item>
+        <item>车机预览现在位于手机设置的最上方。</item>
+    </string-array>
     <string-array name="changelog_41">
         <item>自动无线连接：手机等待车辆时，现在每 8 秒会再次呼叫车辆自己的 Android Auto。仍在启动的车辆不会回应第一次呼叫，而 myCar 之后就只是一直等待。</item>
         <item>如果后面的步骤失败（车辆的 Wi-Fi、连接），由车辆蓝牙发起的尝试会自动从头再来，最多三次，就像你手动点按“断开连接”和“无线连接”一样。</item>

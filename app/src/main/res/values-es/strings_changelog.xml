@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_42">
+        <item>Nueva sección Música en los ajustes del teléfono: Xonos y Spotify tienen cada uno un interruptor, y «Añadir un servicio» ofrece YouTube Music, Apple Music, Amazon Music, Deezer, TIDAL, SoundCloud y Qobuz. En el coche solo están los servicios activados; Xonos está activado si ya lo usabas.</item>
+        <item>Spotify y los demás servicios suenan dentro de myCar desde su propio reproductor web, con el diseño de un ordenador: su sonido llega al coche a través de myCar, aunque la app del servicio no deje que otras apps lo graben.</item>
+        <item>Funcionan como cualquier app de música: la canción junto al mapa y en el dock, los botones del volante y el asistente: pide qué poner, lo busca en el servicio y reproduce el primer resultado.</item>
+        <item>Inicia sesión una vez en el teléfono, con su teclado y su gestor de contraseñas: en el coche sigues con la sesión iniciada.</item>
+        <item>El teclado del coche pega lo que copiaste en el teléfono, y copia de la página, en el navegador, en Cinema y en los servicios de música.</item>
+        <item>Todos los ajustes de la pantalla del coche están también en el teléfono, en Ajustes &gt; Pantalla del coche, con los mismos valores que en el coche: cambia uno en un lado y el otro lo sigue al momento, también durante un viaje.</item>
+        <item>Las páginas junto al mapa se cambian también desde el teléfono: el diseño, lo que muestra cada parte, su orden, páginas nuevas o volver a las predefinidas.</item>
+        <item>La vista previa del coche es lo primero arriba en los Ajustes del teléfono.</item>
+    </string-array>
     <string-array name="changelog_41">
         <item>Conexión inalámbrica automática: mientras el teléfono espera al coche, ahora vuelve a llamar al Android Auto del coche cada 8 segundos. Un coche que aún estaba arrancando no respondía a la primera llamada, y myCar luego solo esperaba.</item>
         <item>Si falla un paso posterior (el Wi-Fi del coche, la conexión), el intento que empezó el Bluetooth del coche vuelve a empezar solo, hasta tres veces, como hacías a mano con «Desconectar» y «Conectar sin cable».</item>
