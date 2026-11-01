@@ -238,6 +238,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
         speakDirectionsFlow.value = AppSettings.getString(
             app, KEY_SPEAK_DIRECTIONS, (audioRouteFlow.value != AudioRoute.BLUETOOTH).toString(),
         ) == "true"
+        speakDirectionsChosen = AppSettings.getString(app, KEY_SPEAK_DIRECTIONS, "") != ""
         bluetoothWarningFlow.value = AppSettings.getString(app, KEY_BLUETOOTH_WARNING, "true") == "true"
         locationWarningFlow.value = AppSettings.getString(app, KEY_LOCATION_WARNING, "true") == "true"
         nightFlow.value = runCatching {
@@ -385,8 +386,17 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
 
     fun setSpeakDirections(on: Boolean) {
         speakDirectionsFlow.value = on
+        speakDirectionsChosen = true
         AppSettings.putString(app, KEY_SPEAK_DIRECTIONS, on.toString())
     }
+
+    /**
+     * The driver set spoken directions by hand. Automatic on Bluetooth keeps quiet only when they
+     * didn't: turned on, myCar speaks - with the car's radio on, the map app's voice over Bluetooth
+     * isn't heard, and the setting said "On" while nothing was said.
+     */
+    @Volatile var speakDirectionsChosen = false
+        private set
 
     fun setBluetoothWarning(on: Boolean) {
         bluetoothWarningFlow.value = on

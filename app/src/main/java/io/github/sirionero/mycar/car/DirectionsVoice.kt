@@ -104,8 +104,9 @@ object DirectionsVoice {
     }
 
     private fun tick() {
-        // Automatic left the sound to Bluetooth: the map app's own voice reaches the car that way.
-        if (!CarSettings.speakDirections.value || CarAudioRoute.onBluetooth) return
+        // Automatic left the sound to Bluetooth: the map app's own voice reaches the car that way -
+        // unless the driver turned spoken directions on by hand.
+        if (!CarSettings.speakDirections.value || (CarAudioRoute.onBluetooth && !CarSettings.speakDirectionsChosen)) return
         val turn = NavTurn.current()
         if (turn == null) {
             turnKey = null
