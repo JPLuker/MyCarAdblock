@@ -72,11 +72,18 @@ object CarKeys {
         // car still on its own screen) used to throw, and the exception ended the session.
         val media = CarServices.mediaOrNull()
         when (keyCode) {
-            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> if (media != null && CarServices.noMusicApp()) playLast() else media?.togglePlay()
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> when {
+                media == null -> Unit
+                CarServices.noMusicApp() -> playLast()
+                // The music paused while a film plays (Cinema, a video in the browser): the key was
+                // meant for that, and starting the music took the film's sound and stopped it.
+                !media.now.value.playing && otherSounding() -> Unit
+                else -> media.togglePlay()
+            }
             KeyEvent.KEYCODE_MEDIA_PLAY -> when {
                 media == null -> Unit
                 CarServices.noMusicApp() -> playLast()
-                !media.now.value.playing -> media.togglePlay()
+                !media.now.value.playing && !otherSounding() -> media.togglePlay()
             }
             KeyEvent.KEYCODE_MEDIA_PAUSE, KeyEvent.KEYCODE_MEDIA_STOP -> if (media != null && media.now.value.playing) media.togglePlay()
             KeyEvent.KEYCODE_MEDIA_NEXT -> media?.next()
@@ -105,9 +112,13 @@ object CarKeys {
         if (!CarServices.mediaDecided.value) return
         // Something else is sounding (Cinema, a video in the browser): the key was meant for it,
         // not for starting the music on top of it.
-        if (appContext?.getSystemService(android.media.AudioManager::class.java)?.isMusicActive == true) return
+        if (otherSounding()) return
         _screenKeys.tryEmit(ScreenKey.PLAY)
     }
+
+    /** Sound playing on the phone that isn't the car's music app (asked while that one is paused). */
+    private fun otherSounding(): Boolean =
+        appContext?.getSystemService(android.media.AudioManager::class.java)?.isMusicActive == true
 
     /** A turn of the rotary knob: each click moves focus one step, like Tab or Shift+Tab. */
     fun onRotate(delta: Int) {
