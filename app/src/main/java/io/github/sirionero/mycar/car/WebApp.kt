@@ -93,6 +93,9 @@ internal fun WebApp(content: String, tile: WebTile?) {
                 factory = { context ->
                     // A page's dropdown can't close myCar on the car's screen (see carWebContext).
                     WebView(carWebContext(context)).apply {
+                        // As tall as its place: with AndroidView's WRAP_CONTENT, WebView lays the
+                        // page out 0 px tall (100vh, bars fixed at the bottom, full-window pages).
+                        layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
                         settings.javaScriptEnabled = true
                         settings.domStorageEnabled = true
                         settings.loadWithOverviewMode = true
