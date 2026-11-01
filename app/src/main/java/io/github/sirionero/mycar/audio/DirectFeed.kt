@@ -57,6 +57,29 @@ internal class DirectFeed(
     val feeding: Boolean
         get() = synchronized(lock) { queued > 0 || (hadMusic && nanos() - lastMusicAt < TAIL_NS) }
 
+    /**
+     * The capture has [size] bytes of [pcm] with sound in them while myCar's own music is only in
+     * its tail (nothing waiting): another app took over - a film, a song on a web player, a message
+     * read out - and the tail ends here. Its first two seconds were dropped for silence. False
+     * while the music itself plays, or for a quiet chunk.
+     */
+    fun endTailFor(pcm: ByteArray, size: Int): Boolean = synchronized(lock) {
+        if (queued > 0 || !hasSound(pcm, size)) return false
+        hadMusic = false
+        true
+    }
+
+    /** Any 16-bit little-endian sample in [pcm] beyond a whisper. */
+    private fun hasSound(pcm: ByteArray, size: Int): Boolean {
+        var i = 0
+        while (i + 1 < size) {
+            val sample = (pcm[i].toInt() and 0xFF) or (pcm[i + 1].toInt() shl 8)
+            if (sample > SOUND || sample < -SOUND) return true
+            i += 2
+        }
+        return false
+    }
+
     fun start() {
         if (running) return
         running = true
@@ -296,6 +319,8 @@ internal class DirectFeed(
 
         /** After the music stops, the capture waits this long before it feeds the car again. */
         private const val TAIL_NS = 2_000_000_000L
+        /** A captured sample beyond this (of 32767) is sound, not a quiet phone's near-silence. */
+        private const val SOUND = 64
         private const val MIN_WAIT_NS = 1_000_000L
         private const val WRITE_WAIT_MS = 50L
     }

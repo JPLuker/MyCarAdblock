@@ -236,8 +236,10 @@ object CarAudio {
 
     internal fun deliver(pcm: ByteArray, size: Int, peak: Float) {
         _level.value = peak
-        // While myCar's own music reaches the car, it alone feeds it.
-        if (feed?.feeding == true) return
+        // While myCar's own music reaches the car, it alone feeds it - and for a moment after, for
+        // the gap between two songs, unless another app's sound is already here (see endTailFor).
+        val own = feed
+        if (own != null && own.feeding && !own.endTailFor(pcm, size)) return
         synchronized(writes) { link?.write(pcm, size) }
     }
 }
