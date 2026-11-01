@@ -300,10 +300,13 @@ object WirelessLink {
         retriesLeft--
         log.i("auto-connect: $why - starting over in ${RETRY_DELAY_MS / 1000} s, as Connect would ($retriesLeft more after this)")
         val app = context.applicationContext
+        // The listening after a drive stays that: started over as a plain start-up it showed
+        // "waiting for the car" on Home for 5 minutes, and ended with "the car didn't connect".
+        val wasQuiet = quiet
         main.postDelayed({
             // Stopped, started anew or driving meanwhile (the cable, a tap, Disconnect): that one decides.
             if (mine != startRun || tcp != null) return@postDelayed
-            start(app, device, byItself = true, again = true)
+            start(app, device, byItself = true, quiet = wasQuiet, again = true)
         }, RETRY_DELAY_MS)
         return true
     }
