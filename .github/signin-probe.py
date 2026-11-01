@@ -116,6 +116,36 @@ SHOW_ALL = r"""(() => {
 })()"""
 
 
+MAIN = r"""(() => {
+  const m = document.querySelector('main');
+  if (!m) return 'no main';
+  const s = getComputedStyle(m);
+  const b = m.getBoundingClientRect();
+  const keys = ['position','top','left','right','bottom','width','height','overflow','overflowX','overflowY','clip','clipPath','opacity','visibility','transform','zIndex','display','inset','translate','scale','contain','isolation','mixBlendMode','backdropFilter'];
+  const out = {};
+  for (const k of keys) out[k] = s[k];
+  const rules = [];
+  for (const sheet of document.styleSheets) {
+    let list; try { list = sheet.cssRules; } catch (e) { continue; }
+    for (const r of list) { try { if (r.selectorText && m.matches(r.selectorText)) rules.push(r.cssText.slice(0, 300)); } catch (e) {} }
+  }
+  const p = m.parentElement, ps = getComputedStyle(p), pb = p.getBoundingClientRect();
+  const bs = getComputedStyle(document.body), bb = document.body.getBoundingClientRect();
+  return JSON.stringify({ cls: m.className, rect: [b.left, b.top, b.width, b.height].map(Math.round), style: out, rules: rules.slice(0, 12),
+    parent: [p.id, ps.position, ps.overflow, ps.height, [pb.left, pb.top, pb.width, pb.height].map(Math.round)],
+    body: [bs.position, bs.overflow, bs.height, bs.backgroundColor, [bb.left, bb.top, bb.width, bb.height].map(Math.round)],
+    html: [getComputedStyle(document.documentElement).overflow, getComputedStyle(document.documentElement).height],
+    mainHtml: m.outerHTML.replace(/\s+/g, ' ').slice(0, 300) });
+})()"""
+
+FORCE = r"""(() => {
+  const s = document.createElement('style');
+  s.textContent = 'main { position: static !important; clip: auto !important; clip-path: none !important; overflow: visible !important; width: auto !important; height: auto !important; opacity: 1 !important; transform: none !important; visibility: visible !important; }';
+  document.documentElement.appendChild(s);
+  return 'forced';
+})()"""
+
+
 def main(base, out):
     pages = [p for p in json.load(urllib.request.urlopen(base + "/json", timeout=20)) if p.get("type") == "page"]
     target = next((p for p in pages if "spotify" in p.get("url", "")), None)
@@ -124,21 +154,14 @@ def main(base, out):
         return
     page = Page(target["webSocketDebuggerUrl"])
     page.call("Page.enable")
-    page.call("Network.enable")
-    print("as myCar opens it:", page.value(PROBE))
+    print("web engine:", page.value("navigator.userAgent"), "|", json.load(urllib.request.urlopen(base + "/json/version", timeout=20)).get("Browser"))
+    print("main:", page.value(MAIN))
     print("deep look:", page.value(DEEP))
     page.shot(out + "-1-as-opened.png")
-    # A. Nothing skipped for being out of sight (content-visibility).
-    print("show all:", page.value(SHOW_ALL))
+    print("force:", page.value(FORCE))
     time.sleep(2)
-    print("deep look, nothing skipped:", page.value(DEEP))
-    page.shot(out + "-2-nothing-skipped.png")
-    # B. A page told it runs in Chrome (window.chrome, as Chrome has and the web engine hasn't), loaded again.
-    page.call("Page.addScriptToEvaluateOnNewDocument", {"source": "if (!window.chrome) window.chrome = { runtime: {}, app: {}, csi: function () {}, loadTimes: function () {} };"})
-    page.call("Page.reload", {"ignoreCache": False})
-    time.sleep(15)
-    print("with window.chrome:", page.value(DEEP))
-    page.shot(out + "-3-window-chrome.png")
+    print("deep look, main forced:", page.value(DEEP))
+    page.shot(out + "-2-main-forced.png")
 
 
 if __name__ == "__main__":
