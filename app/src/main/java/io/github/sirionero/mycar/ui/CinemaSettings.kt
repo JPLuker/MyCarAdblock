@@ -53,7 +53,9 @@ internal fun CinemaSection() {
     var resetAsk by remember { mutableStateOf(false) }
     var name by rememberSaveable { mutableStateOf("") }
     var address by rememberSaveable { mutableStateOf("") }
-    val askLocalNetwork = rememberLocalNetworkAsk()
+    // Only for addresses at home: YouTube, RaiPlay and Twitch had the warning and the question too.
+    // A home site behind a public-looking name is told in the car, where it doesn't load.
+    val askLocalNetwork = rememberLocalNetworkAsk(io.github.sirionero.mycar.LocalNetwork::blocks)
 
     SettingsSection(
         "Cinema",
@@ -61,7 +63,7 @@ internal fun CinemaSection() {
     ) {
         // A site at home (Jellyfin, the router) needs the home network, which Android 17 keeps
         // myCar off until it's allowed.
-        LocalNetworkRow(sites.map { it.url })
+        LocalNetworkRow(sites.map { it.url }, io.github.sirionero.mycar.LocalNetwork::blocks)
         SettingsRow(
             stringResource(R.string.settings_cinema_parked_only),
             Modifier.toggleable(parkedOnly, role = Role.Switch) { on ->
