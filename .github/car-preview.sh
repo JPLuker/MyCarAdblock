@@ -573,6 +573,41 @@ scroll_to() {
     done
     echo "setup-phone: $1 never came into sight"; return 1
 }
+# The phone's Settings: the car preview first at the top (opened, and back), then "Car screen" - the
+# car's settings on the phone - with a choice's dialog, a page of Home opened out with its layouts
+# and what a part can show, the rest of the group scrolled through, and the voice assistant in
+# "Voice". Before setup-phone, which wipes myCar's data.
+phone_settings() {
+    case " ${ONLY:-phone-settings} " in *" phone-settings "*) ;; *) return ;; esac
+    local d=previews/phone-settings i
+    mkdir -p $d
+    adb shell am force-stop "$PKG"
+    adb logcat -c
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen settings >/dev/null
+    sleep 4; adb exec-out screencap -p > $d/01-top.png
+    tap_text "Car preview"; sleep 5; adb exec-out screencap -p > $d/02-preview.png
+    adb shell input keyevent 4; sleep 2; adb exec-out screencap -p > $d/03-back.png
+    tap_text "Car screen"; sleep 3; adb exec-out screencap -p > $d/04-car.png
+    tap_text "Open on connect"; sleep 1.5; adb exec-out screencap -p > $d/05-open-on-connect.png
+    tap_text "Close"; sleep 1
+    scroll_to "Page 1" && tap_text "Page 1"; sleep 1.5; adb exec-out screencap -p > $d/06-page.png
+    tap_text "Layout"; sleep 1.5; adb exec-out screencap -p > $d/07-layouts.png
+    tap_text "Close"; sleep 1
+    tap_text "Weather"; sleep 1.5; adb exec-out screencap -p > $d/08-part.png
+    tap_text "Close"; sleep 1
+    for i in 1 2 3 4 5 6 7; do
+        adb shell input swipe 160 520 160 220 400; sleep 1.5; adb exec-out screencap -p > $d/09-car-$i.png
+    done
+    adb shell input keyevent 4; sleep 2
+    tap_text "Voice"; sleep 3; adb exec-out screencap -p > $d/10-voice.png
+    adb shell input swipe 160 520 160 220 400; sleep 1.5; adb exec-out screencap -p > $d/11-voice.png
+    adb logcat -d -s myCar > $d/log.txt
+    adb logcat -d -b crash > $d/crash.txt 2>&1
+    echo "--- phone settings ---"
+    grep -h "FATAL\|AndroidRuntime" $d/crash.txt || echo "phone-settings: no crash"
+}
+phone_settings
+
 setup_phone() {
     case " ${ONLY:-setup-phone} " in *" setup-phone "*) ;; *) return ;; esac
     local d=previews/setup-phone i
