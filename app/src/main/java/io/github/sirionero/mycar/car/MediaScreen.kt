@@ -95,6 +95,9 @@ fun MediaScreen(app: MediaApp, onExit: () -> Unit) {
     var tab by remember { mutableStateOf(Tab.NOW_PLAYING) }
     var searching by remember { mutableStateOf(false) }
     BackCloses(searching) { searching = false }
+    // The car's Back in a folder of the app's list goes up one, as the list's own arrow does: it
+    // closed the whole player, with the driver deep in an artist's albums.
+    BackCloses(!searching && tab == Tab.BROWSE && browse.trail.isNotEmpty()) { media.up() }
 
     // The connection outlives this screen: the home screen's player is the same one.
     LaunchedEffect(app) { CarServices.openMedia(app) }
