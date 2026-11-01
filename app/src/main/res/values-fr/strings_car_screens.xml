@@ -71,6 +71,14 @@
     <string name="car_keyboard_space">espace</string>
     <string name="car_keyboard_hide">Masquer le clavier</string>
     <string name="car_keyboard_submit">Valider</string>
+    <string name="car_keyboard_paste">Coller</string>
+    <string name="car_keyboard_copy">Copier</string>
+    <string name="car_clipboard_copied">Copié sur le téléphone.</string>
+    <string name="car_clipboard_nothing">Rien à copier.</string>
+    <string name="car_clipboard_password">Les mots de passe ne sont pas copiés.</string>
+    <string name="car_clipboard_empty">Le presse-papiers du téléphone ne contient pas de texte.</string>
+    <string name="car_clipboard_locked">Déverrouillez le téléphone, puis appuyez à nouveau sur « Coller ».</string>
+    <string name="car_clipboard_denied">Android n\'a pas laissé myCar lire le presse-papiers. Ouvrez myCar sur le téléphone, puis appuyez à nouveau sur « Coller ».</string>
 
     <string name="car_player_previous">Précédent</string>
     <string name="car_player_play">Lecture</string>

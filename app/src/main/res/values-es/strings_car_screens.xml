@@ -71,6 +71,14 @@
     <string name="car_keyboard_space">espacio</string>
     <string name="car_keyboard_hide">Ocultar teclado</string>
     <string name="car_keyboard_submit">Enviar</string>
+    <string name="car_keyboard_paste">Pegar</string>
+    <string name="car_keyboard_copy">Copiar</string>
+    <string name="car_clipboard_copied">Copiado en el teléfono.</string>
+    <string name="car_clipboard_nothing">No hay nada que copiar.</string>
+    <string name="car_clipboard_password">Las contraseñas no se copian.</string>
+    <string name="car_clipboard_empty">El portapapeles del teléfono no tiene texto.</string>
+    <string name="car_clipboard_locked">Desbloquea el teléfono y vuelve a tocar «Pegar».</string>
+    <string name="car_clipboard_denied">Android no dejó que myCar leyera el portapapeles. Abre myCar en el teléfono y vuelve a tocar «Pegar».</string>
 
     <string name="car_player_previous">Anterior</string>
     <string name="car_player_play">Reproducir</string>

@@ -208,6 +208,19 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!--
+          See-through, up on the phone for a moment: Android lets myCar read the phone's clipboard,
+          for a Paste on the car's keyboard, only while one of its screens has the focus
+          (car/CarClipboard.kt). Its own task, so the app that was in front comes back after it.
+        -->
+        <activity
+            android:name=".car.CarClipboardActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <!--
           Answers the car's USB connection on MyCarActivity's behalf. Kept apart from the
           activity so Settings can switch off just this (AppSettings.setMyCarEnabled) and leave
           the head unit to Android Auto, without disabling the screen the switch is on.

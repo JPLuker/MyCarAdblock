@@ -34,8 +34,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import io.github.sirionero.mycar.R
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Whether a [CarKeyboard] is on screen right now, so [CarUi] can give it the row of height the
@@ -62,6 +66,9 @@ object CarKeyboardVisibility {
  * [onDismiss] is null wherever there's no keyboard-shown state independent of the screen itself
  * (a search template, sign-in) - there, the header's own back action is the only way out and no
  * dismiss button is drawn.
+ *
+ * With [clipboard], Paste and Copy keys share the phone's clipboard (see [CarClipboard]): Paste
+ * adds its text where typing would, Copy puts [onCopy]'s choice there, or the whole [text].
  */
 @Composable
 fun CarKeyboard(
@@ -72,19 +79,28 @@ fun CarKeyboard(
     submitIcon: Boolean = true,
     submitImage: ImageVector? = null,
     onDismiss: (() -> Unit)? = null,
+    clipboard: Boolean = false,
+    onCopy: (() -> Unit)? = null,
 ) {
     var symbols by remember { mutableStateOf(false) }
     var shifted by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
+    // A Paste read on the phone arrives a moment later: not into a field that has gone meanwhile.
+    val open = remember { AtomicBoolean(true) }
     DisposableEffect(Unit) {
         CarKeyboardVisibility.state.value = true
-        onDispose { CarKeyboardVisibility.state.value = false }
+        onDispose {
+            open.set(false)
+            CarKeyboardVisibility.state.value = false
+        }
     }
 
     // The same field on the phone, for typing on its own keyboard: see [PhoneTyping].
     val latestChange by rememberUpdatedState(onTextChange)
     val latestSubmit by rememberUpdatedState(onSubmit)
     val latestDismiss by rememberUpdatedState(onDismiss)
+    val latestText by rememberUpdatedState(text)
     val phoneField = remember {
         PhoneTyping.open(text, { latestChange(it) }, { latestSubmit() }, onDismiss?.let { { latestDismiss?.invoke() } })
     }
@@ -147,6 +163,15 @@ fun CarKeyboard(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Key(if (symbols) "abc" else "?123", Modifier.weight(1.4f)) { symbols = !symbols }
+                    if (clipboard) {
+                        IconKey(painterResource(R.drawable.sym_content_paste), stringResource(R.string.car_keyboard_paste), Modifier.weight(1f)) {
+                            CarClipboard.paste(context) { pasted -> if (open.get()) latestChange(latestText + pasted) }
+                        }
+                        IconKey(painterResource(R.drawable.sym_content_copy), stringResource(R.string.car_keyboard_copy), Modifier.weight(1f)) {
+                            val copy = onCopy
+                            if (copy != null) copy() else CarClipboard.copy(context, latestText)
+                        }
+                    }
                     Key(stringResource(R.string.car_keyboard_space), Modifier.weight(if (onDismiss != null) 3.2f else 4f)) { onTextChange("$text ") }
                     if (onDismiss != null) {
                         DismissKey(onDismiss, Modifier.weight(1.4f))
@@ -195,6 +220,25 @@ private fun DismissKey(onClick: () -> Unit, modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.car_keyboard_hide))
+        }
+    }
+}
+
+/** A key drawn as an icon, for the clipboard's. */
+@Composable
+private fun IconKey(icon: Painter, description: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    GsIconBox(
+        onClick = onClick,
+        modifier = modifier.height(LocalKeyHeight.current),
+        colors = GsColors(MaterialTheme.colorScheme.surfaceContainerHighest, MaterialTheme.colorScheme.onSurface),
+        shape = RoundedCornerShape(8.dp),
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(icon, contentDescription = description)
         }
     }
 }

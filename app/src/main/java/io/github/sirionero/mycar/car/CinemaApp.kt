@@ -411,6 +411,9 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, onClose: () -> Un
                     fieldText = null
                     web?.evaluateJavascript(BLUR_FIELD_JS, null)
                 },
+                // The phone's clipboard: a password copied on the phone, to sign in.
+                clipboard = true,
+                onCopy = { web?.let(CarClipboard::copyFromPage) },
             )
         }
     }

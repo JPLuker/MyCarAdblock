@@ -116,6 +116,15 @@
     <!-- Descriptions of keys drawn as icons, read by accessibility services -->
     <string name="car_keyboard_hide">Hide keyboard</string>
     <string name="car_keyboard_submit">Submit</string>
+    <string name="car_keyboard_paste">Paste</string>
+    <string name="car_keyboard_copy">Copy</string>
+    <!-- What the keyboard's Paste and Copy did, said on the car screen (car/CarClipboard.kt). "Paste": the key -->
+    <string name="car_clipboard_copied">Copied to the phone.</string>
+    <string name="car_clipboard_nothing">Nothing to copy.</string>
+    <string name="car_clipboard_password">Passwords aren\'t copied.</string>
+    <string name="car_clipboard_empty">The phone\'s clipboard has no text.</string>
+    <string name="car_clipboard_locked">Unlock the phone, then tap Paste again.</string>
+    <string name="car_clipboard_denied">Android didn\'t let myCar read the clipboard. Open myCar on the phone, then tap Paste again.</string>
 
     <!-- The player's buttons, drawn as icons: what each one does, read by accessibility services -->
     <string name="car_player_previous">Previous</string>
