@@ -690,6 +690,22 @@ phone_music() {
     sleep 20; adb exec-out screencap -p > $d/03b-sign-in-later.png
     adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb shell cat /sdcard/ui.xml > $d/03-sign-in-ui.xml
     signin_probe "$d/03-cdp" > $d/03-sign-in-probe.txt
+    # The same sign-in page in a real Chrome on the runner, as a computer and as an app's web view.
+    local chrome ua
+    chrome=$(command -v google-chrome || command -v chromium || command -v chromium-browser)
+    if [ -n "$chrome" ]; then
+        ua="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+        timeout 60 "$chrome" --headless=new --no-sandbox --disable-gpu --hide-scrollbars --window-size=412,860 \
+            --virtual-time-budget=15000 --user-agent="$ua" --screenshot="$d/03-chrome-computer.png" \
+            "https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fopen.spotify.com%2F" >/dev/null 2>&1
+        ua="Mozilla/5.0 (Linux; Android 14; Pixel 7; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.0.0 Mobile Safari/537.36"
+        timeout 60 "$chrome" --headless=new --no-sandbox --disable-gpu --hide-scrollbars --window-size=412,860 \
+            --virtual-time-budget=15000 --user-agent="$ua" --screenshot="$d/03-chrome-webview-ua.png" \
+            "https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fopen.spotify.com%2F" >/dev/null 2>&1
+        echo "chrome: $("$chrome" --version 2>/dev/null)" >> $d/03-sign-in-probe.txt
+    else
+        echo "no Chrome on the runner" >> $d/03-sign-in-probe.txt
+    fi
     adb shell input keyevent 4; sleep 2
     adb exec-out screencap -p > $d/04-back.png
     scroll_to "Add a service" && tap_text "Add a service"; sleep 2; adb exec-out screencap -p > $d/05-add.png

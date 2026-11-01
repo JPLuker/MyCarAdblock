@@ -86,6 +86,36 @@ LOOK = r"""(() => {
 })()"""
 
 
+DEEP = r"""(() => {
+  const field = document.querySelector('input');
+  if (!field) return 'no field';
+  const r = field.getBoundingClientRect();
+  const x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const name = el => el ? (el.tagName + (el.id ? '#' + el.id : '')) : null;
+  const chain = [];
+  for (let el = field; el; el = el.parentElement) {
+    const s = getComputedStyle(el);
+    chain.push(name(el) + ' cv=' + s.contentVisibility + ' pe=' + s.pointerEvents + ' mask=' + (s.maskImage || s.webkitMaskImage) + ' contain=' + s.contain + ' pos=' + s.position + ' z=' + s.zIndex + ' inert=' + el.inert);
+  }
+  return JSON.stringify({
+    atPoint: document.elementsFromPoint(x, y).map(name),
+    chain,
+    dialogs: document.querySelectorAll('dialog[open]').length, inert: document.querySelectorAll('[inert]').length,
+    popovers: (() => { try { return document.querySelectorAll(':popover-open').length } catch (e) { return 'n/a' } })(),
+    visibility: document.visibilityState, chrome: typeof window.chrome, webdriver: navigator.webdriver,
+    htmlClass: document.documentElement.className, bodyStyle: document.body.getAttribute('style'),
+    iframes: [...document.querySelectorAll('iframe')].map(f => { const b = f.getBoundingClientRect(); return (f.src || '').split('?')[0].slice(-50) + ' ' + [b.left, b.top, b.width, b.height].map(Math.round) + ' ' + getComputedStyle(f).visibility; }),
+  });
+})()"""
+
+SHOW_ALL = r"""(() => {
+  const s = document.createElement('style');
+  s.textContent = '*, *::before, *::after { content-visibility: visible !important; }';
+  document.documentElement.appendChild(s);
+  return 'styled';
+})()"""
+
+
 def main(base, out):
     pages = [p for p in json.load(urllib.request.urlopen(base + "/json", timeout=20)) if p.get("type") == "page"]
     target = next((p for p in pages if "spotify" in p.get("url", "")), None)
@@ -96,34 +126,19 @@ def main(base, out):
     page.call("Page.enable")
     page.call("Network.enable")
     print("as myCar opens it:", page.value(PROBE))
-    print("why it doesn't show:", page.value(LOOK))
+    print("deep look:", page.value(DEEP))
     page.shot(out + "-1-as-opened.png")
-    print("ua:", page.value("navigator.userAgent"))
-    # 1. Without the web engine's automatic dark mode.
-    print("auto dark off:", page.call("Emulation.setAutoDarkModeOverride", {"enabled": False}).get("error"))
-    time.sleep(3)
-    print("why, auto dark off:", page.value(LOOK))
-    page.shot(out + "-2-auto-dark-off.png")
-    page.call("Emulation.setAutoDarkModeOverride", {})
-    # 2. A light colour scheme asked of the page.
-    page.call("Emulation.setEmulatedMedia", {"features": [{"name": "prefers-color-scheme", "value": "light"}]})
-    time.sleep(3)
-    print("why, light scheme:", page.value(LOOK))
-    page.shot(out + "-3-light.png")
-    page.call("Emulation.setEmulatedMedia", {"features": []})
-    # 3. Laid out as wide as the car's page (a computer's window), then loaded again.
-    page.call("Emulation.setDeviceMetricsOverride", {"width": 1024, "height": 768, "deviceScaleFactor": 1, "mobile": False})
+    # A. Nothing skipped for being out of sight (content-visibility).
+    print("show all:", page.value(SHOW_ALL))
+    time.sleep(2)
+    print("deep look, nothing skipped:", page.value(DEEP))
+    page.shot(out + "-2-nothing-skipped.png")
+    # B. A page told it runs in Chrome (window.chrome, as Chrome has and the web engine hasn't), loaded again.
+    page.call("Page.addScriptToEvaluateOnNewDocument", {"source": "if (!window.chrome) window.chrome = { runtime: {}, app: {}, csi: function () {}, loadTimes: function () {} };"})
     page.call("Page.reload", {"ignoreCache": False})
     time.sleep(15)
-    print("wide:", page.value(PROBE))
-    print("why, wide:", page.value(LOOK))
-    page.shot(out + "-4-wide.png")
-    page.call("Emulation.clearDeviceMetricsOverride")
-    # 4. Loaded again as it is, after all that: the same?
-    page.call("Page.reload", {"ignoreCache": False})
-    time.sleep(15)
-    print("again as opened:", page.value(LOOK))
-    page.shot(out + "-5-again.png")
+    print("with window.chrome:", page.value(DEEP))
+    page.shot(out + "-3-window-chrome.png")
 
 
 if __name__ == "__main__":
