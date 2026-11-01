@@ -25,6 +25,9 @@ object WebMusicPlayer {
 
         /** Signed out on the phone: the page starts again, signed out. */
         fun signedOut()
+
+        /** The voice assistant's "play [query]": the service's search, and the Play of what it finds first. */
+        fun search(query: String)
     }
 
     /** The car screen's pages, which can make one for a service out of sight. */
@@ -87,6 +90,15 @@ object WebMusicPlayer {
         main.postDelayed({ if (waiting.remove(wait)) wait.future.set(null) }, ANSWER_MS)
         page.act(action, seconds)
         return wait.future
+    }
+
+    /**
+     * "Play [query]" on [service], from the voice assistant: its page searches, made out of sight
+     * if there's none yet, and plays what it finds first.
+     */
+    fun search(service: WebMusicService, query: String) {
+        val page = attached[service.id] ?: pages?.open(service) ?: return
+        page.search(query)
     }
 
     /** [id] signed out on the phone: its page in the car, if there's one, starts again. */

@@ -93,6 +93,26 @@ abstract class WebMusicMediaService(private val serviceId: String) : MediaLibrar
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> =
             Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.of(), params))
+
+        // The voice assistant's "play X" (a search, as Android Auto asks): to the player as asked,
+        // where the page does the searching.
+        override fun onSetMediaItems(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            mediaItems: MutableList<MediaItem>,
+            startIndex: Int,
+            startPositionMs: Long,
+        ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> =
+            Futures.immediateFuture(MediaSession.MediaItemsWithStartPosition(mediaItems, startIndex, startPositionMs))
+
+        // Play with nothing said by the page yet: nothing to bring back from here; the page plays
+        // what it has (no warning in the log at each such Play).
+        override fun onPlaybackResumption(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            isForPlayback: Boolean,
+        ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> =
+            Futures.immediateFuture(MediaSession.MediaItemsWithStartPosition(ImmutableList.of(), C.INDEX_UNSET, C.TIME_UNSET))
     }
 
     private companion object {
@@ -170,6 +190,13 @@ internal class WebPlayer(looper: Looper, private val service: WebMusicService) :
 
     override fun handleStop(): ListenableFuture<*> = WebMusicPlayer.act(service, "pause") { !it.playing }
 
+    /** Only a search comes here ("play X"): the page searches and plays what it finds first. */
+    override fun handleSetMediaItems(mediaItems: List<MediaItem>, startIndex: Int, startPositionMs: Long): ListenableFuture<*> {
+        val query = mediaItems.firstNotNullOfOrNull { it.requestMetadata.searchQuery?.toString()?.trim()?.ifEmpty { null } }
+        if (query != null) WebMusicPlayer.search(service, query)
+        return Futures.immediateVoidFuture()
+    }
+
     override fun handleSeek(mediaItemIndex: Int, positionMs: Long, seekCommand: Int): ListenableFuture<*> {
         val before = page.value.key
         return when (seekCommand) {
@@ -199,6 +226,8 @@ internal class WebPlayer(looper: Looper, private val service: WebMusicService) :
             Player.COMMAND_GET_METADATA,
         )
         .addIf(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM, s.canSeek && s.durationMs > 0)
+        // "Play X" for the voice assistant, where the service has a search.
+        .addIf(Player.COMMAND_SET_MEDIA_ITEM, service.search != null)
         .build()
 
     private fun item(s: WebPlayerState): MediaItemData {

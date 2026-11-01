@@ -2,6 +2,7 @@ package io.github.sirionero.mycar.webmusic
 
 import android.content.ComponentName
 import android.content.Context
+import android.net.Uri
 import android.os.Process
 import androidx.annotation.StringRes
 import io.github.sirionero.mycar.AppSettings
@@ -40,6 +41,13 @@ class WebMusicService(
     val bar: Bar? = null,
     /** A little CSS of its own, for what the car's screen needs hidden or changed. */
     val css: String = "",
+    /** Its search, for the voice assistant's "play X": the address, with `{q}` where the words go. */
+    val search: String? = null,
+    /**
+     * On its search's page, the Play button of what it found first: CSS selectors, tried in order,
+     * that don't depend on the page's language. Before [ANY_PLAY].
+     */
+    val firstPlay: List<String> = emptyList(),
 ) {
     class Bar(
         val playPause: String,
@@ -57,6 +65,14 @@ class WebMusicService(
 
     /** The host its icon is kept by. */
     val host: String get() = site.host
+
+    /** Where its search for [query] is; null when it has none. */
+    fun searchUrl(query: String): String? = search?.replace("{q}", Uri.encode(query.trim()))
+
+    companion object {
+        /** Play buttons as most of these players mark them, whatever the page's language. */
+        val ANY_PLAY = listOf("main [data-testid=\"play-button\"]", "main [data-test=\"play-button\"]", "[data-testid=\"play-button\"]", "[data-test=\"play-button\"]")
+    }
 }
 
 /**
@@ -84,6 +100,8 @@ object WebMusic {
         ),
         // "Install App" in its bar: the app is right here.
         css = "[data-testid=\"global-nav-bar\"] a[href=\"/download\"] { display: none !important; }",
+        search = "https://open.spotify.com/search/{q}",
+        firstPlay = listOf("[data-testid=\"top-result-card\"] [data-testid=\"play-button\"]", "[data-testid=\"tracklist-row\"] button"),
     )
 
     private val AMAZON = listOf("com", "de", "co.uk", "it", "fr", "es", "ca", "com.br", "com.mx", "co.jp", "in", "com.au")
@@ -97,36 +115,44 @@ object WebMusic {
             origins = listOf("https://music.youtube.com"),
             domains = listOf("youtube.com", "google.com"),
             needs = R.string.music_needs_google,
+            search = "https://music.youtube.com/search?q={q}",
+            firstPlay = listOf("ytmusic-card-shelf-renderer ytmusic-play-button-renderer", "ytmusic-shelf-renderer ytmusic-play-button-renderer"),
         ),
         WebMusicService(
             "apple-music", "Apple Music", "https://music.apple.com/",
             origins = listOf("https://music.apple.com"),
             domains = listOf("apple.com"),
             needs = R.string.music_needs_apple,
+            search = "https://music.apple.com/search?term={q}",
         ),
         WebMusicService(
             "amazon-music", "Amazon Music", "https://music.amazon.com/",
             origins = AMAZON.map { "https://music.amazon.$it" },
             domains = AMAZON.map { "amazon.$it" },
             needs = R.string.music_needs_amazon,
+            search = "https://music.amazon.com/search/{q}",
         ),
         WebMusicService(
             "deezer", "Deezer", "https://www.deezer.com/",
             signIn = "https://account.deezer.com/login/",
             origins = listOf("https://www.deezer.com"),
             domains = listOf("deezer.com"),
+            search = "https://www.deezer.com/search/{q}",
         ),
         WebMusicService(
             "tidal", "TIDAL", "https://listen.tidal.com/",
             origins = listOf("https://listen.tidal.com"),
             domains = listOf("tidal.com"),
             needs = R.string.music_needs_tidal,
+            search = "https://listen.tidal.com/search?q={q}",
         ),
         WebMusicService(
             "soundcloud", "SoundCloud", "https://soundcloud.com/",
             signIn = "https://soundcloud.com/signin",
             origins = listOf("https://soundcloud.com"),
             domains = listOf("soundcloud.com"),
+            search = "https://soundcloud.com/search?q={q}",
+            firstPlay = listOf(".searchList .sc-button-play", ".sc-button-play"),
         ),
         WebMusicService(
             "qobuz", "Qobuz", "https://play.qobuz.com/",
@@ -134,6 +160,7 @@ object WebMusic {
             origins = listOf("https://play.qobuz.com"),
             domains = listOf("qobuz.com"),
             needs = R.string.music_needs_qobuz,
+            search = "https://play.qobuz.com/search?q={q}",
         ),
     )
 

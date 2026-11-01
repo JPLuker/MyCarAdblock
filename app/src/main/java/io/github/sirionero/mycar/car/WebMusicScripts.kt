@@ -294,6 +294,58 @@ internal object WebMusicScripts {
 """
 
     /**
+     * On a search's page, the Play of what it found first, pressed: the service's own buttons
+     * ([WebMusicService.firstPlay]) as they are, then the usual marks of a Play button
+     * ([WebMusicService.ANY_PLAY]) only where they show. Says which, or "nothing" yet.
+     */
+    fun firstPlay(service: WebMusicService): String {
+        val own = org.json.JSONArray(service.firstPlay).toString()
+        val any = org.json.JSONArray(WebMusicService.ANY_PLAY).toString()
+        return """
+(function (own, any) {
+  function find(selector, shown) {
+    var all;
+    try { all = document.querySelectorAll(selector); } catch (e) { return null; }
+    for (var i = 0; i < all.length; i++) {
+      var r = all[i].getBoundingClientRect();
+      if (!shown || (r.width > 0 && r.height > 0)) return all[i];
+    }
+    return null;
+  }
+  var lists = [[own, false], [any, true]];
+  for (var l = 0; l < lists.length; l++) {
+    for (var i = 0; i < lists[l][0].length; i++) {
+      var el = find(lists[l][0][i], lists[l][1]);
+      if (el) {
+        var inner = el.querySelector('button, [role="button"]');
+        (el.matches('button, [role="button"], a') || !inner ? el : inner).click();
+        return 'pressed ' + lists[l][0][i];
+      }
+    }
+  }
+  return 'nothing';
+})($own, $any)
+"""
+    }
+
+    /** Debug builds, after a search: the page's buttons that look like a Play, to fit [WebMusicService.firstPlay]. */
+    const val PLAY_BUTTONS = """
+(function () {
+  var out = [];
+  document.querySelectorAll('[data-testid*="play" i], [data-test*="play" i], [class*="play-button" i], [class*="playButton" i], [class*="sc-button-play"], ytmusic-play-button-renderer, [aria-label^="Play" i]').forEach(function (el) {
+    if (out.length >= 15) return;
+    var r = el.getBoundingClientRect();
+    out.push(el.tagName.toLowerCase() + (el.getAttribute('data-testid') ? '[data-testid=' + el.getAttribute('data-testid') + ']' : '') +
+      (el.getAttribute('data-test') ? '[data-test=' + el.getAttribute('data-test') + ']' : '') +
+      (el.getAttribute('aria-label') ? '[aria-label=' + el.getAttribute('aria-label').slice(0, 30) + ']' : '') +
+      (typeof el.className === 'string' && el.className ? '.' + el.className.split(' ').slice(0, 2).join('.') : '') +
+      ' ' + Math.round(r.width) + 'x' + Math.round(r.height));
+  });
+  return location.href + ' | ' + out.join(' | ');
+})()
+"""
+
+    /**
      * Once, at its first page: what the car's web engine is to the service - its address, the user
      * agent, whether it takes protected audio (Widevine, which most of these players need), whether
      * the page has said what plays - into myCar's log. With [layout] (debug builds), a few seconds

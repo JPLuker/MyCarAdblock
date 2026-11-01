@@ -123,6 +123,13 @@ internal class WebMusicPage(
     private var pending: Pair<String, Double?>? = null
     private var wasPlaying = false
 
+    /** A voice search under way, until its first Play is pressed or isn't found. */
+    private var searching = false
+    private var searchTries = 0
+
+    /** Where the page starts when it's made: a search asked before it was, or the service's start. */
+    private var startAt: String? = null
+
     /** The text of the page's field the car's keyboard types in; null with none focused. */
     val field = MutableStateFlow<String?>(null)
 
@@ -208,7 +215,46 @@ internal class WebMusicPage(
         web?.let(CarClipboard::copyFromPage)
     }
 
-    override fun act(action: String, seconds: Double?) = send(action, seconds, retries = if (heard) 0 else RETRIES)
+    override fun act(action: String, seconds: Double?) {
+        // A voice search plays what it finds: the Play sent with it isn't for the song before.
+        if (searching && action == "play") return
+        send(action, seconds, retries = if (heard) 0 else RETRIES)
+    }
+
+    /** "Play [query]": the service's search, loaded here, then the Play of what it found first. */
+    override fun search(query: String) {
+        val url = service.searchUrl(query) ?: return
+        pending = null
+        searching = true
+        searchTries = SEARCH_TRIES
+        main.removeCallbacks(pressFirst)
+        MyCarLog.i("music: ${service.id} searching, as the driver asked")
+        val w = web
+        if (w == null || !loaded) {
+            startAt = url
+            make()
+        } else {
+            w.loadUrl(url)
+        }
+    }
+
+    private val pressFirst = Runnable { pressFirstPlay() }
+
+    /** What the search found first, played with its own Play: tried again while the results come. */
+    private fun pressFirstPlay() {
+        val w = web ?: return
+        if (!searching) return
+        w.evaluateJavascript(WebMusicScripts.firstPlay(service)) { how ->
+            if (!searching || web !== w) return@evaluateJavascript
+            if (how == "\"nothing\"" && --searchTries > 0) {
+                main.postDelayed(pressFirst, SEARCH_RETRY_MS)
+            } else {
+                searching = false
+                MyCarLog.i("music: ${service.id} search: $how")
+                if (BuildConfig.DEBUG) w.evaluateJavascript(WebMusicScripts.PLAY_BUTTONS) { MyCarLog.i("music: ${service.id} search page's play buttons: ${it.take(MAX_LOG)}") }
+            }
+        }
+    }
 
     /** Signed out on the phone: the page starts again, with what it kept in its storage gone too. */
     override fun signedOut() {
@@ -302,7 +348,8 @@ internal class WebMusicPage(
         if (!loaded) {
             loaded = true
             MyCarLog.i("music: opening ${service.name}, laid out ${css}px wide")
-            w.loadUrl(service.url)
+            w.loadUrl(startAt ?: service.url)
+            startAt = null
         }
     }
 
@@ -425,6 +472,11 @@ internal class WebMusicPage(
                     web?.evaluateJavascript(PLAY_SOMETHING_JS) { MyCarLog.i("music: preview pressed ${service.id}'s first Play: $it") }
                 }, PREVIEW_PLAY_MS)
             }
+            // A voice search's page: its results come in a moment after, then their first Play.
+            if (searching && ours(url) && url.orEmpty().contains("search", ignoreCase = true)) {
+                main.removeCallbacks(pressFirst)
+                main.postDelayed(pressFirst, SEARCH_FIRST_MS)
+            }
             // A page that never speaks (another address, a web engine without the script): the
             // buttons go to it all the same after a moment.
             main.postDelayed({
@@ -454,6 +506,7 @@ internal class WebMusicPage(
                 viewport = 0
                 widthScript = null
                 heard = false
+                searching = false
                 fullScreen.value = null
                 field.value = null
                 WebMusicPlayer.report(service.id, WebPlayerState())
@@ -483,6 +536,11 @@ internal class WebMusicPage(
         const val CLEAR_STORAGE_JS = "try { localStorage.clear(); sessionStorage.clear(); } catch (e) {}"
 
         const val PREVIEW_PLAY_MS = 8_000L
+
+        /** A search's results: looked for this long after its page loads, then once a second for a while. */
+        const val SEARCH_FIRST_MS = 1_500L
+        const val SEARCH_RETRY_MS = 1_000L
+        const val SEARCH_TRIES = 12
 
         /** The page's first "Play" button in sight, pressed: for the car preview ([WebMusicPreview]). */
         const val PLAY_SOMETHING_JS = """
