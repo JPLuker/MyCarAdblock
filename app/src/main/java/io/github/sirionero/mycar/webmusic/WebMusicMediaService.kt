@@ -181,7 +181,9 @@ internal class WebPlayer(looper: Looper, private val service: WebMusicService) :
         val builder = State.Builder()
             .setAvailableCommands(commands(s))
             .setPlayWhenReady(s.playing, Player.PLAY_WHEN_READY_CHANGE_REASON_REMOTE)
-        if (!s.hasTrack && !s.playing) {
+        // Something on the page even without a name for it (a song playing, or its cover): shown,
+        // under the service's name, so the dock and the car's buttons have it.
+        if (!s.hasTrack && !s.playing && s.artUrl.isEmpty()) {
             return builder.setPlaylist(emptyList()).setPlaybackState(Player.STATE_IDLE).build()
         }
         val position = s.positionAt(now)
@@ -243,7 +245,7 @@ internal class WebPlayer(looper: Looper, private val service: WebMusicService) :
 
     private fun item(s: WebPlayerState): MediaItemData {
         val metadata = MediaMetadata.Builder()
-            .setTitle(s.title)
+            .setTitle(s.title.ifEmpty { service.name })
             .setArtist(s.artist.ifEmpty { null })
             .setAlbumTitle(s.album.ifEmpty { null })
             .setArtworkUri(s.artUrl.ifEmpty { null }?.let(Uri::parse))
