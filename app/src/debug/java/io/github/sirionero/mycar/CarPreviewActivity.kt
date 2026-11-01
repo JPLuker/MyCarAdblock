@@ -146,6 +146,22 @@ class CarPreviewActivity : ComponentActivity() {
             main.postDelayed({
                 io.github.sirionero.mycar.car.CarKeys.onKey(io.github.sirionero.mycar.car.CarKeys.KEYCODE_MEDIA, down = true, longPress = false)
             }, 3_000)
+            // --es webMusicSearch "lofi": later, "play lofi" as the voice assistant asks the car's
+            // music app for it - the service's search, then the Play of what it finds first.
+            intent.getStringExtra("webMusicSearch")?.let { words ->
+                main.postDelayed({ io.github.sirionero.mycar.car.CarServices.media.playBestMatch(words) }, 14_000)
+            }
+            // What myCar's player gets from the page, every 5 s: for the log of the run.
+            for (at in 5_000L..60_000L step 5_000L) {
+                main.postDelayed({
+                    val media = io.github.sirionero.mycar.car.CarServices.media
+                    val now = media.now.value
+                    io.github.sirionero.mycar.MyCarLog.i(
+                        "preview: the car's player: ${media.phase.value}, active ${now.isActive}, playing ${now.playing}, " +
+                            "title ${now.title.length} characters, state ${now.state}",
+                    )
+                }, at)
+            }
         }
         // --es wallpaper waves: that wallpaper. Set every run, so other shots keep the default.
         io.github.sirionero.mycar.car.design.WallpaperSetting.set(

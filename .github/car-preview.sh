@@ -241,13 +241,19 @@ for service in soundcloud youtube-music; do
     EXTRA="--es webMusic $service --ez webMusicPlay true" shoot "music-$service-play" 1920 720 240 \
         "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$DOCK_MAP;$WAIT;$WAIT"
 done
+# "Play lofi" for the voice assistant (--es webMusicSearch, debug only: asked of the car's music app
+# 14 s in, as the assistant does): the service's own search, then the Play of what it finds first.
+for service in soundcloud youtube-music spotify; do
+    EXTRA="--es webMusic $service --es webMusicSearch lofi" shoot "music-$service-search" 1920 720 240 \
+        "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$DOCK_MAP;$WAIT;$WAIT"
+done
 # Spotify's tile on the app grid, beside the other music apps ("Spotify", "Web" under it).
 EXTRA="--es webMusic spotify" shoot music-grid 1920 720 240 "$WAIT;$WAIT;$GRID_BUTTON;$WAIT"
 echo "--- the music services' web players ---"
 for d in previews/music-*; do
     [ -d "$d" ] || continue
     echo "[$(basename "$d")]"
-    grep -h "music:\|media:\|cinema: no\|clipboard:" "$d/log.txt" "$d/stream.txt" 2>/dev/null | cut -c1-1500 | head -40
+    grep -h "music:\|media:\|cinema: no\|clipboard:\|the car's player" "$d/log.txt" "$d/stream.txt" 2>/dev/null | cut -c1-1500 | head -60
 done
 
 # Plancia and Xonos inside myCar set up on addresses that don't answer (as Tailscale ones do when
