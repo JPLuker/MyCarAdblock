@@ -132,6 +132,8 @@ internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier) {
                     colors = GsColors(Color.Black.copy(alpha = 0.4f), Color.White),
                     size = 52.dp, iconSize = 24.dp, shape = CircleShape,
                 )
+                // Music that can't reach the car (Android's question turned down): says so, and asks again.
+                MusicNotReaching(now.playing, Modifier.align(Alignment.TopStart).padding(start = 10.dp, top = 10.dp, end = 72.dp))
                 Column(
                     Modifier
                         .align(Alignment.BottomCenter)

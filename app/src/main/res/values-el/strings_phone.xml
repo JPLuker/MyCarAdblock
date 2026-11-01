@@ -170,4 +170,7 @@
     <string name="donate_text">Το myCar είναι δωρεάν, χωρίς διαφημίσεις και χωρίς παρακολούθηση. Αν σας βγάζει στον δρόμο, η στήριξή σας το κρατά ζωντανό.</string>
     <string name="donate_bitcoin">Στήριξη με Bitcoin</string>
     <string name="donate_card">Εφάπαξ δωρεά με κάρτα</string>
+    <string name="audio_not_reaching_title">Η μουσική δεν φτάνει στο αυτοκίνητο</string>
+    <string name="audio_not_reaching_text">Η ερώτηση του Android για την αποστολή του ήχου μέσω του myCar απορρίφθηκε, οπότε το αυτοκίνητο δεν λαμβάνει μουσική.</string>
+    <string name="audio_ask_again">Ερώτηση ξανά</string>
 </resources>

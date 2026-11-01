@@ -185,6 +185,18 @@ object CarAudio {
         _capture.value = Capture.DENIED
     }
 
+    /**
+     * The driver asks again for the music, from the car's player or the phone's Home, after
+     * Android's question was turned down: a single "no" left the car without music through myCar
+     * for the whole drive, with nothing on either screen to ask once more.
+     */
+    fun askAgain() {
+        if (_capture.value != Capture.DENIED || _micBlocked.value) return
+        MyCarLog.i("audio: asking Android again for the music to the car")
+        _capture.value = Capture.OFF
+        if (wanted) request()
+    }
+
     /** The question can't be asked now (the phone's screen is shared): the next [request] asks it. */
     fun askLater() {
         if (_capture.value == Capture.ASKING) _capture.value = Capture.OFF

@@ -1,0 +1,72 @@
+package io.github.sirionero.mycar.car
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.audio.CarAudio
+
+/**
+ * On the player, while the music that has to go through myCar can't: Android's question for the
+ * sound was turned down, and that one "no" left the car silent for the whole drive with nothing on
+ * its screen to say so. A tap asks again - on the phone, at once if myCar is open there, or as soon
+ * as it is (the car says so).
+ */
+@Composable
+internal fun MusicNotReaching(playing: Boolean, modifier: Modifier = Modifier) {
+    val capture by CarAudio.capture.collectAsState()
+    val pipe by CarSettings.pipeAudio.collectAsState()
+    val blocked by CarAudio.micBlocked.collectAsState()
+    // myCar's own music (Xonos) needs no question: it reaches the car all the same.
+    if (!playing || !pipe || blocked || capture != CarAudio.Capture.DENIED || CarAudio.consentWaits()) return
+    Row(
+        modifier
+            .clip(RoundedCornerShape(26.dp))
+            .background(Color.Black.copy(alpha = 0.6f))
+            .clickable { CarAudio.askAgain() }
+            .heightIn(min = 52.dp)
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Icon(Icons.Filled.Warning, null, Modifier.size(22.dp), tint = Color(0xFFFFB020))
+        Column {
+            Text(
+                stringResource(R.string.audio_not_reaching_title),
+                style = MaterialTheme.typography.labelLarge,
+                color = Color.White,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                stringResource(R.string.audio_ask_again),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 1,
+            )
+        }
+    }
+}
