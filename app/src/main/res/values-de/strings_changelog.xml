@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.6.8-alpha -->
+    <string-array name="changelog_44">
+        <item>Blende eine App in der App-Übersicht des Autos aus: halte sie gedrückt und wähle „In der App-Übersicht ausblenden“. Zurück holst du sie unter Einstellungen, Ausgeblendete Apps, oder am Telefon (Bildschirm des Autos, Apps in der App-Übersicht des Autos).</item>
+        <item>Mit Spotify oder einem anderen Musikdienst in myCar lässt „App „Spotify“ des Telefons ausblenden“ nur ein Spotify in der Übersicht; das angeheftete Symbol und die Wahl neben der Karte gehen an das in myCar.</item>
+        <item>Der Player neben der Karte in drei Größen, Klein, Mittel und Groß (10 % und 20 % größer), in den Einstellungen des Autos und am Telefon.</item>
+        <item>Während eines Anrufs rücken die Bildschirme unter seine Leiste, so bleiben Zurück, die Reiter und Stopp erreichbar, und ein klingelnder Anruf schließt den Assistenten.</item>
+        <item>Automatisch verbinden: Mit dem Telefon in der Tasche hört myCar nach der Fahrt weiter auf das Auto, ein neuer Versuch zeigt keine rote Karte mehr, und myCar auszuschalten stoppt einen laufenden Start.</item>
+        <item>Meldungen mit dem echten Grund: das Zertifikat oder das Datum des Autos über WLAN, ein Kabelstart, der hängt (mit dem, was zu tun ist), und ein Bildschirm des Autos, der sich nicht zeichnen lässt (myCar beendet und sagt es, statt schwarzem Bildschirm).</item>
+        <item>Ton: Gesprochene Abbiegehinweise folgen dem Weg jedes Autos und schweigen bei Anrufen; Kino pausiert, wenn das Auto zum Radio wechselt, und startet nach dem Ende eines Anrufs.</item>
+        <item>Sprache: Das Telefon nennt den Assistenten erst bereit, wenn alle nötigen Modelle da sind, und die Ersteinrichtung bietet den Download der Sprache wieder an.</item>
+        <item>Außerdem: Das X des Liedtexts bringt den Player zurück, eine neue Wahl neben der Karte erscheint sofort, die Zurück-Taste des Autos schließt Neuigkeiten und die Bluetooth-Karten, und „Fertig“ nach der Anmeldung bei einem Musikdienst.</item>
+    </string-array>
     <string-array name="changelog_43">
         <item>Die Spotify-Anmeldung auf dem Telefon ist nicht mehr schwarz: Die Seite erscheint und lässt sich ausfüllen, wie bei jedem Musikdienst.</item>
         <item>Einfügen in der Tastatur des Autos funktioniert: Die Tastatur bleibt offen und was du auf dem Telefon kopiert hast, landet im Feld.</item>

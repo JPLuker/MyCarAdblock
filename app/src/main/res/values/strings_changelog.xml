@@ -5,6 +5,18 @@
   "Settings >" are the app's own: translate them as the app's screens say them.
 -->
 <resources>
+    <!-- 0.6.8-alpha -->
+    <string-array name="changelog_44">
+        <item>Hide an app from the car\'s app grid: hold it and choose \"Hide from the app grid\". It comes back from Settings, Hidden apps, or from the phone (Car screen, Apps on the car\'s app grid).</item>
+        <item>With Spotify or another music service inside myCar, \"Hide the phone\'s Spotify app\" keeps one Spotify on the grid; its pinned icon and the choice beside the map go to the one inside myCar.</item>
+        <item>The player beside the map in three sizes, Small, Medium and Large (10% and 20% bigger), in the car\'s settings and on the phone.</item>
+        <item>During a call the screens move below the call\'s bar, so Back, the tabs and Stop stay within reach, and a ringing call closes the assistant.</item>
+        <item>Connecting by itself: the phone in a pocket keeps listening for the car after a drive, a try that starts over no longer shows the red card, and turning myCar off stops a start under way.</item>
+        <item>Messages that say the real cause: the certificate or the car\'s date over Wi-Fi, a cable start that stalls (with what to do), and a car screen that can\'t be drawn (myCar closes and says so instead of a black screen).</item>
+        <item>Sound: spoken turns follow each car\'s route and keep quiet during calls; Cinema pauses when the car switches to the radio and starts after a call ends.</item>
+        <item>Voice: the phone says the assistant is ready only with every model it needs, and the first setup offers the voice download again.</item>
+        <item>Also: the lyrics\' X brings the player back, a new choice beside the map shows at once, the car\'s Back closes What\'s new and the Bluetooth cards, and \"Done\" after signing in to a music service.</item>
+    </string-array>
     <!-- 0.6.7-alpha -->
     <string-array name="changelog_43">
         <item>Spotify\'s sign-in on the phone is no longer black: the page shows and can be filled in, as for every music service.</item>

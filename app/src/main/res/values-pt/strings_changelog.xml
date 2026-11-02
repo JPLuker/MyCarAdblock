@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.6.8-alpha -->
+    <string-array name="changelog_44">
+        <item>Oculte um app da grade do carro: mantenha-o pressionado e escolha “Ocultar da grade de apps”. Ele volta em Configurações, Apps ocultos, ou pelo telefone (Tela do carro, Apps na grade do carro).</item>
+        <item>Com o Spotify ou outro serviço de música dentro do myCar, “Ocultar o app Spotify do telefone” deixa um só Spotify na grade; o ícone fixado e a escolha ao lado do mapa passam para o de dentro do myCar.</item>
+        <item>O player ao lado do mapa em três tamanhos, Pequeno, Médio e Grande (10% e 20% maior), nas configurações do carro e no telefone.</item>
+        <item>Durante uma chamada as telas ficam abaixo da barra dela, assim Voltar, as abas e Parar continuam ao alcance, e uma chamada tocando fecha o assistente.</item>
+        <item>Conexão automática: com o telefone no bolso o myCar continua ouvindo o carro depois da viagem, uma tentativa que recomeça não mostra mais o cartão vermelho e desligar o myCar para um início em andamento.</item>
+        <item>Mensagens com a causa real: o certificado ou a data do carro pelo Wi-Fi, um início pelo cabo que trava (com o que fazer) e uma tela do carro que não dá para desenhar (o myCar encerra e avisa, em vez da tela preta).</item>
+        <item>Som: as indicações faladas seguem a rota de cada carro e ficam em silêncio durante as chamadas; o Cinema pausa quando o carro muda para o rádio e começa quando uma chamada termina.</item>
+        <item>Voz: o telefone diz que o assistente está pronto só com todos os modelos de que ele precisa, e a configuração inicial volta a oferecer o download da voz.</item>
+        <item>Também: o X da letra traz o player de volta, uma nova escolha ao lado do mapa aparece na hora, o botão Voltar do carro fecha Novidades e os cartões do Bluetooth, e “Concluído” depois de entrar num serviço de música.</item>
+    </string-array>
     <string-array name="changelog_43">
         <item>O login do Spotify no telefone não fica mais preto: a página aparece e pode ser preenchida, como em todo serviço de música.</item>
         <item>Colar no teclado do carro funciona: o teclado fica aberto e o que você copiou no telefone entra no campo.</item>

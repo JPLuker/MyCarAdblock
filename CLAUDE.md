@@ -1086,6 +1086,34 @@ Tutti i token in un solo posto, `car/design/`:
   "in rete" (`NET_CAPABILITY_NOT_SUSPENDED`: una galleria passava Plancia e Xonos alle app), Plancia con
   20 s all'avvio come Xonos, video coperto in marcia anche senza fix GPS (`CarMotion.movingForVideo`,
   l'ultima velocità vale fino a un fix nuovo, al massimo 5 minuti). Non provato in un'auto vera.
+- **Setaccio 6** (0.6.8, branch `feature/hide-apps`; richiesta dell'utente: "cerca nuovi bug sulla
+  connessione, sulla user experience"): due cacce in parallelo (collegamento: senza fili, cavo e sessione,
+  audio; esperienza d'uso: schermo dell'auto, telefono, messaggi di collegamento), ogni punto verificato da
+  uno scettico e nel codice, poi una revisione indipendente delle correzioni. Auto: durante una chiamata gli
+  schermi (non la mappa) e la scheda dei messaggi stanno sotto la barra della chiamata (`callTop` in
+  `CarUi`, misurata); squillo che chiude assistente e lettura dei messaggi; una scelta nuova per "Accanto
+  alla mappa" riapre la colonna (`showSidePane`); la X del testo riporta il lettore; il tasto Indietro
+  dell'auto risponde alle schede sopra tutto (`car/CardBack.kt`: slot propri, non il `backInterceptor` di
+  HomePager); tastiera della pagina web in vista; Novità che non si chiude spegnendo l'interruttore;
+  linguette del Telefono e X dell'assistente a 56 dp. Telefono: la scheda della lingua della voce conta
+  anche il modello che ascolta; la voce torna nella prima configurazione (`VoiceStep`); "Done" dopo
+  l'accesso a un servizio musicale; Xonos spento chiude anche l'app Xonos; Android 12 senza posizione
+  precisa lo dice. Collegamento: "l'auto non si è collegata via Bluetooth" solo per avvii mai arrivati a
+  una sessione (`drove`); niente scheda rossa prima di una ripartenza (`stop(say = false)`); notifica del
+  viaggio che segue `SessionStatus`; wake lock breve nell'ascolto dopo il viaggio (10 s se l'auto chiama
+  il telefono, 3 minuti se no) e a ogni ripartenza; "Usa myCar in auto" spento ferma un avvio
+  (`stopUnlessDriving`); rete dell'auto rilasciata dopo l'ultimo TCP fallito (`endJoin`); avvio automatico
+  fermato se l'auto se ne va per 30 s (`carGone`/`carHere`); niente myCar sopra una chiamata; col cavo,
+  dopo 45 s "cosa fare" (`SessionStatus.stillConnecting`); immagine che non si crea dopo tre tentativi →
+  sessione chiusa con il motivo; densità 0 → 160 anche per le app; Start e CodecConfig solo con lo schermo
+  nostro; riavvii dell'encoder contati in 10 minuti; avvisi e aiuto della voce azzerati fra viaggi;
+  messaggi giusti per Plancia col ponte, VPN, chiusura durante l'avvio (`certAcceptedBefore`), senza fili.
+  Audio: indicazioni che seguono la strada dell'auto (`followRouteForDirections`) e tacciono in chiamata;
+  avviso "la musica non arriva" anche mentre la domanda aspetta (dopo 5 s) e nel lettore a tutto schermo;
+  Automatico che aspetta la fine di una chiamata (al massimo 5 minuti); Cinema in pausa sul LOSS
+  dell'auto (`CinemaNow`) e che parte dopo una chiamata (focus ritardato). **Lasciati**: i puntini delle
+  pagine a 56 dp (con la decisione sulla striscia sopra i contenuti), il ripiego del cavo sul senza fili.
+  Non provato in un'auto vera.
 - **Prima connessione** (`ui/SetupScreen.kt`, `setup/`): una lista sola, "Set up myCar", al primo
   avvio (al posto di `CertSetupScreen` + le pagine di `SetupGuideScreen`, ancora nel codice finché
   la nuova non è provata sul telefono) e ogni volta che si torna con "Take me back to the initial
@@ -1185,9 +1213,8 @@ Tutti i token in un solo posto, `car/design/`:
   propria (`CarNotifications`, guardare il mittente dell'ultima riga); Assist che continua in Home
   Assistant dopo che myCar ha smesso di aspettare (`unsubscribe_events`); "chiudi il garage" mentre Home
   Assistant si ricollega; il token di Home Assistant confrontato per host e non per origine
-  (`PlanciaWeb`); avvio col cavo fermo su "Connecting" senza dire cosa fare; immagine che non si crea
-  dopo tre tentativi senza dirlo; cavo staccato a viaggio in corso che non passa da solo al senza fili;
-  Cinema che continua quando l'auto passa alla radio (LOSS) e non parte col focus negato.
+  (`PlanciaWeb`); cavo staccato a viaggio in corso che non passa da solo al senza fili (fattibile con
+  guardie, ma è un comportamento nuovo: da proporre all'utente).
 - Scatti `lang-*` per controllare le lingue.
 - Fatto nella 0.6.0: impostazioni del telefono in gruppi (`SettingsPage` in `ui/SettingsScreen.kt`;
   dalla 0.6.6, sotto la scheda dell'anteprima: Generali, Schermo dell'auto, Musica, Connessione, Voce,

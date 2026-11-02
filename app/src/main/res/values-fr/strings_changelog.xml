@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.6.8-alpha -->
+    <string-array name="changelog_44">
+        <item>Masquez une app de la grille de la voiture : maintenez-la appuyée et choisissez « Masquer de la grille des apps ». Elle revient depuis Paramètres, Apps masquées, ou depuis le téléphone (Écran de la voiture, Apps dans la grille de la voiture).</item>
+        <item>Avec Spotify ou un autre service de musique dans myCar, « Masquer l’app Spotify du téléphone » ne laisse qu’un Spotify dans la grille ; son icône épinglée et le choix à côté de la carte passent à celui de myCar.</item>
+        <item>Le lecteur à côté de la carte en trois tailles, Petite, Moyenne et Grande (10 % et 20 % plus grand), dans les paramètres de la voiture et sur le téléphone.</item>
+        <item>Pendant un appel, les écrans passent sous sa barre, pour garder Retour, les onglets et Arrêter à portée de main, et un appel qui sonne ferme l’assistant.</item>
+        <item>Connexion automatique : le téléphone dans la poche, myCar continue d’écouter la voiture après le trajet, un essai qui recommence n’affiche plus la carte rouge et désactiver myCar arrête un démarrage en cours.</item>
+        <item>Des messages avec la vraie cause : le certificat ou la date de la voiture en Wi-Fi, un démarrage par câble qui s’arrête (avec quoi faire) et un écran de voiture impossible à dessiner (myCar ferme et le dit, au lieu de l’écran noir).</item>
+        <item>Son : les indications vocales suivent la route de chaque voiture et se taisent pendant les appels ; Cinéma se met en pause quand la voiture passe à la radio et démarre à la fin d’un appel.</item>
+        <item>Voix : le téléphone dit que l’assistant est prêt seulement avec tous les modèles nécessaires, et la première configuration propose de nouveau de télécharger la voix.</item>
+        <item>Aussi : le X des paroles ramène le lecteur, un nouveau choix à côté de la carte s’affiche tout de suite, le bouton Retour de la voiture ferme Nouveautés et les cartes Bluetooth, et « OK » après la connexion à un service de musique.</item>
+    </string-array>
     <string-array name="changelog_43">
         <item>La connexion à Spotify sur le téléphone n’est plus noire : la page s’affiche et se remplit, comme pour chaque service de musique.</item>
         <item>Coller dans le clavier de la voiture fonctionne : le clavier reste ouvert et ce que vous avez copié sur le téléphone arrive dans le champ.</item>
