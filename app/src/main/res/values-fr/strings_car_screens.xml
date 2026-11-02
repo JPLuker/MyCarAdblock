@@ -133,7 +133,10 @@
 
     <string name="car_lyrics_looking">Recherche des paroles…</string>
     <string name="car_lyrics_nothing_playing">Rien en lecture.</string>
-    <string name="car_lyrics_none">Pas de paroles pour ce titre.</string>
+    <string name="car_lyrics_none">Pas encore de paroles pour ce titre.</string>
+    <string name="car_lyrics_none_detail">Les paroles viennent de LRCLIB, une archive libre écrite par ses auditeurs : tous les titres n’y sont pas encore.</string>
+    <string name="car_lyrics_instrumental">Instrumental</string>
+    <string name="car_lyrics_instrumental_detail">Ce titre n’a pas de paroles à chanter.</string>
     <string name="car_lyrics_unreachable">Impossible d’obtenir les paroles.</string>
     <string name="car_lyrics_unreachable_detail">Elles viennent de lrclib.net : vérifiez la connexion du téléphone.</string>
 

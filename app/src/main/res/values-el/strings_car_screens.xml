@@ -133,7 +133,10 @@
 
     <string name="car_lyrics_looking">Αναζήτηση στίχων…</string>
     <string name="car_lyrics_nothing_playing">Δεν παίζει τίποτα.</string>
-    <string name="car_lyrics_none">Δεν βρέθηκαν στίχοι για αυτό το τραγούδι.</string>
+    <string name="car_lyrics_none">Δεν υπάρχουν ακόμη στίχοι για αυτό το τραγούδι.</string>
+    <string name="car_lyrics_none_detail">Οι στίχοι προέρχονται από το LRCLIB, ένα ελεύθερο αρχείο που γράφουν οι ακροατές: δεν υπάρχουν ακόμη όλα τα τραγούδια.</string>
+    <string name="car_lyrics_instrumental">Ορχηστρικό</string>
+    <string name="car_lyrics_instrumental_detail">Αυτό το κομμάτι δεν έχει στίχους.</string>
     <string name="car_lyrics_unreachable">Δεν ήταν δυνατή η πρόσβαση στους στίχους.</string>
     <string name="car_lyrics_unreachable_detail">Προέρχονται από το lrclib.net: ελέγξτε τη σύνδεση του τηλεφώνου.</string>
 

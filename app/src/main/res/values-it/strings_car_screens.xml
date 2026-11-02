@@ -133,7 +133,10 @@
 
     <string name="car_lyrics_looking">Cerco il testo…</string>
     <string name="car_lyrics_nothing_playing">Niente in riproduzione.</string>
-    <string name="car_lyrics_none">Nessun testo trovato per questo brano.</string>
+    <string name="car_lyrics_none">Ancora nessun testo per questo brano.</string>
+    <string name="car_lyrics_none_detail">I testi vengono da LRCLIB, un archivio libero scritto da chi ascolta: non tutti i brani ci sono ancora.</string>
+    <string name="car_lyrics_instrumental">Brano strumentale</string>
+    <string name="car_lyrics_instrumental_detail">In questo brano non ci sono parole da cantare.</string>
     <string name="car_lyrics_unreachable">Impossibile raggiungere i testi.</string>
     <string name="car_lyrics_unreachable_detail">Vengono da lrclib.net: controlla la connessione del telefono.</string>
 

@@ -26,6 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import android.media.session.PlaybackState
 import io.github.sirionero.mycar.media.MediaArt
+import io.github.sirionero.mycar.media.Lyrics
+import io.github.sirionero.mycar.media.LyricsAnswer
+import io.github.sirionero.mycar.media.lyricsSong
 import kotlinx.coroutines.delay
 import androidx.compose.material3.Icon
 import androidx.compose.animation.animateColorAsState
@@ -109,6 +112,17 @@ fun CarHome() {
     if (now.isActive) lastActive[0] = now
     val holding = sideApp == null && musicShown && !musicOn
     val shownNow = if (holding && !now.isActive && lastActive[0].isActive) lastActive[0] else now
+    // Lyrics that gave the column back for a song without any come back with the next song that has some,
+    // until the driver closes them (their X, the dock's song, the player's X).
+    if (navigator.lyricsWanted && panel == SidePanel.CONTROLS && shownNow.isActive) {
+        val context = LocalContext.current
+        val inside = mediaApp?.component?.let(io.github.sirionero.mycar.xonos.Xonos::isInside) == true
+        val song = remember(shownNow.trackTitle, shownNow.title, shownNow.trackArtist, shownNow.artist, shownNow.album, shownNow.durationMs, shownNow.mediaId, inside) { shownNow.lyricsSong(inside) }
+        LaunchedEffect(song.key) {
+            delay(Lyrics.SETTLE_MS)
+            if (Lyrics.find(context, song).getOrNull() is LyricsAnswer.Found) navigator.lyricsBack()
+        }
+    }
     val splitScreen = panel != SidePanel.NONE && (sideApp != null || musicShown)
     // The music beside the map at the size chosen for it (Small, Medium, Large): an app's own screen
     // there keeps its size.
@@ -279,7 +293,7 @@ private fun SideLyrics(now: NowPlaying, modifier: Modifier) {
                 GsIconButton(Icons.Filled.Close, stringResource(R.string.car_home_hide_lyrics), navigator::showSideControls, size = 52.dp, iconSize = 24.dp)
             }
             Spacer(Modifier.height(12.dp))
-            LyricsPanel(now, Modifier.weight(1f).fillMaxWidth(), lineStyle = MaterialTheme.typography.headlineSmall)
+            LyricsPanel(now, Modifier.weight(1f).fillMaxWidth(), lineStyle = MaterialTheme.typography.headlineSmall, art = art, onNothing = navigator::lyricsGaveWay)
         }
     }
 }

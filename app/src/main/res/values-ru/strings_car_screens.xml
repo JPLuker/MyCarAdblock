@@ -133,7 +133,10 @@
 
     <string name="car_lyrics_looking">Ищем текст…</string>
     <string name="car_lyrics_nothing_playing">Ничего не играет.</string>
-    <string name="car_lyrics_none">Текст для этого трека не найден.</string>
+    <string name="car_lyrics_none">Для этого трека текста пока нет.</string>
+    <string name="car_lyrics_none_detail">Тексты берутся из LRCLIB, свободного архива, который пополняют слушатели: там пока есть не все треки.</string>
+    <string name="car_lyrics_instrumental">Инструментальная композиция</string>
+    <string name="car_lyrics_instrumental_detail">В этом треке нет слов.</string>
     <string name="car_lyrics_unreachable">Не удалось получить текст.</string>
     <string name="car_lyrics_unreachable_detail">Тексты берутся с lrclib.net: проверьте подключение телефона.</string>
 

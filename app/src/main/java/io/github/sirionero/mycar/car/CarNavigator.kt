@@ -115,6 +115,7 @@ class CarNavigator(startId: String) {
      */
     fun togglePlayerDock() {
         showMiniPlayer()
+        lyricsWanted = false
         if (current != CarScreen.Home || !onMapPage) {
             sidePanel = SidePanel.CONTROLS
             home()
@@ -126,14 +127,29 @@ class CarNavigator(startId: String) {
     /** Home with the player beside the map: where the dock's foot leads back to from the app grid. */
     fun homeWithPlayer() {
         showMiniPlayer()
+        lyricsWanted = false
         sidePanel = SidePanel.CONTROLS
         home()
     }
 
-    fun showSideLyrics() { sidePanel = SidePanel.LYRICS }
+    /**
+     * The driver wants the lyrics beside the map: set by their button, cleared by their X, the dock's
+     * song, the dock's foot from the grid or the player's X. While it holds, a song without lyrics gives
+     * the column back to the player ([lyricsGaveWay]) and the next one with lyrics takes it again ([lyricsBack]).
+     */
+    var lyricsWanted by mutableStateOf(false)
+        private set
+
+    fun showSideLyrics() { sidePanel = SidePanel.LYRICS; lyricsWanted = true }
 
     /** The player beside the map again, in place of the lyrics: the lyrics' X. */
-    fun showSideControls() { sidePanel = SidePanel.CONTROLS }
+    fun showSideControls() { sidePanel = SidePanel.CONTROLS; lyricsWanted = false }
+
+    /** This song has no lyrics (or they can't be reached): the player has the column, the lyrics stay wanted. */
+    fun lyricsGaveWay() { if (sidePanel == SidePanel.LYRICS) sidePanel = SidePanel.CONTROLS }
+
+    /** A song with lyrics while they're wanted: back beside the map, in the player's place. */
+    fun lyricsBack() { if (lyricsWanted && sidePanel == SidePanel.CONTROLS) sidePanel = SidePanel.LYRICS }
 
     /**
      * The column beside the map back, if the driver closed it: a new choice for it ("Beside the
@@ -144,7 +160,7 @@ class CarNavigator(startId: String) {
         if (sidePanel == SidePanel.NONE) sidePanel = SidePanel.CONTROLS
     }
 
-    fun closeSidePanel() { sidePanel = SidePanel.NONE }
+    fun closeSidePanel() { sidePanel = SidePanel.NONE; lyricsWanted = false }
 
     /**
      * The mini player over the whole map ([MapMiniPlayer]) put away with its X, for the drive (for as

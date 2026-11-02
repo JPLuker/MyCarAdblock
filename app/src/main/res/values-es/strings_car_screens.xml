@@ -133,7 +133,10 @@
 
     <string name="car_lyrics_looking">Buscando la letra…</string>
     <string name="car_lyrics_nothing_playing">No suena nada.</string>
-    <string name="car_lyrics_none">No hay letra para esta canción.</string>
+    <string name="car_lyrics_none">Todavía no hay letra para esta canción.</string>
+    <string name="car_lyrics_none_detail">Las letras vienen de LRCLIB, un archivo libre escrito por quienes escuchan: todavía no están todas las canciones.</string>
+    <string name="car_lyrics_instrumental">Instrumental</string>
+    <string name="car_lyrics_instrumental_detail">Esta canción no tiene letra para cantar.</string>
     <string name="car_lyrics_unreachable">No se ha podido obtener la letra.</string>
     <string name="car_lyrics_unreachable_detail">Viene de lrclib.net: comprueba la conexión del teléfono.</string>
 

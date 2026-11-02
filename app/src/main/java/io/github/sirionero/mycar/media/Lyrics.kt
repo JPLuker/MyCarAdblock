@@ -74,8 +74,8 @@ fun NowPlaying.lyricsSong(xonosInside: Boolean) = SongInfo(
  * of another song, or times off by a different recording, are worse than none.
  *
  * A lookup sends the song's title, artist and length to lrclib.net: only while the lyrics are on
- * screen, and the next song in the queue while they're on screen (LyricsAhead). Never in the
- * background otherwise.
+ * screen, or kept beside the map (CarNavigator.lyricsWanted), and the next song in the queue while
+ * they're on screen (LyricsAhead). Never in the background otherwise.
  *
  * Answers are kept in memory for the process and on disk under the cache directory: lyrics and
  * "instrumental" for good, "none" for [NONE_KEPT_MS] (LRCLIB grows). A lookup that couldn't reach

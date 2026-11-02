@@ -203,7 +203,12 @@
     <!-- Lyrics, on the media screen and beside the map. They come from lrclib.net (a name) -->
     <string name="car_lyrics_looking">Looking for lyrics…</string>
     <string name="car_lyrics_nothing_playing">Nothing playing.</string>
-    <string name="car_lyrics_none">No lyrics found for this track.</string>
+    <string name="car_lyrics_none">No lyrics for this song yet.</string>
+    <!-- Under car_lyrics_none on the full media screen: where lyrics come from. LRCLIB is a name -->
+    <string name="car_lyrics_none_detail">Lyrics come from LRCLIB, a free archive written by listeners: not every song is in it yet.</string>
+    <!-- The song has no words: its title or LRCLIB says it is instrumental -->
+    <string name="car_lyrics_instrumental">Instrumental</string>
+    <string name="car_lyrics_instrumental_detail">No words to sing along to in this one.</string>
     <string name="car_lyrics_unreachable">Couldn\'t reach the lyrics.</string>
     <string name="car_lyrics_unreachable_detail">They come from lrclib.net: check the phone\'s connection.</string>
 
