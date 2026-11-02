@@ -249,13 +249,13 @@ object CarAssistant {
             return
         }
         appContext?.let(VoiceFocus::acquire)
-        speaking = speak(engine, text) { stopped ->
+        speaking = speak(engine, text) { stopped, refused ->
             VoiceFocus.release()
             // Still this answer on screen: done speaking, or cut short by a message read aloud. Not
             // when the microphone or Cancel stopped it, which have moved the overlay on already.
             if (mine == replies && _state.value.phase == Phase.SPEAKING) {
                 // Not said, the engine refused: on screen long enough to read, as with no engine.
-                if (!stopped && ttsFailed) {
+                if (refused) {
                     mainHandler.postDelayed({
                         if (mine == replies && _state.value.phase == Phase.SPEAKING) {
                             _state.value = _state.value.copy(phase = Phase.IDLE)
@@ -375,7 +375,7 @@ object CarAssistant {
             return
         }
         VoiceFocus.acquire(context)
-        speak(engine, text) { _ ->
+        speak(engine, text) { _, _ ->
             VoiceFocus.release()
             // Always, stopped part way too: a turn that cut a message read out on the car's channel
             // for spoken prompts (DirectionsVoice) left the reply waiting for good. Whoever stopped
@@ -387,8 +387,11 @@ object CarAssistant {
 
     private var utterances = 0
 
-    /** What to do when each utterance ends, by its id; true when it was stopped part way. */
-    private val endings = java.util.concurrent.ConcurrentHashMap<String, (stopped: Boolean) -> Unit>()
+    /**
+     * What to do when each utterance ends, by its id: stopped part way, or refused by the engine
+     * (never said).
+     */
+    private val endings = java.util.concurrent.ConcurrentHashMap<String, (stopped: Boolean, refused: Boolean) -> Unit>()
 
     /**
      * One listener for every utterance, which finds its own ending by id. With a listener per
@@ -407,8 +410,8 @@ object CarAssistant {
         }
     }
 
-    private fun end(utteranceId: String?, stopped: Boolean) {
-        endings.remove(utteranceId ?: return)?.invoke(stopped)
+    private fun end(utteranceId: String?, stopped: Boolean, refused: Boolean = false) {
+        endings.remove(utteranceId ?: return)?.invoke(stopped, refused)
     }
 
     /**
@@ -416,22 +419,30 @@ object CarAssistant {
      * engine went away mid-drive) sends no callback at all: it ends at once, or the voice focus
      * stayed taken and the music paused for the rest of the drive.
      */
-    private fun speak(engine: TextToSpeech, text: String, ending: (stopped: Boolean) -> Unit): String {
+    private fun speak(engine: TextToSpeech, text: String, ending: (stopped: Boolean, refused: Boolean) -> Unit): String {
         val id = "mycar-${++utterances}"
         endings[id] = ending
         // The car's sound through myCar with nothing captured - myCar's own music (Xonos) goes
         // straight into the car - and the voice came out of the phone's speaker: on the car's
         // channel for spoken prompts instead, where the car has one.
         if (CarSettings.pipeAudio.value && io.github.sirionero.mycar.audio.CarAudio.capture.value != io.github.sirionero.mycar.audio.CarAudio.Capture.ON &&
-            DirectionsVoice.speakForAssistant(text, VoiceLanguages.speakingLocale(AssistantLanguage.language)) { cut -> end(id, stopped = cut) }
+            DirectionsVoice.speakForAssistant(text, VoiceLanguages.speakingLocale(AssistantLanguage.language)) { cut, refused ->
+                end(id, stopped = cut, refused = refused)
+            }
         ) {
             return id
         }
         engine.setOnUtteranceProgressListener(progress)
         if (engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, id) != TextToSpeech.SUCCESS) {
-            MyCarLog.w("assistant: speech engine refused to speak - starting it again next drive")
-            ttsFailed = true
-            end(id, stopped = false)
+            // A text too long for any engine says nothing about the engine; otherwise it went away
+            // (updated in the background) and is made again at the next drive.
+            if (text.length < TextToSpeech.getMaxSpeechInputLength()) {
+                MyCarLog.w("assistant: speech engine refused to speak - starting it again next drive")
+                ttsFailed = true
+            } else {
+                MyCarLog.w("assistant: too long to speak (${text.length} characters)")
+            }
+            end(id, stopped = false, refused = true)
         }
         return id
     }

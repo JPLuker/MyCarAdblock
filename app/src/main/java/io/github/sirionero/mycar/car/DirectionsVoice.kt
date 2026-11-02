@@ -257,10 +257,13 @@ object DirectionsVoice {
         pending[utterance] = done
         if (engine.synthesizeToFile(text, Bundle(), file, utterance) != TextToSpeech.SUCCESS) {
             pending.remove(utterance)
+            refusedNow = true
             // The engine went away mid-drive (updated in the background: Android never binds it
-            // again): made anew at the next drive.
-            MyCarLog.w("guidance: text-to-speech refused to speak - starting it again next drive")
-            ttsFailed = true
+            // again): made anew at the next drive. Not for a text too long for any engine.
+            if (text.length < TextToSpeech.getMaxSpeechInputLength()) {
+                MyCarLog.w("guidance: text-to-speech refused to speak - starting it again next drive")
+                ttsFailed = true
+            }
             return
         }
         // A long reply or message read out takes longer to make than a turn.
@@ -287,26 +290,33 @@ object DirectionsVoice {
      * car gave no such channel or there's no voice: the assistant speaks as before. [done] once, on
      * the main thread: true when cut short ([stopAssistant]).
      */
-    fun speakForAssistant(text: String, locale: Locale, done: (cut: Boolean) -> Unit): Boolean {
+    fun speakForAssistant(text: String, locale: Locale, done: (cut: Boolean, refused: Boolean) -> Unit): Boolean {
         val sink = link ?: return false
-        if (tts == null || !ttsReady) return false
+        // An engine that already refused: the assistant's own, or its answer on screen.
+        if (tts == null || !ttsReady || ttsFailed) return false
         val turn = assistantTurn.incrementAndGet()
         speaker.execute {
             var cut = true
+            var refused = false
             try {
                 if (turn == assistantTurn.get() && link === sink) {
+                    refusedNow = false
                     play(text, turn, locale, going = { turn == assistantTurn.get() }, what = "the assistant's reply")
+                    refused = refusedNow
                     cut = turn != assistantTurn.get()
                 }
             } catch (e: Exception) {
                 MyCarLog.w("guidance: could not speak the assistant's reply: ${e.message}")
                 cut = false
             } finally {
-                main.post { done(cut) }
+                main.post { done(cut, refused) }
             }
         }
         return true
     }
+
+    /** The last text [play] gave the engine was refused (read on the speaker's thread, right after). */
+    @Volatile private var refusedNow = false
 
     /** The assistant stopped speaking: its reply on the car's channel stops too. */
     fun stopAssistant() {
