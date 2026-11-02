@@ -112,9 +112,12 @@ fun CarHome() {
     if (now.isActive) lastActive[0] = now
     val holding = sideApp == null && musicShown && !musicOn
     val shownNow = if (holding && !now.isActive && lastActive[0].isActive) lastActive[0].playingAs(now) else now
+    // The music beside the map (the player, the lyrics), not an app's own screen there.
+    val music = sideApp?.template == null && sideApp?.builtIn != BuiltInApps.Plancia
     // Lyrics that gave the column back for a song without any come back with the next song that has some,
-    // until the driver closes them (their X, the dock's song, the player's X).
-    if (navigator.lyricsWanted && panel == SidePanel.CONTROLS && shownNow.isActive) {
+    // until the driver closes them (their X, the dock's song, the player's X). Not looked up with an app
+    // beside the map, where they can't show (no searches in the background).
+    if (navigator.lyricsWanted && panel == SidePanel.CONTROLS && shownNow.isActive && music) {
         val context = LocalContext.current
         val inside = mediaApp?.component?.let(io.github.sirionero.mycar.xonos.Xonos::isInside) == true
         val song = remember(shownNow.trackTitle, shownNow.title, shownNow.trackArtist, shownNow.artist, shownNow.album, shownNow.durationMs, shownNow.mediaId, inside) { shownNow.lyricsSong(inside) }
@@ -137,7 +140,6 @@ fun CarHome() {
     val splitScreen = panel != SidePanel.NONE && (sideApp != null || musicShown || reserved)
     // The music beside the map at the size chosen for it (Small, Medium, Large): an app's own screen
     // there keeps its size.
-    val music = sideApp?.template == null && sideApp?.builtIn != BuiltInApps.Plancia
     val playerSize by CarSettings.playerSize.collectAsStateWithLifecycle()
     // The map alone with music on (the column closed with its X, the dock's song, or Close beside an
     // app): the mini player floats over it instead (see MapMiniPlayer); not while the map is panned.
