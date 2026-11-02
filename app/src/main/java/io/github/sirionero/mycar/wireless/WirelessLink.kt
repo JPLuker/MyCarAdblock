@@ -186,10 +186,21 @@ object WirelessLink {
         runCatching { awake?.takeIf { it.isHeld }?.release() }
     }
 
-    private fun holdService(context: Context) {
+    /**
+     * Takes the drive's service for start-up [mine]; false if that start-up is over already. With
+     * [stop] under one lock: a stop as the channel opened or the Wi-Fi was asked for gave the service
+     * back, and the start-up then took it again, for good - the phone kept awake, "Connecting…" on
+     * Home, and every arrival of the car taken for a drive under way.
+     */
+    private fun holdService(context: Context, mine: Int): Boolean = synchronized(serviceLock) {
+        if (mine != startRun) return false
         ownsService = true
         io.github.sirionero.mycar.SessionService.start(context, wireless = true, holder = io.github.sirionero.mycar.SessionService.STARTUP)
+        true
     }
+
+    /** Guards [holdService] against [stop]. */
+    private val serviceLock = Any()
 
     /** A start-up that never got to a drive gives the drive's service back; a drive gives it back as it ends. */
     private fun giveBackService(context: Context) {
@@ -467,9 +478,12 @@ object WirelessLink {
      */
     fun stop(context: Context, say: Boolean = true) {
         tcpRun++
-        startRun++
+        // With the service: a start-up taking it right now either sees itself stopped or gives it back here.
+        synchronized(serviceLock) {
+            startRun++
+            giveBackService(context)
+        }
         againFor = null
-        giveBackService(context)
         sleepAgain()
         val starting = worker != null && SessionStatus.state.value.phase == SessionStatus.Phase.CONNECTING
         worker?.interrupt()
@@ -556,9 +570,14 @@ object WirelessLink {
         // The car's Wi-Fi is handed only to an app in front or with a foreground service. With the
         // phone in a pocket - connecting by itself, or after a stop - the screen isn't in front, and
         // the drive's service only came once the picture was up: the join was refused.
-        holdService(context)
+        if (!holdService(context, mine)) {
+            log.i("Bluetooth: stopped as the channel opened - closing it")
+            runCatching { socket.close() }
+            if (rfcomm === socket) rfcomm = null
+            return
+        }
         log.i("Bluetooth: channel open")
-        SessionStatus.connecting(R.string.wireless_link_bt_talking, name)
+        if (mine == startRun) SessionStatus.connecting(R.string.wireless_link_bt_talking, name)
         // A car whose Android Auto isn't ready yet can take the channel and say nothing: the start-up
         // stayed on "talking to the car" for good, holding the drive's service, and every arrival of
         // the car after it was taken for a drive under way. Closed, it starts over (channelEnded).
@@ -794,7 +813,7 @@ object WirelessLink {
             runCatching { rfcomm?.close() }
             return
         }
-        SessionStatus.connecting(R.string.wireless_link_wifi_joining, name)
+        if (mine == startRun) SessionStatus.connecting(R.string.wireless_link_wifi_joining, name)
         val spec = WifiNetworkSpecifier.Builder().setSsid(ssid).apply {
             runCatching { MacAddress.fromString(bssid) }.getOrNull()
                 ?.takeIf { it != MacAddress.fromString("00:00:00:00:00:00") }
@@ -864,7 +883,7 @@ object WirelessLink {
         }
         // In the foreground for the request (see [run]): the service started with the channel, given
         // a moment to be up.
-        holdService(context)
+        if (!holdService(context, mine)) return
         val until = System.currentTimeMillis() + 3_000
         while (!io.github.sirionero.mycar.SessionService.running && System.currentTimeMillis() < until) {
             try {
