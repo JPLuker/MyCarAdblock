@@ -63,7 +63,9 @@ object CarAssistant {
     private var appContext: Context? = null
     private var recognizer: SpeechRecognizer? = null
     private var tts: TextToSpeech? = null
-    private var ttsReady = false
+    @Volatile private var ttsReady = false
+    /** The engine didn't start, or stopped speaking (updated in the background): made anew next drive. */
+    @Volatile private var ttsFailed = false
     /** The language the voice was last set to, so it's set again only when that changes. */
     private var voiceIn: VoiceLanguage? = null
 
@@ -86,9 +88,18 @@ object CarAssistant {
 
     fun init(context: Context) {
         appContext = context.applicationContext
-        if (tts != null) return
+        // Started again, at the next drive, after a start that failed or an engine that went away
+        // (updated in the background, Android never binds it again), as DirectionsVoice does:
+        // otherwise answers and messages stayed silent until myCar's process went.
+        if (tts != null && !ttsFailed) return
+        tts?.shutdown()
+        voiceIn = null
+        ttsReady = false
+        ttsFailed = false
         tts = TextToSpeech(appContext) { status ->
             ttsReady = status == TextToSpeech.SUCCESS
+            ttsFailed = !ttsReady
+            if (ttsFailed) MyCarLog.w("assistant: text-to-speech didn't start (status $status) - trying again next drive")
             if (ttsReady) mainHandler.post(::syncLanguage)
         }
         syncLanguage()
@@ -229,6 +240,16 @@ object CarAssistant {
             // Still this answer on screen: done speaking, or cut short by a message read aloud. Not
             // when the microphone or Cancel stopped it, which have moved the overlay on already.
             if (mine == replies && _state.value.phase == Phase.SPEAKING) {
+                // Not said, the engine refused: on screen long enough to read, as with no engine.
+                if (!stopped && ttsFailed) {
+                    mainHandler.postDelayed({
+                        if (mine == replies && _state.value.phase == Phase.SPEAKING) {
+                            _state.value = _state.value.copy(phase = Phase.IDLE)
+                            then()
+                        }
+                    }, SILENT_REPLY_MS)
+                    return@speak
+                }
                 _state.value = _state.value.copy(phase = Phase.IDLE)
                 if (!stopped) mainHandler.post(then)
             }
@@ -394,7 +415,8 @@ object CarAssistant {
         }
         engine.setOnUtteranceProgressListener(progress)
         if (engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, id) != TextToSpeech.SUCCESS) {
-            MyCarLog.w("assistant: speech engine refused to speak")
+            MyCarLog.w("assistant: speech engine refused to speak - starting it again next drive")
+            ttsFailed = true
             end(id, stopped = false)
         }
         return id

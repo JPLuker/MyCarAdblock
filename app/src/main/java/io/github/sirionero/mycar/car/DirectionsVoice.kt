@@ -257,6 +257,10 @@ object DirectionsVoice {
         pending[utterance] = done
         if (engine.synthesizeToFile(text, Bundle(), file, utterance) != TextToSpeech.SUCCESS) {
             pending.remove(utterance)
+            // The engine went away mid-drive (updated in the background: Android never binds it
+            // again): made anew at the next drive.
+            MyCarLog.w("guidance: text-to-speech refused to speak - starting it again next drive")
+            ttsFailed = true
             return
         }
         // A long reply or message read out takes longer to make than a turn.
