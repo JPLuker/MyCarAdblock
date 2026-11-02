@@ -53,6 +53,8 @@ class MyCarRunner(
      * (the Wi-Fi socket; a blocked read returns). Called when the session gives up or stops itself.
      */
     private val closeTransport: (() -> Unit)? = null,
+    /** Whether a car accepted this certificate before (see [CertRotation.acceptedBefore]). */
+    private val certAcceptedBefore: (CertProvider.Identity) -> Boolean = { false },
 ) {
     private val log = MyCarLog.tagged("PROTO")
 
@@ -463,7 +465,8 @@ class MyCarRunner(
                 )
                 SessionStatus.failed(
                     R.string.connection_car_date,
-                    R.string.connection_car_date_detail,
+                    // No cable to plug in again over Wi-Fi.
+                    if (wireless) R.string.cert_notice_clock_text else R.string.connection_car_date_detail,
                 )
                 state = State.DONE
                 authenticationFailed = true
@@ -1398,12 +1401,20 @@ class MyCarRunner(
             State.DONE -> SessionStatus.disconnected()
             State.WAIT_VERSION -> SessionStatus.failed(
                 R.string.connection_no_answer,
-                R.string.connection_no_answer_detail,
+                // Android's "which app" question is the cable's only: over Wi-Fi it led nowhere.
+                if (wireless) R.string.connection_no_answer_wireless_detail else R.string.connection_no_answer_detail,
             )
-            State.TLS_HANDSHAKE, State.WAIT_AUTH -> SessionStatus.failed(
-                R.string.connection_hung_up_setup,
-                R.string.connection_hung_up_setup_detail,
-            )
+            State.TLS_HANDSHAKE, State.WAIT_AUTH -> {
+                // Not the certificate, most likely: the car never got it, myCar gave up on a car that
+                // stalled, or a car took this very certificate before. "It turned the certificate
+                // down" sent the driver to change one that works.
+                val known = presented?.let { runCatching { certAcceptedBefore(it) }.getOrDefault(false) } == true
+                SessionStatus.failed(
+                    R.string.connection_hung_up_setup,
+                    if (!certificateShown || gaveUp || known) R.string.connection_hung_up_setup_link_detail
+                    else R.string.connection_hung_up_setup_detail,
+                )
+            }
             State.WAIT_SDR -> SessionStatus.failed(
                 R.string.connection_hung_up_after_cert,
                 R.string.connection_hung_up_after_cert_detail,

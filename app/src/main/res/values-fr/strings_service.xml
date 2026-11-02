@@ -29,8 +29,10 @@
     <string name="connection_picture_stopped_detail">L’encodeur vidéo du téléphone échoue sans cesse (%1$s). myCar a fermé la connexion : reconnectez-vous.</string>
     <string name="connection_no_answer">La voiture n’a pas répondu</string>
     <string name="connection_no_answer_detail">La connexion s’est ouverte, mais la voiture n’a rien envoyé. Si Android demande quelle app ouvrir pour la voiture, choisissez myCar.</string>
+    <string name="connection_no_answer_wireless_detail">La connexion par le Wi-Fi de la voiture s’est ouverte, mais la voiture n’a rien envoyé. Reconnectez-vous ; si cela se reproduit, éteignez puis rallumez la voiture.</string>
     <string name="connection_hung_up_setup">La voiture a raccroché pendant la configuration</string>
     <string name="connection_hung_up_setup_detail">La voiture a mis fin à la connexion pendant sa sécurisation. En général, cela veut dire qu’elle a refusé le certificat.</string>
+    <string name="connection_hung_up_setup_link_detail">La connexion s’est fermée pendant sa sécurisation, plus probablement à cause du câble ou du Wi-Fi de la voiture que du certificat. Reconnectez-vous.</string>
     <string name="connection_hung_up_after_cert">La voiture a raccroché après le certificat</string>
     <string name="connection_hung_up_after_cert_detail">La voiture a accepté le certificat, mais a mis fin à la connexion avant la fin de la configuration.</string>
 
@@ -50,7 +52,7 @@
     <string name="wireless_link_wifi_off">Le Wi-Fi du téléphone est désactivé</string>
     <string name="wireless_link_wifi_off_detail">Activez le Wi-Fi du téléphone : la connexion sans fil à la voiture passe par le Wi-Fi de la voiture.</string>
     <string name="wireless_link_vpn">Un VPN bloque la voiture</string>
-    <string name="wireless_link_vpn_detail">myCar a rejoint le réseau de %1$s, mais un VPN sur ce téléphone (Tailscale, par exemple) l’empêche d’atteindre la voiture. Connectez-vous avec le câble, désactivez le VPN, ou excluez-en myCar dans ses paramètres ; Plancia et Xonos dans myCar ne pourront alors plus utiliser les adresses du VPN, comme les noms Tailscale.</string>
+    <string name="wireless_link_vpn_detail">myCar a rejoint le réseau de %1$s, mais un VPN sur ce téléphone (Tailscale, par exemple) l’empêche d’atteindre la voiture. Connectez-vous avec le câble, désactivez le VPN, ou excluez-en myCar dans ses paramètres : Plancia et Xonos dans myCar atteignent alors les adresses Tailscale par les apps Plancia et Xonos, si elles sont sur le téléphone.</string>
     <string name="wireless_link_no_connection">Wi-Fi de la voiture rejoint, mais pas de connexion</string>
     <string name="wireless_link_no_connection_detail">myCar a rejoint le réseau de %1$s, mais n’a pas pu atteindre Android Auto à %2$s.</string>
     <string name="wireless_link_local_network_detail">Android tient myCar à l’écart des réseaux locaux, et le Wi-Fi de la voiture en est un : sur le téléphone, accordez à myCar l’autorisation Appareils à proximité, puis reconnectez-vous.</string>

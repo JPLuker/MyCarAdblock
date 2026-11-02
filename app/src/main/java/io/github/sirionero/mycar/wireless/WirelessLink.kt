@@ -208,7 +208,8 @@ object WirelessLink {
      * [again]: a start-over of one of those ([startOver]), which keeps counting its tries.
      */
     fun start(context: Context, device: BluetoothDevice, byItself: Boolean = false, quiet: Boolean = false, again: Boolean = false) {
-        stop(context)
+        // A start-over goes on saying "connecting": not a moment of "not connected" between two tries.
+        stop(context, say = !(again && !quiet))
         againFor = device
         drove = false
         this.quiet = quiet
@@ -318,8 +319,11 @@ object WirelessLink {
                     // The listening after a drive said "talking to the car" when the channel opened:
                     // its last start-over over, that went too, or it stayed up for good.
                     if (SessionStatus.state.value.phase == SessionStatus.Phase.CONNECTING) SessionStatus.disconnected()
-                } else if (!saidWhy) {
+                } else if (!saidWhy && !drove) {
                     // Nothing follows: "talking to the car" stayed up for good, and only Disconnect cleared it.
+                    // Only for a start that never reached a session: one on the car's Wi-Fi has said
+                    // its own reason already (MyCarRunner: the certificate, the car's date), and this
+                    // took its place, blaming the car's Bluetooth.
                     car?.let { SessionStatus.failed(R.string.wireless_link_bt_no_car, R.string.wireless_link_bt_no_car_detail, name(it)) }
                 }
             }
@@ -396,8 +400,11 @@ object WirelessLink {
         activeSsid = null
     }
 
-    /** Closes the Bluetooth channel, the socket and the Wi-Fi request. Safe to call any time. */
-    fun stop(context: Context) {
+    /**
+     * Closes the Bluetooth channel, the socket and the Wi-Fi request. Safe to call any time. [say]
+     * puts Home's card back to "not connected" if a start-up was under way.
+     */
+    fun stop(context: Context, say: Boolean = true) {
         tcpRun++
         startRun++
         againFor = null
@@ -420,7 +427,7 @@ object WirelessLink {
         // Stopped before the car's session began, so nothing else resets Home's card.
         if (starting) {
             log.i("wireless start-up stopped")
-            SessionStatus.disconnected()
+            if (say) SessionStatus.disconnected()
         }
     }
 
@@ -760,12 +767,15 @@ object WirelessLink {
                 if (network === this && tcp == null) giveBackService(context)
                 log.w("Wi-Fi: couldn't join \"$ssid\" (declined, out of range, or wrong password)")
                 runCatching { send(output, MSG_CONNECTION_STATUS, Protobuf.varintField(1, -1)) }
-                SessionStatus.failed(
-                    R.string.wireless_link_wifi_failed,
-                    R.string.wireless_link_wifi_failed_detail,
-                    name,
-                )
-                startOver(context, mine, "the car's Wi-Fi didn't come")
+                // Said only when nothing follows: before a start-over Home turned red for 3 s, as
+                // if it were over, and Disconnect went from it.
+                if (!startOver(context, mine, "the car's Wi-Fi didn't come")) {
+                    SessionStatus.failed(
+                        R.string.wireless_link_wifi_failed,
+                        R.string.wireless_link_wifi_failed_detail,
+                        name,
+                    )
+                }
             }
 
             // Android can hold an app's traffic back on a network it has joined (battery or data
@@ -944,7 +954,9 @@ object WirelessLink {
             }
         }
         log.e("TCP: gave up on $ip:$port", last)
-        if (run == tcpRun) giveBackService(context)
+        // Stopped meanwhile (Disconnect, the cable, a tap), or a newer join that will say its own.
+        if (run != tcpRun) return
+        giveBackService(context)
         if (vpnActive(context)) {
             SessionStatus.failed(
                 R.string.wireless_link_vpn,
@@ -960,8 +972,8 @@ object WirelessLink {
             SessionStatus.failed(R.string.wireless_link_no_connection, R.string.wireless_link_local_network_detail)
             return
         }
-        // Not behind a VPN, which no start-over gets past.
-        if (run == tcpRun) startOver(context, mine, "no TCP to the car")
+        // Not behind a VPN, which no start-over gets past. Said only when nothing follows.
+        if (startOver(context, mine, "no TCP to the car")) return
         SessionStatus.failed(
             R.string.wireless_link_no_connection,
             R.string.wireless_link_no_connection_detail,

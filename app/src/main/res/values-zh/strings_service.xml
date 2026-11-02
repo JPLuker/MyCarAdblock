@@ -29,8 +29,10 @@
     <string name="connection_picture_stopped_detail">手机的视频编码器一直出错（%1$s）。myCar 已关闭连接：请重新连接。</string>
     <string name="connection_no_answer">汽车没有响应</string>
     <string name="connection_no_answer_detail">连接已打开，但汽车什么也没有发送。如果 Android 询问要为汽车打开哪个应用，请选择 myCar。</string>
+    <string name="connection_no_answer_wireless_detail">通过汽车 Wi-Fi 的连接已建立，但汽车没有发送任何内容。请重新连接；如果反复出现，请将汽车熄火后重新启动。</string>
     <string name="connection_hung_up_setup">汽车在设置过程中断开了连接</string>
     <string name="connection_hung_up_setup_detail">汽车在加密连接时断开了。这通常说明它拒绝了证书。</string>
+    <string name="connection_hung_up_setup_link_detail">连接在加密过程中断开，原因更可能是数据线或汽车的 Wi-Fi，而不是证书。请重新连接。</string>
     <string name="connection_hung_up_after_cert">汽车在检查证书后断开了连接</string>
     <string name="connection_hung_up_after_cert_detail">汽车接受了证书，但在设置完成前断开了连接。</string>
 
@@ -50,7 +52,7 @@
     <string name="wireless_link_wifi_off">手机的 WLAN 已关闭</string>
     <string name="wireless_link_wifi_off_detail">请打开手机的 WLAN：与汽车的无线连接要经过汽车的 WLAN。</string>
     <string name="wireless_link_vpn">VPN 阻止了与汽车的连接</string>
-    <string name="wireless_link_vpn_detail">myCar 已加入 %1$s 的网络，但这部手机上的 VPN（例如 Tailscale）不让它连接汽车。请使用数据线连接、关闭 VPN，或在 VPN 的设置中把 myCar 排除在外——这样 myCar 中的 Plancia 和 Xonos 就无法使用 VPN 的地址，比如 Tailscale 名称。</string>
+    <string name="wireless_link_vpn_detail">myCar 已加入 %1$s 的网络，但这部手机上的 VPN（例如 Tailscale）不让它连接汽车。请使用数据线连接、关闭 VPN，或在 VPN 的设置中把 myCar 排除在外：这样 myCar 中的 Plancia 和 Xonos 会通过 Plancia 和 Xonos 应用访问 Tailscale 地址（如果手机上装有这两个应用）。</string>
     <string name="wireless_link_no_connection">已加入汽车的 WLAN，但无法连接</string>
     <string name="wireless_link_no_connection_detail">myCar 已加入 %1$s 的网络，但无法通过 %2$s 访问 Android Auto。</string>
     <string name="wireless_link_local_network_detail">Android 不让 myCar 访问本地网络，而汽车的 WLAN 就是本地网络：请在手机上给 myCar 授予“附近的设备”权限，然后重新连接。</string>

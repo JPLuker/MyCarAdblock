@@ -29,8 +29,10 @@
     <string name="connection_picture_stopped_detail">Der Video-Encoder des Telefons fällt immer wieder aus (%1$s). myCar hat die Verbindung geschlossen: Verbinde dich erneut.</string>
     <string name="connection_no_answer">Das Auto hat nicht geantwortet</string>
     <string name="connection_no_answer_detail">Die Verbindung wurde geöffnet, aber das Auto hat nichts gesendet. Wenn Android fragt, welche App sich für das Auto öffnen soll, wähle myCar.</string>
+    <string name="connection_no_answer_wireless_detail">Die Verbindung über das WLAN des Autos stand, aber das Auto hat nichts gesendet. Verbinde erneut; wenn es wieder passiert, schalte das Auto aus und wieder ein.</string>
     <string name="connection_hung_up_setup">Das Auto hat während der Einrichtung aufgelegt</string>
     <string name="connection_hung_up_setup_detail">Das Auto hat die Verbindung beendet, während sie gesichert wurde. Meistens heißt das, dass es das Zertifikat abgelehnt hat.</string>
+    <string name="connection_hung_up_setup_link_detail">Die Verbindung endete, während sie gesichert wurde, wahrscheinlich wegen des Kabels oder des WLANs des Autos und nicht wegen des Zertifikats. Verbinde erneut.</string>
     <string name="connection_hung_up_after_cert">Das Auto hat nach dem Zertifikat aufgelegt</string>
     <string name="connection_hung_up_after_cert_detail">Das Auto hat das Zertifikat akzeptiert, aber die Verbindung beendet, bevor die Einrichtung fertig war.</string>
 
@@ -50,7 +52,7 @@
     <string name="wireless_link_wifi_off">Das WLAN des Telefons ist aus</string>
     <string name="wireless_link_wifi_off_detail">Schalte das WLAN des Telefons ein: Die kabellose Verbindung zum Auto läuft über das WLAN des Autos.</string>
     <string name="wireless_link_vpn">Ein VPN blockiert das Auto</string>
-    <string name="wireless_link_vpn_detail">myCar ist im Netz von %1$s, aber ein VPN auf diesem Telefon (zum Beispiel Tailscale) lässt es das Auto nicht erreichen. Verbinde per Kabel, schalte das VPN aus oder nimm myCar in dessen Einstellungen davon aus – dann können Plancia und Xonos in myCar die Adressen des VPN, wie Tailscale-Namen, nicht nutzen.</string>
+    <string name="wireless_link_vpn_detail">myCar ist im Netz von %1$s, aber ein VPN auf diesem Telefon (zum Beispiel Tailscale) lässt es das Auto nicht erreichen. Verbinde per Kabel, schalte das VPN aus oder nimm myCar in dessen Einstellungen davon aus: Plancia und Xonos in myCar erreichen Tailscale-Adressen dann über die Apps Plancia und Xonos, wenn sie auf dem Telefon sind.</string>
     <string name="wireless_link_no_connection">WLAN des Autos verbunden, aber keine Verbindung</string>
     <string name="wireless_link_no_connection_detail">myCar ist im Netz von %1$s, konnte Android Auto unter %2$s aber nicht erreichen.</string>
     <string name="wireless_link_local_network_detail">Android hält myCar von lokalen Netzwerken fern, und das WLAN des Autos ist eins: Erlaube myCar auf dem Telefon die Berechtigung Geräte in der Nähe und verbinde dich dann neu.</string>

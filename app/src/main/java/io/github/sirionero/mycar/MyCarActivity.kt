@@ -627,6 +627,8 @@ class MyCarActivity : ComponentActivity(), Projection {
         }
         if (checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
             MyCarLog.w("auto-connect: needs the Nearby devices permission")
+            // Said on Home: myCar opened by itself, and "not connected" was all it showed.
+            SessionStatus.failed(R.string.wireless_link_bt_permission, R.string.wireless_link_bt_permission_detail, address)
             return
         }
         val adapter = getSystemService(android.bluetooth.BluetoothManager::class.java)?.adapter
@@ -678,6 +680,7 @@ class MyCarActivity : ComponentActivity(), Projection {
             projection = this,
             vehicleProfileFor = { info -> VehicleProfiles.find(VehicleProfiles.load(this), info) },
             onCertVerdict = { identity, verdict -> CertRotation.report(applicationContext, identity, verdict) },
+            certAcceptedBefore = { CertRotation.acceptedBefore(applicationContext, it) },
         )
         this.runner = runner
         worker = runSession(runner)
@@ -741,6 +744,7 @@ class MyCarActivity : ComponentActivity(), Projection {
             vehicleProfileFor = { info -> VehicleProfiles.find(VehicleProfiles.load(this), info) },
             wireless = true,
             onCertVerdict = { identity, verdict -> CertRotation.report(applicationContext, identity, verdict) },
+            certAcceptedBefore = { CertRotation.acceptedBefore(applicationContext, it) },
             closeTransport = { socket.close() },
         )
         this.runner = runner
