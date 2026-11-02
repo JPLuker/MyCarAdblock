@@ -65,6 +65,34 @@ internal data class MiniPlace(val x: Float, val y: Float) {
             return (room / ownW).coerceIn(MIN_FIT, 1f)
         }
 
+        /**
+         * Where it's let go, but not under the map's buttons at the top right, which are drawn over it
+         * (a tap on its Pause went to Search): from under the app's row of actions just below it, and
+         * from beside the map's buttons left of them, or below them where left would put it over the
+         * card a map shows at its left. Elsewhere it stays where it was let go. Same units as [start].
+         */
+        fun clearOfButtons(at: MiniPlace, areaW: Float, areaH: Float, ownW: Float, ownH: Float): MiniPlace {
+            val roomW = areaW - ownW
+            val roomH = areaH - ownH
+            if (roomW <= 0f || roomH <= 0f) return at
+            var x = at.x * roomW
+            var y = at.y * roomH
+            val besideCard = cardEdge(areaW)
+            // The app's row reaches left from the right edge as far as its actions do: right of the card, clear of it.
+            if (y < ROW_CLEAR && x + ownW > besideCard) y = ROW_CLEAR.coerceAtMost(roomH)
+            if (x > roomW - BUTTONS_STEP && y < BUTTONS_REACH_MOST) {
+                when {
+                    roomW - BUTTONS_STEP >= besideCard -> x = roomW - BUTTONS_STEP
+                    BUTTONS_REACH_MOST <= roomH -> y = BUTTONS_REACH_MOST
+                    else -> x = (roomW - BUTTONS_STEP).coerceAtLeast(0f)
+                }
+            }
+            return MiniPlace((x / roomW).coerceIn(0f, 1f), (y / roomH).coerceIn(0f, 1f))
+        }
+
+        /** Where the card a map shows at its left ends, with the gap after it, in an area [areaW] wide. */
+        private fun cardEdge(areaW: Float) = maxOf((areaW + 2 * MINI_EDGE) * PANE_FRACTION, PANE_MIN_EDGE) - MINI_EDGE + GAP
+
         /** From its top-left corner in pixels, in a room [roomW] x [roomH] beyond its own size. No room that way: the far end. */
         fun of(left: Float, top: Float, roomW: Int, roomH: Int) = MiniPlace(
             if (roomW > 0) (left / roomW).coerceIn(0f, 1f) else 1f,
@@ -92,6 +120,8 @@ private const val TRIP_CARD_RISE = 40f
 private const val BUTTONS_REACH = 302f
 /** How far down they reach on most maps: an app's row of actions and three map buttons, as Vela has. */
 private const val BUTTONS_REACH_MOST = 240f
+/** How far down the app's row of actions at the top right reaches, and 8 dp: its buttons are 54 dp. */
+private const val ROW_CLEAR = 62f
 /** How far left of the area's right edge the mini player ends to clear those buttons (their width, and 8 dp). */
 private const val BUTTONS_STEP = 62f
 /** The card at a map's left (MapPaneLayout) ends at this fraction of the map's width, or at least at [PANE_MIN_EDGE] (MAP_PANE_MIN_EDGE). */

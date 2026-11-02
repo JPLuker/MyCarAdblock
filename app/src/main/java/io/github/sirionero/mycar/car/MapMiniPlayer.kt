@@ -128,6 +128,16 @@ internal fun MapMiniPlayer(now: NowPlaying, modifier: Modifier = Modifier) {
             )
         }
         val restNow by rememberUpdatedState(rest)
+        // The area and its own size in dp, as MiniPlace counts them, for where it's let go.
+        val areaNow by rememberUpdatedState(androidx.compose.ui.geometry.Size(maxWidth.value, maxHeight.value))
+        val ownNow by rememberUpdatedState(
+            with(density) {
+                androidx.compose.ui.geometry.Size(
+                    if (size.width > 0) size.width.toDp().value else MINI_WIDTH * fit,
+                    if (size.height > 0) size.height.toDp().value else MINI_HEIGHT * fit,
+                )
+            },
+        )
         var held by remember { mutableStateOf(false) }
         // How far the finger has taken it from where it rests, in pixels.
         var moved by remember { mutableStateOf(Offset.Zero) }
@@ -161,9 +171,12 @@ internal fun MapMiniPlayer(now: NowPlaying, modifier: Modifier = Modifier) {
                             },
                             onEnd = { dragged ->
                                 if (dragged) {
-                                    val to = MiniPlace.of(
-                                        restNow.x * roomNow.width + moved.x, restNow.y * roomNow.height + moved.y,
-                                        roomNow.width, roomNow.height,
+                                    val to = MiniPlace.clearOfButtons(
+                                        MiniPlace.of(
+                                            restNow.x * roomNow.width + moved.x, restNow.y * roomNow.height + moved.y,
+                                            roomNow.width, roomNow.height,
+                                        ),
+                                        areaNow.width, areaNow.height, ownNow.width, ownNow.height,
                                     )
                                     kept = to
                                     MiniPlayerSetting.moveTo(to)
