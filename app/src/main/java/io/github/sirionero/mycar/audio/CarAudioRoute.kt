@@ -127,7 +127,11 @@ object CarAudioRoute {
     }
 
     private fun checkDropped() {
-        if (!projecting || !onBluetooth || bluetoothMusic()) return
+        if (!projecting || !onBluetooth || bluetoothMusic()) {
+            // Back (or nothing to watch): a call seen this time doesn't lengthen the next drop's wait.
+            sawCall = false
+            return
+        }
         if (inCall()) {
             sawCall = true
             main.postDelayed({ checkDropped() }, settling, DROP_MS)

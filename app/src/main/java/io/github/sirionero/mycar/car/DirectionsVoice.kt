@@ -223,6 +223,9 @@ object DirectionsVoice {
 
     /** Newest wins: a prompt still waiting when the next one arrives is already out of date. */
     private fun say(text: String) {
+        // A turn comes before the assistant's reply on the same channel: the reply stops (as with
+        // Cancel), or the turn waited behind a message read out.
+        stopAssistant()
         val id = ++latest
         speaker.execute {
             if (id != latest) return@execute
@@ -253,7 +256,9 @@ object DirectionsVoice {
             pending.remove(utterance)
             return
         }
-        if (!done.await(SYNTH_TIMEOUT_S, TimeUnit.SECONDS)) {
+        // A long reply or message read out takes longer to make than a turn.
+        val limit = if (locale == null) SYNTH_TIMEOUT_S else SYNTH_TIMEOUT_S + text.length / 20L
+        if (!done.await(limit, TimeUnit.SECONDS)) {
             pending.remove(utterance)
             MyCarLog.w("guidance: text-to-speech took too long, $what went unspoken")
             return
@@ -262,6 +267,8 @@ object DirectionsVoice {
             MyCarLog.w("guidance: text-to-speech gave audio myCar can't read")
             return
         }
+        // Cut while it was being made (Cancel, the microphone): nothing to start on the car's channel.
+        if (!going()) return
         stream(sink, pcm, going)
         MyCarLog.i("guidance: spoke $what (${pcm.size / (2 * sink.channels) * 1000 / sink.sampleRate} ms)")
     }
@@ -276,13 +283,13 @@ object DirectionsVoice {
     fun speakForAssistant(text: String, locale: Locale, done: (cut: Boolean) -> Unit): Boolean {
         val sink = link ?: return false
         if (tts == null || !ttsReady) return false
-        val turn = ++assistantTurn
+        val turn = assistantTurn.incrementAndGet()
         speaker.execute {
             var cut = true
             try {
-                if (turn == assistantTurn && link === sink) {
-                    play(text, turn, locale, going = { turn == assistantTurn }, what = "the assistant's reply")
-                    cut = turn != assistantTurn
+                if (turn == assistantTurn.get() && link === sink) {
+                    play(text, turn, locale, going = { turn == assistantTurn.get() }, what = "the assistant's reply")
+                    cut = turn != assistantTurn.get()
                 }
             } catch (e: Exception) {
                 MyCarLog.w("guidance: could not speak the assistant's reply: ${e.message}")
@@ -296,11 +303,11 @@ object DirectionsVoice {
 
     /** The assistant stopped speaking: its reply on the car's channel stops too. */
     fun stopAssistant() {
-        assistantTurn++
+        assistantTurn.incrementAndGet()
     }
 
-    /** The assistant's reply on the car's channel now; any other number, it's over or cut. */
-    @Volatile private var assistantTurn = 0
+    /** The assistant's reply on the car's channel now; any other number, it's over or cut. From two threads. */
+    private val assistantTurn = java.util.concurrent.atomic.AtomicInteger()
     private val main = android.os.Handler(android.os.Looper.getMainLooper())
 
     /**
