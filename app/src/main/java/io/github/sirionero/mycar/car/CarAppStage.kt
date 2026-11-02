@@ -75,7 +75,9 @@ fun CarAppStage(
             if (status.surfaceRequested) {
                 AppSurface(connection, frame, template, Modifier.fillMaxSize())
             }
-            overMap()
+            // Not under a template that covers the map (a list, a search): composed there, its buttons
+            // took the knob's turns unseen, and pressing it paused or skipped behind the list.
+            if (!isContentTemplate(template)) overMap()
             TemplateChrome(template, Modifier.fillMaxSize().padding(top = if (embedded) 0.dp else CHROME_BAR))
             if (!embedded) ChromeBar(status, endLabel, onDisconnect, Modifier.align(Alignment.TopCenter))
         }
