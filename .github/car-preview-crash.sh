@@ -192,3 +192,12 @@ EXTRA="$HA $PAGE3 --ez demoSong true --es miniAt 0.05,1" stress crash-webfocus 8
     "wait:9000;tap:$C_CLOSE;wait:2500;rep:20;$TO_LEFT;wait:1000-1500;focusweb;wait:300-2000;$DRIVER;wait:500-1500;end;snap:end" 200
 EXTRA="$HA $PAGE3 --ez demoSong true --es miniAt 0.05,1" stress crash-webfocus-cleared 800 480 160 \
     "wait:9000;tap:$C_CLOSE;wait:2500;rep:20;$TO_LEFT;wait:1000-1500;focusweb;wait:300-2000;unfocus;wait:150;$DRIVER;wait:500-1500;end;snap:end" 200
+
+# 6. The fix (0.7.0, car/LeaveWithoutFocus.kt): the part keeps Plancia's page a frame longer and takes
+# its focus first. crash-webfocus and crash-focus*, above, must not go down any more; and two more ways
+# out of the page with the focus in it: the page changed (holding Plancia's bar, then Back twice: the
+# changing ends, then the map), and the app grid and back.
+EXTRA="$HA $PAGE3 --ez demoSong true --es miniAt 0.05,1" stress crash-webfocus-edit 800 480 160 \
+    "wait:9000;tap:$C_CLOSE;wait:2500;rep:15;$TO_LEFT;wait:1000-1500;focusweb;wait:300-1500;tap:250,22,900;wait:600-1200;key:4;wait:300-800;key:4;wait:500-1200;end;snap:end" 200
+EXTRA="$HA $PAGE3 --ez demoSong true" stress crash-webfocus-grid 800 480 160 \
+    "wait:9000;rep:20;$TO_LEFT;wait:1000-1500;focusweb;wait:300-1500;tap:$C_FOOT;wait:600-1200;tap:$C_FOOT;wait:800-1500;end;snap:end" 200
