@@ -381,6 +381,16 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
         val saved = savedRoute()
         audioRouteFlow.value = saved
         pipeAudioFlow.value = saved == AudioRoute.CAR_LINK
+        followRouteForDirections()
+    }
+
+    /**
+     * Spoken directions not set by hand follow the drive's route, as [setAudioRoute] makes them: a
+     * route kept for one car came in after the default was worked out from the global one, and turns
+     * were spoken twice (Bluetooth, the map app's voice too) or not at all (through myCar).
+     */
+    private fun followRouteForDirections() {
+        if (!speakDirectionsChosen) speakDirectionsFlow.value = audioRouteFlow.value != AudioRoute.BLUETOOTH
     }
 
     /** The route kept for the drive's car, while it's connected. */
@@ -397,6 +407,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
         io.github.sirionero.mycar.MyCarLog.i("audio: this car's own route - ${route.id}")
         audioRouteFlow.value = route
         pipeAudioFlow.value = route == AudioRoute.CAR_LINK
+        followRouteForDirections()
     }
 
     /**

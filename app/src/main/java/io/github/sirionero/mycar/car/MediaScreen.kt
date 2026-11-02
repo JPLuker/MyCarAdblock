@@ -559,6 +559,8 @@ private fun NowPlayingControls(now: NowPlaying, media: CarMedia, modifier: Modif
         modifier.verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
     ) {
+        // As on the player beside the map: music that can't reach the car says so here too.
+        MusicNotReaching(now.playing)
         Column {
             Text(
                 now.title.ifEmpty { stringResource(R.string.car_media_nothing_playing) },

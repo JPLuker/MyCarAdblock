@@ -107,6 +107,9 @@ object DirectionsVoice {
         // Automatic left the sound to Bluetooth: the map app's own voice reaches the car that way -
         // unless the driver turned spoken directions on by hand.
         if (!CarSettings.speakDirections.value || (CarAudioRoute.onBluetooth && !CarSettings.speakDirectionsChosen)) return
+        // On a call: no turn spoken over the conversation (the dock shows it meanwhile). Nothing
+        // below runs, so a turn still ahead when the call ends is spoken then.
+        if (io.github.sirionero.mycar.call.CarCalls.state.value is io.github.sirionero.mycar.call.CallUiState.Active) return
         val turn = NavTurn.current()
         if (turn == null) {
             turnKey = null

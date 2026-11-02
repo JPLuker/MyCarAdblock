@@ -286,8 +286,12 @@ private class Playback(private val context: Context, private val media: CinemaMe
         .build()
     private val focus = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
         .setAudioAttributes(attributes)
+        // Asked during a call: granted when it ends (a GAIN, which plays), instead of refused for good.
+        .setAcceptsDelayedFocusGain(true)
         .setOnAudioFocusChangeListener { onFocus(it) }
         .build()
+    /** The car's LOSS reaches this player, which no media session shows ([CinemaNow]). */
+    private val pauseHook = { pause() }
     private var surface: Surface? = null
     private var released = false
     private var pausedForFocus = false
@@ -330,6 +334,7 @@ private class Playback(private val context: Context, private val media: CinemaMe
         get() = if (width > 0 && height > 0) width.toFloat() / height else 0f
 
     fun open() {
+        CinemaNow.pause = pauseHook
         player.setAudioAttributes(attributes)
         player.setOnPreparedListener { onPrepared() }
         player.setOnVideoSizeChangedListener { _, w, h ->
@@ -401,9 +406,19 @@ private class Playback(private val context: Context, private val media: CinemaMe
 
     fun play() {
         if (released || !prepared || problem != null) return
-        if (audio.requestAudioFocus(focus) != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            MyCarLog.i("cinema: the phone's sound is busy (a call?) - not playing now")
-            return
+        when (audio.requestAudioFocus(focus)) {
+            AudioManager.AUDIOFOCUS_REQUEST_GRANTED -> Unit
+            AudioManager.AUDIOFOCUS_REQUEST_DELAYED -> {
+                // During a call: it starts when the call ends, the GAIN that comes then.
+                MyCarLog.i("cinema: the phone's sound is busy (a call) - playing once it's free")
+                pausedForFocus = true
+                pausedAt = SystemClock.elapsedRealtime()
+                return
+            }
+            else -> {
+                MyCarLog.i("cinema: the phone's sound is busy - not playing now")
+                return
+            }
         }
         if (ended) {
             player.seekTo(0)
@@ -467,6 +482,7 @@ private class Playback(private val context: Context, private val media: CinemaMe
 
     fun release() {
         if (released) return
+        if (CinemaNow.pause === pauseHook) CinemaNow.pause = null
         leave()
         released = true
         main.removeCallbacks(autoRetry)

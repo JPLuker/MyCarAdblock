@@ -626,7 +626,10 @@ class MyCarRunner(
             sendControl = { id, body -> send(id, body, encrypted = true) },
             // The driver picked the radio or another source on the car: pause the phone's music
             // as Android Auto does, instead of letting it play on to no one.
-            onTakenBack = { CarServices.pausePhoneMedia("the car switched to another source") },
+            onTakenBack = {
+                CarServices.pausePhoneMedia("the car switched to another source")
+                io.github.sirionero.mycar.car.CinemaNow.pauseForCar()
+            },
         )
         if (CarSettings.pipeAudio.value) {
             openChannel(media.serviceId)
