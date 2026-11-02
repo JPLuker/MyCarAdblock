@@ -118,6 +118,9 @@ EXTRA="--ez demoSong true --es playerSize 1.2" shoot split-large 1920 720 240 "$
 EXTRA="--ez demoSong true --es playerSize 1.2" shoot split-large-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.4" shoot split-extra 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.4" shoot split-extra-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
+# The same with the car's screen at Extra large: the player as big as leaves the map room for an app's
+# card (MAP_PANE_MIN_EDGE) and itself room for its X over the glass.
+EXTRA="--ez demoSong true --es playerSize 1.4 --es carScale 1.5" shoot split-extra-xl-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
 # The lyrics beside the map at Extra large, from the player's Lyrics button (the fourth of its bottom
 # row): the made-up song has none, so the cover above one line where there's room (1920x720), the line
 # alone at 800x480; 4 s later the player has the column back.

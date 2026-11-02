@@ -137,7 +137,6 @@ fun CarHome() {
     // there keeps its size.
     val music = sideApp?.template == null && sideApp?.builtIn != BuiltInApps.Plancia
     val playerSize by CarSettings.playerSize.collectAsStateWithLifecycle()
-    val sideScale = if (music) playerSize else 1f
     // The map alone with music on (the column closed with its X, the dock's song, or Close beside an
     // app): the mini player floats over it instead (see MapMiniPlayer); not while the map is panned.
     // Its song as the column would draw it: the last one during the column's hold, whatever is beside the map.
@@ -149,6 +148,9 @@ fun CarHome() {
     // screen or not - only the gap between the two panes when the player is sharing the screen
     // with the map.
     HomePager(onHome) { inView ->
+    androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
+    // As far as it fits: the map keeps room for an app's card over it, the column for its X over the glass.
+    val sideScale = if (music) sideScaleFor(playerSize, maxWidth.value - 8f, maxHeight.value, MAP_PANE_MIN_EDGE.value + 24f) else 1f
     Row(
         Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -179,6 +181,7 @@ fun CarHome() {
                 else -> GlassDockedPlayer(shownNow, side, startingApp = mediaApp?.label?.takeIf { reserved && !shownNow.isActive })
             }
         }
+    }
     }
     }
 }
@@ -262,9 +265,6 @@ private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame
     // No map drawn yet (starting, stopped, failed): the mini player over the message, which keeps the middle.
     if (mini != null) MapMiniPlayer(mini, Modifier.fillMaxSize())
 }
-
-/** The side's share of the screen beside the map at Small: one part to the map's 2.1. */
-private const val MAP_SHARE = 3.1f
 
 /** How long the music's column waits, once nothing plays, before giving the map its width back. */
 private const val MUSIC_HOLD_MS = 6_000L

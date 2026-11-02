@@ -58,6 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import io.github.sirionero.mycar.R
+import androidx.compose.ui.zIndex
 import io.github.sirionero.mycar.car.design.AppIcon
 import io.github.sirionero.mycar.car.design.MyCarCarTheme
 import io.github.sirionero.mycar.car.design.MyCarPalette
@@ -125,10 +126,11 @@ internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp:
                         AppIcon(appIcon, null, NO_COVER_ICON)
                     }
                 }
-                // Dark glass, so it shows on a white cover as well as a black one.
+                // Dark glass, so it shows on a white cover as well as a black one. Drawn, and touched,
+                // over the glass pane where a short column brings the two together.
                 GsIconButton(
                     Icons.Filled.Close, stringResource(R.string.car_player_close), navigator::closeSidePanel,
-                    Modifier.align(Alignment.TopEnd).padding(10.dp),
+                    Modifier.align(Alignment.TopEnd).zIndex(1f).padding(10.dp),
                     colors = GsColors(Color.Black.copy(alpha = 0.4f), Color.White),
                     size = 52.dp, iconSize = 24.dp, shape = CircleShape,
                 )
