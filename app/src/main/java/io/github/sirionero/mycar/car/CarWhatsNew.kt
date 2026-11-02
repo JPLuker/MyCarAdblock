@@ -103,10 +103,10 @@ fun CarWhatsNew() {
                     }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    GsSwitch(afterUpdates) { on ->
+                    GsSwitch(afterUpdates, onCheckedChange = { on: Boolean ->
                         if (!on && !open) keepShown = true
                         CarSettings.setWhatsNewAfterUpdates(on)
-                    }
+                    })
                     Text(
                         stringResource(R.string.car_whatsnew_show_after_updates),
                         style = MaterialTheme.typography.titleMedium,
