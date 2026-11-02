@@ -334,7 +334,7 @@
     <string name="music_sign_out">Выйти</string>
     <string name="music_sign_out_detail">Из этого сервиса в myCar, на телефоне и в автомобиле</string>
     <string name="music_hide_app">Скрыть приложение %1$s на телефоне</string>
-    <string name="music_hide_app_detail">В сетке приложений автомобиля остаётся только %1$s внутри myCar: приложение %1$s на этом телефоне не показывается, так что их не два.</string>
+    <string name="music_hide_app_detail">В сетке приложений автомобиля остаётся только %1$s внутри myCar: приложение %1$s на этом телефоне не показывается, чтобы не было двух одинаковых.</string>
     <string name="music_sign_out_title">Выйти из %1$s?</string>
     <string name="music_sign_out_text">myCar забудет вход в %1$s и то, что сохранили его страницы. Ваш аккаунт останется как есть.</string>
     <string name="music_add">Добавить сервис</string>

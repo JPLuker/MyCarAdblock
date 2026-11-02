@@ -42,7 +42,7 @@
     <string name="car_apps_reset_order">App-Reihenfolge zurücksetzen</string>
     <string name="car_apps_hide_from_grid">In der App-Übersicht ausblenden</string>
     <string name="car_apps_show_on_grid">In der App-Übersicht anzeigen</string>
-    <string name="car_apps_hidden_toast">Ausgeblendet: %1$s. Zurück holst du sie unter Einstellungen, Ausgeblendete Apps.</string>
+    <string name="car_apps_hidden_toast">Ausgeblendet: %1$s. Du holst sie unter „Einstellungen“, „Ausgeblendete Apps“ zurück.</string>
 
     <string name="car_map_starting">%1$s wird gestartet…</string>
     <string name="car_map_starting_unknown">Die Karte wird gestartet…</string>

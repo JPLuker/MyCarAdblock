@@ -300,7 +300,7 @@
     <string name="settings_car_pages_ready_text">你的页面将被预设页面替换：地图左侧是天气和日程；如果已设置或安装 Plancia，右侧是 Plancia 和浏览器。</string>
     <string name="settings_car_fit_offline">连接车辆后即可适配其屏幕：每次修改都会立即显示在车机上。</string>
     <string name="settings_grid_apps">车机应用网格中的应用</string>
-    <string name="settings_grid_apps_all">全部显示</string>
+    <string name="settings_grid_apps_all">已全部显示</string>
     <plurals name="settings_grid_apps_hidden">
         <item quantity="other">已隐藏 %d 个</item>
     </plurals>

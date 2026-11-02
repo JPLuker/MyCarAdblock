@@ -11,7 +11,7 @@
     <string name="car_settings_size_medium">Μεσαίο</string>
     <string name="car_settings_player_size">Μέγεθος του προγράμματος αναπαραγωγής δίπλα στον χάρτη</string>
     <string name="car_settings_hidden_apps">Κρυφές εφαρμογές</string>
-    <string name="car_settings_hidden_apps_none">Καμία. Για να κρύψετε μια εφαρμογή, κρατήστε την πατημένη στο πλέγμα εφαρμογών και επιλέξτε Απόκρυψη από το πλέγμα εφαρμογών.</string>
+    <string name="car_settings_hidden_apps_none">Καμία. Για να κρύψετε μια εφαρμογή, κρατήστε την πατημένη στο πλέγμα εφαρμογών και επιλέξτε «Απόκρυψη από το πλέγμα εφαρμογών».</string>
     <string name="car_settings_hidden_apps_show">Εμφάνιση</string>
     <string name="car_settings_app_theme">Θέμα εφαρμογής</string>
     <string name="car_settings_app_theme_phone">Όπως το τηλέφωνο</string>

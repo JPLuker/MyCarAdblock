@@ -307,7 +307,7 @@
         <item quantity="one">%d ausgeblendet</item>
         <item quantity="other">%d ausgeblendet</item>
     </plurals>
-    <string name="settings_grid_apps_note">Entferne den Haken bei einer App, damit sie nicht in der App-Übersicht des Autos erscheint. Im Auto: Halte eine App gedrückt und wähle In der App-Übersicht ausblenden. Eine im Dock angeheftete App bleibt dort.</string>
+    <string name="settings_grid_apps_note">Entferne den Haken bei einer App, damit sie nicht in der App-Übersicht des Autos erscheint. Im Auto: Halte eine App gedrückt und wähle „In der App-Übersicht ausblenden“. Eine im Dock angeheftete App bleibt dort.</string>
     <string name="theme_title">Design</string>
     <string name="theme_footer">So sieht myCar auf dem Telefon aus. Der Bildschirm des Autos hat sein eigenes, in den Einstellungen des Autos.</string>
     <string name="theme_phone">Wie das Telefon</string>
@@ -327,8 +327,8 @@
     <string name="music_sign_in_title">%1$s: anmelden</string>
     <string name="music_sign_out">Abmelden</string>
     <string name="music_sign_out_detail">Von diesem Dienst in myCar, auf dem Telefon und im Auto</string>
-    <string name="music_hide_app">%1$s-App des Telefons ausblenden</string>
-    <string name="music_hide_app_detail">In der App-Übersicht des Autos bleibt nur %1$s in myCar: Die %1$s-App dieses Telefons erscheint dort nicht, so gibt es sie nicht doppelt.</string>
+    <string name="music_hide_app">App „%1$s“ des Telefons ausblenden</string>
+    <string name="music_hide_app_detail">In der App-Übersicht des Autos bleibt nur %1$s in myCar: Die App „%1$s“ dieses Telefons erscheint dort nicht, so gibt es sie nicht doppelt.</string>
     <string name="music_sign_out_title">Von %1$s abmelden?</string>
     <string name="music_sign_out_text">myCar vergisst die Anmeldung bei %1$s und was seine Seiten gespeichert haben. Dein Konto bleibt, wie es ist.</string>
     <string name="music_add">Dienst hinzufügen</string>

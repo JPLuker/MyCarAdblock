@@ -307,7 +307,7 @@
         <item quantity="one">%d nascosta</item>
         <item quantity="other">%d nascoste</item>
     </plurals>
-    <string name="settings_grid_apps_note">Togli la spunta a un\'app per tenerla fuori dalla griglia delle app dell\'auto. In auto: tieni premuta un\'app e scegli Nascondi dalla griglia delle app. Un\'app fissata nel dock resta lì.</string>
+    <string name="settings_grid_apps_note">Togli la spunta a un\'app per tenerla fuori dalla griglia delle app dell\'auto. In auto: tieni premuta un\'app e scegli «Nascondi dalla griglia delle app». Un\'app fissata nel dock resta lì.</string>
     <string name="theme_title">Tema</string>
     <string name="theme_footer">L\'aspetto di myCar sul telefono. Lo schermo dell\'auto ha il suo, nelle impostazioni dell\'auto.</string>
     <string name="theme_phone">Come il telefono</string>
