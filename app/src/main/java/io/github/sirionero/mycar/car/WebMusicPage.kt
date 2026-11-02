@@ -59,6 +59,14 @@ internal class WebMusicPages(private val context: Context) : WebMusicPlayer.Page
 
     init {
         WebMusicPlayer.pages = this
+        // Music that was playing on the screen before this one, in the same drive: on again. Always
+        // emptied: at the end of a drive the old screen still fills it.
+        val again = WebMusicPlayer.resumeAfterRebuild
+        WebMusicPlayer.resumeAfterRebuild = emptyList()
+        if (CarServices.mediaDecided.value) again.forEach { service ->
+            MyCarLog.i("music: ${service.id}: playing again on the new car screen")
+            open(service)?.act("play")
+        }
         // A service turned off on the phone leaves the car at once: its page goes, its music with it.
         scope.launch {
             WebMusic.on.collect { on ->
@@ -76,6 +84,8 @@ internal class WebMusicPages(private val context: Context) : WebMusicPlayer.Page
         if (service.id in WebMusic.on.value) page(service).also { it.make() } else null
 
     fun destroy() {
+        // Before the pages go (they report an empty state as they do).
+        WebMusicPlayer.resumeAfterRebuild = pages.values.map { it.service }.filter { WebMusicPlayer.state(it.id).value.playing }
         scope.cancel()
         if (WebMusicPlayer.pages === this) WebMusicPlayer.pages = null
         pages.values.forEach { it.destroy() }
@@ -121,6 +131,7 @@ internal class WebMusicPage(
 
     /** A button that came before the page could take it: sent once it can. */
     private var pending: Pair<String, Double?>? = null
+    private var lastCrashResume = 0L
     private var wasPlaying = false
 
     /** A voice search under way, until its first Play is pressed or isn't found. */
@@ -541,6 +552,7 @@ internal class WebMusicPage(
             (view.parent as? ViewGroup)?.removeView(view)
             runCatching { view.destroy() }
             if (view === web && !released) {
+                val was = WebMusicPlayer.state(service.id).value.playing
                 loaded = false
                 viewport = 0
                 widthScript = null
@@ -550,6 +562,13 @@ internal class WebMusicPage(
                 field.value = null
                 WebMusicPlayer.report(service.id, WebPlayerState())
                 web = createWebView()
+                // Playing when it closed: the new page plays again at its first message. Once a minute
+                // at most, in case the page itself is what ends the engine.
+                val at = SystemClock.uptimeMillis()
+                if (was && at - lastCrashResume > CRASH_RESUME_GAP_MS) {
+                    lastCrashResume = at
+                    pending = "play" to null
+                }
                 place()
                 loadSoon()
             }
@@ -562,6 +581,8 @@ internal class WebMusicPage(
         const val AFTER_MS = 2_500L
         const val LAYOUT_WAIT_MS = 400L
         const val HEARD_WAIT_MS = 5_000L
+        /** A page that closes again within this, playing, is opened again paused. */
+        const val CRASH_RESUME_GAP_MS = 60_000L
         const val RETRIES = 20
         const val RETRY_MS = 1_000L
 

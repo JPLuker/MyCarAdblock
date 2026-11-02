@@ -39,6 +39,7 @@ import io.github.sirionero.mycar.car.Prefetch
 import io.github.sirionero.mycar.stats.UsageStats
 import io.github.sirionero.mycar.ui.MyCarApp
 import io.github.sirionero.mycar.ui.MyCarTheme
+import io.github.sirionero.mycar.webmusic.WebMusicPlayer
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
@@ -540,6 +541,9 @@ class MyCarActivity : ComponentActivity(), Projection {
         }
         screenProjector?.stop()
         screenProjector = null
+        // Sharing the phone's screen stops the web music, as it stops the sound's capture: not again
+        // when the car's screen comes back.
+        WebMusicPlayer.resumeAfterRebuild = emptyList()
         PhoneMirror.begin(token, target, frameWidth, frameHeight, frameDensity)
         if (PhoneMirror.active.value) PhoneMirror.launchPending(this) else showCarUi()
     }
