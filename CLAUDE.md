@@ -210,7 +210,7 @@ Modulo unico `:app` (cartella `app/`), package `io.github.sirionero.mycar`. UI *
 | radice | Protocollo AA: `MyCarRunner` (sessione, canali, video/audio), `SessionService` (servizio in primo piano del viaggio), `Tailnet` (Tailscale/VPN per i messaggi di Plancia e Xonos), `Framing`, `Protobuf`, `PhoneTls`, `ServiceDiscovery`, `CertProvider` / `CertDownloader`, `VideoSource` (encoder), `ScreenProjector` (VirtualDisplay + `Presentation` con Compose → encoder → auto), `MyCarActivity` (possiede la sessione USB/wireless), `PermissionActivity` (la domanda di Android sul telefono per un tocco sull'auto), `MyCarLog`, `AppLanguage` (la lingua di myCar) e `Words` (i suoi testi fuori dalle schermate), `MyCarApplication` |
 | `car/` | **UI mostrata sull'auto**: `CarUi` (root: tema, navigazione, overlay, transizioni), `CarDock` (dock a sinistra), `CarHomeScreen` (mappa + player), `HomePager` / `HomePages` / `HomeWidgets` (pagine della Home ai lati della mappa, widget meteo e agenda), `GlassPlayer` (player accanto alla mappa), `CarLauncher` (griglia app a pagine), `PhoneAssistants` (assistente vocale a scelta), `AssistantLanguage` + frasari (l'assistente nella lingua di myCar), `AssistantBrain` (quello che non è un comando va a Home Assistant), `WallpaperPicker`, `MediaScreen`, `PhoneDialerScreen` / `PhoneRecents` (Telefono: Recenti, contatti, tastierino), `QuickReplyTexts` (risposte rapide nella lingua di myCar), `CallOverlay`, `CarDashboardScreen`, `CarSettingsScreen`, `PlanciaApp` / `PlanciaWeb` / `PlanciaScripts` (Plancia integrata), `CinemaApp` / `CinemaShelves` / `CinemaPlayer` / `CinemaContinue` (Cinema in auto), `CarDriving` (stato di guida detto dall'auto, per il video), `CarWebContext` (il contesto di ogni WebView sullo schermo dell'auto), `WebSelect` (menu a tendina delle pagine), `AppLinks` (link alle app nelle pagine), `TemplateBack` / `BackCloses` (tasto Indietro dell'auto), `WebMusicApp` / `WebMusicPage` / `WebMusicScripts` (i lettori web dei servizi musicali), `CarClipboard` (appunti tra telefono e auto nella tastiera dell'auto), `CarNavigator` (stack schermate `CarScreen`), template Car App Library (`Template*`) |
 | `car/theme/` | Design system attuale dei controlli: `GsTheme` / `ControlLook` (temi Flat/Tactile/Keycap), `GsControls` (`GsButton`, `GsIconButton`, `gsColors`), `GsSeekBar`, `GsSwitch` |
-| `ui/` | **UI sul telefono**: onboarding (`IntroScreen` col veliero `PirateShip`, `SetupScreen`; le vecchie `CertSetupScreen` / `SetupGuideScreen`), `UpdateSplash` (la bandiera dopo ogni aggiornamento), `HomeScreen`, `SettingsScreen`, `LanguageSettings` (la lingua), `IntroLanguage` (la pagina della lingua nell'introduzione), `CarScreenSettings` (le impostazioni dell'auto sul telefono, coi pezzi `Pick`/`PickRow`/`PickDialog`/`SwitchRow`), `CarPagesSettings` (le pagine accanto alla mappa dal telefono), `AssistantSettings` (l'assistente vocale, in Voce), `MusicSettings` (la sezione Musica: Xonos, Spotify e gli altri servizi), `PlanciaSettings` (account di Home Assistant per Plancia), `XonosSettings` (account di Music Assistant per Xonos, nella sezione Musica), `CinemaSettings` (siti di Cinema e "Video only when parked"), `MyCarTheme` (Material You), `AboutLinks` (link, donazioni, avvisi di licenza) |
+| `ui/` | **UI sul telefono**: onboarding (`IntroScreen` col veliero `PirateShip`, `SetupScreen`; le vecchie `CertSetupScreen` / `SetupGuideScreen`), `UpdateSplash` (la bandiera dopo ogni aggiornamento), `HomeScreen`, `SettingsScreen`, `LanguageSettings` (la lingua), `IntroBadges` (i distintivi animati delle pagine dell'introduzione della 0.7 e la fila dei servizi musicali), `CarScreenSettings` (le impostazioni dell'auto sul telefono, coi pezzi `Pick`/`PickRow`/`PickDialog`/`SwitchRow`), `CarPagesSettings` (le pagine accanto alla mappa dal telefono), `AssistantSettings` (l'assistente vocale, in Voce), `MusicSettings` (la sezione Musica: Xonos, Spotify e gli altri servizi), `PlanciaSettings` (account di Home Assistant per Plancia), `XonosSettings` (account di Music Assistant per Xonos, nella sezione Musica), `CinemaSettings` (siti di Cinema e "Video only when parked"), `MyCarTheme` (Material You), `AboutLinks` (link, donazioni, avvisi di licenza) |
 | `host/` | Host Car App Library per app di terze parti (`CarAppConnection`, `KnownApps`) |
 | `cinema/` | Cinema: `Cinema` (i siti, "solo a macchina ferma", `MORE` suggeriti), `SiteIcons` (l'icona che ogni sito dà di sé, scaricata e tenuta sul telefono), `PhoneVideos` (video del telefono), `TvLists` + `M3u` (liste IPTV), `ChannelLogos` |
 | `home/` | Home Assistant di Plancia integrata: `HomeAssistant` (account, collegamento per tutto il viaggio, plance, import dall'app Plancia), `HaClient` (WebSocket, OkHttp), `Panels` (plance e titoli), `Assist` + `AssistPlan` (le domande all'assistente vocale di Home Assistant) |
@@ -669,8 +669,8 @@ Tutti i token in un solo posto, `car/design/`:
 - **Lingue** (0.6.0, richiesta dell'utente: "tutta l'applicazione, non solo l'assistente", le lingue
   di Xonos): myCar in inglese, italiano, spagnolo, tedesco, francese, portoghese (brasiliano, come
   Xonos), greco, russo e cinese semplificato (`AppLanguage`): quella del telefono finché non se ne
-  sceglie una in Impostazioni > Lingua (`ui/LanguageSettings.kt`) o nella pagina "La tua lingua."
-  dell'introduzione della 0.6 (`ui/IntroLanguage.kt`). Da Android 13 la tiene Android
+  sceglie una in Impostazioni > Lingua (`ui/LanguageSettings.kt`; l'introduzione della 0.6 aveva anche
+  la pagina "La tua lingua.", tolta nella 0.7). Da Android 13 la tiene Android
   (`LocaleManager`, `res/xml/locales_config.xml`: si sceglie anche dalle impostazioni di Android per
   l'app) e vale per tutto il processo senza riavvii (MyCarActivity gestisce il cambio di `locale`); su
   Android 12 la applica myCar (`MyCarApplication` → `applyToProcess`, `wrap` nelle activity,
@@ -760,6 +760,23 @@ Tutti i token in un solo posto, `car/design/`:
   stesso telo, `drawCloth`) sull'albero maestro; mare a tre strati, scia, spruzzi, ombra, gabbiani,
   sole e luccichio; col tema scuro luna, stelle e mare cupo. Tutto nel solo disegno (orologio di 120 s
   su cui tornano tutti i periodi). Una nuova installazione non vede né l'una né l'altro.
+- **Introduzione della 0.7** (richiesta dell'utente: "un grande aggiornamento" col veliero, e l'intro che
+  presenta le novità dalla 0.6): parte da sola quando `versionName` diventa 0.7.x (`Intro.release`). Pagine
+  (`IntroStep`): WELCOME (veliero, etichetta "alpha · smooth sailing", in italiano "a gonfie vele": in ogni
+  lingua un modo di dire sul navigare), MUSIC ("Music, built in.": Spotify e gli altri servizi dal loro
+  lettore web, accesso col proprio account in Impostazioni > Musica, l'app Spotify del telefono da nascondere;
+  sotto scorre la fila dei servizi, `ServiceTicker`, dal catalogo di `WebMusic` più Xonos, senza Apple Music:
+  niente nome Apple sulle pagine di myCar), MINI_PLAYER (mini lettore e lettore fino a Molto grande), LYRICS,
+  LOCATION (posizione col telefono bloccato in tasca), CAR_ON_PHONE (impostazioni dell'auto, pagine e app
+  nascoste dal telefono), VOICE e GRAPHENE come prima. Tolte LANGUAGE, WIRELESS, KNOBS, THEME, APPS (non
+  dicono niente di nuovo a chi viene dalla 0.6) coi loro testi e `ui/IntroLanguage.kt`. Distintivi animati
+  nuovi in `ui/IntroBadges.kt` (nota che balla, mini lettore spostato sullo schermo, righe del testo che si
+  accendono, freccia con gli anelli, telefono con due interruttori), dentro il solito biscotto di
+  `BadgeStep`. Titoli di circa dieci lettere per riga (il carattere segue la larghezza): niente parole
+  lunghe. Il passo salvato vale solo per la sua release (`step_release`): una pagina lasciata a metà
+  dell'intro della 0.6 non fa saltare le prime della 0.7. Scatti: `setup-phone/09-intro-page-2…7` e, per
+  lingua, `lang-<lingua>/phone/intro-page-2…7`. Provato col banco Compose Desktop (sopra, "Build"): le
+  pagine nuove in inglese, greco, russo, tedesco, francese e cinese stanno anche a 320×640 dp.
 - Condivisione schermo (`mirror/`): mentre il telefono è copiato in auto, `TouchRelayService`
   (accessibilità, già usato per i tocchi) aggiunge un pixel trasparente
   `TYPE_ACCESSIBILITY_OVERLAY` con `screenOrientation = LANDSCAPE` (fisso, non sensore) che gira il
@@ -1225,7 +1242,7 @@ Tutti i token in un solo posto, `car/design/`:
   Nelle schede i tasti stanno uno sotto l'altro: affiancati, su un telefono stretto il secondo
   diventava una colonna di lettere. Scatti in CI: `setup-phone` (installa senza permessi, scarica
   davvero i certificati, tocca i tasti per testo con uiautomator, scorre a piccoli passi; schermo
-  dell'emulatore 320×640; in fondo `09-intro-1…4`, il veliero dell'intro con le animazioni accese, e
+  dell'emulatore 320×640; in fondo `09-intro-1…4`, il veliero dell'intro con le animazioni accese, `09-intro-page-2…7` le sue pagine dopo, e
   `10-update-1…4`, la bandiera dopo un aggiornamento, con le preferenze scritte via `run-as`). Verificato (0.5.14): lista dal titolo, certificati scaricati e
   controllati, Android Auto tenuto, un "Allow" con sei domande di Android in fila, tutto spuntato,
   Home senza "Finish setting up", ritorno dalla Guida, e con i contatti tolti di nuovo "Allow".
