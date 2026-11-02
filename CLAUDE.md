@@ -1114,6 +1114,29 @@ Tutti i token in un solo posto, `car/design/`:
   dell'auto (`CinemaNow`) e che parte dopo una chiamata (focus ritardato). **Lasciati**: i puntini delle
   pagine a 56 dp (con la decisione sulla striscia sopra i contenuti), il ripiego del cavo sul senza fili.
   Non provato in un'auto vera.
+- **Setaccio 7** (0.6.8, stesso branch; richiesta dell'utente: "controlla anche l'assistente, l'autoplay
+  delle app tipo Spotify, le notifiche che non interrompano i servizi, la mappa (Vela) non funziona più
+  benissimo"): tre cacce (assistente, musica web, mappa dal lato di myCar), ogni punto verificato da uno
+  scettico. **Mappa**: la colonna della musica si chiude solo dopo 6 s senza musica (`MUSIC_HOLD_MS` in
+  `CarHome`, si disegna l'ultimo brano attivo): ogni cambio di larghezza è una superficie nuova per l'app della
+  mappa (due passaggi, Vela ridisegnava); area visibile che parte dal bordo vero della scheda della lista
+  (`MAP_PANE_MIN_EDGE` = 244 dp, `visibleAreaFor(…, minPanePx)`); scheda della svolta al massimo il 60%
+  della mappa. Non è dimostrato che fosse questa la causa di "Vela non va benissimo": va provato in auto.
+  **Musica web**: aprire un servizio (griglia, dock, voce: `launchEntry`) fa `openMedia(autoplay = true)`,
+  Autoplay o no; un Play che ha aspettato la pagina (`patient`) si riprova fino a 45 s dall'avvio della
+  pagina (`BOOT_MS`), e dopo una risposta "page" che non suona si rimanda dopo 4 s (`PLAY_CHECK_MS`), finché
+  è la musica dell'auto e non c'è stato un altro tasto (`acts`); mai un secondo clic sul tasto play/pausa
+  della barra. Schermo dell'auto rifatto (encoder nuovo) → `WebMusicPlayer.resumeAfterRebuild`, svuotato
+  dalla condivisione dello schermo; pagina caduta (renderer) → riparte se suonava, una volta al minuto.
+  Spotify Connect: l'orologio della barra che avanza senza niente che suona qui (`remote` nello script) conta
+  come musica altrove: il Play non clicca, l'auto lo dice una volta (`car_web_music_elsewhere`). Notifiche:
+  i popup sono muti, il focus transitorio di voce e assistente lo riprende il WebView da solo (smentiti dagli
+  scettici i due punti contrari). **Assistente**: motore di sintesi rifatto al viaggio dopo se non parte o
+  smette di parlare (`ttsFailed`, come `DirectionsVoice`); niente ascolto né risposta vocale durante lo
+  squillo; un solo `VoiceFocus` dalla domanda alla risposta (in `CarUi`, try/finally); tasto voce in
+  condivisione schermo → `PhoneMirror.requestStop()`; riconoscimento del telefono con la musica in pausa
+  (`systemFocus`); `stopVoice` chiude tutte le frasi in corso; niente bip per un ascolto annullato durante il
+  caricamento del modello. Non provato con un account Spotify vero né in auto con Vela.
 - **Prima connessione** (`ui/SetupScreen.kt`, `setup/`): una lista sola, "Set up myCar", al primo
   avvio (al posto di `CertSetupScreen` + le pagine di `SetupGuideScreen`, ancora nel codice finché
   la nuova non è provata sul telefono) e ogni volta che si torna con "Take me back to the initial

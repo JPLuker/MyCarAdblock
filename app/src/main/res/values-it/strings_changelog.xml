@@ -10,6 +10,9 @@
         <item>Messaggi col motivo vero: il certificato o la data dell\'auto senza fili, un avvio col cavo che si ferma (con cosa fare) e uno schermo dell\'auto che non si riesce a disegnare (myCar chiude e lo dice, invece dello schermo nero).</item>
         <item>Audio: le indicazioni seguono la strada di ogni auto e tacciono durante le chiamate; Cinema si ferma quando l\'auto passa alla radio e parte quando finisce una chiamata.</item>
         <item>Voce: il telefono dice che l\'assistente è pronto solo con tutti i modelli che gli servono, e la prima configurazione offre di nuovo il download della voce.</item>
+        <item>La mappa resta ferma quando cambia la musica: la colonna del lettore aspetta qualche secondo prima di chiudersi, così Vela e le altre mappe tengono la loro superficie, e accanto al lettore l\'area in cui disegnano è quella giusta.</item>
+        <item>Spotify e gli altri servizi musicali dentro myCar: aperti, suonano il brano della loro barra, l\'Autoplay aspetta che la pagina sia pronta, la musica riparte dopo che lo schermo dell\'auto si rifà, e myCar dice quando Spotify suona su un altro dispositivo.</item>
+        <item>Assistente: una sola pausa dalla domanda alla risposta, niente ascolto mentre squilla una chiamata, la voce torna al viaggio dopo se il motore vocale del telefono si era fermato, e il tasto voce durante la condivisione dello schermo riporta a myCar.</item>
         <item>Inoltre: la X del testo riporta il lettore, una nuova scelta accanto alla mappa si vede subito, il tasto Indietro dell\'auto chiude Novità e le schede del Bluetooth, e «Fatto» dopo l\'accesso a un servizio musicale.</item>
     </string-array>
     <string-array name="changelog_43">

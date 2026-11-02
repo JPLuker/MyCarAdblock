@@ -10,6 +10,9 @@
         <item>Des messages avec la vraie cause : le certificat ou la date de la voiture en Wi-Fi, un démarrage par câble qui s’arrête (avec quoi faire) et un écran de voiture impossible à dessiner (myCar ferme et le dit, au lieu de l’écran noir).</item>
         <item>Son : les indications vocales suivent la route de chaque voiture et se taisent pendant les appels ; Cinéma se met en pause quand la voiture passe à la radio et démarre à la fin d’un appel.</item>
         <item>Voix : le téléphone dit que l’assistant est prêt seulement avec tous les modèles nécessaires, et la première configuration propose de nouveau de télécharger la voix.</item>
+        <item>La carte ne bouge plus quand la musique change : la colonne du lecteur attend quelques secondes avant de se fermer, ainsi Vela et les autres cartes gardent leur surface, et à côté du lecteur la zone autour de laquelle elles dessinent est la bonne.</item>
+        <item>Spotify et les autres services de musique dans myCar : à l’ouverture, le titre de leur barre se lance, la lecture automatique attend que la page soit prête, la musique continue après que l’écran de la voiture est refait, et myCar vous dit quand Spotify joue sur un autre appareil.</item>
+        <item>Assistant : une seule pause de la question à la réponse, pas d’écoute pendant qu’un appel sonne, sa voix revient au trajet suivant si le moteur vocal du téléphone s’était arrêté, et la touche vocale pendant le partage d’écran ramène à myCar.</item>
         <item>Aussi : le X des paroles ramène le lecteur, un nouveau choix à côté de la carte s’affiche tout de suite, le bouton Retour de la voiture ferme Nouveautés et les cartes Bluetooth, et « OK » après la connexion à un service de musique.</item>
     </string-array>
     <string-array name="changelog_43">

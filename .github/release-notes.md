@@ -1,4 +1,4 @@
-myCar 0.6.8-alpha: hide apps from the car's grid, one Spotify instead of two, the player beside the map in three sizes, and a day of fixes for connecting, the sound and the car's screen.
+myCar 0.6.8-alpha: hide apps from the car's grid, one Spotify instead of two, the player beside the map in three sizes, Spotify inside myCar that plays by itself, a steadier map, and a day of fixes for connecting, the sound, the assistant and the car's screen.
 
 ## New
 - **Hide an app** from the car's app grid: hold it (on the grid or in the dock) and choose "Hide from the app grid". The car says where it comes back from: Settings > Hidden apps, each with Show. On the phone, Settings > Car screen > "Apps on the car's app grid" lists every app with a tick. Settings itself can't be hidden; a hidden app pinned to the dock stays there, and the voice assistant still opens it by name.
@@ -32,7 +32,26 @@ myCar 0.6.8-alpha: hide apps from the car's grid, one Spotify instead of two, th
 - After signing in to a music service, back on its player, the bar says its name with "Done".
 - "Beside the map" shows the music when the app chosen is gone. On Android 12 "Connect wirelessly" names the precise location when that's what is missing. An update ready during a wireless drive says "Disconnect from the car", not "Unplug".
 
-Found by two independent bug hunts (connection, sound, car screen, phone), each point checked by a skeptical second reader and in the code, and an independent review of the new features and of the fixes. Checked in the emulator: the app menu with Hide, the grid without the app and the car's notice, Hidden apps, the player at Medium and Large (1920x720 and 800x480), the phone's list of apps and the size choice. Every commit compiled and unit-tested in CI. Not tried in a real car.
+## The map (Vela and the others)
+- The player's column beside the map closed and opened again whenever the music app reconnected, the music changed app, between two songs or when a web player's page reloaded. Every width of the map is a new surface for its app, so the map app was handed its map twice and drew it again (Vela redrew from scratch). The column now waits 6 seconds without music before giving the map its width back; it still opens at once, and the X or music closed by the driver closes it at once.
+- Beside the player (more so at Medium and Large, or with a large size for the car's screen) the area a map app was told it could use started at 42% of the map, while the list card next to it is at least 232 dp wide: 45-65 dp of map behind the card counted as visible, and a route or a result could end up there. The area now starts at the card's real edge.
+- On a narrow map the turn card, always 320 dp, covered up to 80% of the width and went under the map's buttons: now at most 60%.
+
+## Spotify and the music services inside myCar
+- Opening a service from the grid, the dock or by voice plays the song in its bar, Autoplay or not (nothing chosen there: its Play does nothing). It used to open paused, and only the wheel's Play or myCar's Play started it.
+- Autoplay at the start of a drive: the Play went to the page once, at its first message, and counted as done whatever the page answered, so with Spotify still starting or a slow network it was lost. It is now tried until 45 seconds after the page starts, and a Play the page's player took but that plays nothing yet is sent again after 4 seconds while this is the car's music and nothing else was pressed. Never a second click on Spotify's own button, which plays and pauses.
+- When the car's screen is rebuilt (the phone's camera or a video call takes the encoder at a stop) or the web engine's page process ends, the services that were playing play again in the same drive; they stopped for good until someone pressed Play. Not after screen sharing, which stops the music as it stops the capture.
+- Spotify Web controlling another device (Spotify Connect, the phone's app) looked paused, and myCar's Play clicked its one button and stopped that music. Now the bar's clock running by itself counts as music playing elsewhere: Play doesn't click, and the car says once that Spotify is playing on another device. Not tried with a Spotify account.
+- Message popups make no sound, and the assistant and messages read aloud pause a web player for a moment: the web engine takes the music back by itself, so nothing else was needed there (checked in the code).
+
+## Assistant
+- One pause from the question to the answer: the listening gave the music back as soon as the words were read, so with Home Assistant (or an app connecting for "play X") the music came back in the wait and the answer stopped it again.
+- No listening and no voice reply while a call rings (the dock's microphone and the wheel's voice key still worked over the ringtone, and a reply could send words heard in it).
+- A phone speech engine that didn't start at the first drive, or was updated with myCar open, left the assistant mute until myCar's process ended: answers vanished at once and messages weren't read. It is now made again at the next drive (the turns' engine too), and an answer the engine refuses stays on screen long enough to read.
+- The wheel's voice key during screen sharing listened with nothing on the car's screen and lost the command: the sharing now ends and myCar's screen comes back with the assistant (a phone assistant that really opens stays on the shared screen).
+- With the phone's speech recognition the music now pauses while it listens, as with myCar's own; Cancel or the X give the music back even when the speech engine never says it stopped; a listen cancelled while the voice model loads no longer beeps.
+
+Found by three independent bug hunts (connection, sound, car screen, phone; then the assistant, the web music services and the map on myCar's side), each point checked by a skeptical second reader and in the code, and an independent review of the new features and of the fixes. Checked in the emulator: the app menu with Hide, the grid without the app and the car's notice, Hidden apps, the player at Medium and Large (1920x720 and 800x480), the phone's list of apps and the size choice. Every commit compiled and unit-tested in CI. Not tried in a real car.
 
 ## Also in 0.6.7-alpha
 ### Fixes from 0.6.6

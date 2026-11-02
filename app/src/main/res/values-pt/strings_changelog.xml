@@ -10,6 +10,9 @@
         <item>Mensagens com a causa real: o certificado ou a data do carro pelo Wi-Fi, um início pelo cabo que trava (com o que fazer) e uma tela do carro que não dá para desenhar (o myCar encerra e avisa, em vez da tela preta).</item>
         <item>Som: as indicações faladas seguem a rota de cada carro e ficam em silêncio durante as chamadas; o Cinema pausa quando o carro muda para o rádio e começa quando uma chamada termina.</item>
         <item>Voz: o telefone diz que o assistente está pronto só com todos os modelos de que ele precisa, e a configuração inicial volta a oferecer o download da voz.</item>
+        <item>O mapa fica parado quando a música muda: a coluna do player espera alguns segundos antes de fechar, assim o Vela e os outros mapas mantêm a sua superfície, e ao lado do player a área em volta da qual desenham é a certa.</item>
+        <item>Spotify e os outros serviços de música dentro do myCar: ao abrir um, toca a música da barra dele, a reprodução automática espera a página ficar pronta, a música continua depois que a tela do carro é refeita, e o myCar avisa você quando o Spotify toca em outro dispositivo.</item>
+        <item>Assistente: uma só pausa da pergunta à resposta, nada de ouvir enquanto uma chamada toca, a voz dele volta na próxima viagem se o mecanismo de voz do celular tinha parado, e a tecla de voz durante o compartilhamento de tela volta ao myCar.</item>
         <item>Também: o X da letra traz o player de volta, uma nova escolha ao lado do mapa aparece na hora, o botão Voltar do carro fecha Novidades e os cartões do Bluetooth, e “Concluído” depois de entrar num serviço de música.</item>
     </string-array>
     <string-array name="changelog_43">
