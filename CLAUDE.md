@@ -132,7 +132,9 @@ Rispondi sempre in **italiano**.
   "Ponte per <myCar> verso <server>" per ogni connessione. Dopo la compilazione delle app lo script
   ferma i demoni di Gradle e Kotlin: con quella memoria occupata l'emulatore cadeva con Xonos che
   suonava. Un emulatore caduto non blocca più la corsa: adb si arrende dopo 3 minuti, il log di ogni
-  scatto resta in `stream.txt`, gli scatti si pubblicano comunque.
+  scatto resta in `stream.txt`, gli scatti si pubblicano comunque. Dopo una caduta gli scatti che seguono
+  sono PNG vuoti (0 byte) e i loro log sono vuoti: vanno rifatti (contare i PNG sopra 1 KB). Xonos dentro
+  myCar fa cadere l'emulatore ogni tanto: meglio in una corsa a parte (`shots: xonos-inside xonos-side`).
   Con `xonos_server` (e `xonos_ref`) `build-apps.sh` costruisce anche il pacchetto di Music Assistant per
   il telefono che Xonos scarica su richiesta (modulo `:server` + `make_payload.py` di Xonos, solo x86_64:
   Python 3.13 sul runner, FFmpeg e librespot compilati con NDK e Rust, una ventina di minuti), firmato
