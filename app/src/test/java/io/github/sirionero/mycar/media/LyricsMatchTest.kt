@@ -128,6 +128,18 @@ class LyricsMatchTest {
         assertFalse(LyricsMatch.worthAsking(plan.last(), entriesSoFar = 3))
     }
 
+    @Test
+    fun `no artist, no question`() {
+        // Only the title (a web app, an audiobook's chapter), or a channel that names no artist.
+        assertTrue(LyricsMatch.plan(q("Some Song", "", seconds = 200)).isEmpty())
+        assertTrue(LyricsMatch.plan(q("Some Song", "VEVO", seconds = 200)).isEmpty())
+        // A featured artist in the title, or a radio's "ARTIST - TITLE", is one.
+        assertFalse(LyricsMatch.plan(q("Some Song (feat. Someone)", "", seconds = 200)).isEmpty())
+        assertFalse(LyricsMatch.plan(q("QUEEN - DON'T STOP ME NOW", "")).isEmpty())
+        // The title still says instrumental, without asking.
+        assertTrue(LyricsMatch.instrumentalByTitle(q("Some Song (Instrumental)", "")))
+    }
+
     // --- the answers -----------------------------------------------------------------------------
 
     @Test

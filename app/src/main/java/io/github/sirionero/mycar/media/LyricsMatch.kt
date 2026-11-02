@@ -181,9 +181,11 @@ object LyricsMatch {
     /**
      * At most [MAX_ASKS], in order, no question twice: the exact one, then LRCLIB's search by title
      * and main artist, by the loose title, and its search by words last. A radio's "ARTIST - TITLE"
-     * is asked first by the artist it names: the station's name would find nothing.
+     * is asked first by the artist it names: the station's name would find nothing. No artist at all
+     * (an app that gives only the title): nothing, as [fit] couldn't take any entry.
      */
     fun plan(q: SongQuery): List<Ask> {
+        if (q.artist.isEmpty() && q.alt == null && q.names.isEmpty()) return emptyList()
         val asks = LinkedHashSet<Ask>()
         q.alt?.let { (artist, title) -> asks += Ask.Search(title, artist) }
         if (q.artist.isNotEmpty()) asks += Ask.Get(q.title, q.artist, q.durationSec)
