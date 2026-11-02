@@ -250,11 +250,12 @@ internal object WebMusicScripts {
   }
 
   // Whether the bar's clock moves on by itself, read once a second: only its digits, any language.
-  var clockMs = null, clockRunsUntil = 0;
+  var clockMs = null, clockRunsUntil = 0, clockSeen = 0;
   function watchClock() {
     var c = BAR && clock(text(byTestId(BAR.position)));
     if (c && !c.left && clockMs !== null && c.ms > clockMs && c.ms - clockMs <= 3000) clockRunsUntil = Date.now() + 2500;
     clockMs = (c && !c.left) ? c.ms : null;
+    clockSeen = (c && !c.left) ? clockSeen + 1 : 0;
   }
 
   // Said when something changes, and when the position jumps (a seek): not every second.
@@ -293,6 +294,13 @@ internal object WebMusicScripts {
     var s = snapshot(), on = s.playing || s.remote;
     if ((action === 'play' && on) || (action === 'pause' && !on)) return 'already';
     var button = BUTTONS[action] && byTestId(BUTTONS[action]);
+    // The bar's one play/pause button, with its clock just shown: read twice first (a second
+    // apart) to know whether it runs - playing on another device - or a click would pause it there.
+    if (button && !button.disabled && !s.playing && (action === 'play' || action === 'pause') &&
+        BUTTONS[action] === BAR.playPause && clockSeen < 2) {
+      var c = clock(text(byTestId(BAR.position)));
+      if (c && !c.left) return 'wait';
+    }
     if (button && !button.disabled) {
       button.click();
       schedule();

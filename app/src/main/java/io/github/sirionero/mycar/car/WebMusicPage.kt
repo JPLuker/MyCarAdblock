@@ -241,12 +241,12 @@ internal class WebMusicPage(
         if (searching && action == "play" && SystemClock.uptimeMillis() - searchedAt < SEARCH_HOLD_MS) return
         // Made without network (a garage, off screen for the wheel's Play): nothing reloaded it, and
         // the buttons went to the error page. Loaded again now, and the button sent once it's there.
+        acts++
         if (unreachable.value && web != null) {
             pending = action to seconds
             reload()
             return
         }
-        acts++
         send(action, seconds, patient = !heard)
     }
 
@@ -312,7 +312,7 @@ internal class WebMusicPage(
      * the service still starting, is sent again while this is the car's music. Never a second click
      * on the service's own button: it plays and pauses, and a song still loading would be paused.
      */
-    private fun send(action: String, seconds: Double?, patient: Boolean, gen: Int = acts) {
+    private fun send(action: String, seconds: Double?, patient: Boolean, gen: Int = acts, waits: Int = WAITS) {
         val w = web
         if (w == null || !heard) {
             pending = action to seconds
@@ -322,10 +322,19 @@ internal class WebMusicPage(
         if (!ours(w.url)) return
         val arg = seconds?.let { ", $it" } ?: ""
         w.evaluateJavascript("window.__mycarMusicAct ? window.__mycarMusicAct('$action'$arg) : 'no script'") { how ->
-            val trying = patient && gen == acts && web === w && SystemClock.uptimeMillis() - startedAt < BOOT_MS
+            // Still this press, on this page, for the car's music: another press, another page or
+            // another music app chosen meanwhile ends the tries.
+            fun current() = gen == acts && web === w && (action != "play" || isTheCarsMusic())
+            val trying = patient && current() && SystemClock.uptimeMillis() - startedAt < BOOT_MS
+            // "wait": the service's bar has just come, and whether it plays on another device isn't
+            // known yet - a click now could pause it there. A press on a page that has spoken waits too,
+            // a little.
+            val waiting = how == "\"wait\""
             when {
-                trying && (how == "\"none\"" || how == "\"no script\"") ->
-                    main.postDelayed({ send(action, seconds, patient, gen) }, RETRY_MS)
+                trying && (how == "\"none\"" || how == "\"no script\"" || waiting) ->
+                    main.postDelayed({ if (current()) send(action, seconds, patient, gen) }, RETRY_MS)
+                !patient && waiting && waits > 0 && current() ->
+                    main.postDelayed({ if (current()) send(action, seconds, patient, gen, waits - 1) }, RETRY_MS)
                 trying && action == "play" && how == "\"page\"" -> main.postDelayed({
                     if (gen == acts && web === w && !WebMusicPlayer.state(service.id).value.playing && isTheCarsMusic()) {
                         MyCarLog.i("music: ${service.id} play: not playing yet - again")
@@ -615,6 +624,8 @@ internal class WebMusicPage(
         /** A page that closes again within this, playing, is opened again paused. */
         const val CRASH_RESUME_GAP_MS = 60_000L
         const val RETRY_MS = 1_000L
+        /** A press on a page that has spoken, while its bar is too new to tell where it plays: tried this many times more. */
+        const val WAITS = 3
         /** How long a press that waited for the page is tried, from the page's start: a slow network too. */
         const val BOOT_MS = 45_000L
         /** After the page's player took a Play: playing by then, or the Play goes again. */
