@@ -41,8 +41,11 @@ internal object LastExit {
                     it.reason == ApplicationExitInfo.REASON_CRASH_NATIVE || it.reason == ApplicationExitInfo.REASON_CRASH
             }
         if (exits.isEmpty()) return
-        // The first time, only the latest: the older ones are from before this was written.
-        val shown = if (told == 0L) exits.take(1) else exits.take(3)
+        // The first time (the first start of a version that has this), those of the last two days:
+        // installing it closes a running myCar, and that "updated" alone hid the crash before it.
+        val recent = if (told == 0L) exits.filter { it.timestamp > System.currentTimeMillis() - 2 * 86_400_000L } else exits
+        val shown = recent.take(5)
+        if (recent.size > shown.size) MyCarLog.i("last exit: ${recent.size - shown.size} earlier endings not shown")
         shown.reversed().forEach(::tellOne)
         prefs.edit().putLong(TOLD, exits.maxOf { it.timestamp }).apply()
     }
