@@ -63,6 +63,8 @@ object CarAssistant {
 
     private var appContext: Context? = null
     private var recognizer: SpeechRecognizer? = null
+    /** The phone's recognizer has the music paused, as myCar's own engine does (VoiceFocus). */
+    private var systemFocus = false
     private var tts: TextToSpeech? = null
     @Volatile private var ttsReady = false
     /** The engine didn't start, or stopped speaking (updated in the background): made anew next drive. */
@@ -440,6 +442,8 @@ object CarAssistant {
     private fun stopVoice() {
         tts?.stop()
         DirectionsVoice.stopAssistant()
+        // Ended here, not left to the engine's callbacks: one that never came kept the music paused.
+        endings.keys.toList().forEach { end(it, stopped = true) }
     }
 
     /**
@@ -526,6 +530,11 @@ object CarAssistant {
                 partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()?.let(onPartial)
             }
         })
+        // The music paused while the phone's recognizer listens, as with myCar's own: it heard the song.
+        if (!systemFocus) {
+            VoiceFocus.acquire(context)
+            systemFocus = true
+        }
         r.startListening(
             Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -554,6 +563,10 @@ object CarAssistant {
         SpeechEngine.cancel()
         recognizer?.let { runCatching { it.cancel() }; it.destroy() }
         recognizer = null
+        if (systemFocus) {
+            systemFocus = false
+            VoiceFocus.release()
+        }
     }
 
     private fun errorMessage(code: Int): String = when (code) {
