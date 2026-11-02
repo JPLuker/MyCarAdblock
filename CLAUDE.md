@@ -90,6 +90,16 @@ Rispondi sempre in **italiano**.
   memoria. Verificato (0.7, API 37.0 e 34): nessuna caduta. `last-exit-crash/` + `last-exit/`:
   `--ei crashAfterMs` (solo debug) manda a myCar un SIGSEGV, lo scatto dopo scrive come è finito
   (`LastExit`): verificato su Android 17, segnale, frame e righe dal tombstone.
+  Crash del LayoutNode (`.github/car-preview-crash.sh`, inclusa da `car-preview.sh`; scatti `crash-*`
+  solo se nominati in `shots`): `--es script` (solo debug, `PreviewScript.kt`) manda tocchi,
+  trascinamenti e fling coi tempi di un'auto (`tap`, `drag`, `fling`, `tapText`, `focus`, `key`,
+  `focusweb` / `unfocus` per il fuoco del WebView, `rep:n … end`, `snap`), e tiene gli ultimi
+  fotogrammi in `ring/`; `CrashProbe.kt` scrive i cambi di fuoco col loro stack, il nodo a metà
+  rimozione e quello che cade. `crash-webfocus` (fuoco al WebView di Plancia, poi alla mappa),
+  `crash-focus`, `crash-focus-grid`, `crash-webfocus-edit` (pagina in modifica), `crash-webfocus-grid`
+  provano la correzione; `crash-webfocus-cleared` era il controllo A/B; `crash-swipe-*`,
+  `crash-grid-*`, `crash-cinema`, `crash-plancia-*` rifanno i viaggi dei log. Home Assistant parte
+  anche per gli scatti `crash-`.
   Assistente: `assistant/` (Impostazioni al posto di un assistente-activity, `phone-screen.png`),
   `assistant-google/` (l'app Google dell'emulatore: schermo del telefono dopo il microfono e dopo lo
   scorrimento dall'angolo, `phone-mic.png` / `phone-swipe.png`), `assistant-mic/` +
@@ -884,7 +894,33 @@ Tutti i token in un solo posto, `car/design/`:
   su cui si ferma ogni cambio ("home: page") e Plancia che entra o esce dalla vista. Nato dalle cadute
   di 0.6.8/0.6.9 (Pixel 10 Pro, Android 17): log fermi senza eccezione e senza alcun tocco prima (la
   seconda a 1 s dall'inizio del caricamento di Parakeet multilingual, 640 MB); lo scorrimento dalla
-  pagina in tre parti non cade in emulatore.
+  pagina in tre parti non cade in emulatore. Al primo avvio con `LastExit` (nessuna uscita già detta)
+  si scrivono le uscite degli ultimi due giorni, al massimo 5, dalla più vecchia. Il gestore dei crash
+  scrive la traccia intera (fino a 400 righe, con le cause), non le prime 12: nella release le righe
+  di Compose riempivano tutto. Il rilascio allega `myCar-v<versione>-mapping.txt` (la mappa di R8):
+  le tracce della release hanno nomi abbreviati (`r8-map-id-…`), e si leggono con `retrace` e quel file.
+- **Il crash della pagina in tre parti** (0.6.7-0.6.9, corretto in 0.7.0, `car/LeaveWithoutFocus.kt`):
+  `IllegalStateException: LayoutNode should be attached to an owner`, myCar chiusa e viaggio finito.
+  Un tocco nella pagina di Plancia, in una parte di una pagina della Home, dà il fuoco al WebView; se
+  poi la parte lascia lo schermo col fuoco dentro (alla mappa, alla griglia, in modifica:
+  `PlanciaPart(runs = false)` mette il segnaposto), `LayoutNode.removeAt` stacca la `Column` prima di
+  toglierla dalla lista, l'`AndroidView` toglie la sua view, Android passa il fuoco
+  (`rootViewRequestFocus`) e la ricerca del fuoco di Compose passa per il beyond-bounds del pager, che
+  rimisura subito (`remeasureSync`): il `Box` della parte è misurato col figlio ancora dentro, poi il
+  figlio esce dalla lista senza che il Box sia di nuovo da misurare, e al disegno dopo `Box.replace()`
+  posiziona un nodo staccato. Riprodotto in CI a ogni giro (API 37.0 e 34, scatti `crash-*`), mai col
+  fuoco tolto prima. Correzione: `leavesWithoutFocus(runs) { web.dropFocus() }` tiene la pagina un
+  fotogramma in più e in un effetto, fuori dall'applicazione dei cambi, le toglie il fuoco; la Home
+  toglie il fuoco alle view (`View.dropInteropFocus`, mai ai controlli di Compose) quando esce dallo
+  schermo e quando una pagina entra in modifica (il browser di una parte resta composto, ma la
+  modifica può toglierlo). Ogni nuova view focalizzabile (WebView) dentro le pagine del pager va
+  tolta allo stesso modo. Plancia accanto alla mappa e a tutto schermo non cadono (provato).
+- **Caricamento dei modelli della voce** (0.7.0, `SpeechEngine`): uno alla volta (al microfono il
+  finale dopo Kroko, non insieme), mai dopo la fine del viaggio (`generation`: `unload()` fa scadere i
+  caricamenti in attesa), e prima del primo comando (`warm`) il finale solo se resta memoria
+  abbondante (`roomForFinal`: libera meno 5/4 del modello sopra 4 volte la soglia di Android e 2 GB).
+  Ogni caricamento scrive la memoria libera e l'heap nativo. L'anteprima dell'auto sul telefono, senza
+  viaggio, non li carica.
 - **Motore da Gearslip** (0.5.18, branch `fix/engine`): delle 116 modifiche di Gearslip dopo il fork
   (0.3.01 → 0.3.31) si portano solo quelle che non possono cambiare come si collega un'auto che oggi va
   (richiesta dell'utente: "porta quello che ha senso, non cose che potrebbero rompere il nostro
@@ -1322,6 +1358,14 @@ Tutti i token in un solo posto, `car/design/`:
 - Auto-updater delle build GitHub: rilasci di `sirionero/mycar`; disattivato nella build F-Droid.
 
 ## Backlog
+
+- **Spotify Web e "Nascondi l'app del telefono" a inizio viaggio** (dalla caccia della 0.7.0, da provare
+  con un account Premium): myCar mette in pausa l'app Spotify del telefono e apre Spotify Web con
+  l'Autoplay; l'app in pausa resta il dispositivo attivo di Spotify Connect, quindi il Play della pagina
+  potrebbe farla ripartire sul telefono (altoparlante, o niente in auto) e poi dire "suona su un altro
+  dispositivo". Correzione pensata, solo nella pagina: un Play di myCar seguito entro 10 s da `remote`
+  manda una volta "pause" e un avviso suo ("scegli 'Questo browser web' nei dispositivi di Spotify",
+  9 lingue). Prima va visto succedere.
 
 - **Schermo dell'auto tutto nero** dopo un collegamento riuscito, a volte (segnalato dopo la 0.6.3):
   non trovato leggendo il codice. Escluso: il display virtuale di myCar non si spegne col telefono
