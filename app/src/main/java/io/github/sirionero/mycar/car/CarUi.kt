@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.car.app.model.CarIcon
 import androidx.car.app.navigation.model.NavigationTemplate
 import androidx.car.app.navigation.model.RoutingInfo
+import io.github.sirionero.mycar.speech.VoiceFocus
 import io.github.sirionero.mycar.host.CarAppConnection
 import io.github.sirionero.mycar.host.display
 import io.github.sirionero.mycar.host.text
@@ -179,24 +180,32 @@ fun CarUi() {
         // Assistant, which held every request after it until it answered.
         CarAssistant.pendingCommand.collectLatest { heard ->
             if (heard != null) {
-                // Whatever a command meets (a provider that fails, an app that throws), the drive
-                // goes on: an exception here used to end myCar.
-                val reply = try {
-                    AssistantCommands.handle(appContext, navigator, frameForAssistant, heard)
-                } catch (e: kotlinx.coroutines.CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    MyCarLog.e("assistant: \"$heard\" failed", e)
-                    "Something went wrong. Try again."
+                // One pause from the question to the answer: the listening gives the music its focus
+                // back once the words are read, and Home Assistant (or an app connecting for "play X")
+                // let it play again in between, then the answer paused it once more.
+                VoiceFocus.acquire(appContext)
+                try {
+                    // Whatever a command meets (a provider that fails, an app that throws), the drive
+                    // goes on: an exception here used to end myCar.
+                    val reply = try {
+                        AssistantCommands.handle(appContext, navigator, frameForAssistant, heard)
+                    } catch (e: kotlinx.coroutines.CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        MyCarLog.e("assistant: \"$heard\" failed", e)
+                        "Something went wrong. Try again."
+                    }
+                    // None of myCar's commands: the driver's Home Assistant may know, or run it.
+                    val answer = if (AssistantCommands.missed(reply) && AssistantBrain.ready) {
+                        CarAssistant.askingHome(heard)
+                        AssistantBrain.ask(heard)
+                    } else {
+                        null
+                    }
+                    if (answer != null) CarAssistant.replyAsSaid(heard, answer.text) else CarAssistant.reply(reply)
+                } finally {
+                    VoiceFocus.release()
                 }
-                // None of myCar's commands: the driver's Home Assistant may know, or run it.
-                val answer = if (AssistantCommands.missed(reply) && AssistantBrain.ready) {
-                    CarAssistant.askingHome(heard)
-                    AssistantBrain.ask(heard)
-                } else {
-                    null
-                }
-                if (answer != null) CarAssistant.replyAsSaid(heard, answer.text) else CarAssistant.reply(reply)
             }
         }
     }
