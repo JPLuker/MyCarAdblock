@@ -8,6 +8,9 @@
     <string name="car_settings_size_normal">Normal</string>
     <string name="car_settings_size_large">Grande</string>
     <string name="car_settings_size_extra_large">Muy grande</string>
+    <string name="car_settings_hidden_apps">Apps ocultas</string>
+    <string name="car_settings_hidden_apps_none">Ninguna. Para ocultar una app, mantenla pulsada en la cuadrícula de apps y elige Ocultar de la cuadrícula de apps.</string>
+    <string name="car_settings_hidden_apps_show">Mostrar</string>
     <string name="car_settings_app_theme">Tema de la app</string>
     <string name="car_settings_app_theme_phone">Como el teléfono</string>
     <string name="car_settings_app_theme_light">Claro</string>

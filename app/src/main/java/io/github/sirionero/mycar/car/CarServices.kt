@@ -294,7 +294,7 @@ object CarServices {
         val ctx = context ?: return false
         val last = CarSettings.lastMedia.value?.let(ComponentName::unflattenFromString) ?: return false
         val app = withContext(Dispatchers.IO) { MediaCatalog.installed(ctx) }
-            .let { catalog -> catalog.firstOrNull { it.component == last } ?: xonosFor(last, catalog) } ?: return false
+            .let { catalog -> webFor(last, catalog) ?: catalog.firstOrNull { it.component == last } ?: xonosFor(last, catalog) } ?: return false
         openMedia(app, autoplay = autoplay)
         return true
     }
@@ -355,7 +355,7 @@ object CarServices {
                 openMedia(playing, auto = true)
             } else {
                 val last = CarSettings.lastMedia.value?.let(ComponentName::unflattenFromString)
-                val app = last?.let { component -> catalog.firstOrNull { it.component == component } ?: xonosFor(component, catalog) }
+                val app = last?.let { component -> webFor(component, catalog) ?: catalog.firstOrNull { it.component == component } ?: xonosFor(component, catalog) }
                 if (app != null) openMedia(app, autoplay = CarSettings.autoplay.value, auto = true)
             }
         }
@@ -383,6 +383,13 @@ object CarServices {
         Xonos.isInside(last) -> catalog.firstOrNull { it.component.packageName == Xonos.APP_PACKAGE }
         else -> null
     }
+
+    /**
+     * A music service's web player for its own app used last, once that app is ticked to stay off the
+     * car's grid (see [WebMusic.replacing]): the drive opens the one the driver keeps in the car.
+     */
+    private fun webFor(last: ComponentName, catalog: List<MediaApp>): MediaApp? =
+        WebMusic.replacing(last.packageName)?.let { service -> catalog.firstOrNull { WebMusic.serviceFor(it.component) === service } }
 
     /**
      * The Xonos app took Xonos's place for the drive (see [InsideOrApp]): if Xonos inside myCar was

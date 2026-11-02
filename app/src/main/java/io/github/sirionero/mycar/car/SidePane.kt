@@ -79,9 +79,11 @@ internal val Entry.fitsBesideMap: Boolean
 internal fun rememberSidePaneApp(): Entry? {
     val choice by SidePaneChoice.current.collectAsState()
     val entries = rememberAllEntries()
+    val hideApp by io.github.sirionero.mycar.webmusic.WebMusic.hideApp.collectAsState()
     if (choice == SidePaneChoice.MUSIC) return null
-    return remember(choice, entries) {
-        val id = withXonosInside(withPlanciaInside(choice, entries), entries)
+    return remember(choice, entries, hideApp) {
+        // A choice saved with the Plancia or Xonos app, or a music service's app, as it shows now.
+        val id = pinShown(choice, entries)
         entries.find { it.componentId == id && it.fitsBesideMap }
     }
 }
@@ -184,10 +186,12 @@ private val LIVE = setOf(CarAppConnection.Phase.BINDING, CarAppConnection.Phase.
 internal fun SidePanePicker() {
     val current by SidePaneChoice.current.collectAsState()
     val entries = rememberAllEntries()
-    val apps = entries.filter { it.fitsBesideMap && it.componentId != null }.sortedBy { it.label.lowercase() }
+    // Not the phone's app of a music service that takes its place: one Spotify, as on the grid.
+    val replaced = rememberReplacedByWeb()
+    val apps = entries.filter { it.fitsBesideMap && it.componentId != null && !replaced(it) }.sortedBy { it.label.lowercase() }
     // Lit as beside the map: a choice saved with the Plancia or Xonos app is the one inside myCar now
     // (and back, while the app stands in); compared as saved, nothing was lit.
-    val shown = withXonosInside(withPlanciaInside(current, entries), entries)
+    val shown = pinShown(current, entries)
     val options = listOf(SidePaneChoice.MUSIC to stringResource(R.string.car_side_music)) + apps.mapNotNull { e -> e.componentId?.let { it to e.shownLabel } }
     val scheme = MaterialTheme.colorScheme
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -8,6 +8,9 @@
     <string name="car_settings_size_normal">Κανονικό</string>
     <string name="car_settings_size_large">Μεγάλο</string>
     <string name="car_settings_size_extra_large">Πολύ μεγάλο</string>
+    <string name="car_settings_hidden_apps">Κρυφές εφαρμογές</string>
+    <string name="car_settings_hidden_apps_none">Καμία. Για να κρύψετε μια εφαρμογή, κρατήστε την πατημένη στο πλέγμα εφαρμογών και επιλέξτε Απόκρυψη από το πλέγμα εφαρμογών.</string>
+    <string name="car_settings_hidden_apps_show">Εμφάνιση</string>
     <string name="car_settings_app_theme">Θέμα εφαρμογής</string>
     <string name="car_settings_app_theme_phone">Όπως το τηλέφωνο</string>
     <string name="car_settings_app_theme_light">Φωτεινό</string>

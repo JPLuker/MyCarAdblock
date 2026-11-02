@@ -96,6 +96,8 @@ fun CarSettingsScreen() {
 
         HomePagesSettings()
 
+        HiddenAppsSettings()
+
         ChoiceRow(
             stringResource(R.string.car_settings_size),
             listOf(

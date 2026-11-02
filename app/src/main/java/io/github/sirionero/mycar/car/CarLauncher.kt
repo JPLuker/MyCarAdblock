@@ -356,7 +356,9 @@ fun CarLauncher() {
     }
 
     val appOrder by CarSettings.appOrder.collectAsState()
-    val tiles = launcherOrder(all, showVehicleData, appOrder).map(::tileOf)
+    // Apps the driver hid, and a music service's own app beside its web player, stay off the grid.
+    val offGrid = rememberOffTheGrid(all)
+    val tiles = launcherOrder(all.filterNot(offGrid), showVehicleData, appOrder).map(::tileOf)
 
     Box(Modifier.fillMaxSize()) {
         rememberWallpaper()?.let { WallpaperBackground(it, Modifier.matchParentSize()) }

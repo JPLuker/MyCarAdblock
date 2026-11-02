@@ -301,6 +301,13 @@
     <string name="settings_car_pages_header">Vos pages de part et d’autre de la carte, sur l’Accueil de la voiture. Modifiez-les ici, ou dans la voiture avec le crayon à côté des points.</string>
     <string name="settings_car_pages_ready_text">Vos pages laissent la place aux pages toutes prêtes : la météo et l’agenda à gauche de la carte et, à sa droite, Plancia à côté du navigateur, si Plancia est configuré ou installé.</string>
     <string name="settings_car_fit_offline">Connectez-vous à la voiture pour ajuster son écran : la voiture affiche chaque modification au moment où vous la faites.</string>
+    <string name="settings_grid_apps">Apps dans la grille de la voiture</string>
+    <string name="settings_grid_apps_all">Toutes affichées</string>
+    <plurals name="settings_grid_apps_hidden">
+        <item quantity="one">%d masquée</item>
+        <item quantity="other">%d masquées</item>
+    </plurals>
+    <string name="settings_grid_apps_note">Décochez une app pour la garder hors de la grille des apps de la voiture. Dans la voiture : maintenez une app appuyée et choisissez Masquer de la grille des apps. Une app épinglée au dock y reste.</string>
     <string name="theme_title">Thème</string>
     <string name="theme_footer">L’apparence de myCar sur le téléphone. L’écran de la voiture a la sienne, dans les paramètres de la voiture.</string>
     <string name="theme_phone">Comme le téléphone</string>
@@ -320,6 +327,8 @@
     <string name="music_sign_in_title">%1$s : se connecter</string>
     <string name="music_sign_out">Se déconnecter</string>
     <string name="music_sign_out_detail">De ce service dans myCar, sur le téléphone et dans la voiture</string>
+    <string name="music_hide_app">Masquer l’app %1$s du téléphone</string>
+    <string name="music_hide_app_detail">La grille des apps de la voiture ne garde que %1$s dans myCar : l’app %1$s de ce téléphone n’y apparaît pas, il n’y en a donc pas deux.</string>
     <string name="music_sign_out_title">Se déconnecter de %1$s ?</string>
     <string name="music_sign_out_text">myCar oublie la connexion à %1$s et ce que ses pages ont gardé. Votre compte reste tel quel.</string>
     <string name="music_add">Ajouter un service</string>

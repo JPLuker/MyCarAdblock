@@ -40,6 +40,9 @@
     <string name="car_apps_move_left">Mover para a esquerda</string>
     <string name="car_apps_move_right">Mover para a direita</string>
     <string name="car_apps_reset_order">Restaurar a ordem dos apps</string>
+    <string name="car_apps_hide_from_grid">Ocultar da grade de apps</string>
+    <string name="car_apps_show_on_grid">Mostrar na grade de apps</string>
+    <string name="car_apps_hidden_toast">App oculto: %1$s. Para trazê-lo de volta: Configurações, Apps ocultos.</string>
 
     <string name="car_map_starting">Iniciando %1$s…</string>
     <string name="car_map_starting_unknown">Iniciando o mapa…</string>

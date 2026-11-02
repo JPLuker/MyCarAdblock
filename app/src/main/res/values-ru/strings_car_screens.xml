@@ -8,6 +8,9 @@
     <string name="car_settings_size_normal">Обычный</string>
     <string name="car_settings_size_large">Большой</string>
     <string name="car_settings_size_extra_large">Очень большой</string>
+    <string name="car_settings_hidden_apps">Скрытые приложения</string>
+    <string name="car_settings_hidden_apps_none">Нет. Чтобы скрыть приложение, удерживайте его в сетке приложений и выберите «Скрыть из сетки приложений».</string>
+    <string name="car_settings_hidden_apps_show">Показать</string>
     <string name="car_settings_app_theme">Тема приложения</string>
     <string name="car_settings_app_theme_phone">Как на телефоне</string>
     <string name="car_settings_app_theme_light">Светлая</string>

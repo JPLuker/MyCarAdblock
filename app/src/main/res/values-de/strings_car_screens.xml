@@ -8,6 +8,9 @@
     <string name="car_settings_size_normal">Normal</string>
     <string name="car_settings_size_large">Groß</string>
     <string name="car_settings_size_extra_large">Sehr groß</string>
+    <string name="car_settings_hidden_apps">Ausgeblendete Apps</string>
+    <string name="car_settings_hidden_apps_none">Keine. Um eine App auszublenden, halte sie in der App-Übersicht gedrückt und wähle In der App-Übersicht ausblenden.</string>
+    <string name="car_settings_hidden_apps_show">Anzeigen</string>
     <string name="car_settings_app_theme">App-Design</string>
     <string name="car_settings_app_theme_phone">Wie Telefon</string>
     <string name="car_settings_app_theme_light">Hell</string>

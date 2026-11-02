@@ -301,6 +301,13 @@
     <string name="settings_car_pages_header">Tus páginas a los lados del mapa, en el Inicio del coche. Cámbialas aquí, o en el coche con el lápiz junto a los puntos.</string>
     <string name="settings_car_pages_ready_text">Tus páginas dejan su sitio a las predefinidas: el tiempo y la agenda a la izquierda del mapa y, a su derecha, Plancia junto al navegador, si Plancia está configurada o instalada.</string>
     <string name="settings_car_fit_offline">Conéctate al coche para ajustar su pantalla: el coche muestra cada cambio mientras lo haces.</string>
+    <string name="settings_grid_apps">Apps en la cuadrícula del coche</string>
+    <string name="settings_grid_apps_all">Todas visibles</string>
+    <plurals name="settings_grid_apps_hidden">
+        <item quantity="one">%d oculta</item>
+        <item quantity="other">%d ocultas</item>
+    </plurals>
+    <string name="settings_grid_apps_note">Desmarca una app para dejarla fuera de la cuadrícula de apps del coche. En el coche: mantén pulsada una app y elige Ocultar de la cuadrícula de apps. Una app fijada en el dock se queda ahí.</string>
     <string name="theme_title">Tema</string>
     <string name="theme_footer">El aspecto de myCar en el teléfono. La pantalla del coche tiene el suyo, en los ajustes del coche.</string>
     <string name="theme_phone">Como el teléfono</string>
@@ -320,6 +327,8 @@
     <string name="music_sign_in_title">%1$s: iniciar sesión</string>
     <string name="music_sign_out">Cerrar sesión</string>
     <string name="music_sign_out_detail">De este servicio en myCar, en el teléfono y en el coche</string>
+    <string name="music_hide_app">Ocultar la app %1$s del teléfono</string>
+    <string name="music_hide_app_detail">En la cuadrícula de apps del coche solo queda %1$s dentro de myCar: la app %1$s de este teléfono no aparece, así no hay dos.</string>
     <string name="music_sign_out_title">¿Cerrar sesión en %1$s?</string>
     <string name="music_sign_out_text">myCar olvida la sesión de %1$s y lo que guardaron sus páginas. Tu cuenta sigue igual.</string>
     <string name="music_add">Añadir un servicio</string>
