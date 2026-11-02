@@ -181,9 +181,9 @@ class CarAppConnection(private val context: Context) {
             }
         }
 
-        // BIND_INCLUDE_CAPABILITIES only lends the location capability myCar holds at bind
-        // time, so the keep-alive has to be running first - a nav app that starts its own
-        // location service before then is refused, and MapQuest crashes on that.
+        // The keep-alive has to be running first: a nav app that starts its own location service
+        // with no capability to borrow is refused, and MapQuest crashes on that. (The capability
+        // itself follows myCar's as it changes: a keep-alive started later still reaches the app.)
         if (holdsLocation) {
             bind()
         } else {

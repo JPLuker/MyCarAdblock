@@ -41,6 +41,8 @@ class TouchRelayService : AccessibilityService() {
     override fun onServiceConnected() {
         instance = this
         MyCarLog.i("touch relay connected")
+        // Bound by Android with BIND_ALLOW_BACKGROUND_ACTIVITY_STARTS: the car map's location service may start now.
+        io.github.sirionero.mycar.host.LocationKeepAlive.retry(this, "the accessibility service is on")
         // Switched on while the phone was already showing in the car.
         if (PhoneMirror.active.value) holdLandscape(true)
     }

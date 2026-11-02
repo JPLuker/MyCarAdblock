@@ -48,10 +48,16 @@ internal fun BluetoothPairOverlay() {
             val locationDismissed by LocationCheck.carDismissed.collectAsState()
             val bluetoothDue = missing && warn && !dismissed
             val locationDue = locationOff && !locationDismissed
-            // These two cover the map with a veil until OK: they wait for the car to stop, as
+            // The map running with no position to borrow: Android refused myCar's location service
+            // (the phone locked as the map connected), or myCar has no location permission.
+            val noPosition by io.github.sirionero.mycar.host.LocationKeepAlive.noPosition.collectAsState()
+            val navStatus by CarServices.nav.status.collectAsState()
+            val positionDue = noPosition != io.github.sirionero.mycar.host.LocationKeepAlive.NoPosition.NONE &&
+                navStatus.phase == io.github.sirionero.mycar.host.CarAppConnection.Phase.RUNNING
+            // These cover the map with a veil until OK: they wait for the car to stop, as
             // What's new does, instead of coming up mid-drive when Bluetooth drops. The car's own
             // driving status says so, else the phone's GPS (see CarDriving).
-            val moving = if (bluetoothDue || locationDue) !rememberVideoAllowed() else false
+            val moving = if (bluetoothDue || locationDue || positionDue) !rememberVideoAllowed() else false
             if (moving) return
             if (bluetoothDue) PairCard(
                 title = stringResource(R.string.bluetooth_not_connected_title),
@@ -67,6 +73,18 @@ internal fun BluetoothPairOverlay() {
                 secondary = stringResource(R.string.bluetooth_dont_show_again) to LocationCheck::neverAgain,
                 primary = stringResource(R.string.common_ok) to LocationCheck::dismissOnCar,
                 onBack = LocationCheck::dismissOnCar,
+            ) else if (positionDue) PairCard(
+                title = stringResource(R.string.car_map_no_position_title),
+                body = stringResource(
+                    if (noPosition == io.github.sirionero.mycar.host.LocationKeepAlive.NoPosition.NO_PERMISSION) {
+                        R.string.car_map_no_position_permission
+                    } else {
+                        R.string.car_map_no_position_locked
+                    },
+                ),
+                secondary = null,
+                primary = stringResource(R.string.common_ok) to { io.github.sirionero.mycar.host.LocationKeepAlive.dismissNoPosition() },
+                onBack = { io.github.sirionero.mycar.host.LocationKeepAlive.dismissNoPosition() },
             )
         }
         CarBluetooth.Prompt.ASK -> PairCard(

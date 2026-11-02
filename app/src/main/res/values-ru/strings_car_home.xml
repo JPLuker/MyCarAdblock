@@ -184,6 +184,9 @@
     <string name="car_host_threw">%1$s: исключение %2$s %3$s</string>
     <string name="car_host_location_channel">Местоположение для навигации</string>
     <string name="car_host_location_notification">myCar передаёт местоположение карте в автомобиле</string>
+    <string name="car_map_no_position_title">У карты нет вашего местоположения</string>
+    <string name="car_map_no_position_locked">Android не передаёт его myCar, пока телефон заблокирован. Теперь, когда вы остановились, разблокируйте телефон и откройте myCar.</string>
+    <string name="car_map_no_position_permission">У myCar нет доступа к местоположению. Разрешите его в myCar на телефоне.</string>
 
     <string name="car_wallpaper_title">Обои</string>
     <string name="car_wallpaper_still">Статичные</string>

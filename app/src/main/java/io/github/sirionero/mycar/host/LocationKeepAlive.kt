@@ -1,6 +1,7 @@
 package io.github.sirionero.mycar.host
 
 import android.Manifest
+import android.app.KeyguardManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -12,9 +13,16 @@ import android.content.pm.ServiceInfo
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import androidx.car.app.CarAppService
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.SessionService
 import io.github.sirionero.mycar.Words
+import io.github.sirionero.mycar.mirror.TouchRelayService
+import io.github.sirionero.mycar.wireless.WirelessLink
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Lets a hosted navigation app keep receiving the phone's location while myCar is not on screen.
@@ -22,8 +30,13 @@ import io.github.sirionero.mycar.Words
  * Android only gives an app location in the background if something visible to the user is
  * running for it. A nav app bound as a car app has nothing of its own showing, so it goes
  * without a fix as soon as the phone screen leaves it. Binding with BIND_INCLUDE_CAPABILITIES
- * lends it this service's location capability, which is why this foreground service exists.
- * It needs the ordinary location permission, granted on the phone.
+ * lends it this service's location capability (recomputed as it changes, not only at bind time),
+ * which is why this foreground service exists. It needs the ordinary location permission.
+ *
+ * Android lets it lend only if it was started from an eligible state: myCar on screen, within
+ * 10 s of one of myCar's screens being created (the car's arrival creates one), or with myCar's
+ * accessibility service on. Once started that way it lends for as long as it runs, phone locked
+ * or not - so the drive takes it as the car arrives ([holdForDrive]), not when the map binds.
  */
 class LocationKeepAlive : Service() {
 
@@ -39,13 +52,13 @@ class LocationKeepAlive : Service() {
             .setContentTitle(Words.get(R.string.car_host_location_notification))
             .setOngoing(true)
             .build()
-        // The system can refuse a location-type foreground service if myCar is no longer in
-        // an eligible state by the time this runs - the phone screen locking mid-session is the
-        // common case. That refusal throws, and left uncaught it takes the whole app down with
-        // it; a nav app losing its background location fix is a small loss next to that.
+        // The system can refuse a location-type foreground service if myCar is not in an eligible
+        // state by the time this runs - the phone locked, myCar's screen created more than 10 s ago.
+        // That refusal throws, and left uncaught it takes the whole app down with it.
         runCatching {
             startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
         }.onSuccess {
+            MyCarLog.i("location keep-alive: running")
             settle(State.ON)
             // Every hold went while it was starting: stop now, as it may only once in the foreground.
             main.post {
@@ -55,7 +68,8 @@ class LocationKeepAlive : Service() {
                 }
             }
         }.onFailure {
-            MyCarLog.w("location keep-alive: could not start the foreground service - ${it.message}")
+            MyCarLog.w("location keep-alive: could not start the foreground service (${phoneState(this)}) - ${it.message}")
+            refused(NoPosition.LOCKED)
             settle(State.FAILED)
             stopSelf()
         }
@@ -69,9 +83,15 @@ class LocationKeepAlive : Service() {
 
     enum class State { OFF, STARTING, ON, FAILED }
 
+    /** Why a car map has no position to borrow, for the car to say (see BluetoothPairOverlay). */
+    enum class NoPosition { NONE, LOCKED, NO_PERMISSION }
+
     companion object {
         private const val CHANNEL = "mycar_location"
         private const val NOTIFICATION_ID = 44
+
+        /** How often a start-up's hold checks whether that start-up is still going on. */
+        private const val START_UP_CHECK_MS = 60_000L
 
         /** Public flag value; the constant itself is hidden from the SDK. */
         const val BIND_INCLUDE_CAPABILITIES = 0x1000
@@ -81,9 +101,49 @@ class LocationKeepAlive : Service() {
         @Volatile var state = State.OFF
             private set
 
-        /** Each connected car app holds one; the service stops only when the last lets go. */
+        /** Each connected car app holds one, and the drive one more; the service stops only when the last lets go. */
         private var holders = 0
         private val waiting = mutableListOf<() -> Unit>()
+
+        /** The drive's own hold: see [holdForDrive]. */
+        private var driveHold = false
+        /** [driveHold] taken as the car's Bluetooth (or a tap, or the cable) started a start-up, before SessionService holds it. */
+        private var startUpOnly = false
+        private var appContext: Context? = null
+        /** The driver said OK to the car's "no position" card this drive: it doesn't come back. */
+        private var told = false
+
+        private val _noPosition = MutableStateFlow(NoPosition.NONE)
+
+        /**
+         * A car app holds the service and Android refused it (the phone locked, myCar not on screen),
+         * or myCar has no location permission: the car's map has no position. For the car to say so
+         * once it has stopped. NONE once the service runs, the driver says OK, or no one holds it.
+         */
+        val noPosition: StateFlow<NoPosition> = _noPosition.asStateFlow()
+
+        /** The car's card answered: not shown again this drive. */
+        fun dismissNoPosition() {
+            main.post {
+                told = true
+                _noPosition.value = NoPosition.NONE
+            }
+        }
+
+        /** A start-up's hold goes by itself if that start-up ends without a drive. */
+        private val startUpCheck = object : Runnable {
+            override fun run() {
+                if (!driveHold || !startUpOnly) return
+                if (WirelessLink.busy || SessionService.held) {
+                    main.postDelayed(this, START_UP_CHECK_MS)
+                    return
+                }
+                MyCarLog.i("location keep-alive: the start-up ended without a drive - letting go")
+                startUpOnly = false
+                driveHold = false
+                appContext?.let { release(it) }
+            }
+        }
 
         /**
          * Takes a hold on the service, starting it if it isn't running, and calls [ready] (on the
@@ -115,6 +175,9 @@ class LocationKeepAlive : Service() {
             main.post {
                 holders = (holders - 1).coerceAtLeast(0)
                 if (holders > 0) return@post
+                // No one holds it: the drive is over, and what the car was told with it.
+                _noPosition.value = NoPosition.NONE
+                told = false
                 // Stopped before it calls startForeground, Android takes myCar down with it: it
                 // stops itself once started (see onStartCommand).
                 if (state == State.STARTING) return@post
@@ -124,13 +187,56 @@ class LocationKeepAlive : Service() {
         }
 
         /**
-         * Tries again after a refusal, for a car map that is still connected: Android refuses this
-         * service while the phone is locked, and lets it start once myCar is on screen.
+         * The drive's hold, taken as the car arrives: from [SessionService.start] (the car's
+         * Bluetooth channel, the cable, the car's picture) and, earlier still, as a start-up begins
+         * ([untilStartUpEnds]: the car's Bluetooth opening myCar, a tap on a car, the cable) - given
+         * back by itself if that start-up never reaches a drive. Android lets this service lend its
+         * location with the phone locked only if started within 10 s of myCar's screen being
+         * created: taken once the map bound (14 s later through a slow Wi-Fi) it was refused, and
+         * the map had no position until myCar was opened. Every call retries a refused start.
          */
-        fun retry(context: Context) {
+        fun holdForDrive(context: Context, untilStartUpEnds: Boolean = false) {
+            val app = context.applicationContext
+            main.post {
+                appContext = app
+                if (!driveHold) {
+                    // No car map on the phone: no service, and no notification, for nothing.
+                    if (!carMapInstalled(app)) return@post
+                    driveHold = true
+                    told = false
+                    holders++
+                    startUpOnly = untilStartUpEnds
+                    if (startUpOnly) main.postDelayed(startUpCheck, START_UP_CHECK_MS)
+                } else if (!untilStartUpEnds && startUpOnly) {
+                    // The drive's service holds it from here: given back with SessionService.stop.
+                    startUpOnly = false
+                    main.removeCallbacks(startUpCheck)
+                }
+                if (state == State.OFF || state == State.FAILED) begin(app)
+            }
+        }
+
+        /** No one holds the drive's service any more: the drive's hold goes too. */
+        fun releaseDrive(context: Context) {
+            val app = context.applicationContext
+            main.post {
+                // Taken again meanwhile: a start-up's end on WirelessLink's thread racing a drive's start.
+                if (!driveHold || SessionService.held) return@post
+                driveHold = false
+                startUpOnly = false
+                main.removeCallbacks(startUpCheck)
+                release(app)
+            }
+        }
+
+        /**
+         * Tries again after a refusal, while something holds the service: myCar on screen, or its
+         * accessibility service just switched on, makes Android let it start.
+         */
+        fun retry(context: Context, why: String = "myCar is on screen") {
             main.post {
                 if (holders > 0 && state == State.FAILED) {
-                    MyCarLog.i("location keep-alive: myCar is on screen, trying again")
+                    MyCarLog.i("location keep-alive: $why, trying again")
                     begin(context.applicationContext)
                 }
             }
@@ -143,20 +249,44 @@ class LocationKeepAlive : Service() {
                 context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
             if (!granted) {
                 MyCarLog.w("location keep-alive: no location permission, car maps won't get a fix in the background")
+                refused(NoPosition.NO_PERMISSION)
                 settle(State.FAILED)
                 return
             }
             state = State.STARTING
             runCatching { context.startForegroundService(Intent(context, LocationKeepAlive::class.java)) }
                 .onFailure {
-                    MyCarLog.w("location keep-alive: start refused - ${it.message}")
+                    MyCarLog.w("location keep-alive: start refused (${phoneState(context)}) - ${it.message}")
+                    refused(NoPosition.LOCKED)
                     settle(State.FAILED)
                 }
         }
 
+        /** For the log of a refusal: what Android weighs, and what the next trip's log should tell apart. */
+        private fun phoneState(context: Context): String {
+            val locked = runCatching { context.getSystemService(KeyguardManager::class.java)?.isKeyguardLocked }.getOrNull()
+            return "phone locked: $locked, myCar's accessibility: ${if (TouchRelayService.enabled) "on" else "off"}"
+        }
+
+        /** A car app (a map) holding the service and getting nothing to borrow: the car says why. */
+        private fun refused(why: NoPosition) {
+            main.post {
+                val carApps = holders - (if (driveHold) 1 else 0)
+                if (carApps > 0 && !told) _noPosition.value = why
+            }
+        }
+
+        /** A car navigation app on the phone (found through <queries> on CarAppService). */
+        private fun carMapInstalled(context: Context): Boolean = runCatching {
+            context.packageManager.queryIntentServices(
+                Intent(CarAppService.SERVICE_INTERFACE).addCategory(CarAppService.CATEGORY_NAVIGATION_APP), 0,
+            ).any { it.serviceInfo.packageName != context.packageName }
+        }.getOrDefault(true).also { if (!it) MyCarLog.i("location keep-alive: no car map on the phone - not needed") }
+
         private fun settle(to: State) {
             main.post {
                 state = to
+                if (to == State.ON) _noPosition.value = NoPosition.NONE
                 val run = waiting.toList()
                 waiting.clear()
                 run.forEach { it() }
