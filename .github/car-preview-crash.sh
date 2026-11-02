@@ -165,3 +165,18 @@ EXTRA="$HA $PAGE3 --ez demoSong true" stress crash-plancia-column 800 480 160 \
 # key), the made-up song put in its player now and then (no account plays here).
 EXTRA="$HA $PAGE3 --es webMusic spotify --ez webMusicKey false --ez webMusicPlay true --es miniAt 0.05,1" stress crash-plancia-spotify 800 480 160 \
     "wait:12000;demo;wait:1500;tap:$C_CLOSE;wait:2500;demo;snap:mini;$(tapback "demo;");$(tapgrid "demo;");snap:end" 500
+
+# 5. The trigger alone (crash-plancia-* went down within two minutes, each time right after a tap in
+# Plancia's page that took the focus without opening anything): Home Assistant's page back to its start,
+# a tap on "Summaries" (a heading: nothing opens), then away from the page in three parts. crash-focus:
+# back to the map as the driver; crash-focus-grid: the app grid and back, as in the 0.6.7 log;
+# crash-focus-cleared: the same as crash-focus with the focus taken from the web view first (unfocus):
+# if that one doesn't go down, the focus is what does it. The focus changes are in the log with their
+# stack ("preview: focus"), and on the crash the node still laying out ("preview: laying out").
+FOCUS_TAP="tap:120,22;wait:400-700;tap:150,236"
+EXTRA="$HA $PAGE3 --ez demoSong true --es miniAt 0.05,1" stress crash-focus 800 480 160 \
+    "wait:9000;tap:$C_CLOSE;wait:2500;rep:30;$TO_LEFT;wait:800-1500;$FOCUS_TAP;wait:300-2500;$DRIVER;wait:500-1500;end;snap:end" 240
+EXTRA="$HA $PAGE3 --ez demoSong true" stress crash-focus-grid 800 480 160 \
+    "wait:9000;rep:30;$TO_LEFT;wait:800-1500;$FOCUS_TAP;wait:300-2000;tap:$C_FOOT;wait:600-1200;tap:$C_FOOT;wait:800-1500;end;snap:end" 260
+EXTRA="$HA $PAGE3 --ez demoSong true --es miniAt 0.05,1" stress crash-focus-cleared 800 480 160 \
+    "wait:9000;tap:$C_CLOSE;wait:2500;rep:30;$TO_LEFT;wait:800-1500;$FOCUS_TAP;wait:300-2500;unfocus;wait:150;$DRIVER;wait:500-1500;end;snap:end" 240

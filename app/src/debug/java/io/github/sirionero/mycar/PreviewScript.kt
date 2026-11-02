@@ -42,6 +42,7 @@ import kotlin.random.Random
  *   rebuild                      the car's screen made again, as with a new encoder
  *   demo                         the made-up song again in the car's player, its music app kept
  *   key:code                     a key of the car pressed and let go (CarKeys)
+ *   unfocus                      the focus taken from the view that has it (a web view after a tap)
  *   snap:name                    the picture now, as name.png
  *   log:text                     a line in the log
  *   rep:n ... end                the steps between n times
@@ -74,7 +75,14 @@ internal class PreviewScript(
         }
     }
 
+    /** The car screen's root view (ScreenProjector keeps it to itself). */
+    private fun rootView(): View? = runCatching {
+        ScreenProjector::class.java.getDeclaredField("root").apply { isAccessible = true }.get(projector) as View?
+    }.getOrNull()
+
+    /** On the main thread, with the car's screen up. */
     fun start(text: String) {
+        CrashProbe.install(::rootView)
         val steps = expand(text.split(';').map { it.trim() }.filter { it.isNotEmpty() })
         MyCarLog.i("preview: script of ${steps.size} steps, seed $seed")
         Thread({ run(steps) }, "preview-car").apply { isDaemon = true }.start()
@@ -177,6 +185,15 @@ internal class PreviewScript(
                     projector.refresh()
                 }
                 MyCarLog.i("preview: step $n: the car handed its screen back - the picture drawn again")
+            }
+            // The focus taken from whatever has it on the car's screen (a web view after a tap in it).
+            "unfocus" -> {
+                val from = onMain {
+                    val focused = rootView()?.findFocus()
+                    focused?.clearFocus()
+                    focused?.javaClass?.simpleName ?: "nothing"
+                }
+                MyCarLog.i("preview: step $n: focus taken from $from")
             }
             "rebuild" -> {
                 MyCarLog.i("preview: step $n: the car's screen made again")

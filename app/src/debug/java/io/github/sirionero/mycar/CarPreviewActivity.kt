@@ -249,6 +249,8 @@ class CarPreviewActivity : ComponentActivity() {
             }
         }, main)
 
+        // The crash-* shots: Compose's composition stack on a crash (see CrashProbe), before any composition.
+        if (intent.hasExtra("script")) CrashProbe.traceCompositions()
         val p = ScreenProjector(this).also { projector = it }
         // --ez player true: the docked player alone, with a made-up song (see PlayerPreview).
         // --ez wallpapers true: the wallpaper picker alone, below the fold in the car's settings.
