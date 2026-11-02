@@ -13,7 +13,7 @@
         <item>Die Karte bleibt ruhig, wenn sich die Musik ändert: Die Spalte des Players wartet ein paar Sekunden, bevor sie schließt, so behalten Vela und andere Karten ihre Fläche, und neben dem Player stimmt der Bereich, um den sie zeichnen.</item>
         <item>Spotify und die anderen Musikdienste in myCar: Beim Öffnen spielt der Titel aus ihrer Leiste, Autoplay wartet, bis die Seite bereit ist, die Musik läuft weiter, nachdem der Bildschirm des Autos neu aufgebaut wurde, und myCar sagt dir, wenn Spotify auf einem anderen Gerät spielt.</item>
         <item>Assistent: eine einzige Pause von der Frage bis zur Antwort, kein Zuhören, während ein Anruf klingelt, seine Stimme kommt bei der nächsten Fahrt zurück, wenn die Sprachausgabe des Handys ausgefallen war, und die Sprachtaste beim Teilen des Bildschirms führt zu myCar zurück.</item>
-        <item>Außerdem: Das X des Liedtexts bringt den Player zurück, eine neue Wahl neben der Karte erscheint sofort, die Zurück-Taste des Autos schließt Neuigkeiten und die Bluetooth-Karten, und „Fertig“ nach der Anmeldung bei einem Musikdienst.</item>
+        <item>Außerdem: Das X des Liedtexts bringt den Player zurück, eine neue Wahl neben der Karte erscheint sofort, die Zurück-Taste des Autos schließt Neuigkeiten und die Bluetooth-Karten, und „Fertig“ nach der Anmeldung bei einem Musikdienst. Der Bildschirm des Autos ist in der für myCar gewählten Sprache, auch wenn das Handy eine andere nutzt.</item>
     </string-array>
     <string-array name="changelog_43">
         <item>Die Spotify-Anmeldung auf dem Telefon ist nicht mehr schwarz: Die Seite erscheint und lässt sich ausfüllen, wie bei jedem Musikdienst.</item>

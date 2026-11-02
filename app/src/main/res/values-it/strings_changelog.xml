@@ -13,7 +13,7 @@
         <item>La mappa resta ferma quando cambia la musica: la colonna del lettore aspetta qualche secondo prima di chiudersi, così Vela e le altre mappe tengono la loro superficie, e accanto al lettore l\'area in cui disegnano è quella giusta.</item>
         <item>Spotify e gli altri servizi musicali dentro myCar: aperti, suonano il brano della loro barra, l\'Autoplay aspetta che la pagina sia pronta, la musica riparte dopo che lo schermo dell\'auto si rifà, e myCar dice quando Spotify suona su un altro dispositivo.</item>
         <item>Assistente: una sola pausa dalla domanda alla risposta, niente ascolto mentre squilla una chiamata, la voce torna al viaggio dopo se il motore vocale del telefono si era fermato, e il tasto voce durante la condivisione dello schermo riporta a myCar.</item>
-        <item>Inoltre: la X del testo riporta il lettore, una nuova scelta accanto alla mappa si vede subito, il tasto Indietro dell\'auto chiude Novità e le schede del Bluetooth, e «Fatto» dopo l\'accesso a un servizio musicale.</item>
+        <item>Inoltre: la X del testo riporta il lettore, una nuova scelta accanto alla mappa si vede subito, il tasto Indietro dell\'auto chiude Novità e le schede del Bluetooth, e «Fatto» dopo l\'accesso a un servizio musicale. Lo schermo dell\'auto è nella lingua scelta per myCar anche quando il telefono ne usa un\'altra.</item>
     </string-array>
     <string-array name="changelog_43">
         <item>L\'accesso a Spotify sul telefono non è più nero: la pagina si vede e si compila, come per ogni servizio musicale.</item>

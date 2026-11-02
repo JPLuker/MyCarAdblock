@@ -10,6 +10,7 @@ myCar 0.6.8-alpha: hide apps from the car's grid, one Spotify instead of two, th
 - A call ringing closes the assistant, and a message being read or answered (a reply already confirmed still goes): they talked and listened over the call's screen.
 - A new choice for "Beside the map", in the car or on the phone, shows at once even after the player's X; the lyrics' X brings the player back instead of closing everything.
 - The car's Back key closes What's new and the Bluetooth, location and pairing cards (pairing is left to the driver) instead of changing the screen hidden under them.
+- With a language chosen for myCar that isn't the phone's, the car's screen stayed in the phone's language from Android 13 on: Android gives the chosen language to myCar's screens on the phone, not to the one made for another display. myCar now puts its own words in it.
 - Settings > Web page: the keyboard comes into sight (it opened below the edge) and Back closes it. What's new no longer closes mid-read when its switch is turned off. The Phone's tabs and the assistant's X are 56 dp.
 
 ## Connecting

@@ -18,7 +18,7 @@
         <item>The map stays put when the music changes: the player\'s column waits a few seconds before closing, so Vela and other maps keep their surface, and beside the player the area they draw around is the right one.</item>
         <item>Spotify and the other music services inside myCar: opening one plays the song in its bar, Autoplay waits until the page is ready, the music plays on after the car\'s screen is rebuilt, and myCar says when Spotify plays on another device.</item>
         <item>Assistant: one pause from question to answer, no listening while a call rings, its voice back at the next drive if the phone\'s speech engine had stopped, and the wheel\'s voice key during screen sharing brings myCar back.</item>
-        <item>Also: the lyrics\' X brings the player back, a new choice beside the map shows at once, the car\'s Back closes What\'s new and the Bluetooth cards, and \"Done\" after signing in to a music service.</item>
+        <item>Also: the lyrics\' X brings the player back, a new choice beside the map shows at once, the car\'s Back closes What\'s new and the Bluetooth cards, and \"Done\" after signing in to a music service. The car\'s screen is in the language chosen for myCar even when the phone\'s is another.</item>
     </string-array>
     <!-- 0.6.7-alpha -->
     <string-array name="changelog_43">

@@ -13,7 +13,7 @@
         <item>El mapa no se mueve cuando cambia la música: la columna del reproductor espera unos segundos antes de cerrarse, así Vela y los demás mapas conservan su superficie, y junto al reproductor la zona en la que dibujan es la correcta.</item>
         <item>Spotify y los demás servicios de música dentro de myCar: al abrir uno suena la canción de su barra, la reproducción automática espera a que la página esté lista, la música sigue tras rehacerse la pantalla del coche y myCar te avisa cuando Spotify suena en otro dispositivo.</item>
         <item>Asistente: una sola pausa de la pregunta a la respuesta, no escucha mientras suena una llamada, su voz vuelve en el siguiente viaje si el motor de voz del teléfono se había parado, y la tecla de voz con la pantalla compartida vuelve a myCar.</item>
-        <item>Además: la X de la letra trae de vuelta el reproductor, una nueva elección junto al mapa se ve enseguida, el botón Atrás del coche cierra Novedades y las tarjetas del Bluetooth, y «Listo» tras iniciar sesión en un servicio de música.</item>
+        <item>Además: la X de la letra trae de vuelta el reproductor, una nueva elección junto al mapa se ve enseguida, el botón Atrás del coche cierra Novedades y las tarjetas del Bluetooth, y «Listo» tras iniciar sesión en un servicio de música. La pantalla del coche está en el idioma elegido para myCar aunque el teléfono use otro.</item>
     </string-array>
     <string-array name="changelog_43">
         <item>El inicio de sesión de Spotify en el teléfono ya no sale en negro: la página se ve y se puede rellenar, como en todos los servicios de música.</item>

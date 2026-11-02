@@ -663,7 +663,11 @@ Tutti i token in un solo posto, `car/design/`:
   righe di novità) e un traduttore per lingua. Anteprima in CI: scatti `lang-<lingua>` (Home con la
   musica, griglia, impostazioni dell'auto a 1920x720; `lang-<lingua>-800x480`; sul telefono setup,
   Home, impostazioni, aiuto e introduzione in `phone/`, aperti con `--es screen <nome>` della build
-  debug), con la lingua messa da `cmd locale set-app-locales`.
+  debug), con la lingua messa da `cmd locale set-app-locales`. Da Android 13 Android dà la lingua
+  scelta per l'app alle sue activity, non al contesto della `Presentation` sul display dell'auto (gli
+  scatti della 0.6.8 lo hanno mostrato: telefono tradotto, auto in inglese): `AppLanguage.localized` e
+  `resources` confrontano la lingua delle risorse con quella voluta (`Locale.getDefault()` da Android 13,
+  la scelta salvata prima) e, se diverse, la mettono loro.
 - **L'assistente in 9 lingue** (0.6.0): segue la lingua di myCar (`VoiceLanguages.phone()` legge
   `Locale.getDefault()`, che Android 13 mette alla lingua scelta per l'app e MyCarApplication su
   Android 12). Frasari nuovi, scritti e provati sul banco JVM (`AssistantLanguage` + frasari +
@@ -1136,7 +1140,13 @@ Tutti i token in un solo posto, `car/design/`:
   squillo; un solo `VoiceFocus` dalla domanda alla risposta (in `CarUi`, try/finally); tasto voce in
   condivisione schermo → `PhoneMirror.requestStop()`; riconoscimento del telefono con la musica in pausa
   (`systemFocus`); `stopVoice` chiude tutte le frasi in corso; niente bip per un ascolto annullato durante il
-  caricamento del modello. Non provato con un account Spotify vero né in auto con Vela.
+  caricamento del modello. Revisione indipendente delle correzioni: con la barra di Spotify appena comparsa
+  la pagina risponde "wait" finché l'orologio non è letto due volte (`clockSeen`), così il Play non mette in
+  pausa Spotify che suona altrove; i tentativi si fermano se cambia la musica dell'auto o arriva un altro
+  tasto; la fine di una frase dice se il motore l'ha rifiutata (`refused`, anche dal canale delle
+  indicazioni) e il motore si segna da rifare solo se il testo non era troppo lungo; il brano tenuto
+  durante l'attesa della colonna solo per la stessa app e solo durante l'attesa (`holding`). Non provato
+  con un account Spotify vero né in auto con Vela.
 - **Prima connessione** (`ui/SetupScreen.kt`, `setup/`): una lista sola, "Set up myCar", al primo
   avvio (al posto di `CertSetupScreen` + le pagine di `SetupGuideScreen`, ancora nel codice finché
   la nuova non è provata sul telefono) e ogni volta che si torna con "Take me back to the initial
