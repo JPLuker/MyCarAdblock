@@ -547,6 +547,12 @@ internal class WebMusicPage(
     private fun sendPending() {
         val (action, seconds) = pending ?: return
         pending = null
+        // Another music chosen while the page loaded (or the music closed): its Play is no one's now.
+        // Sent, the page played and took the car's music back from the driver's pick.
+        if (action == "play" && !isTheCarsMusic()) {
+            MyCarLog.i("music: ${service.id} play dropped - no longer the car's music")
+            return
+        }
         send(action, seconds, patient = true)
     }
 
