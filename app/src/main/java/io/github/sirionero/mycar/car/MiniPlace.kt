@@ -48,6 +48,18 @@ internal data class MiniPlace(val x: Float, val y: Float) {
             )
         }
 
+        /**
+         * How much smaller it's drawn on a map too small for it beside the card a map shows at its left
+         * (an 800x480 screen at Extra large: 173 dp of room for 276): to fit that room, never under
+         * [MIN_FIT] (about its size at the Normal size there). 1 where it fits.
+         */
+        fun fitScale(areaW: Float, ownW: Float = MINI_WIDTH): Float {
+            val besideCard = maxOf((areaW + 2 * MINI_EDGE) * PANE_FRACTION, PANE_MIN_EDGE) - MINI_EDGE + GAP
+            val room = areaW - besideCard
+            if (ownW <= 0f || room >= ownW) return 1f
+            return (room / ownW).coerceIn(MIN_FIT, 1f)
+        }
+
         /** From its top-left corner in pixels, in a room [roomW] x [roomH] beyond its own size. No room that way: the far end. */
         fun of(left: Float, top: Float, roomW: Int, roomH: Int) = MiniPlace(
             if (roomW > 0) (left / roomW).coerceIn(0f, 1f) else 1f,
@@ -80,6 +92,8 @@ private const val PANE_FRACTION = 0.42f
 private const val PANE_MIN_EDGE = 244f
 /** The room left between the mini player and the map's cards. */
 private const val GAP = 8f
+/** The smallest it's drawn on a small map ([MiniPlace.fitScale]): at Extra large (1.5) about 0.9 of its Normal size. */
+private const val MIN_FIT = 0.6f
 
 /**
  * Whether the mini player shows: music on (through the column's short wait too) over a map that has

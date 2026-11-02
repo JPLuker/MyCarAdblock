@@ -24,6 +24,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +45,7 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -117,11 +119,12 @@ internal fun MapMiniPlayer(now: NowPlaying, modifier: Modifier = Modifier) {
         var kept by remember { mutableStateOf(MiniPlayerSetting.place.value) }
         // Where it rests: there, or, never moved, where it starts on this map (its own size known or not).
         val density = LocalDensity.current
+        val fit = MiniPlace.fitScale(maxWidth.value)
         val rest = kept ?: with(density) {
             MiniPlace.start(
                 maxWidth.value, maxHeight.value,
-                if (size.width > 0) size.width.toDp().value else MINI_WIDTH,
-                if (size.height > 0) size.height.toDp().value else MINI_HEIGHT,
+                if (size.width > 0) size.width.toDp().value else MINI_WIDTH * fit,
+                if (size.height > 0) size.height.toDp().value else MINI_HEIGHT * fit,
             )
         }
         val restNow by rememberUpdatedState(rest)
@@ -135,74 +138,78 @@ internal fun MapMiniPlayer(now: NowPlaying, modifier: Modifier = Modifier) {
             tween(MyCarMotion.PressMs, easing = MyCarMotion.Decelerate),
             label = "miniLift",
         )
-        Surface(
-            modifier = Modifier
-                .align(BiasAbsoluteAlignment(rest.x * 2 - 1, rest.y * 2 - 1))
-                .offset { IntOffset(moved.x.roundToInt(), moved.y.roundToInt()) }
-                .onSizeChanged { size = it }
-                .pointerInput(Unit) {
-                    dragAfterHold(
-                        onHold = { held = true },
-                        onDrag = { by ->
-                            // Inside the map whichever way: from where it rests to either edge.
-                            val restX = restNow.x * roomNow.width
-                            val restY = restNow.y * roomNow.height
-                            val next = moved + by
-                            moved = Offset(
-                                next.x.coerceIn(-restX, roomNow.width - restX),
-                                next.y.coerceIn(-restY, roomNow.height - restY),
-                            )
-                        },
-                        onEnd = { dragged ->
-                            if (dragged) {
-                                val to = MiniPlace.of(
-                                    restNow.x * roomNow.width + moved.x, restNow.y * roomNow.height + moved.y,
-                                    roomNow.width, roomNow.height,
+        // On a map too small for it beside the card at its left (800x480 at Extra large): drawn smaller,
+        // about its size at the Normal size there, so it fits the room right of that card.
+        CompositionLocalProvider(LocalDensity provides if (fit < 1f) Density(density.density * fit, density.fontScale) else density) {
+            Surface(
+                modifier = Modifier
+                    .align(BiasAbsoluteAlignment(rest.x * 2 - 1, rest.y * 2 - 1))
+                    .offset { IntOffset(moved.x.roundToInt(), moved.y.roundToInt()) }
+                    .onSizeChanged { size = it }
+                    .pointerInput(Unit) {
+                        dragAfterHold(
+                            onHold = { held = true },
+                            onDrag = { by ->
+                                // Inside the map whichever way: from where it rests to either edge.
+                                val restX = restNow.x * roomNow.width
+                                val restY = restNow.y * roomNow.height
+                                val next = moved + by
+                                moved = Offset(
+                                    next.x.coerceIn(-restX, roomNow.width - restX),
+                                    next.y.coerceIn(-restY, roomNow.height - restY),
                                 )
-                                kept = to
-                                MiniPlayerSetting.moveTo(to)
-                                MyCarLog.i("mini player: let go at ${to.saved()}")
-                            }
-                            moved = Offset.Zero
-                            held = false
-                        },
-                    )
-                }
-                // After the gesture in the chain: a lifted mini player doesn't scale the finger's moves.
-                .graphicsLayer { scaleX = lift; scaleY = lift }
-                .height(MyCarSize.TouchTarget),
-            shape = RoundedCornerShape(percent = 50),
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
-            shadowElevation = if (held) 12.dp else 6.dp,
-        ) {
-            Row(Modifier.padding(end = MyCarSpace.S), verticalAlignment = Alignment.CenterVertically) {
-                val open = stringResource(R.string.car_mini_open_player)
-                // The cover, the mini player's whole height to hit: the full player.
-                Box(
-                    Modifier
-                        .size(MyCarSize.TouchTarget)
-                        .clickable(role = Role.Button, onClick = navigator::media)
-                        .semantics { contentDescription = open },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    if (cover != null) {
-                        Image(cover, null, Modifier.size(COVER).clip(RoundedCornerShape(MyCarRadius.Small)), contentScale = ContentScale.Crop)
-                    } else {
-                        AppIcon(appIcon, null, COVER)
+                            },
+                            onEnd = { dragged ->
+                                if (dragged) {
+                                    val to = MiniPlace.of(
+                                        restNow.x * roomNow.width + moved.x, restNow.y * roomNow.height + moved.y,
+                                        roomNow.width, roomNow.height,
+                                    )
+                                    kept = to
+                                    MiniPlayerSetting.moveTo(to)
+                                    MyCarLog.i("mini player: let go at ${to.saved()}")
+                                }
+                                moved = Offset.Zero
+                                held = false
+                            },
+                        )
                     }
-                }
-                TransportRow(now, media, skip = SKIP)
-                PlainButton(
-                    {
-                        navigator.hideMiniPlayer()
-                        CarToasts.show(MiniPlayerSetting, Words.get(R.string.car_mini_hidden_toast), CarToast.LENGTH_LONG)
-                    },
-                    stringResource(R.string.car_mini_hide),
-                    CLOSE,
-                ) {
-                    Icon(Icons.Filled.Close, null, Modifier.size(22.dp), tint = LocalContentColor.current.copy(alpha = 0.7f))
+                    // After the gesture in the chain: a lifted mini player doesn't scale the finger's moves.
+                    .graphicsLayer { scaleX = lift; scaleY = lift }
+                    .height(MyCarSize.TouchTarget),
+                shape = RoundedCornerShape(percent = 50),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+                shadowElevation = if (held) 12.dp else 6.dp,
+            ) {
+                Row(Modifier.padding(end = MyCarSpace.S), verticalAlignment = Alignment.CenterVertically) {
+                    val open = stringResource(R.string.car_mini_open_player)
+                    // The cover, the mini player's whole height to hit: the full player.
+                    Box(
+                        Modifier
+                            .size(MyCarSize.TouchTarget)
+                            .clickable(role = Role.Button, onClick = navigator::media)
+                            .semantics { contentDescription = open },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (cover != null) {
+                            Image(cover, null, Modifier.size(COVER).clip(RoundedCornerShape(MyCarRadius.Small)), contentScale = ContentScale.Crop)
+                        } else {
+                            AppIcon(appIcon, null, COVER)
+                        }
+                    }
+                    TransportRow(now, media, skip = SKIP)
+                    PlainButton(
+                        {
+                            navigator.hideMiniPlayer()
+                            CarToasts.show(MiniPlayerSetting, Words.get(R.string.car_mini_hidden_toast), CarToast.LENGTH_LONG)
+                        },
+                        stringResource(R.string.car_mini_hide),
+                        CLOSE,
+                    ) {
+                        Icon(Icons.Filled.Close, null, Modifier.size(22.dp), tint = LocalContentColor.current.copy(alpha = 0.7f))
+                    }
                 }
             }
         }

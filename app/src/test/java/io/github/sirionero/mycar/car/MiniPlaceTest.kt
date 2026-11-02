@@ -84,4 +84,13 @@ class MiniPlaceTest {
         assertFalse(miniPlayerShows(on = true, hidden = false, music = true, besideMap = false, inView = false, panning = false))
         assertFalse(miniPlayerShows(on = true, hidden = false, music = true, besideMap = false, inView = true, panning = true))
     }
+
+    @Test fun fitsBesideTheCardOnASmallMap() {
+        // 1920x720: room to spare.
+        assertEquals(1f, MiniPlace.fitScale(1752f), 0.001f)
+        // 800x480 at Extra large: 413 dp of area, the card to 240 dp, 173 dp of room for 276.
+        assertEquals(173f / 276f, MiniPlace.fitScale(413f), 0.01f)
+        // Never smaller than about its Normal size at Extra large.
+        assertEquals(0.6f, MiniPlace.fitScale(300f), 0.001f)
+    }
 }
