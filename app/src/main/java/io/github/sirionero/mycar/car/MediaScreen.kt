@@ -70,6 +70,8 @@ import io.github.sirionero.mycar.media.MediaApp
 import io.github.sirionero.mycar.media.MediaArt
 import io.github.sirionero.mycar.media.LyricsResult
 import io.github.sirionero.mycar.media.Lyrics
+import io.github.sirionero.mycar.media.LyricsAnswer
+import io.github.sirionero.mycar.media.lyricsSong
 import io.github.sirionero.mycar.media.MediaEntry
 import io.github.sirionero.mycar.media.NowPlaying
 import io.github.sirionero.mycar.media.QueueTrack
@@ -431,12 +433,14 @@ internal fun LyricsPanel(
     lineStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.titleLarge,
 ) {
     val context = LocalContext.current
+    // The song by the track's own tags (not a displayed "Artist • Album"): one key per song.
+    val song = remember(now.trackTitle, now.title, now.trackArtist, now.artist, now.album, now.durationMs) { now.lyricsSong(xonosInside = false) }
     // Asked again with Try again, after a lookup that couldn't reach lrclib.net.
     var attempt by remember { mutableIntStateOf(0) }
-    val lyrics by produceState<LyricsState>(LyricsState.Loading, now.title, now.artist, now.album, now.durationMs, attempt) {
+    val lyrics by produceState<LyricsState>(LyricsState.Loading, song.key, attempt) {
         value = LyricsState.Loading
-        value = Lyrics.find(context, now.title, now.artist, now.album, now.durationMs).fold(
-            onSuccess = { found -> found?.let { LyricsState.Found(it) } ?: LyricsState.Missing },
+        value = Lyrics.find(context, song).fold(
+            onSuccess = { answer -> if (answer is LyricsAnswer.Found) LyricsState.Found(answer.result) else LyricsState.Missing },
             onFailure = { LyricsState.Unreachable },
         )
     }
