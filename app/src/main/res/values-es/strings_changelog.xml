@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 0.6.8-alpha -->
+    <!-- 0.7.0-alpha -->
+    <string-array name="changelog_46">
+        <item>Corregido un fallo que cerraba myCar y cortaba la conexión: llegaba tras tocar la página de Plancia, en una página junto al mapa, y volver luego al mapa o a la cuadrícula de apps.</item>
+        <item>Si myCar se cierra de repente, el siguiente inicio escribe en el registro por qué se cerró (un fallo, la memoria, sin respuesta), para poder corregirlo.</item>
+        <item>Los modelos de voz se cargan de uno en uno, nunca después de acabar el viaje, y antes de la primera orden solo si sobra memoria.</item>
+        <item>Minirreproductor: en pantallas pequeñas aparece lejos de los botones del mapa, y los botones atenuados del mapa ya no se quedan con los toques destinados al mapa.</item>
+        <item>Letras: cada canción empieza por su primera línea, y la versión en directo de otra canción ya no trae su letra.</item>
+        <item>Spotify y los demás servicios de música: «pon …» espera la página hasta 25 segundos, y un Play que seguía esperando no arranca si mientras tanto has cambiado la música.</item>
+        <item>Elegir la radio del coche detiene un vídeo o una radio en Cinema o en el navegador, y no vuelven a empezar solos. La reproducción automática pone la música solo cuando el sonido tiene camino hacia el coche.</item>
+        <item>Asistente: «siguiente», «pausa» o «para» dentro de una pregunta más larga ya no cambian la canción; un «cancelar» dicho al final de la cuenta atrás de una respuesta se oye; leer un mensaje en voz alta tiene un límite de tiempo.</item>
+        <item>Novedades espera a que acabe una llamada, y durante una llamada las páginas junto al mapa y su menú quedan debajo de la barra de la llamada.</item>
+        <item>Cambiar el idioma de myCar durante un viaje cambia al instante la pantalla del coche; en Android 12 y 13, abrir myCar durante un viaje devuelve la posición al mapa.</item>
+    </string-array>
+    <!-- 0.6.9-alpha -->
     <string-array name="changelog_45">
         <item>Minirreproductor sobre el mapa completo: al cerrar el reproductor junto al mapa, un pequeño reproductor flota sobre el mapa con la portada, atrás, reproducir o pausa y siguiente. Mantenlo pulsado y arrástralo adonde quieras; su X lo oculta durante el viaje (la canción del dock recupera el reproductor), y se puede desactivar en Ajustes.</item>
         <item>Letras encontradas mucho más a menudo: títulos limpios de «Remastered», «feat.», «Live» y de los nombres que añaden radios y vídeos, y cada resultado comprobado, para que nunca aparezca la letra de otra canción. Las pistas instrumentales lo indican; con Xonos dentro de myCar, primero las letras de Music Assistant.</item>

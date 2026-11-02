@@ -5,7 +5,20 @@
   "Settings >" are the app's own: translate them as the app's screens say them.
 -->
 <resources>
-    <!-- 0.6.8-alpha -->
+    <!-- 0.7.0-alpha -->
+    <string-array name="changelog_46">
+        <item>Fixed a crash that closed myCar and ended the drive: it came after a tap in Plancia\'s page, on a page beside the map, then a turn back to the map or to the app grid.</item>
+        <item>If myCar ever closes by itself, the next start writes in the log why Android closed it (a crash, memory, not responding), so it can be fixed.</item>
+        <item>The voice models load one at a time, never after the drive is over, and before the first command only with memory to spare.</item>
+        <item>Mini player: on small screens it starts clear of the map\'s buttons, and the map\'s faded buttons no longer take taps meant for the map.</item>
+        <item>Lyrics: every song starts from its first line, and a live version of another song no longer brings its words.</item>
+        <item>Spotify and the other music services: \"play …\" waits up to 25 seconds for the page, and a Play still waiting doesn\'t start once you\'ve changed the music.</item>
+        <item>Choosing the car\'s radio stops a video or a radio playing in Cinema or the browser, and they don\'t start again by themselves. Autoplay starts the music only once the sound has a way to the car.</item>
+        <item>Assistant: \"next\", \"pause\" or \"stop\" inside a longer question no longer change the song; a \"cancel\" said at the end of a reply\'s countdown is heard; reading a message aloud has a time limit.</item>
+        <item>What\'s new waits for a call to end, and during a call the pages beside the map and their menu stay below the call\'s bar.</item>
+        <item>Changing myCar\'s language during a drive changes the car\'s screen at once; on Android 12 and 13, opening myCar during a drive gives the map its position back.</item>
+    </string-array>
+    <!-- 0.6.9-alpha -->
     <string-array name="changelog_45">
         <item>Mini player over the whole map: close the player beside the map and a small player floats over the map, with the cover, back, play or pause and next. Hold it, then drag it anywhere; its X hides it for the drive (the song in the dock brings the player back), and Settings can turn it off.</item>
         <item>Song lyrics found far more often: titles cleaned of \"Remastered\", \"feat.\", \"Live\" and the names radios and videos add, and every result checked, so another song\'s lyrics never show. Instrumental tracks say so; with Xonos inside myCar, Music Assistant\'s lyrics come first.</item>
@@ -15,6 +28,7 @@
         <item>Autoplay is on by default, and the player beside the map also comes Extra large (40% bigger).</item>
         <item>No more \"Spotify is playing on another device\" at every song change.</item>
     </string-array>
+    <!-- 0.6.8-alpha -->
     <string-array name="changelog_44">
         <item>Hide an app from the car\'s app grid: hold it and choose \"Hide from the app grid\". It comes back from Settings, Hidden apps, or from the phone (Car screen, Apps on the car\'s app grid).</item>
         <item>With Spotify or another music service inside myCar, \"Hide the phone\'s Spotify app\" keeps one Spotify on the grid; its pinned icon and the choice beside the map go to the one inside myCar.</item>

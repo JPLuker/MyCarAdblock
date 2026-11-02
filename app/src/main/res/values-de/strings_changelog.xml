@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 0.6.8-alpha -->
+    <!-- 0.7.0-alpha -->
+    <string-array name="changelog_46">
+        <item>Ein Absturz ist behoben, der myCar schloss und die Verbindung beendete: Er kam nach einem Tippen in die Plancia-Seite auf einer Seite neben der Karte und dem Wechsel zurück zur Karte oder zur App-Übersicht.</item>
+        <item>Schließt sich myCar einmal von selbst, schreibt der nächste Start ins Protokoll, warum Android myCar geschlossen hat (Absturz, Speicher, keine Antwort), damit es behoben werden kann.</item>
+        <item>Die Sprachmodelle laden nacheinander, nie nach dem Ende der Fahrt, und vor dem ersten Befehl nur, wenn reichlich Speicher frei ist.</item>
+        <item>Mini-Player: Auf kleinen Bildschirmen startet er abseits der Kartentasten, und die verblassten Tasten der Karte fangen keine Tipps mehr ab, die der Karte gelten.</item>
+        <item>Songtexte: Jeder Song beginnt mit seiner ersten Zeile, und die Live-Version eines anderen Songs bringt nicht mehr dessen Text.</item>
+        <item>Spotify und die anderen Musikdienste: „Spiele …“ wartet bis zu 25 Sekunden auf die Seite, und ein noch wartendes Play startet nicht, wenn du inzwischen die Musik gewechselt hast.</item>
+        <item>Wählst du das Radio des Autos, stoppen ein Video oder ein Radio in Cinema oder im Browser und starten nicht von selbst wieder. Autoplay startet die Musik erst, wenn der Ton einen Weg ins Auto hat.</item>
+        <item>Assistent: „weiter“, „Pause“ oder „Stopp“ in einer längeren Frage wechseln den Song nicht mehr; ein „Abbrechen“ am Ende des Countdowns einer Antwort wird gehört; das Vorlesen einer Nachricht hat ein Zeitlimit.</item>
+        <item>Neuigkeiten warten das Ende eines Anrufs ab, und während eines Anrufs bleiben die Seiten neben der Karte und ihr Menü unter der Anrufleiste.</item>
+        <item>Änderst du die Sprache von myCar während der Fahrt, ändert sich der Bildschirm des Autos sofort; unter Android 12 und 13 gibt das Öffnen von myCar während der Fahrt der Karte ihre Position zurück.</item>
+    </string-array>
+    <!-- 0.6.9-alpha -->
     <string-array name="changelog_45">
         <item>Mini-Player über der ganzen Karte: Schließt du den Player neben der Karte, schwebt ein kleiner Player über der Karte, mit Cover, Zurück, Wiedergabe oder Pause und Weiter. Halte ihn gedrückt und zieh ihn, wohin du willst; sein X blendet ihn für die Fahrt aus (der Titel im Dock holt den Player zurück), und in den Einstellungen lässt er sich ausschalten.</item>
         <item>Songtexte werden viel öfter gefunden: Titel ohne „Remastered“, „feat.“, „Live“ und die Namen, die Radios und Videos anhängen, und jedes Ergebnis wird geprüft, sodass nie der Text eines anderen Songs erscheint. Instrumentale Titel sagen es; mit Xonos in myCar zuerst die Texte von Music Assistant.</item>
