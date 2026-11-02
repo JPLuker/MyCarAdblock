@@ -6,7 +6,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalView
 import io.github.sirionero.mycar.MyCarLog
 
 /*
@@ -35,6 +37,27 @@ internal fun leavesWithoutFocus(shows: Boolean, letGo: () -> String?): Boolean {
         here = shows
     }
     return shows || here
+}
+
+/**
+ * [value], but while [holds] and a view inside the car's screen has the focus, a change to it comes
+ * a frame late: in between, [letGo] takes the focus, so what the change takes off the screen goes
+ * without it. With nothing focused there the change is at once, as before.
+ */
+@Composable
+internal fun <T> afterFocusLeaves(value: T, holds: Boolean, letGo: () -> String?): T {
+    val view = LocalView.current
+    var shown by remember { mutableStateOf(value) }
+    val holding by rememberUpdatedState(holds)
+    LaunchedEffect(value) {
+        if (value != shown) {
+            if (holding) letGo()?.let { MyCarLog.i("focus: taken from $it before a change to the screen") }
+            shown = value
+        }
+    }
+    if (!holds || value == shown) return value
+    val focused = view.findFocus()
+    return if (focused == null || focused === view) value else shown
 }
 
 /**

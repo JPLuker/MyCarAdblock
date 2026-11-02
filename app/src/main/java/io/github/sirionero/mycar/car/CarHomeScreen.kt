@@ -151,8 +151,14 @@ fun CarHome() {
     // The map's page among the driver's own (see HomePager). No outer padding on any side, split
     // screen or not - only the gap between the two panes when the player is sharing the screen
     // with the map.
+    val planciaWeb = LocalPlanciaWeb.current
+    val planciaBeside = splitScreen && sideApp?.builtIn == BuiltInApps.Plancia
     HomePager(onHome) { inView ->
     androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
+    // Plancia's page beside the map stays a frame after it goes (out of view, Close, another choice),
+    // so a tap's focus can leave it first (see LeaveWithoutFocus.kt); the column with it.
+    val planciaShown = leavesWithoutFocus(planciaBeside && inView) { planciaWeb?.dropFocus() }
+    val split = splitScreen || planciaShown
     // As far as it fits: the map keeps room for an app's card over it, the column for its X over the glass.
     val sideScale = if (music) sideScaleFor(playerSize, maxWidth.value - 8f, maxHeight.value, MAP_PANE_MIN_EDGE.value + 24f) else 1f
     Row(
@@ -162,24 +168,25 @@ fun CarHome() {
         Box(
             Modifier
                 // The side a third of the screen, as it always was, times its size: the map takes the rest.
-                .weight(if (splitScreen) MAP_SHARE / sideScale - 1f else 1f)
+                .weight(if (split) MAP_SHARE / sideScale - 1f else 1f)
                 .fillMaxHeight(),
         ) {
-            MapPane(navStatus, frame, inView, mini = miniNow.takeIf { miniPlayerShows(miniOn, navigator.miniPlayerHidden, musicShown, splitScreen, inView, panning) })
+            MapPane(navStatus, frame, inView, mini = miniNow.takeIf { miniPlayerShows(miniOn, navigator.miniPlayerHidden, musicShown, split, inView, panning) })
         }
-        if (splitScreen) CompositionLocalProvider(LocalPlayerInView provides inView, LocalDensity provides LocalDensity.current.scaledBy(sideScale)) {
+        if (split) CompositionLocalProvider(LocalPlayerInView provides inView, LocalDensity provides LocalDensity.current.scaledBy(sideScale)) {
             val side = Modifier.weight(1f).fillMaxHeight()
             val sideTemplate = sideApp?.template
             val sideMedia = sideApp?.media
             when {
+                // Plancia inside myCar: its one page goes wherever it's on screen, so here too only in
+                // view (and a frame more, see planciaShown).
+                planciaShown -> PlanciaPane(side)
                 // Only while its page is in view on Home: an app opened full screen from the grid,
                 // or on another page, uses the same connection, and two stages on it would pull its
                 // surface back and forth.
                 sideTemplate != null ->
                     if (inView) SideAppPane(sideTemplate, frame, side) else AppPlaceholder(sideApp?.shownLabel.orEmpty(), sideApp?.icon, side)
-                // Plancia inside myCar: its one page goes wherever it's on screen, so here too only in view.
-                sideApp?.builtIn == BuiltInApps.Plancia ->
-                    if (inView) PlanciaPane(side) else AppPlaceholder("Plancia", null, side, builtInId = BuiltInApps.Plancia.id)
+                sideApp?.builtIn == BuiltInApps.Plancia -> AppPlaceholder("Plancia", null, side, builtInId = BuiltInApps.Plancia.id)
                 panel == SidePanel.LYRICS -> SideLyrics(shownNow, side)
                 sideMedia != null -> SideMediaPane(sideMedia, shownNow, side)
                 else -> GlassDockedPlayer(shownNow, side, startingApp = mediaApp?.label?.takeIf { reserved && !shownNow.isActive })

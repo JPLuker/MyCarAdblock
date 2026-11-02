@@ -108,7 +108,11 @@ import kotlinx.coroutines.launch
 internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -> Unit) {
     val navigator = LocalCarNavigator.current
     val scope = rememberCoroutineScope()
-    val pages = rememberHomePages()
+    val view = LocalView.current
+    // Pages changed on the phone while Home shows: a frame late if a web page in them has the focus,
+    // taken first (see LeaveWithoutFocus.kt). Changes made here come while a page is being changed,
+    // with the focus already gone, so at once.
+    val pages = afterFocusLeaves(rememberHomePages(), holds = onHome) { view.dropInteropFocus() }
     val latest by rememberUpdatedState(pages)
     val mapIndex = pages.indexOfFirst { it.layout == PageLayout.MAP }.coerceAtLeast(0)
     val pager = rememberPagerState(initialPage = mapIndex) { pages.size }
@@ -156,7 +160,6 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
             io.github.sirionero.mycar.MyCarLog.i("home: page ${index + 1} of ${latest.size}, ${page?.layout?.id}${page?.slots?.let { " $it" }.orEmpty()}")
         }
     }
-    val view = LocalView.current
     LaunchedEffect(onHome) {
         if (!onHome) {
             editing = null

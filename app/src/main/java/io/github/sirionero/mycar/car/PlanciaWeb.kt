@@ -121,7 +121,8 @@ internal class PlanciaWeb(context: Context, dark: Boolean) {
         val w = web ?: return null
         if (!w.hasFocus()) return null
         w.clearFocus()
-        return "Plancia's page"
+        // Android may give it straight back (the knob's last place): then the log says so.
+        return if (w.hasFocus()) "Plancia's page, which took it back" else "Plancia's page"
     }
 
     fun openMenu() {
