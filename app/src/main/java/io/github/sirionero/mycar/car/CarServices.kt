@@ -170,7 +170,9 @@ object CarServices {
         val app = context ?: return@Runnable
         io.github.sirionero.mycar.speech.SpeechEngine.warm(
             app,
-            io.github.sirionero.mycar.speech.VoiceLanguages.effective(app, CarSettings.systemSpeech.value),
+            io.github.sirionero.mycar.speech.VoiceLanguages.effective(
+                app, CarSettings.systemSpeech.value && android.speech.SpeechRecognizer.isRecognitionAvailable(app),
+            ),
         )
     }
 

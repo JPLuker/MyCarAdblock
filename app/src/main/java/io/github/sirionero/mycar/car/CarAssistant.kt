@@ -79,7 +79,7 @@ object CarAssistant {
      */
     internal fun syncLanguage() {
         val context = appContext ?: return
-        val language = VoiceLanguages.effective(context, CarSettings.systemSpeech.value)
+        val language = VoiceLanguages.effective(context, phoneListens(context))
         AssistantLanguage.language = language
         val engine = tts ?: return
         if (!ttsReady || voiceIn == language) return
@@ -346,13 +346,21 @@ object CarAssistant {
     }
 
     /**
+     * The phone's own speech recognition listens: chosen, and there is one on the phone. Chosen on a
+     * phone without any (GrapheneOS), myCar's models listen, as for the microphone (listenOnce):
+     * taken as the phone's, the assistant said "The speech model didn't load." at every press.
+     */
+    private fun phoneListens(context: Context): Boolean =
+        CarSettings.systemSpeech.value && SpeechRecognizer.isRecognitionAvailable(context)
+
+    /**
      * myCar is in a language its downloaded models don't hear: the assistant listens in English
      * (VoiceLanguages.effective), and Italian said to it came out as nonsense with no word why.
      * Said in myCar's own language, with the model to download.
      */
     private fun languageHint(context: Context): String {
         val phone = VoiceLanguages.phone()
-        if (phone == VoiceLanguage.EN || AssistantLanguage.language != VoiceLanguage.EN || CarSettings.systemSpeech.value) return ""
+        if (phone == VoiceLanguage.EN || AssistantLanguage.language != VoiceLanguage.EN || phoneListens(context)) return ""
         val model = SpeechModels.recommended(phone).last()
         MyCarLog.w("assistant: no model hears ${phone.code} - listening in English")
         return Words.get(
