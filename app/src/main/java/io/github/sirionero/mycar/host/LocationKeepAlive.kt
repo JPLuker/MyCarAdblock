@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -259,12 +260,20 @@ class LocationKeepAlive : Service() {
         /**
          * Tries again after a refusal, while something holds the service: myCar on screen, or its
          * accessibility service just switched on, makes Android let it start.
+         *
+         * On Android 12 and 13 a start from the background isn't refused: the service runs, with no
+         * location to lend, and nothing shows it. Started once more from here, Android gives the
+         * running service what it lends for the rest of the drive.
          */
         fun retry(context: Context, why: String = "myCar is on screen") {
             main.post {
                 if (holders > 0 && state == State.FAILED) {
                     MyCarLog.i("location keep-alive: $why, trying again")
                     begin(context.applicationContext)
+                } else if (holders > 0 && state == State.ON && Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    val app = context.applicationContext
+                    runCatching { app.startForegroundService(Intent(app, LocationKeepAlive::class.java)) }
+                        .onFailure { MyCarLog.w("location keep-alive: $why, but couldn't start it again - ${it.message}") }
                 }
             }
         }
