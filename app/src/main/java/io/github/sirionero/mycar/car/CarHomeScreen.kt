@@ -111,7 +111,7 @@ fun CarHome() {
     val lastActive = remember(mediaApp) { arrayOf(now) }
     if (now.isActive) lastActive[0] = now
     val holding = sideApp == null && musicShown && !musicOn
-    val shownNow = if (holding && !now.isActive && lastActive[0].isActive) lastActive[0] else now
+    val shownNow = if (holding && !now.isActive && lastActive[0].isActive) lastActive[0].playingAs(now) else now
     // Lyrics that gave the column back for a song without any come back with the next song that has some,
     // until the driver closes them (their X, the dock's song, the player's X).
     if (navigator.lyricsWanted && panel == SidePanel.CONTROLS && shownNow.isActive) {
@@ -144,7 +144,7 @@ fun CarHome() {
     // Its song as the column would draw it: the last one during the column's hold, whatever is beside the map.
     val miniOn by MiniPlayerSetting.on.collectAsStateWithLifecycle()
     val panning by CarServices.nav.panMode.collectAsStateWithLifecycle()
-    val miniNow = if (musicShown && !musicOn && !now.isActive && lastActive[0].isActive) lastActive[0] else now
+    val miniNow = if (musicShown && !musicOn && !now.isActive && lastActive[0].isActive) lastActive[0].playingAs(now) else now
 
     // The map's page among the driver's own (see HomePager). No outer padding on any side, split
     // screen or not - only the gap between the two panes when the player is sharing the screen
@@ -270,6 +270,21 @@ private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame
 
 /** How long the music's column waits, once nothing plays, before giving the map its width back. */
 private const val MUSIC_HOLD_MS = 6_000L
+
+/**
+ * The song held through the column's wait, with its play button as the app is now: an app that stops
+ * on pause (STATE_STOPPED) shows Play, which is what a touch does (togglePlay reads the app's own state);
+ * before, it went on saying Pause and a second touch started the music again. Still a song in play, so
+ * the column and the mini player keep drawing it.
+ */
+private fun NowPlaying.playingAs(live: NowPlaying): NowPlaying =
+    if (live.playing == playing) this else NowPlaying(
+        title = title, artist = artist, album = album, art = art, artUri = artUri,
+        state = if (live.playing) live.state else PlaybackState.STATE_PAUSED,
+        positionMs = positionMs, durationMs = durationMs, speed = speed, updatedAt = updatedAt, actions = actions,
+        custom = custom, error = error, activeQueueItemId = activeQueueItemId, heart = heart,
+        trackTitle = trackTitle, trackArtist = trackArtist, mediaId = mediaId,
+    )
 
 /** Everything drawn [scale] times bigger: the player beside the map at Medium or Large. */
 private fun Density.scaledBy(scale: Float): Density = if (scale == 1f) this else Density(density * scale, fontScale)
