@@ -115,6 +115,16 @@ EXTRA="--ez demoSong true --es playerSize 1.2" shoot split-large 1920 720 240 "$
 EXTRA="--ez demoSong true --es playerSize 1.2" shoot split-large-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.4" shoot split-extra 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.4" shoot split-extra-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
+# The mini player over the whole map (car/MapMiniPlayer.kt). The player's X closes the column and the
+# mini player floats in the map's bottom-right corner; held on its cover and dragged to the top middle
+# (the log says where it was let go); its X puts it away (the card says how); the dock's song brings the
+# column back, the column's X the mini player, where it was let go; a slow tap (0.9 s, not moved) on its
+# cover still opens the full player. Then at 800x480, light, where an earlier drive left it, off.
+EXTRA="--ez demoSong true" shoot mini 1920 720 240 "$WAIT;1866,54;$WAIT;1536,654,drag,936,174;1254,174;72,279;1866,54;$WAIT;936,174,long"
+EXTRA="--ez demoSong true" shoot mini-800x480 800 480 160 "$WAIT;764,36;$WAIT;544,436,drag,460,60"
+EXTRA="--ez demoSong true --es carTheme LIGHT" shoot mini-light 1920 720 240 "$WAIT;1866,54;$WAIT"
+EXTRA="--ez demoSong true --es miniAt 0.5,0" shoot mini-kept 1920 720 240 "$WAIT;1866,54;$WAIT"
+EXTRA="--ez demoSong true --ez miniPlayer false" shoot mini-off 1920 720 240 "$WAIT;1866,54;$WAIT"
 # Hiding an app from the grid: a long press on the browser for its menu, then "Hide from the app
 # grid" (the fourth button of the card in the middle of the screen), the grid without it and the
 # car saying where it comes back from. Then the settings' hidden apps, with the browser hidden.

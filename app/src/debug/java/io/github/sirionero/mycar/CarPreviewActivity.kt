@@ -139,6 +139,18 @@ class CarPreviewActivity : ComponentActivity() {
             intent.getStringExtra("playerSize")?.toFloatOrNull()?.takeIf { it in io.github.sirionero.mycar.car.CarSettings.PLAYER_SIZES }
                 ?: io.github.sirionero.mycar.car.CarSettings.PLAYER_SMALL,
         )
+        // --es miniAt 0.5,0: the mini player over the map starts there (0,0 top left, 1,1 bottom right);
+        // its corner every other run. --ez miniPlayer false: off. Set every run.
+        io.github.sirionero.mycar.car.MiniPlayerSetting.setOn(intent.getBooleanExtra("miniPlayer", true))
+        io.github.sirionero.mycar.car.MiniPlayerSetting.moveTo(
+            io.github.sirionero.mycar.car.MiniPlace.parse(intent.getStringExtra("miniAt").orEmpty())
+                ?: io.github.sirionero.mycar.car.MiniPlace.CORNER,
+        )
+        // --es carTheme LIGHT: the car's screen in that theme (PHONE, LIGHT, DARK); dark every other run.
+        CarSettings.setAppTheme(
+            intent.getStringExtra("carTheme")?.let { runCatching { io.github.sirionero.mycar.car.AppTheme.valueOf(it) }.getOrNull() }
+                ?: io.github.sirionero.mycar.car.AppTheme.DARK,
+        )
         // No app hidden from the grid to start with: the shots tap the apps where they always are.
         // --es hideApps mycar:web,mycar:cinema: those off it.
         io.github.sirionero.mycar.car.HiddenApps.reset()
@@ -185,8 +197,9 @@ class CarPreviewActivity : ComponentActivity() {
         CarEnvironment.start(this)
 
         // "x,y" taps, "x,y,long" holds the finger down long enough for a long press (an app's menu).
-        val taps = intent.getStringExtra("taps").orEmpty().split(";").filter { it.isNotBlank() }
-            .map { it.split(",").let { p -> Triple(p[0].toFloat(), p[1].toFloat(), p.getOrNull(2) == "long") } }
+        // "x,y" taps, "x,y,long" holds the finger down 0.9 s (an app's menu; a slow tap), "x,y,drag,x2,y2"
+        // holds it that long, then drags it to x2,y2 in 10 steps (the mini player over the map).
+        val taps = intent.getStringExtra("taps").orEmpty().split(";").filter { it.isNotBlank() }.map { it.split(",") }
 
         val imageReader = ImageReader.newInstance(w, h, PixelFormat.RGBA_8888, 3)
         reader = imageReader
@@ -311,11 +324,23 @@ class CarPreviewActivity : ComponentActivity() {
 
         main.postDelayed({
             snap()
-            taps.forEachIndexed { i, (x, y, long) ->
+            taps.forEachIndexed { i, tap ->
+                val x = tap[0].toFloat()
+                val y = tap[1].toFloat()
                 main.postDelayed({
                     val point = listOf(TouchPoint(0, x, y))
                     p.dispatchTouch(MotionEvent.ACTION_DOWN, 0, point)
-                    main.postDelayed({ p.dispatchTouch(MotionEvent.ACTION_UP, 0, point) }, if (long) 900L else 80L)
+                    if (tap.getOrNull(2) == "drag") {
+                        val toX = tap[3].toFloat()
+                        val toY = tap[4].toFloat()
+                        val steps = 10
+                        for (s in 1..steps) main.postDelayed({
+                            p.dispatchTouch(MotionEvent.ACTION_MOVE, 0, listOf(TouchPoint(0, x + (toX - x) * s / steps, y + (toY - y) * s / steps)))
+                        }, 900L + 40L * s)
+                        main.postDelayed({ p.dispatchTouch(MotionEvent.ACTION_UP, 0, listOf(TouchPoint(0, toX, toY))) }, 900L + 40L * (steps + 1))
+                    } else {
+                        main.postDelayed({ p.dispatchTouch(MotionEvent.ACTION_UP, 0, point) }, if (tap.getOrNull(2) == "long") 900L else 80L)
+                    }
                 }, 2500L * (i + 1))
                 main.postDelayed({ snap() }, 2500L * (i + 1) + 1500)
             }
