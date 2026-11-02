@@ -545,6 +545,7 @@ object CarServices {
         // A toast or the voice help up as the drive ended came back at the start of the next one.
         CarToasts.clearAll()
         VoiceHelp.hide()
+        CarSettings.forgetOpenWhatsNew()
         media.forgetLosses()
         clearSectionCache()
         navStopped = false
