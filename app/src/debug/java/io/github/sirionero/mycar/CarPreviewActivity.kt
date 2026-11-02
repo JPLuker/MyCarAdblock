@@ -63,6 +63,17 @@ class CarPreviewActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MyCarLog.init(this)
+        // How the shot before ended, as myCar's own screen writes it at the top of a drive's log.
+        LastExit.log(this)
+        // --ei crashAfterMs 6000: myCar's process takes a SIGSEGV that long in, a native crash with a
+        // tombstone, for the next shot's "last exit" lines (the last-exit shots).
+        intent.getIntExtra("crashAfterMs", -1).takeIf { it >= 0 }?.let { ms ->
+            main.postDelayed({
+                MyCarLog.w("preview: a native crash on purpose")
+                MyCarLog.flush()
+                android.os.Process.sendSignal(android.os.Process.myPid(), 11)
+            }, ms.toLong())
+        }
         // --ez demoSong true: no music app to bring back, or an earlier shot's would reopen on Home
         // and take the made-up song's place. Cleared before the settings are read.
         if (intent.getBooleanExtra("demoSong", false)) io.github.sirionero.mycar.AppSettings.putString(this, "car_last_media", "")

@@ -109,10 +109,25 @@ alive() {
         adb logcat -d -v time -b main,system | grep -E "DEBUG|Fatal signal|F libc|libc  |chromium|cr_|WebView|hwui|OpenGLRenderer|RenderThread|lowmemorykiller|Killing|has died|ActivityManager: Process" | tail -300
         echo "--- Android's record of myCar's exits ---"
         adb shell dumpsys activity exit-info "$PKG" | head -120
+        echo "--- myCar's memory at the end ---"
+        adb shell dumpsys meminfo "$PKG" | head -45
+        echo "--- Android's settings on apps' memory ---"
+        adb shell device_config list activity_manager | grep -iE "mem|limit|kill" | head -40
     } > "previews/$1/alive.txt" 2>&1
     echo "--- $1: myCar's process at the end: ${pid:-none (gone)} ---"
     grep -m 30 -E "Fatal signal|\*\*\* \*\*\*|signal [0-9]+ \(|Abort message|#[0-9]{2} pc" "previews/$1/alive.txt" || true
 }
+
+# How myCar's last process ended, at the top of the next log (LastExit): a native crash on purpose
+# (--ei crashAfterMs, debug only: a SIGSEGV), then a shot that only starts and says how the one before
+# ended - the signal, the crashing thread's frames - as a drive's log would after a crash.
+EXTRA="--ei crashAfterMs 5000" shoot last-exit-crash 800 480 160 "$WAIT;$WAIT;$WAIT"
+alive last-exit-crash
+shoot last-exit 800 480 160 "$WAIT"
+case " ${ONLY:-last-exit} " in *" last-exit "*)
+    echo "--- last-exit: how the shot before ended, in myCar's log ---"
+    grep -h "last exit" previews/last-exit/log.txt 2>/dev/null | cut -c1-250 | head -50 || echo "last-exit: nothing" ;;
+esac
 
 # Home, then the app grid (dock's foot), then the dashboard (the clock at its top).
 shoot 800x480 800 480 160 "48,436;48,44"
