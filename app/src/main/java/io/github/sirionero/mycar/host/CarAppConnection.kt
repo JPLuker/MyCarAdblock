@@ -262,6 +262,7 @@ class CarAppConnection(private val context: Context) {
         pendingDestination = null
         destinationOnceRunning = null
         _template.value = null
+        loggedTemplate = null
         update { Status() }
     }
 
@@ -286,6 +287,7 @@ class CarAppConnection(private val context: Context) {
         // carries over. Its template stayed on screen, every button pointing at a dead app, and a
         // first template refused by the new one no longer counted as the failure it is.
         _template.value = null
+        loggedTemplate = null
         appManager = null
         navigationManager = null
         surfaceCallback = null
@@ -624,13 +626,13 @@ class CarAppConnection(private val context: Context) {
         MyCarLog.i("host: took the surface back")
     }
 
-    /** Tells the app which part of its surface the driver can actually see. */
     /** The areas last told to the app, see [reportAreas]. */
     private var reportedAreas: Pair<Rect, Rect>? = null
     /** The app's template updates so far, and the kind of template last written to the log. */
     private val invalidations = java.util.concurrent.atomic.AtomicInteger()
     private var loggedTemplate: String? = null
 
+    /** Tells the app which part of its surface the driver can actually see. */
     fun reportAreas(visible: Rect, stable: Rect) {
         val callback = surfaceCallback ?: return
         // During a route the app sends a template about once a second, and each one sent the same

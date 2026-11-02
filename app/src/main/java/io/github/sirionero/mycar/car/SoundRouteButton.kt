@@ -26,6 +26,8 @@ internal fun SoundRouteButton(size: Dp) {
             val toMyCar = !throughMyCar
             CarSettings.setAudioRoute(if (toMyCar) AudioRoute.CAR_LINK else AudioRoute.BLUETOOTH)
             // One tap moves the sound, and it stays that way for this car: the car says where it goes now.
+            // Taps in a row: only the last word stays, not a queue of old ones.
+            CarToasts.clear(SoundRoute)
             CarToasts.show(
                 SoundRoute,
                 Words.get(if (toMyCar) R.string.car_player_sound_now_mycar else R.string.car_player_sound_now_bluetooth),
