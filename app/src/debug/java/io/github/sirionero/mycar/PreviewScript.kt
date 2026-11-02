@@ -43,6 +43,7 @@ import kotlin.random.Random
  *   demo                         the made-up song again in the car's player, its music app kept
  *   key:code                     a key of the car pressed and let go (CarKeys)
  *   unfocus                      the focus taken from the view that has it (a web view after a tap)
+ *   focusweb                     the focus given to the web view in sight, as a tap in it can
  *   snap:name                    the picture now, as name.png
  *   log:text                     a line in the log
  *   rep:n ... end                the steps between n times
@@ -195,6 +196,14 @@ internal class PreviewScript(
                 }
                 MyCarLog.i("preview: step $n: focus taken from $from")
             }
+            // The focus given to the web view in sight (Plancia's page), as a tap in it gives it.
+            "focusweb" -> {
+                val result = onMain {
+                    val web = rootView()?.let { firstWebView(it) }
+                    if (web == null) "no web view in sight" else "${web.requestFocus()}, focused ${web.hasFocus()}"
+                }
+                MyCarLog.i("preview: step $n: focus to the web view: $result")
+            }
             "rebuild" -> {
                 MyCarLog.i("preview: step $n: the car's screen made again")
                 onMain { rebuild() }
@@ -223,6 +232,14 @@ internal class PreviewScript(
             }
             else -> MyCarLog.w("preview: step $n: unknown step '$step'")
         }
+    }
+
+    private fun firstWebView(view: View): android.webkit.WebView? {
+        if (view is android.webkit.WebView && view.isShown) return view
+        if (view is ViewGroup) {
+            for (i in 0 until view.childCount) firstWebView(view.getChildAt(i))?.let { return it }
+        }
+        return null
     }
 
     /** A quick drag, to turn a page: 250 ms, a move every 16. */

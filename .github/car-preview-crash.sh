@@ -185,3 +185,10 @@ EXTRA="$HA $PAGE3 --ez demoSong true --es miniAt 0.05,1" stress crash-focus-clea
 # part of a page does: does the same go down there too?
 EXTRA="$HA --es sidePane mycar:plancia" stress crash-focus-side 800 480 160 \
     "wait:9000;rep:20;tap:640-760,200-400;wait:300-2000;tap:$C_FOOT;wait:600-1200;tap:$C_FOOT;wait:800-1500;end;snap:end" 200
+# The same with the focus given to Plancia's web view directly (focusweb), as a tap in it gives it: a
+# tap doesn't always (crash-focus-cleared's taps never did, so it proved nothing). crash-webfocus leaves
+# the page with the focus there; crash-webfocus-cleared takes it away first (unfocus).
+EXTRA="$HA $PAGE3 --ez demoSong true --es miniAt 0.05,1" stress crash-webfocus 800 480 160 \
+    "wait:9000;tap:$C_CLOSE;wait:2500;rep:20;$TO_LEFT;wait:1000-1500;focusweb;wait:300-2000;$DRIVER;wait:500-1500;end;snap:end" 200
+EXTRA="$HA $PAGE3 --ez demoSong true --es miniAt 0.05,1" stress crash-webfocus-cleared 800 480 160 \
+    "wait:9000;tap:$C_CLOSE;wait:2500;rep:20;$TO_LEFT;wait:1000-1500;focusweb;wait:300-2000;unfocus;wait:150;$DRIVER;wait:500-1500;end;snap:end" 200
