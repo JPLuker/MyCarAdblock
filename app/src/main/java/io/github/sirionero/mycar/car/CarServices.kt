@@ -351,7 +351,13 @@ object CarServices {
             // a driver who started a song before plugging in shouldn't have to go open its tile by
             // hand just to see what's already going.
             val playing = withContext(Dispatchers.IO) { currentlyPlaying(ctx, catalog) }
-            if (playing != null) {
+            // The phone's own app of a service whose web player takes its place in the car (its app
+            // ticked to stay off the grid): the music goes on in that player instead, the app paused.
+            val web = playing?.let { webFor(it.component, catalog) }
+            if (web != null) {
+                pausePhoneMedia("its web player takes its place in the car")
+                openMedia(web, autoplay = true, auto = true)
+            } else if (playing != null) {
                 openMedia(playing, auto = true)
             } else {
                 val last = CarSettings.lastMedia.value?.let(ComponentName::unflattenFromString)

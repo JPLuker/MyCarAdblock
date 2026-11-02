@@ -127,7 +127,10 @@ internal fun hiddenEntries(ids: Set<String>, entries: List<Entry>): List<Entry> 
 internal fun HiddenAppsSettings() {
     val ids by HiddenApps.ids.collectAsState()
     val entries = rememberAllEntries()
-    val hidden = remember(ids, entries) { hiddenEntries(ids, entries) }
+    // Not the phone's app of a music service in its place: Show couldn't bring it back, the Music
+    // tick on the phone keeps it off. Untick that, and it's here again with a Show that works.
+    val replaced = rememberReplacedByWeb()
+    val hidden = remember(ids, entries, replaced) { hiddenEntries(ids, entries).filterNot(replaced) }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.car_settings_hidden_apps), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
         hidden.forEach { entry ->

@@ -356,13 +356,17 @@ private fun MoveButtons(id: String) {
     // The grid as it's drawn: a move trades places with the app shown next to it, not a hidden one.
     val all = rememberAllEntries()
     val offGrid = rememberOffTheGrid(all)
-    val order = launcherOrder(all.filterNot(offGrid), rememberVehicleDataShown(), custom).mapNotNull { it.componentId }
+    val vehicleData = rememberVehicleDataShown()
+    val order = launcherOrder(all.filterNot(offGrid), vehicleData, custom).mapNotNull { it.componentId }
     val index = order.indexOf(id)
     if (index < 0) return
     fun move(by: Int) {
         val next = order.toMutableList()
         java.util.Collections.swap(next, index, index + by)
-        CarSettings.setAppOrder(next)
+        // Saved over the whole order: an app off the grid keeps its place for when it comes back.
+        val shown = order.toSet()
+        val moved = next.iterator()
+        CarSettings.setAppOrder(launcherOrder(all, vehicleData, custom).mapNotNull { it.componentId }.map { if (it in shown) moved.next() else it })
     }
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         GsButton(

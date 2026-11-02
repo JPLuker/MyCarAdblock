@@ -97,6 +97,9 @@ internal fun CarDock(navigator: CarNavigator, modifier: Modifier = Modifier) {
     val entries = rememberAllEntries()
     val running = rememberRunningApps()
     val pinnedIds by CarSettings.pinnedApps.collectAsState()
+    // pinShown reads the music services' "hide the phone's app" ticks: read here, so a tick on the
+    // phone moves a pin at once.
+    io.github.sirionero.mycar.webmusic.WebMusic.hideApp.collectAsState().value
     val frame by CarEnvironment.frame.collectAsState()
     // A call's card covers the top of the map, the next turn's arrow and distance with it - ringing,
     // and for the whole call once answered: the next turn is here meanwhile.
