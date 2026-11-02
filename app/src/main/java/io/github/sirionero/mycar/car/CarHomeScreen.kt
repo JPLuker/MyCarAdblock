@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -89,7 +90,23 @@ fun CarHome() {
     // Beside the map: the app chosen for it in the car's settings, always; or, by default, the
     // music player while something plays.
     val sideApp = rememberSidePaneApp()
-    val splitScreen = panel != SidePanel.NONE && (sideApp != null || (phase == CarMedia.Phase.READY && now.isActive))
+    // The music's column closes only after a short hold: an app that relinks, a change of music app,
+    // the gap between two songs or a web page that reloads would otherwise close it and open it again,
+    // and every width of the map is a new surface for its app (two hand-overs: Vela redraws the map).
+    // Opening stays immediate; music closed by the driver (no music app any more) closes it at once.
+    val mediaApp by CarServices.mediaApp.collectAsStateWithLifecycle()
+    val musicOn = phase == CarMedia.Phase.READY && now.isActive
+    var musicShown by remember { mutableStateOf(musicOn) }
+    LaunchedEffect(musicOn, mediaApp) {
+        if (musicOn) musicShown = true
+        else if (mediaApp == null) musicShown = false
+        else { delay(MUSIC_HOLD_MS); musicShown = false }
+    }
+    // The last song with a title and a live state, drawn during the hold.
+    val lastActive = remember { arrayOf(now) }
+    if (now.isActive) lastActive[0] = now
+    val shownNow = if (now.isActive) now else lastActive[0]
+    val splitScreen = panel != SidePanel.NONE && (sideApp != null || musicShown)
     // The music beside the map at the size chosen for it (Small, Medium, Large): an app's own screen
     // there keeps its size.
     val music = sideApp?.template == null && sideApp?.builtIn != BuiltInApps.Plancia
@@ -125,9 +142,9 @@ fun CarHome() {
                 // Plancia inside myCar: its one page goes wherever it's on screen, so here too only in view.
                 sideApp?.builtIn == BuiltInApps.Plancia ->
                     if (inView) PlanciaPane(side) else AppPlaceholder("Plancia", null, side, builtInId = BuiltInApps.Plancia.id)
-                panel == SidePanel.LYRICS -> SideLyrics(now, side)
-                sideMedia != null -> SideMediaPane(sideMedia, now, side)
-                else -> GlassDockedPlayer(now, side)
+                panel == SidePanel.LYRICS -> SideLyrics(shownNow, side)
+                sideMedia != null -> SideMediaPane(sideMedia, shownNow, side)
+                else -> GlassDockedPlayer(shownNow, side)
             }
         }
     }
@@ -210,6 +227,9 @@ private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame
 
 /** The side's share of the screen beside the map at Small: one part to the map's 2.1. */
 private const val MAP_SHARE = 3.1f
+
+/** How long the music's column waits, once nothing plays, before giving the map its width back. */
+private const val MUSIC_HOLD_MS = 6_000L
 
 /** Everything drawn [scale] times bigger: the player beside the map at Medium or Large. */
 private fun Density.scaledBy(scale: Float): Density = if (scale == 1f) this else Density(density * scale, fontScale)
