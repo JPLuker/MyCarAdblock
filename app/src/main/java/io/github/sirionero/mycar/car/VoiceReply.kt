@@ -226,8 +226,30 @@ object VoiceReply {
     private fun startCountdown(id: Int, ms: Long) {
         val sendAt = SystemClock.uptimeMillis() + ms
         _state.value = _state.value.copy(until = sendAt, span = ms, held = 0f)
+        extended = false
         main.removeCallbacksAndMessages(SEND_TOKEN)
-        main.postAtTime({ if (id == run) send() }, SEND_TOKEN, sendAt)
+        main.postAtTime({ if (id == run) countdownOver(id) }, SEND_TOKEN, sendAt)
+    }
+
+    /** A phrase is being heard in the countdown: begun (its first word, or its end), its words not made out yet. */
+    private var talking = false
+    /** The countdown has had its one wait for a phrase ([countdownOver]). */
+    private var extended = false
+
+    /**
+     * The countdown has run out: sent, unless a phrase is still being heard - a "cancel" said in its
+     * last seconds, ended by a second of quiet and then made out by the final model. Sent then, the
+     * phrase was thrown away and the reply went. That phrase gets once [LAST_PHRASE_MS] more (the bar
+     * stays empty): road noise or the radio hold the reply back no longer than that.
+     */
+    private fun countdownOver(id: Int) {
+        if (talking && !extended) {
+            extended = true
+            MyCarLog.i("voice reply: a phrase still being heard as the countdown ends - waiting for it")
+            main.postAtTime({ if (id == run) send() }, SEND_TOKEN, SystemClock.uptimeMillis() + LAST_PHRASE_MS)
+            return
+        }
+        send()
     }
 
     /**
@@ -235,11 +257,15 @@ object VoiceReply {
      * pauses: in a noisy car it held for road noise and the radio, and the reply never went.
      */
     private fun listenForCommand(id: Int) {
+        talking = false
         CarAssistant.dictate(
             onPartial = {},
             cue = false,
+            onSpeaking = { if (id == run) talking = true },
+            onHeard = { if (id == run) talking = true },
             onResult = { text ->
                 if (id != run) return@dictate
+                talking = false
                 when (command(text)) {
                     Command.CANCEL -> {
                         close()
@@ -259,6 +285,7 @@ object VoiceReply {
             // Silence ends the recognizer before the countdown does: listen again until it sends.
             onError = {
                 if (id != run) return@dictate
+                talking = false
                 // A short gap, so a recognizer that fails at once can't spin.
                 main.postDelayed({ if (id == run) listenForCommand(id) }, RELISTEN_MS)
             },
@@ -421,4 +448,6 @@ object VoiceReply {
     private const val OFFER_MS = 6_500L
     private const val OFFER_GRACE_MS = 1_500L
     private const val RELISTEN_MS = 400L
+    /** How long a reply waits, once, for a phrase still being heard as its countdown ends. */
+    private const val LAST_PHRASE_MS = 2_000L
 }

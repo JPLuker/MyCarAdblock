@@ -495,10 +495,12 @@ object CarAssistant {
         onError: (String) -> Unit,
         cue: Boolean = true,
         onSpeaking: () -> Unit = {},
+        /** The phrase has ended and its words are being made out. */
+        onHeard: () -> Unit = {},
     ) {
         cancel()
         syncLanguage()
-        listenOnce(onPartial, onHeard = {}, onResult = onResult, onError = onError, cue = cue, onSpeaking = onSpeaking)
+        listenOnce(onPartial, onHeard = onHeard, onResult = onResult, onError = onError, cue = cue, onSpeaking = onSpeaking)
     }
 
     /**
