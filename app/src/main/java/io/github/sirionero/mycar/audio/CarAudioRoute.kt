@@ -10,6 +10,9 @@ import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.SessionReport
 import io.github.sirionero.mycar.car.CarBluetooth
 import io.github.sirionero.mycar.car.CarSettings
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /** How the phone's sound reaches the car; the car's settings choose, Automatic by default. */
 enum class AudioRoute(val id: String) {
@@ -54,6 +57,15 @@ object CarAudioRoute {
         audio = context.applicationContext.getSystemService(AudioManager::class.java)
     }
 
+    private val _deciding = MutableStateFlow(false)
+
+    /**
+     * Automatic hasn't picked this drive's way yet (the car's Bluetooth given its few seconds, a call
+     * waited out): the drive's own Autoplay waits for it (CarServices.autoplayIfDue), as music
+     * started now played on the phone's speaker.
+     */
+    val deciding: StateFlow<Boolean> = _deciding.asStateFlow()
+
     /** Automatic left this drive's music to Bluetooth, the map app's voice with it. */
     val onBluetooth: Boolean
         get() = CarSettings.audioRoute.value == AudioRoute.AUTO && !CarSettings.pipeAudio.value
@@ -67,6 +79,7 @@ object CarAudioRoute {
 
     fun onCarDisconnected() = main.post {
         projecting = false
+        _deciding.value = false
         sawCall = false
         callWaits = 0
         dropCallWaits = 0
@@ -81,6 +94,7 @@ object CarAudioRoute {
     }
 
     private fun decide() {
+        _deciding.value = true
         main.removeCallbacksAndMessages(settling)
         sawCall = false
         callWaits = 0
@@ -99,7 +113,10 @@ object CarAudioRoute {
      * [MAX_CALL_WAITS] waits: an app can leave the phone "in communication" for good.
      */
     private fun settle() {
-        if (!projecting || CarSettings.audioRoute.value != AudioRoute.AUTO) return
+        if (!projecting || CarSettings.audioRoute.value != AudioRoute.AUTO) {
+            _deciding.value = false
+            return
+        }
         if (bluetoothMusic()) {
             sawCall = false
             useBluetooth()
@@ -120,6 +137,7 @@ object CarAudioRoute {
         log.i("route: through myCar - the car takes no music from the phone over Bluetooth")
         SessionReport.audioRoute("auto: through myCar (no Bluetooth music connection to the car)")
         CarSettings.useCarLink(true)
+        _deciding.value = false
     }
 
     /** Waits for a call at the start of a drive, [SETTLE_MS] each: five minutes. */
@@ -130,6 +148,7 @@ object CarAudioRoute {
         log.i("route: Bluetooth - the car takes the phone's music over it")
         SessionReport.audioRoute("auto: Bluetooth (the car takes the phone's music over it)")
         CarSettings.useCarLink(false)
+        _deciding.value = false
         watch()
     }
 

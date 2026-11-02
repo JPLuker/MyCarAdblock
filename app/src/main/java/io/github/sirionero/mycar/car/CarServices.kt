@@ -356,9 +356,25 @@ object CarServices {
         autoplayPending = false
     }
 
-    /** Called once the media app is connected: starts playback if that was asked for. */
+    /**
+     * Called once the media app is connected, and again as the sound's way to the car changes:
+     * starts playback if that was asked for. The drive's own pick waits for its sound to have a way
+     * to the car ([autoplayWaits]): started at once, it played on the phone's speaker in the driver's
+     * pocket for as long as Automatic decided or Android's question waited for myCar on screen. What
+     * the driver opens plays at once.
+     */
     fun autoplayIfDue() {
         if (!autoplayPending) return
+        if (mediaAutoPicked && autoplayWaits(
+                deciding = io.github.sirionero.mycar.audio.CarAudioRoute.deciding.value,
+                throughMyCar = CarSettings.pipeAudio.value,
+                captureOn = CarAudio.capture.value == CarAudio.Capture.ON,
+                straightIn = _mediaApp.value?.component?.let(Xonos::isInside) == true && CarAudio.direct.value,
+            )
+        ) {
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the sound to have a way to the car")
+            return
+        }
         autoplayPending = false
         if (!media.now.value.playing) media.togglePlay()
     }
