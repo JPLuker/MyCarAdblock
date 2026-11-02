@@ -43,6 +43,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -70,14 +71,15 @@ object MiniPlayerSetting {
     private const val KEY_AT = "car_mini_player_at"
     private var app: Context? = null
     private val onFlow = MutableStateFlow(true)
-    private val placeFlow = MutableStateFlow(MiniPlace.CORNER)
+    private val placeFlow = MutableStateFlow<MiniPlace?>(null)
     val on: StateFlow<Boolean> = onFlow
-    internal val place: StateFlow<MiniPlace> = placeFlow
+    /** Where the driver let it go; null until then: it starts where [MiniPlace.start] puts it on the map. */
+    internal val place: StateFlow<MiniPlace?> = placeFlow
 
     fun init(context: Context) {
         val app = context.applicationContext.also { this.app = it }
         onFlow.value = AppSettings.getString(app, KEY_ON, "true") == "true"
-        placeFlow.value = MiniPlace.parse(AppSettings.getString(app, KEY_AT, "")) ?: MiniPlace.CORNER
+        placeFlow.value = MiniPlace.parse(AppSettings.getString(app, KEY_AT, ""))
     }
 
     fun setOn(on: Boolean) {
@@ -85,9 +87,9 @@ object MiniPlayerSetting {
         app?.let { AppSettings.putString(it, KEY_ON, on.toString()) }
     }
 
-    internal fun moveTo(place: MiniPlace) {
+    internal fun moveTo(place: MiniPlace?) {
         placeFlow.value = place
-        app?.let { AppSettings.putString(it, KEY_AT, place.saved()) }
+        app?.let { AppSettings.putString(it, KEY_AT, place?.saved().orEmpty()) }
     }
 }
 
@@ -107,11 +109,22 @@ internal fun MapMiniPlayer(now: NowPlaying, modifier: Modifier = Modifier) {
     val art = rememberArt(now)
     val cover = remember(art) { art?.asImageBitmap() }
     val appIcon = remember(mediaApp) { mediaApp?.let { findEntry(it.component.flattenToString())?.icon } }
-    BoxWithConstraints(modifier.padding(MyCarSpace.M)) {
+    // Clear of the page dots along the bottom: under them, a tap on the cover turned the page.
+    BoxWithConstraints(modifier.padding(start = MINI_EDGE.dp, top = MINI_EDGE.dp, end = MINI_EDGE.dp, bottom = MINI_DOTS_STRIP.dp)) {
         var size by remember { mutableStateOf(IntSize.Zero) }
-        // Where it rests. Set here the moment it's let go, with the drag cleared in the same frame:
+        // Where it was let go. Set here the moment it's let go, with the drag cleared in the same frame:
         // the saved place reaches a collector a moment later, and it sprang back for a frame meanwhile.
-        var rest by remember { mutableStateOf(MiniPlayerSetting.place.value) }
+        var kept by remember { mutableStateOf(MiniPlayerSetting.place.value) }
+        // Where it rests: there, or, never moved, where it starts on this map (its own size known or not).
+        val density = LocalDensity.current
+        val rest = kept ?: with(density) {
+            MiniPlace.start(
+                maxWidth.value, maxHeight.value,
+                if (size.width > 0) size.width.toDp().value else MINI_WIDTH,
+                if (size.height > 0) size.height.toDp().value else MINI_HEIGHT,
+            )
+        }
+        val restNow by rememberUpdatedState(rest)
         var held by remember { mutableStateOf(false) }
         // How far the finger has taken it from where it rests, in pixels.
         var moved by remember { mutableStateOf(Offset.Zero) }
@@ -132,8 +145,8 @@ internal fun MapMiniPlayer(now: NowPlaying, modifier: Modifier = Modifier) {
                         onHold = { held = true },
                         onDrag = { by ->
                             // Inside the map whichever way: from where it rests to either edge.
-                            val restX = rest.x * roomNow.width
-                            val restY = rest.y * roomNow.height
+                            val restX = restNow.x * roomNow.width
+                            val restY = restNow.y * roomNow.height
                             val next = moved + by
                             moved = Offset(
                                 next.x.coerceIn(-restX, roomNow.width - restX),
@@ -143,10 +156,10 @@ internal fun MapMiniPlayer(now: NowPlaying, modifier: Modifier = Modifier) {
                         onEnd = { dragged ->
                             if (dragged) {
                                 val to = MiniPlace.of(
-                                    rest.x * roomNow.width + moved.x, rest.y * roomNow.height + moved.y,
+                                    restNow.x * roomNow.width + moved.x, restNow.y * roomNow.height + moved.y,
                                     roomNow.width, roomNow.height,
                                 )
-                                rest = to
+                                kept = to
                                 MiniPlayerSetting.moveTo(to)
                                 MyCarLog.i("mini player: let go at ${to.saved()}")
                             }

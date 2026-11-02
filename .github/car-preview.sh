@@ -124,12 +124,16 @@ EXTRA="--ez demoSong true --es playerSize 1.4" shoot split-extra-800x480 800 480
 EXTRA="--ez demoSong true --es playerSize 1.4" shoot lyrics-side 1920 720 240 "$WAIT;$WAIT;1654,627;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.4" shoot lyrics-side-extra-800x480 800 480 160 "$WAIT;$WAIT;693,423;$WAIT;$WAIT;$WAIT;$WAIT"
 # The mini player over the whole map (car/MapMiniPlayer.kt). The player's X closes the column and the
-# mini player floats in the map's bottom-right corner; held on its cover and dragged to the top middle
-# (the log says where it was let go); its X puts it away (the card says how); the dock's song brings the
-# column back, the column's X the mini player, where it was let go; a slow tap (0.9 s, not moved) on its
-# cover still opens the full player. Then at 800x480, light, where an earlier drive left it, off.
-EXTRA="--ez demoSong true" shoot mini 1920 720 240 "$WAIT;1866,54;$WAIT;1536,654,drag,936,174;1254,174;72,279;1866,54;$WAIT;936,174,long"
-EXTRA="--ez demoSong true" shoot mini-800x480 800 480 160 "$WAIT;764,36;$WAIT;544,436,drag,460,60"
+# mini player floats in the map's bottom-right corner, over the page dots; held on its cover and dragged
+# to the top middle (the log says where it was let go); its X puts it away (the card says how); the dock's
+# song brings the column back, the column's X the mini player, where it was let go; a slow tap (0.9 s, not
+# moved) on its cover still opens the full player. Then at 800x480, light, where an earlier drive left it,
+# off; and at 800x480 with the car's screen at Large and Extra large (--es carScale), where the map is
+# small: it starts left of the map's buttons and above the trip's time.
+EXTRA="--ez demoSong true" shoot mini 1920 720 240 "$WAIT;1866,54;$WAIT;1536,582,drag,936,174;1254,174;72,279;1866,54;$WAIT;936,174,long"
+EXTRA="--ez demoSong true" shoot mini-800x480 800 480 160 "$WAIT;764,36;$WAIT;544,388,drag,460,60"
+EXTRA="--ez demoSong true --es carScale 1.25" shoot mini-large-800x480 800 480 160 "$WAIT;755,45;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es carScale 1.5" shoot mini-xl-800x480 800 480 160 "$WAIT;746,54;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es carTheme LIGHT" shoot mini-light 1920 720 240 "$WAIT;1866,54;$WAIT"
 EXTRA="--ez demoSong true --es miniAt 0.5,0" shoot mini-kept 1920 720 240 "$WAIT;1866,54;$WAIT"
 EXTRA="--ez demoSong true --ez miniPlayer false" shoot mini-off 1920 720 240 "$WAIT;1866,54;$WAIT"

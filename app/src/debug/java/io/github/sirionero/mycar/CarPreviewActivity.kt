@@ -139,12 +139,15 @@ class CarPreviewActivity : ComponentActivity() {
             intent.getStringExtra("playerSize")?.toFloatOrNull()?.takeIf { it in io.github.sirionero.mycar.car.CarSettings.PLAYER_SIZES }
                 ?: io.github.sirionero.mycar.car.CarSettings.PLAYER_SMALL,
         )
+        // --es carScale 1.25: the car's screen at that size (Large 1.25, Extra large 1.5); Normal every other run.
+        io.github.sirionero.mycar.car.CarSettings.setScale(
+            intent.getStringExtra("carScale")?.toFloatOrNull()?.takeIf { it in 0.8f..1.5f } ?: 1f,
+        )
         // --es miniAt 0.5,0: the mini player over the map starts there (0,0 top left, 1,1 bottom right);
-        // its corner every other run. --ez miniPlayer false: off. Set every run.
+        // where it starts unmoved every other run. --ez miniPlayer false: off. Set every run.
         io.github.sirionero.mycar.car.MiniPlayerSetting.setOn(intent.getBooleanExtra("miniPlayer", true))
         io.github.sirionero.mycar.car.MiniPlayerSetting.moveTo(
-            io.github.sirionero.mycar.car.MiniPlace.parse(intent.getStringExtra("miniAt").orEmpty())
-                ?: io.github.sirionero.mycar.car.MiniPlace.CORNER,
+            io.github.sirionero.mycar.car.MiniPlace.parse(intent.getStringExtra("miniAt").orEmpty()),
         )
         // --es carTheme LIGHT: the car's screen in that theme (PHONE, LIGHT, DARK); dark every other run.
         CarSettings.setAppTheme(
