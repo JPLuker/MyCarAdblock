@@ -93,13 +93,14 @@ private fun AppSurface(
     modifier: Modifier = Modifier,
 ) {
     var size by remember { mutableStateOf(0 to 0) }
+    val minPanePx = with(androidx.compose.ui.platform.LocalDensity.current) { MAP_PANE_MIN_EDGE.roundToPx() }
 
     // The app lays its map out around whatever the host covers, so a template change moves the
     // visible area even though the surface itself hasn't changed.
-    LaunchedEffect(template, size) {
+    LaunchedEffect(template, size, minPanePx) {
         val (width, height) = size
         if (width > 0 && height > 0) {
-            val visible = visibleAreaFor(template, width, height)
+            val visible = visibleAreaFor(template, width, height, minPanePx)
             connection.reportAreas(visible = visible, stable = visible)
         }
     }

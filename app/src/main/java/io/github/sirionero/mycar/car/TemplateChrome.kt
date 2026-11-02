@@ -101,11 +101,13 @@ fun TemplateChrome(template: Template?, modifier: Modifier = Modifier) {
  * A template that isn't map-backed covers the surface completely, and reporting an empty
  * rectangle is how the app is told to stop bothering.
  */
-fun visibleAreaFor(template: Template?, width: Int, height: Int): Rect = when (template) {
+fun visibleAreaFor(template: Template?, width: Int, height: Int, minPanePx: Int = 0): Rect = when (template) {
     is NavigationTemplate -> Rect(0, 0, width, (height * (1f - ESTIMATE_FRACTION)).toInt())
+    // The pane's real right edge: on a narrow map (the player beside it, a large size) its minimum
+    // width ([MAP_PANE_MIN_EDGE], in pixels as [minPanePx]) goes past the fraction.
     is MapWithContentTemplate, is MapTemplate, is PlaceListNavigationTemplate,
     is RoutePreviewNavigationTemplate, is PlaceListMapTemplate,
-    -> Rect((width * CONTENT_PANE_FRACTION).toInt(), 0, width, height)
+    -> Rect(maxOf((width * CONTENT_PANE_FRACTION).toInt(), minPanePx).coerceAtMost(width), 0, width, height)
     null -> Rect(0, 0, width, height)
     else -> Rect(0, 0, 0, 0)
 }
@@ -115,9 +117,11 @@ fun visibleAreaFor(template: Template?, width: Int, height: Int): Rect = when (t
 @Composable
 private fun NavigationChrome(template: NavigationTemplate, modifier: Modifier) {
     val pan by templateConnection().panMode.collectAsState()
-    Box(modifier.fillMaxWidth()) {
+    androidx.compose.foundation.layout.BoxWithConstraints(modifier.fillMaxWidth()) {
+        // On a narrow map (the player beside it, a large size) the card leaves the right edge to the
+        // map's controls: never more than 60% of the map.
         if (!pan) (template.navigationInfo as? RoutingInfo)?.let {
-            RoutingCard(it, Modifier.align(Alignment.TopStart).padding(12.dp).width(320.dp))
+            RoutingCard(it, Modifier.align(Alignment.TopStart).padding(12.dp).width(minOf(320.dp, maxWidth * 0.6f)))
         }
         RightEdgeControls(
             if (pan) null else template.actionStrip,
@@ -369,7 +373,7 @@ private fun MapPaneLayout(
                 Modifier
                     .align(Alignment.TopStart)
                     .padding(12.dp)
-                    .width(maxOf(maxWidth * CONTENT_PANE_FRACTION - 12.dp, 232.dp))
+                    .width(maxOf(maxWidth * CONTENT_PANE_FRACTION - 12.dp, MAP_PANE_MIN_EDGE - 12.dp))
                     .let { if (fullHeight) it.height(maxHeight - 24.dp) else it.heightIn(max = maxHeight - 24.dp) },
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
                 shadowElevation = 8.dp,
@@ -492,6 +496,9 @@ private fun ListPane(
 
 /** Fraction of the surface the content pane covers beside a map. */
 private const val CONTENT_PANE_FRACTION = 0.42f
+
+/** The content pane's right edge at its narrowest: 12 dp of margin and 232 dp of width. */
+internal val MAP_PANE_MIN_EDGE = 244.dp
 
 /** Fraction of the surface the travel-estimate bar covers along the bottom. */
 private const val ESTIMATE_FRACTION = 0.14f
