@@ -27,7 +27,7 @@ myCar 0.6.7-alpha: Spotify's sign-in on the phone and Paste in the car fixed, a 
 - The next turn stays in the dock for the whole call, not only while it rings. What's new waits until the car stops (the car's own word, then the GPS) and never covers a ringing call. Back in the music list goes up a folder. The wheel's Play no longer starts the music over a film.
 - The music app beside the map, played from there, becomes the one the next drive starts with. A web player signed in on the phone during a drive reloads in the car, and one made without network reloads at the first button.
 - Lighter: the voice models load 20 seconds after the car connects, not while its first picture is made; the map app is sent its visible area only when it changes, and its template updates no longer write two log lines a second.
-- Cinema's settings on the phone ask for the home network only for home addresses, not for YouTube.
+- Cinema's settings on the phone no longer ask for the home network for the suggested sites (YouTube, RaiPlay, Twitch, "More sites"); sites you add still may.
 
 Checked in the emulator (Android 14 and 17): Spotify's and Deezer's sign-in pages show and Spotify's email field takes a touch; YouTube in Cinema with its bottom bar; the browser's page and dropdown; every commit compiled and unit-tested in CI. Found by a night of independent code reviews, each point checked in the code before fixing. Not tried in a real car.
 
