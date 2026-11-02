@@ -18,6 +18,7 @@ import io.github.sirionero.mycar.car.CarUi
 import java.io.File
 import java.io.FileOutputStream
 import io.github.sirionero.mycar.car.withLayout
+import io.github.sirionero.mycar.car.withSlot
 
 /**
  * Debug-only harness: runs the real car UI on a virtual display (the same path a head unit
@@ -95,7 +96,20 @@ class CarPreviewActivity : ComponentActivity() {
         intent.getStringExtra("pageLayout")?.let { io.github.sirionero.mycar.car.PageLayout.of(it) }?.let { layout ->
             val pages = io.github.sirionero.mycar.car.readyMade(null) +
                 io.github.sirionero.mycar.car.HomePage(2, io.github.sirionero.mycar.car.PageLayout.HALVES)
-            io.github.sirionero.mycar.car.HomePages.save(pages.withLayout(1, layout))
+            var laid = pages.withLayout(1, layout)
+            // --es pageParts plancia,agenda,weather: what that page shows, part by part (weather, agenda,
+            // browser, plancia; anything else leaves the part empty): the plancia-swipe shots.
+            intent.getStringExtra("pageParts")?.split(',')?.forEachIndexed { slot, name ->
+                val content = when (name.trim()) {
+                    "weather" -> io.github.sirionero.mycar.car.PageContent.WEATHER
+                    "agenda" -> io.github.sirionero.mycar.car.PageContent.AGENDA
+                    "browser" -> io.github.sirionero.mycar.car.PageContent.BROWSER
+                    "plancia" -> io.github.sirionero.mycar.car.PageContent.PLANCIA
+                    else -> null
+                }
+                laid = laid.withSlot(1, slot, content)
+            }
+            io.github.sirionero.mycar.car.HomePages.save(laid)
         }
         // --ez bridge true: Plancia's and Xonos's connections through the Plancia and Xonos apps'
         // bridges, as with myCar left out of Tailscale - the emulator has no Tailscale. Every run.
@@ -203,7 +217,8 @@ class CarPreviewActivity : ComponentActivity() {
 
         // "x,y" taps, "x,y,long" holds the finger down long enough for a long press (an app's menu).
         // "x,y" taps, "x,y,long" holds the finger down 0.9 s (an app's menu; a slow tap), "x,y,drag,x2,y2"
-        // holds it that long, then drags it to x2,y2 in 10 steps (the mini player over the map).
+        // holds it that long, then drags it to x2,y2 in 10 steps (the mini player over the map);
+        // "x,y,swipe,x2,y2" goes to x2,y2 at once, in 8 steps of 16 ms, as a finger turning a page.
         val taps = intent.getStringExtra("taps").orEmpty().split(";").filter { it.isNotBlank() }.map { it.split(",") }
 
         val imageReader = ImageReader.newInstance(w, h, PixelFormat.RGBA_8888, 3)
@@ -353,6 +368,14 @@ class CarPreviewActivity : ComponentActivity() {
                             p.dispatchTouch(MotionEvent.ACTION_MOVE, 0, listOf(TouchPoint(0, x + (toX - x) * s / steps, y + (toY - y) * s / steps)))
                         }, 900L + 40L * s)
                         main.postDelayed({ p.dispatchTouch(MotionEvent.ACTION_UP, 0, listOf(TouchPoint(0, toX, toY))) }, 900L + 40L * (steps + 1))
+                    } else if (tap.getOrNull(2) == "swipe") {
+                        val toX = tap[3].toFloat()
+                        val toY = tap[4].toFloat()
+                        val steps = 8
+                        for (s in 1..steps) main.postDelayed({
+                            p.dispatchTouch(MotionEvent.ACTION_MOVE, 0, listOf(TouchPoint(0, x + (toX - x) * s / steps, y + (toY - y) * s / steps)))
+                        }, 16L * s)
+                        main.postDelayed({ p.dispatchTouch(MotionEvent.ACTION_UP, 0, listOf(TouchPoint(0, toX, toY))) }, 16L * (steps + 1))
                     } else {
                         main.postDelayed({ p.dispatchTouch(MotionEvent.ACTION_UP, 0, point) }, if (tap.getOrNull(2) == "long") 900L else 80L)
                     }

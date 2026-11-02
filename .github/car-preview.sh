@@ -92,6 +92,28 @@ shoot() {
     adb logcat -d -b crash > "previews/$1/crash.txt" 2>&1
 }
 
+# alive <shot>: whether myCar still runs at the end of the shot (the shot leaves it running), and if
+# not how it ended: the crash buffer (a native crash's tombstone too), what the web engine, the
+# graphics and Android said about it, and Android's record of the process's exits. In alive.txt.
+alive() {
+    case " ${ONLY:-$1} " in *" $1 "*) ;; *) return ;; esac
+    [ -d "previews/$1" ] || return
+    adb get-state >/dev/null 2>&1 || return
+    local pid
+    pid=$(adb shell pidof "$PKG" | tr -d '\r')
+    {
+        echo "myCar's process at the end of the shot: ${pid:-none}"
+        echo "--- crash buffer ---"
+        adb logcat -d -b crash
+        echo "--- native crashes, the web engine, graphics, kills ---"
+        adb logcat -d -v time -b main,system | grep -E "DEBUG|Fatal signal|F libc|libc  |chromium|cr_|WebView|hwui|OpenGLRenderer|RenderThread|lowmemorykiller|Killing|has died|ActivityManager: Process" | tail -300
+        echo "--- Android's record of myCar's exits ---"
+        adb shell dumpsys activity exit-info "$PKG" | head -120
+    } > "previews/$1/alive.txt" 2>&1
+    echo "--- $1: myCar's process at the end: ${pid:-none (gone)} ---"
+    grep -m 30 -E "Fatal signal|\*\*\* \*\*\*|signal [0-9]+ \(|Abort message|#[0-9]{2} pc" "previews/$1/alive.txt" || true
+}
+
 # Home, then the app grid (dock's foot), then the dashboard (the clock at its top).
 shoot 800x480 800 480 160 "48,436;48,44"
 shoot 1920x720 1920 720 240 "$GRID_BUTTON;72,66"
@@ -179,6 +201,28 @@ if [ -n "${HA_TOKEN:-}" ]; then
     EXTRA="$HA" shoot plancia-app 1920 720 240 "$WAIT;$WAIT;$GRID_BUTTON;$(at plancia);$WAIT;$WAIT;$WAIT;$PLANCIA_MENU;$WAIT"
     EXTRA="$HA" shoot plancia-page 1920 720 240 "$WAIT;$WAIT;$DOCK_MAP;1098,675;$WAIT;$WAIT;$WAIT"
     EXTRA="$HA --es sidePane mycar:plancia" shoot plancia-side 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+    # A page left of the map in three parts, as a driver had it (--es pageParts): Plancia in the half,
+    # the agenda and the weather in the quarters; the music beside the map. Its dot turns to it (the
+    # dock's map first, which brings the dots back over the map), then a swipe on the weather goes back
+    # to the map ("x,y,swipe,x2,y2"), eight times - the last four as soon as the page is there. The
+    # driver's report (0.6.9): myCar went away as the page went back to the map. alive.txt says whether
+    # myCar still runs at the end, and how it went if not.
+    swipes() {
+        local taps="$WAIT" i
+        for i in 1 2 3 4; do taps="$taps;$1;$2;$WAIT;$3;$WAIT"; done
+        for i in 1 2 3 4; do taps="$taps;$1;$2;$3"; done
+        echo "$taps;$WAIT;$WAIT"
+    }
+    SWIPE_PAGE="--es pageLayout half-quarters --es pageParts plancia,agenda,weather --ez demoSong true"
+    EXTRA="$HA $SWIPE_PAGE" shoot plancia-swipe 1920 720 240 "$(swipes "$DOCK_MAP" 966,675 1700,560,swipe,500,560)"
+    alive plancia-swipe
+    EXTRA="$HA $SWIPE_PAGE" shoot plancia-swipe-800x480 800 480 160 "$(swipes 48,116 404,450 720,380,swipe,220,380)"
+    alive plancia-swipe-800x480
+    # The same with Spotify's web player as the car's music, a second web page in myCar as in that drive
+    # (no account here: it loads, signed out, and nothing plays).
+    EXTRA="$HA --es pageLayout half-quarters --es pageParts plancia,agenda,weather --es webMusic spotify" \
+        shoot plancia-swipe-spotify 800 480 160 "$(swipes 48,116 404,450 720,380,swipe,220,380)"
+    alive plancia-swipe-spotify
     echo "--- Plancia inside myCar ---"
     grep -h "plancia:\|web:" previews/plancia-app/log.txt 2>/dev/null || echo "plancia-app: nothing in the log"
     # What isn't one of myCar's commands goes to Home Assistant's Assist (car/AssistantBrain), as if
