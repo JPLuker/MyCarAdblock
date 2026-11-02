@@ -140,9 +140,12 @@ object CarAssistant {
         syncLanguage()
         // A message being read or answered gives way: the driver asked for the assistant instead,
         // and the reply left waiting would keep the car's voice key for itself. A reply counting
-        // down goes now, as the wheel's voice key sends it: dropping it lost it without a word.
+        // down goes now, as the wheel's voice key sends it: dropping it lost it without a word. One
+        // still read back doesn't (as for a ringing call, CarUi): the driver hasn't heard it yet, and
+        // the microphone is what a driver who hears it come out wrong touches to say "cancel".
         if (VoiceReply.active) {
-            if (VoiceReply.state.value.phase == VoiceReply.Phase.CONFIRMING) VoiceReply.sendNow() else VoiceReply.cancel()
+            val reply = VoiceReply.state.value
+            if (reply.phase == VoiceReply.Phase.CONFIRMING && reply.until > 0L) VoiceReply.sendNow() else VoiceReply.cancel()
         }
         // The driver may have picked another assistant, which then takes the button instead.
         if (AssistantChoice.startOther(context)) return

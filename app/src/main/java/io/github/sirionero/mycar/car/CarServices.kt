@@ -519,9 +519,11 @@ object CarServices {
         runCatching { media.disconnect() }
         runCatching { browse.disconnect() }
         // A reply the driver was confirming goes out, any other is dropped, as when the microphone
-        // is pressed: left as it was, its card came back at the next connection, stuck.
+        // is pressed: left as it was, its card came back at the next connection, stuck. Only once its
+        // countdown runs: still read back, the driver hadn't heard it yet.
         if (VoiceReply.active) {
-            if (VoiceReply.state.value.phase == VoiceReply.Phase.CONFIRMING) VoiceReply.sendNow() else VoiceReply.cancel()
+            val reply = VoiceReply.state.value
+            if (reply.phase == VoiceReply.Phase.CONFIRMING && reply.until > 0L) VoiceReply.sendNow() else VoiceReply.cancel()
         }
         CarAssistant.cancel()
         io.github.sirionero.mycar.home.HomeAssistant.release()
