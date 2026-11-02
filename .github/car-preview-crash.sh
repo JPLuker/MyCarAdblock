@@ -180,3 +180,8 @@ EXTRA="$HA $PAGE3 --ez demoSong true" stress crash-focus-grid 800 480 160 \
     "wait:9000;rep:30;$TO_LEFT;wait:800-1500;$FOCUS_TAP;wait:300-2000;tap:$C_FOOT;wait:600-1200;tap:$C_FOOT;wait:800-1500;end;snap:end" 260
 EXTRA="$HA $PAGE3 --ez demoSong true --es miniAt 0.05,1" stress crash-focus-cleared 800 480 160 \
     "wait:9000;tap:$C_CLOSE;wait:2500;rep:30;$TO_LEFT;wait:800-1500;$FOCUS_TAP;wait:300-2500;unfocus;wait:150;$DRIVER;wait:500-1500;end;snap:end" 240
+# Plancia beside the map instead (car Settings > Beside the map): a tap in its page, then the app grid
+# and back. Its pane is in the Row of the map's page, which swaps it for an icon out of view as the
+# part of a page does: does the same go down there too?
+EXTRA="$HA --es sidePane mycar:plancia" stress crash-focus-side 800 480 160 \
+    "wait:9000;rep:20;tap:640-760,200-400;wait:300-2000;tap:$C_FOOT;wait:600-1200;tap:$C_FOOT;wait:800-1500;end;snap:end" 200
