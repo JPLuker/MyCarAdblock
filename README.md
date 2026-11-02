@@ -55,14 +55,26 @@ behind it all — still or moving.
 - **Music.** Browse, play, and queue tracks from a car-enabled media app, with a Now
   Playing view, an Up Next queue, and lyrics. Type a search, and apps that accept one
   play the best match. The player looks like a recent phone's: plain controls, a thin line
-  to seek, the cover's colours behind it, and the cover in sight while you browse.
+  to seek, the cover's colours behind it, and the cover in sight while you browse. Its sound
+  button shows whether the music reaches the car over Bluetooth or through myCar, and a tap
+  sends it the other way; myCar remembers the choice for each car.
 - **The web.** A browser template with its own on-screen keyboard, for anything that
-  doesn't ship a car interface of its own.
+  doesn't ship a car interface of its own. The keyboard pastes what you copied on the phone, and
+  copies from the page, in Cinema and the music services too.
 - **Your music library.** Xonos, built in: your Music Assistant library among the car's music
   apps — everything Music Assistant plays, from your own files to the services you added to it.
   With the car audio through myCar, its sound goes straight to the car, and Android doesn't ask
   to share the audio while you listen to it. Sign in on the phone, or bring your account over
   from the Xonos app with one tap.
+- **Spotify and other services, inside myCar.** Switch on Spotify in the phone's Settings >
+  Music, or add YouTube Music, Amazon Music, Deezer, TIDAL, SoundCloud, Qobuz and more. Each one
+  plays inside myCar from the service's own web player, laid out as on a computer, so its sound
+  reaches the car through myCar even where the service's app won't let it be passed along. Sign
+  in once on the phone, with its keyboard and password manager, and the car stays signed in. They
+  work like any music app: the song beside the map and in the dock, the steering wheel buttons,
+  and the voice assistant, which searches the service and plays the first result. "Hide the
+  phone's Spotify app" keeps one Spotify on the car's grid, not two. Some services need a
+  subscription of their own.
 - **Your home.** Plancia, built in: your Home Assistant dashboards in the car, connected from
   the start of the drive and kept loaded, so they're there the moment you open them — full
   screen from the app grid, on a page beside the map, or beside the map itself. Set it up in
@@ -104,7 +116,8 @@ behind it all — still or moving.
 - **Notifications.** Only messages, missed calls, alarms, and reminders interrupt you.
   The rest wait on the dashboard.
 - **Your apps, your order.** The launcher groups apps by kind: phone, maps, music,
-  messaging, and the rest. Press and hold an app to move it.
+  messaging, and the rest. Press and hold an app to move it, or to hide it from the grid; it
+  comes back from the car's Settings > Hidden apps, or from the phone.
 - **Car controls.** Steering wheel buttons, control knobs, and D-pads all work.
 - **A look of its own.** A dock down the left with the clock and your apps, a paged app grid,
   app icons in a rounded-square frame with a soft glass shine, and the Inter typeface. Dark by
@@ -114,7 +127,8 @@ behind it all — still or moving.
 - **Beside the map.** When music plays, the player shares the screen with the map, its cover
   filling its side on frosted glass. Tap the song in the dock to put it away or bring it back;
   the dock's foot brings map and music back from the app grid. Or pick an app to stay beside
-  the map instead, such as Plancia for your home or Xonos for your music.
+  the map instead, such as Plancia for your home or Xonos for your music. The player comes in
+  three sizes: Small, Medium and Large.
 - **Pages beside the map.** Swipe across Home, or tap the dots at its foot, for pages either side
   of the map: a whole page, two halves, four parts, a half beside two quarters, or a wide strip
   above or below two quarters, holding the weather, your agenda, the browser, Plancia's
@@ -122,13 +136,20 @@ behind it all — still or moving.
   and Plancia beside the browser on its right; the pencil beside the dots changes a page.
 - **Pick your size.** Scale the whole car screen from Extra small to Extra large, for the car's
   display and your eyes.
-- **Themes.** Choose flat buttons or skeuomorphic ones that look like real keys.
+- **Themes.** Choose flat buttons or skeuomorphic ones that look like real keys. On the phone,
+  myCar follows the phone's light or dark look, or takes Light, Dark, Black (AMOLED) or Monokai.
+- **The car's settings on the phone too.** Every setting of the car's screen is on the phone as
+  well, in Settings > Car screen, pages beside the map included: change one on either side and
+  the other follows at once, during a drive too. At the top of the phone's Settings, Car preview
+  shows the car's screen on the phone, to try it without a car.
 
 ## Status
 
 - **Wired or wireless.** Plug the phone into the car's USB port, or, in a car with wireless
   Android Auto, tap Connect wirelessly and pick the car. Pair the phone with the car over
-  Bluetooth first.
+  Bluetooth first. After a drive without the cable Android asks once, and from then on the car
+  connects by itself when it starts, with the phone in your pocket (Settings > Connection >
+  Connect wirelessly by itself).
 - **Setup is one list.** First launch shows what's needed to connect and what the drive
   needs, with a tick on what's done and one button for the next step: get the certificates,
   then allow calls, map and music in one go. "Take me back to the initial setup", in How to
@@ -139,9 +160,11 @@ behind it all — still or moving.
 - **It works with [LIVI](https://github.com/f-io/LIVI),** the open-source head unit
   used in homemade car dashboards, as Gearslip does.
 - **Some apps refuse myCar.** Spotify, Waze, and Google Messages use a version of
-  Google's car library that accepts only Android Auto itself. Spotify still plays through
-  myCar's own player. Apps that list trusted hosts by package and signing certificate
-  need to add myCar to that list; see [docs/BUILDING_APPS.md](docs/BUILDING_APPS.md).
+  Google's car library that accepts only Android Auto itself. The Spotify app still plays
+  through myCar's own player, but its sound reaches the car only over Bluetooth: it won't let
+  another app pass it along. Spotify inside myCar reaches the car either way. Apps that list
+  trusted hosts by package and signing certificate need to add myCar to that list; see
+  [docs/BUILDING_APPS.md](docs/BUILDING_APPS.md).
 - **myCar can't be installed next to Gearslip.** Both define the permission that car apps
   look for, and Android lets only one signing key define it. Uninstall Gearslip first.
 - **Calls use the car's Bluetooth,** as they do in Android Auto. Pair the phone with the
@@ -267,6 +290,11 @@ Changes since October 26, 2026, when myCar forked Gearslip 0.3.01-alpha:
 - myCar in nine languages, the Xonos app's: English, Italian, Spanish, German, French,
   Portuguese, Greek, Russian and Simplified Chinese, on the phone, on the car screen and in the
   voice assistant, following the phone or picked in Settings > Language.
+- Built in, beside the car apps: Plancia (Home Assistant), Xonos (Music Assistant), Cinema, and
+  Spotify and other music services from their own web players.
+- Every setting of the car's screen is on the phone too, pages beside the map included; apps can
+  be hidden from the car's grid, and the player beside the map comes in three sizes.
+- A car that worked without the cable connects again by itself when it starts.
 - Incoming calls from contacts show on the car screen; answer, decline, or end them there, and a
   declined call no longer leaves its card stuck. myCar says when call audio stays on the phone
   because the car's Bluetooth hands-free isn't connected.
@@ -275,7 +303,8 @@ Changes since October 26, 2026, when myCar forked Gearslip 0.3.01-alpha:
   with the phone locked myCar asks you to unlock it first, then starts the assistant.
 - Car audio finds its way each drive: Bluetooth when the car takes the phone's music that way,
   otherwise through myCar's own link to the car, over the cable or Wi-Fi. The music comes back
-  after a call or the assistant, where it used to stay off until the next drive.
+  after a call or the assistant, where it used to stay off until the next drive. A button in the
+  player switches the way, remembered for each car.
 - Screen sharing turns the phone landscape while it shows in the car, so apps fill the wide
   screen instead of standing upright between two bars.
 - Car apps show their own icons again, instead of another app's.
