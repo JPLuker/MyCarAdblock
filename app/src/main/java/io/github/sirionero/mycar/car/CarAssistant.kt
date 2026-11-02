@@ -386,7 +386,7 @@ object CarAssistant {
             return
         }
         VoiceFocus.acquire(context)
-        speak(engine, text) { _, _ ->
+        val id = speak(engine, text) { _, _ ->
             VoiceFocus.release()
             // Always, stopped part way too: a turn that cut a message read out on the car's channel
             // for spoken prompts (DirectionsVoice) left the reply waiting for good. Whoever stopped
@@ -394,6 +394,23 @@ object CarAssistant {
             // act for the run they were made in.
             mainHandler.post(onDone)
         }
+        // The assistant's watchdog doesn't see a message read aloud (its phase stays idle): an engine
+        // that never says it finished (updated in the background mid-message) kept the music paused and
+        // the reply stuck on its card. Ended after as long as any voice takes to say it, as an answer is,
+        // and not while the engine still tells the words it says.
+        val limit = ((SPEAK_BASE_MS + text.length * SPEAK_PER_CHAR_MS) * slowness()).toLong().coerceAtMost(SPEAK_MAX_MS)
+        mainHandler.postDelayed(object : Runnable {
+            override fun run() {
+                if (!endings.containsKey(id)) return
+                if (SystemClock.uptimeMillis() - lastWordAt < STILL_TALKING_MS) {
+                    mainHandler.postDelayed(this, WATCH_MS)
+                    return
+                }
+                MyCarLog.w("assistant: a message read aloud never said it ended after ${limit / 1000} s - closing it")
+                tts?.stop()
+                end(id, stopped = true)
+            }
+        }, limit)
     }
 
     private var utterances = 0
