@@ -146,7 +146,14 @@ class CarNavigator(startId: String) {
     fun showSideControls() { sidePanel = SidePanel.CONTROLS; lyricsWanted = false }
 
     /** This song has no lyrics (or they can't be reached): the player has the column, the lyrics stay wanted. */
-    fun lyricsGaveWay() { if (sidePanel == SidePanel.LYRICS) sidePanel = SidePanel.CONTROLS }
+    fun lyricsGaveWay(songKey: String) {
+        lyricsGaveWayFor = songKey
+        if (sidePanel == SidePanel.LYRICS) sidePanel = SidePanel.CONTROLS
+    }
+
+    /** The song ([io.github.sirionero.mycar.media.SongInfo.key]) the lyrics last gave the column back for: not looked up again for their return. */
+    var lyricsGaveWayFor: String? = null
+        private set
 
     /** A song with lyrics while they're wanted: back beside the map, in the player's place. */
     fun lyricsBack() { if (lyricsWanted && sidePanel == SidePanel.CONTROLS) sidePanel = SidePanel.LYRICS }

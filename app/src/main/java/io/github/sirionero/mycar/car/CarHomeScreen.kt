@@ -119,6 +119,8 @@ fun CarHome() {
         val inside = mediaApp?.component?.let(io.github.sirionero.mycar.xonos.Xonos::isInside) == true
         val song = remember(shownNow.trackTitle, shownNow.title, shownNow.trackArtist, shownNow.artist, shownNow.album, shownNow.durationMs, shownNow.mediaId, inside) { shownNow.lyricsSong(inside) }
         LaunchedEffect(song.key) {
+            // Not the song they just gave way for: looked up again at once, it asked LRCLIB as many times more.
+            if (song.key == navigator.lyricsGaveWayFor) return@LaunchedEffect
             delay(Lyrics.SETTLE_MS)
             if (Lyrics.find(context, song).getOrNull() is LyricsAnswer.Found) navigator.lyricsBack()
         }
@@ -302,7 +304,11 @@ private fun SideLyrics(now: NowPlaying, modifier: Modifier) {
                 GsIconButton(Icons.Filled.Close, stringResource(R.string.car_home_hide_lyrics), navigator::showSideControls, size = 52.dp, iconSize = 24.dp)
             }
             Spacer(Modifier.height(12.dp))
-            LyricsPanel(now, Modifier.weight(1f).fillMaxWidth(), lineStyle = MaterialTheme.typography.headlineSmall, art = art, onNothing = navigator::lyricsGaveWay)
+            // The next song ahead only while these are what the driver sees: not under another screen or on another page.
+            LyricsPanel(
+                now, Modifier.weight(1f).fillMaxWidth(), lineStyle = MaterialTheme.typography.headlineSmall, art = art,
+                onNothing = navigator::lyricsGaveWay, ahead = LocalPlayerInView.current && navigator.current == CarScreen.Home,
+            )
         }
     }
 }

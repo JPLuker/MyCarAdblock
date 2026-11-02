@@ -438,8 +438,10 @@ internal fun LyricsPanel(
     art: android.graphics.Bitmap? = null,
     /** The media screen: "Now playing" under "no lyrics". */
     onPlayer: (() -> Unit)? = null,
-    /** Beside the map: told a moment after "no lyrics" or "couldn't reach", to give the column back to the player. */
-    onNothing: (() -> Unit)? = null,
+    /** Beside the map: told a moment after "no lyrics" or "couldn't reach", with the song's key, to give the column back to the player. */
+    onNothing: ((songKey: String) -> Unit)? = null,
+    /** The next song looked up too ([LyricsAhead]): only where the lyrics are on screen. */
+    ahead: Boolean = true,
 ) {
     val context = LocalContext.current
     // Xonos inside myCar: Music Assistant is asked first, by the track's address.
@@ -448,9 +450,12 @@ internal fun LyricsPanel(
     // The song by the track's own tags (not a displayed "Artist • Album"): one key per song.
     val song = remember(now.trackTitle, now.title, now.trackArtist, now.artist, now.album, now.durationMs, now.mediaId, inside) { now.lyricsSong(inside) }
     // While they're on screen, the next song in the queue too: its lyrics show at once when it starts.
-    LaunchedEffect(song.key) { LyricsAhead.warmNext(CarServices.media) }
-    // Asked again with Try again, after a lookup that couldn't reach lrclib.net.
-    var attempt by remember { mutableIntStateOf(0) }
+    // Not with Xonos inside myCar: Music Assistant may have them in the track's tags, and LRCLIB would
+    // be sent the title for nothing.
+    LaunchedEffect(song.key, ahead, inside) { if (ahead && !inside) LyricsAhead.warmNext(CarServices.media) }
+    // Asked again with Try again, after a lookup that couldn't reach lrclib.net: this song only, the
+    // next one waits as songs skipped in a row do.
+    var attempt by remember(song.key) { mutableIntStateOf(0) }
     // Already looked up (ahead, or before): no "Looking for lyrics…" flash.
     val lyrics by produceState<LyricsState>(Lyrics.known(song)?.let(::stateOf) ?: LyricsState.Loading, song.key, attempt) {
         Lyrics.known(song)?.let { value = stateOf(it); return@produceState }
@@ -494,7 +499,7 @@ internal fun LyricsPanel(
                 art = art,
             )
             // A moment to read it, then (beside the map) the player has the column for this song.
-            if (onNothing != null && !nothingPlaying) LaunchedEffect(song.key) { delay(NOTHING_SHOWN_MS); onNothing() }
+            if (onNothing != null && !nothingPlaying) LaunchedEffect(song.key) { delay(NOTHING_SHOWN_MS); onNothing(song.key) }
         }
         LyricsState.Unreachable -> {
             LyricsNotice(
@@ -504,7 +509,7 @@ internal fun LyricsPanel(
                 art = art,
             )
             // Beside the map the player isn't held hostage by a tunnel: back after a moment.
-            if (onNothing != null) LaunchedEffect(song.key, attempt) { delay(UNREACHABLE_SHOWN_MS); onNothing() }
+            if (onNothing != null) LaunchedEffect(song.key, attempt) { delay(UNREACHABLE_SHOWN_MS); onNothing(song.key) }
         }
         is LyricsState.Found -> {
             val lines = state.result.lines
