@@ -649,7 +649,11 @@ class CarAppConnection(private val context: Context) {
     // these four. Coordinates are in surface pixels. Scroll distances follow GestureDetector's
     // convention (previous minus current), which is the opposite sign to a Compose drag.
 
-    fun surfaceClick(x: Float, y: Float) = onSurface("onClick") { it.onClick(x, y) }
+    fun surfaceClick(x: Float, y: Float) {
+        // In the log of the next drive: a tap that reached the app's surface (the map's, a browse app's).
+        MyCarLog.i("host: tap on ${component?.packageName}'s surface at ${x.toInt()},${y.toInt()}")
+        onSurface("onClick") { it.onClick(x, y) }
+    }
 
     fun surfaceScroll(distanceX: Float, distanceY: Float) =
         onSurface("onScroll") { it.onScroll(distanceX, distanceY) }

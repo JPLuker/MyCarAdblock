@@ -95,18 +95,7 @@ private fun AppSurface(
     template: Template?,
     modifier: Modifier = Modifier,
 ) {
-    var size by remember { mutableStateOf(0 to 0) }
     val minPanePx = with(androidx.compose.ui.platform.LocalDensity.current) { MAP_PANE_MIN_EDGE.roundToPx() }
-
-    // The app lays its map out around whatever the host covers, so a template change moves the
-    // visible area even though the surface itself hasn't changed.
-    LaunchedEffect(template, size, minPanePx) {
-        val (width, height) = size
-        if (width > 0 && height > 0) {
-            val visible = visibleAreaFor(template, width, height, minPanePx)
-            connection.reportAreas(visible = visible, stable = visible)
-        }
-    }
 
     // A fresh SurfaceView - and so a fresh Surface - for every size, the way Android Auto hands an
     // app a new surface rather than resizing the old one. A resized SurfaceView keeps the same
@@ -117,6 +106,18 @@ private fun AppSurface(
     androidx.compose.foundation.layout.BoxWithConstraints(modifier) {
         val epoch by connection.surfaceEpoch.collectAsState()
         androidx.compose.runtime.key(constraints.maxWidth, constraints.maxHeight, epoch) {
+            // Per surface: one made again at the same size (epoch) is lent with the whole surface as its
+            // visible area, and is told the real one again after that, starting from no size.
+            var size by remember { mutableStateOf(0 to 0) }
+            // The app lays its map out around whatever the host covers, so a template change moves the
+            // visible area even though the surface itself hasn't changed.
+            LaunchedEffect(template, size, minPanePx) {
+                val (width, height) = size
+                if (width > 0 && height > 0) {
+                    val visible = visibleAreaFor(template, width, height, minPanePx)
+                    connection.reportAreas(visible = visible, stable = visible)
+                }
+            }
             SurfaceHost(connection, frame, onSize = { size = it }, Modifier.fillMaxSize())
         }
     }
