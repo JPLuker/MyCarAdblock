@@ -628,8 +628,8 @@ class MyCarActivity : ComponentActivity(), Projection {
             return
         }
         MyCarLog.i("accessory attached by the system - permission is implicit on this path")
-        // The car map's position, as the cable's arrival opens myCar (given back if no drive follows).
-        io.github.sirionero.mycar.host.LocationKeepAlive.holdForDrive(this, untilStartUpEnds = true)
+        // The car map's position comes with SessionService.start in start(), once the accessory is
+        // there and open: taken here, an attach that went nowhere started the location service.
         start(accessory)
     }
 
