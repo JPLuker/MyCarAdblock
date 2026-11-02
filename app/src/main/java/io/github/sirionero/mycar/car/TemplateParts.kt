@@ -264,7 +264,9 @@ internal fun RightEdgeControls(
     ) {
         if (actions.isNotEmpty()) {
             Row(asleep, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                actions.forEach { ActionButton(it) }
+                // On a narrow map (the player beside it at a large size) the button with words gives way,
+                // not the last one: squeezed in turn, the settings button ended up a sliver.
+                actions.forEach { ActionButton(it, modifier = if (it.title.text().isNotEmpty()) Modifier.weight(1f, fill = false) else Modifier) }
             }
         }
         mapActions.forEach { ActionButton(it, modifier = asleep) }
@@ -346,7 +348,7 @@ internal fun ActionButton(action: Action, large: Boolean = false, modifier: Modi
             ) {
                 if (hasGlyph) CarGlyph(action.icon, Modifier.size(24.dp), standardFor(action))
                 if (hasGlyph) Spacer(Modifier.width(8.dp))
-                Text(title, style = ChromeType.body, maxLines = 1)
+                Text(title, style = ChromeType.body, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }
