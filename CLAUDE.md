@@ -306,7 +306,8 @@ Tutti i token in un solo posto, `car/design/`:
   manopola la raggiungerebbe sotto l'elenco). Si muove fuori dalla striscia dei puntini delle pagine
   (`MINI_DOTS_STRIP` 60 dp); finché il guidatore non la sposta la partenza la calcola `MiniPlace.start`: in
   basso a destra sulle mappe grandi, sulle piccole (800x480 a Large/Extra large) a sinistra dei tasti della
-  mappa ma mai sotto la scheda a sinistra (42% della mappa, almeno 244 dp). Scatti `mini-large-800x480`,
+  mappa ma mai sotto la scheda a sinistra (42% della mappa, almeno 244 dp); dove accanto alla scheda non ci sta
+  (800x480 a Extra large: 173 dp per 276) si disegna in scala (`MiniPlace.fitScale`, mai sotto 0,6). Scatti `mini-large-800x480`,
   `mini-xl-800x480` (`--es carScale`). Sta nello slot `overMap` di `CarAppStage`, fra la
   superficie e la chrome del template: schede e tasti dell'app restano sopra, la superficie non cambia, ogni
   tocco fuori dalla pillola va alla mappa. Gesto nostro sul passaggio Initial (`dragAfterHold`): tocco breve al
