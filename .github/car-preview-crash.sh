@@ -47,7 +47,8 @@ stress() {
     adb pull "$FILES/." "$d/" >/dev/null 2>&1 || echo "nothing to pull for $1"
     adb logcat -d -b crash > "$d/crash.txt" 2>&1
     adb logcat -d -v threadtime > "$d/logcat-all.txt" 2>&1
-    grep -A400 "FATAL EXCEPTION" "$d/logcat-all.txt" > "$d/fatal.txt"
+    # myCar's own: another app's crash (Google Play services goes now and then) is no news here.
+    grep -B1 -A400 "Process: $PKG" "$d/logcat-all.txt" > "$d/fatal.txt"
     adb shell dumpsys activity exit-info "$PKG" | head -60 > "$d/exit-info.txt" 2>&1
     kill "$streaming" 2>/dev/null
     # The whole log only around the end: Chromium's lines make it large.
@@ -55,7 +56,7 @@ stress() {
     alive "$1"
     echo "--- $1: the last steps ---"
     grep "preview: step" "$d/stream.txt" | tail -n 20 | cut -c1-200
-    if [ -s "$d/fatal.txt" ] || grep -q "FATAL EXCEPTION" "$d/crash.txt"; then
+    if [ -s "$d/fatal.txt" ] || grep -q "Process: $PKG" "$d/crash.txt"; then
         echo "--- $1: THE CRASH ---"
         { cat "$d/fatal.txt"; echo "--- crash buffer ---"; cat "$d/crash.txt"; } | head -n 400
     fi
@@ -132,3 +133,35 @@ CINEMA="$CINEMA;tap:$C_FOOT;wait:500-1200;tap:$C_FOOT;wait:200-800;tap:322,472;w
 CINEMA="$CINEMA;tap:$C_CLOSE;wait:1000-3000;$TO_LEFT;wait:600-1500;$DRIVER;wait:500-1500;end"
 EXTRA="$HA $PAGE3 --ez demoSong true --es webMusic spotify --es miniAt 0.05,1" stress crash-cinema 800 480 160 \
     "wait:9000;demo;tap:$C_CLOSE;wait:2000;drag:266,388,140,400,700,20,900;wait:1500;snap:mini;$CINEMA;snap:end" 330
+
+# 4. Both the driver's logs had, a moment before, a tap in Plancia's page on the page in three parts
+# (0.6.9: (221,285), 14 s before turning back to the map; 0.6.7: (232,307), 1.7 s before the foot): the
+# web view takes the touch, and the focus. So: the page in three parts, Home Assistant's page back to
+# its start (its bar's arrow), a tap in it, then back to the map as the driver, or the app grid.
+IN_PLANCIA="tap:120,22;wait:300-700;tap:221,285"
+ANY_PLANCIA="tap:120-430,110-420"
+tapback() {
+    local p="${1:-}" r
+    r="rep:16;$p$TO_LEFT;wait:800-2000;$IN_PLANCIA;wait:300-4000;$DRIVER;wait:500-1500;end"
+    r="$r;rep:10;$p$TO_LEFT;wait:800-2000;$ANY_PLANCIA;wait:100-1500;$ANY;wait:300-1200;end"
+    r="$r;rep:6;$p$TO_LEFT;wait:800-2000;$ANY_PLANCIA;wait:50-300;$FLING;wait:300-1200;end"
+    r="$r;rep:3;$p$TO_LEFT;wait:800-2000;$IN_PLANCIA;wait:14000;$DRIVER;wait:500-1500;end"
+    echo "$r"
+}
+tapgrid() {
+    local p="${1:-}" r
+    r="rep:14;$p$TO_LEFT;wait:800-2000;tap:120,22;wait:300-700;tap:232,307;wait:1200-2000;tap:$C_FOOT;wait:600-1500;tap:$C_FOOT;wait:800-1500;end"
+    r="$r;rep:6;${p}drag:338,12,647,28,200,20;wait:600-1200;tap:232,307;wait:0-1800;tap:$C_FOOT;wait:300-1200;tap:$C_FOOT;wait:800-1500;end"
+    r="$r;rep:5;$p$TO_LEFT;wait:800-1500;focus:2500;wait:1000-1500;tap:232,307;wait:1600-1800;tap:$C_FOOT;wait:500-1200;tap:$C_FOOT;wait:800-1500;end"
+    echo "$r"
+}
+# The whole map with the mini player in the corner, as in the 0.6.9 log; then the column (the grid's
+# "map and music" brings it back) for the 0.6.7 one.
+EXTRA="$HA $PAGE3 --ez demoSong true --es miniAt 0.05,1" stress crash-plancia-mini 800 480 160 \
+    "wait:9000;tap:$C_CLOSE;wait:2500;snap:mini;$(tapback);$(tapgrid);snap:end" 480
+EXTRA="$HA $PAGE3 --ez demoSong true" stress crash-plancia-column 800 480 160 \
+    "wait:9000;snap:start;$(tapgrid);$(tapback);snap:end" 480
+# Spotify's web player as the car's music, as the driver had it: opened by the drive's start (no media
+# key), the made-up song put in its player now and then (no account plays here).
+EXTRA="$HA $PAGE3 --es webMusic spotify --ez webMusicKey false --ez webMusicPlay true --es miniAt 0.05,1" stress crash-plancia-spotify 800 480 160 \
+    "wait:12000;demo;wait:1500;tap:$C_CLOSE;wait:2500;demo;snap:mini;$(tapback "demo;");$(tapgrid "demo;");snap:end" 500

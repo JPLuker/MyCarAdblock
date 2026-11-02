@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import io.github.sirionero.mycar.media.CarMedia
@@ -278,16 +279,22 @@ internal class PreviewScript(
     private fun find(label: String): Spot? {
         val view = runCatching {
             ScreenProjector::class.java.getDeclaredField("root").apply { isAccessible = true }.get(projector) as View?
-        }.getOrNull() ?: return null
-        val compose = composeRoot(view) ?: return null
+        }.onFailure { MyCarLog.w("preview: no car screen to look on (${it.javaClass.simpleName})") }.getOrNull() ?: return null
+        val owner = semanticsOwner(view)
+        if (owner == null) {
+            MyCarLog.w("preview: no Compose root on the car's screen (${view.javaClass.name})")
+            return null
+        }
         val width = view.width.toFloat()
         val height = view.height.toFloat()
         var inSight: Spot? = null
         var away: Spot? = null
+        val seen = ArrayList<String>()
         fun visit(node: SemanticsNode) {
             val config = node.config
             val words = config.getOrNull(SemanticsProperties.Text).orEmpty().map { it.text } +
                 config.getOrNull(SemanticsProperties.ContentDescription).orEmpty()
+            if (seen.size < 60) seen.addAll(words)
             val bounds = node.boundsInRoot
             val x = bounds.center.x
             val y = bounds.center.y
@@ -298,14 +305,19 @@ internal class PreviewScript(
             }
             for (child in node.children) visit(child)
         }
-        visit(compose.semanticsOwner.rootSemanticsNode)
+        // The unmerged tree: each text where it's drawn, whatever merges it for a screen reader.
+        visit(owner.unmergedRootSemanticsNode)
+        if (inSight == null && away == null) MyCarLog.w("preview: '$label' not found; words on the car's screen: ${seen.take(60)}")
         return inSight ?: away
     }
 
-    private fun composeRoot(view: View): RootForTest? {
-        if (view is RootForTest) return view
+    /** The car screen's Compose root, as tests reach it (RootForTest), or by its getter. */
+    private fun semanticsOwner(view: View): SemanticsOwner? {
+        if (view is RootForTest) return view.semanticsOwner
+        val getter = view.javaClass.methods.firstOrNull { it.name == "getSemanticsOwner" && it.parameterTypes.isEmpty() }
+        if (getter != null) (runCatching { getter.invoke(view) }.getOrNull() as? SemanticsOwner)?.let { return it }
         if (view is ViewGroup) {
-            for (i in 0 until view.childCount) composeRoot(view.getChildAt(i))?.let { return it }
+            for (i in 0 until view.childCount) semanticsOwner(view.getChildAt(i))?.let { return it }
         }
         return null
     }
