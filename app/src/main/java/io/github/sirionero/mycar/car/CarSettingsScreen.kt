@@ -105,6 +105,7 @@ fun CarSettingsScreen() {
                 CarSettings.PLAYER_SMALL to stringResource(R.string.car_settings_size_small),
                 CarSettings.PLAYER_MEDIUM to stringResource(R.string.car_settings_size_medium),
                 CarSettings.PLAYER_LARGE to stringResource(R.string.car_settings_size_large),
+                CarSettings.PLAYER_EXTRA to stringResource(R.string.car_settings_size_extra_large),
             ),
             playerSize,
         ) { CarSettings.setPlayerSize(it) }

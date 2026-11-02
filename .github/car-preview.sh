@@ -113,6 +113,8 @@ EXTRA="--ez demoSong true" shoot media-800x480 800 480 160 "$WAIT;$WAIT;703,133;
 EXTRA="--ez demoSong true --es playerSize 1.1" shoot split-medium 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.2" shoot split-large 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.2" shoot split-large-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es playerSize 1.4" shoot split-extra 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es playerSize 1.4" shoot split-extra-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
 # Hiding an app from the grid: a long press on the browser for its menu, then "Hide from the app
 # grid" (the fourth button of the card in the middle of the screen), the grid without it and the
 # car saying where it comes back from. Then the settings' hidden apps, with the browser hidden.

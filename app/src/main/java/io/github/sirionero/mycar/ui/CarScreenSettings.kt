@@ -123,6 +123,7 @@ private fun CarHomeSection() {
                 Pick(CarSettings.PLAYER_SMALL, stringResource(R.string.car_settings_size_small)),
                 Pick(CarSettings.PLAYER_MEDIUM, stringResource(R.string.car_settings_size_medium)),
                 Pick(CarSettings.PLAYER_LARGE, stringResource(R.string.car_settings_size_large)),
+                Pick(CarSettings.PLAYER_EXTRA, stringResource(R.string.car_settings_size_extra_large)),
             ),
             playerSize,
         ) { CarSettings.setPlayerSize(it) }
