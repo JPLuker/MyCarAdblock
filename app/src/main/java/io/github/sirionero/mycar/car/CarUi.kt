@@ -348,8 +348,9 @@ fun CarUi() {
                     Box(Modifier.weight(1f).fillMaxHeight()) {
                         // Home never leaves the composition; other screens cover it. Dropping it
                         // would tear down the map's surface, and coming back would then show black
-                        // while the nav app redrew on a new one.
-                        CarHome()
+                        // while the nav app redrew on a new one. Its driver's pages, not the map, move
+                        // down under a call's banner as the screens do.
+                        CompositionLocalProvider(LocalCallTop provides callTop) { CarHome() }
                         if (screen != CarScreen.Home) {
                             // Each new screen settles in: a short fade and a slight grow, over an
                             // opaque background that's there at once, so the map never flashes
@@ -399,8 +400,8 @@ fun CarUi() {
                             }
                         }
                         CarToastOverlay(Modifier.align(Alignment.BottomCenter))
-                        // A page's dropdown (see WebSelect): under a call's question.
-                        WebSelectSheet()
+                        // A page's dropdown (see WebSelect): under a call's question, and its sheet under a call's banner.
+                        WebSelectSheet(Modifier.padding(top = callTop))
                         CallPromptOverlay()
                         BluetoothPairOverlay()
                         PopupTimer()
@@ -434,6 +435,13 @@ fun CarUi() {
         }
     }
 }
+
+/**
+ * How far a call's banner reaches down from the top of the screen beside the dock while a call is under
+ * way (0 otherwise): what goes under it on Home - the driver's pages and their changing, not the map -
+ * starts below it, as the other screens do.
+ */
+internal val LocalCallTop = androidx.compose.runtime.compositionLocalOf { 0.dp }
 
 /**
  * A single blocking screen, shown once per install before anything else the car screen can show -
