@@ -309,26 +309,29 @@ object AssistantCommands {
         if (CALL_TRIGGERS.any { heard.startsWith(it) }) return null
         val media = CarServices.media
         val none = CarServices.noMusicApp()
+        // Its buttons only for the music's own words (and its app's name): "when is my next appointment"
+        // isn't "next", nor "pause the TV" a pause of the car's music - they go on, to Home Assistant at the end.
+        val forMusic = musicCommandOnly(heard, CarServices.mediaApp.value?.label)
         return when {
-            ("pause" in heard && "unpause" !in heard) || heard.startsWith("stop") || heard == "quiet" || heard == "shut up" -> {
+            forMusic && (("pause" in heard && "unpause" !in heard) || heard.startsWith("stop") || heard == "quiet" || heard == "shut up") -> {
                 media.pause()
                 VoiceFocus.afterRelease { media.pause() }
                 "Paused."
             }
             // Before "play" below: "play the next song", "play something else", "play it again".
-            "next" in heard || "skip" in heard || heard.startsWith("change the song") || ANOTHER.matches(heard) -> {
+            forMusic && ("next" in heard || "skip" in heard || heard.startsWith("change the song") || ANOTHER.matches(heard)) -> {
                 if (none) return "Nothing's playing."
                 media.next()
                 "Skipping."
             }
-            "previous" in heard || "last song" in heard || "last track" in heard || "last one" in heard || "back song" in heard ||
-                "go back a song" in heard || AGAIN.matches(heard) || "replay" in heard -> {
+            forMusic && ("previous" in heard || "last song" in heard || "last track" in heard || "last one" in heard || "back song" in heard ||
+                "go back a song" in heard || AGAIN.matches(heard) || "replay" in heard) -> {
                 if (none) return "Nothing's playing."
                 media.previous()
                 "Playing the previous track."
             }
-            "resume" in heard || "unpause" in heard || heard in RESUME_PHRASES ||
-                (heard.startsWith("play") && "playing" !in heard) -> {
+            forMusic && ("resume" in heard || "unpause" in heard || heard in RESUME_PHRASES ||
+                (heard.startsWith("play") && "playing" !in heard)) -> {
                 // No music app open (the first drive, one closed from its menu): the one played
                 // last, playing - as the car's ▶ key does. It used to say "Playing." to silence.
                 if (none) {
