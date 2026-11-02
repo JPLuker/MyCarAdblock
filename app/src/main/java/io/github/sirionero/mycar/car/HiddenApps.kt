@@ -140,6 +140,7 @@ internal fun HiddenAppsSettings() {
                     entry.shownLabel,
                     Modifier.weight(1f),
                     style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
