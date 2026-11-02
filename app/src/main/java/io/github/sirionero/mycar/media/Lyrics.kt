@@ -168,8 +168,9 @@ object Lyrics {
             .onSuccess { trace ->
                 // Without Music Assistant's word LRCLIB's answer isn't kept: on disk it came before
                 // Music Assistant for good (lyrics) or a week ("none"), the track's own tags unseen.
-                // Lyrics it found stay in memory for this run.
-                if (maAnswered) keep(context, key, trace.answer)
+                // Lyrics it found stay in memory for this run. So does an answer it gave only in part (a
+                // question it couldn't be asked might have had the times): asked again on the next run.
+                if (maAnswered && trace.complete) keep(context, key, trace.answer)
                 else if (trace.answer is LyricsAnswer.Found) remember(key, trace.answer)
                 log("LRCLIB, question ${trace.askIndex + 1}, ${trace.requests} requests", song, trace.answer)
             }
@@ -231,6 +232,8 @@ object Lyrics {
         val requests: Int,
         /** Every entry LRCLIB gave, for the check's log. */
         val seen: List<LyricsMatch.Hit>,
+        /** Every question it needed asked, or its answer settled: worth keeping on disk. */
+        val complete: Boolean = true,
     )
 
     /** Debug check only (LyricsCheckActivity): LRCLIB asked afresh, no cache either way. */
@@ -283,7 +286,9 @@ object Lyrics {
             fit.instrumental -> LyricsAnswer.Instrumental
             else -> resultOf(fit)?.let { LyricsAnswer.Found(it) } ?: LyricsAnswer.None
         }
-        return Trace(answer, fit, bestAt, requests, seen)
+        // A weaker fit (no times) with a question left unasked (busy, no network, too slow) is only in part.
+        val complete = failure == null || (fit != null && LyricsMatch.settled(q, fit))
+        return Trace(answer, fit, bestAt, requests, seen, complete)
     }
 
     private fun urlOf(ask: Ask): String = when (ask) {
