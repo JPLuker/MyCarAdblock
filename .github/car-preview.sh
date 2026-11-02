@@ -289,6 +289,18 @@ for service in soundcloud youtube-music spotify; do
 done
 # Spotify's tile on the app grid, beside the other music apps ("Spotify", "Web" under it).
 EXTRA="--es webMusic spotify" shoot music-grid 1920 720 240 "$WAIT;$WAIT;$GRID_BUTTON;$WAIT"
+# The map's surfaces as a drive with music starts (CarServices.musicStarting): Vela, and Spotify's web
+# player as the drive's music (Autoplay on, as by default). The player's column is kept from the start,
+# so the map's first surface should already be the narrow one, and "Starting Spotify…" beside it; with
+# no account here no song comes, and 20 s in the map gets its whole width. The dock's map button 7 s in
+# brings Home back over the full player that the media key opened.
+installed $VELA && EXTRA="--es webMusic spotify" shoot map-start 1920 720 240 \
+    "$WAIT;$DOCK_MAP;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+if [ -d previews/map-start ]; then
+    echo "--- the map's surfaces as a drive with music starts: the first should be the narrow one ---"
+    grep -h "stage: surface\|host: lent\|media: \|preview: the car's player" \
+        previews/map-start/log.txt previews/map-start/stream.txt 2>/dev/null | cut -c1-300 | head -40
+fi
 echo "--- the music services' web players ---"
 for d in previews/music-*; do
     [ -d "$d" ] || continue
@@ -589,6 +601,42 @@ if [ -n "${HA_TOKEN:-}" ]; then
     grep -h "assistant:\|test assistant: shown\|plancia: connected" previews/brain-locked/log.txt 2>/dev/null ||
         echo "brain-locked: nothing in the log"
 fi
+
+# The car map's position with the phone locked (host/LocationKeepAlive.kt): Android lets a location
+# foreground service started from the background lend its location only within 10 s of one of the
+# app's screens being created (the trip of 2 Nov 2026, on Android 17: refused 14 s in). myCar's screen
+# opened with the phone locked by a PIN and its screen off, as the car's Bluetooth opens it in a
+# pocket; the drive's hold taken 1 s in (--ei locationProbeMs, debug only) should run, the same taken
+# 15 s in should be refused. The wallpaper picker alone, so that no car map binds and takes the service
+# first (a car map has to be installed, though: Vela). Meant for api 37.0; the two runs in at-1000/ and
+# at-15000/, each with Android's account of myCar's services (dumpsys.txt).
+case " ${ONLY:-location-locked} " in *" location-locked "*)
+    adb shell pm grant $PKG android.permission.ACCESS_FINE_LOCATION || true
+    adb shell pm grant $PKG android.permission.ACCESS_COARSE_LOCATION || true
+    rm -rf previews/location-locked previews/location-locked-runs
+    mkdir -p previews/location-locked-runs
+    for at in 1000 15000; do
+        LOGTAGS=ActivityManager \
+            BEFORE="adb shell locksettings set-pin $PIN; adb shell input keyevent KEYCODE_SLEEP; sleep 3" \
+            EXTRA="--ez wallpapers true --ei locationProbeMs $at" shoot location-locked 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT" \
+            "sleep $(( at / 1000 + 3 > 5 ? at / 1000 - 2 : 0 )); adb shell dumpsys activity services $PKG > previews/location-locked/dumpsys.txt 2>&1"
+        [ -d previews/location-locked ] && mv previews/location-locked "previews/location-locked-runs/at-$at"
+        adb shell locksettings clear --old $PIN || true
+        adb shell input keyevent KEYCODE_WAKEUP
+        adb shell wm dismiss-keyguard || true
+        sleep 2
+    done
+    mv previews/location-locked-runs previews/location-locked
+    echo "--- the car map's position with the phone locked: the drive's hold 1 s in, then 15 s in ---"
+    for at in 1000 15000; do
+        echo "[at $at ms]"
+        grep -h "preview: location\|location keep-alive\|LocationKeepAlive\|preview: displayId" \
+            "previews/location-locked/at-$at/log.txt" "previews/location-locked/at-$at/stream.txt" 2>/dev/null | cut -c1-400 | head -20
+        grep -iE "LocationKeepAlive|isForeground|foregroundServiceType|WhileInUse|Wiu" \
+            "previews/location-locked/at-$at/dumpsys.txt" 2>/dev/null | head -20
+    done
+    ;;
+esac
 
 # The assistant in another language on the car's screen (--es voiceLang, as with its model on the
 # phone): its help in Italian, in German (the longest words), at 800x480, and an answer in German.

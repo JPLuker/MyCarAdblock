@@ -274,6 +274,16 @@ class CarPreviewActivity : ComponentActivity() {
                 io.github.sirionero.mycar.car.CarAssistant.heard(said)
             }, 8_000)
         }
+        // --ei locationProbeMs 1000: the drive's hold on the car map's position (LocationKeepAlive) taken
+        // that long after this screen was created, as the car's arrival takes it (the location-locked
+        // shot, with the phone locked: Android lets it run only within 10 s of a screen being created).
+        intent.getIntExtra("locationProbeMs", -1).takeIf { it >= 0 }?.let { ms ->
+            MyCarLog.i("preview: location probe in ${ms}ms")
+            main.postDelayed({
+                MyCarLog.i("preview: location probe now")
+                io.github.sirionero.mycar.host.LocationKeepAlive.holdForDrive(this, untilStartUpEnds = true)
+            }, ms.toLong())
+        }
         MyCarLog.i("preview: displayId=${p.displayId}")
         if (intent.getBooleanExtra("hide", false)) p.setOverlayVisible(false)
 
