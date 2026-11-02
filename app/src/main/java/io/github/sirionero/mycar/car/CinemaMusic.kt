@@ -1,5 +1,6 @@
 package io.github.sirionero.mycar.car
 
+import android.os.SystemClock
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.media.CarMedia
 import kotlinx.coroutines.CoroutineScope
@@ -16,13 +17,13 @@ import kotlinx.coroutines.launch
 internal object CinemaMusic {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
-    /** What [opened] saw: the music app, while it played. */
-    class Playing internal constructor(val component: android.content.ComponentName)
+    /** What [opened] saw: the music app, while it played, and when (elapsedRealtime). */
+    class Playing internal constructor(val component: android.content.ComponentName, val openedAt: Long)
 
     /** Cinema opens: the music app, if it's playing now. */
     fun opened(): Playing? {
         val app = CarServices.mediaApp.value ?: return null
-        return if (CarServices.media.now.value.playing) Playing(app.component) else null
+        return if (CarServices.media.now.value.playing) Playing(app.component, SystemClock.elapsedRealtime()) else null
     }
 
     /** Cinema closed: the music [was] playing goes on, if it stopped meanwhile and is still the car's. */
@@ -34,6 +35,12 @@ internal object CinemaMusic {
             val media = CarServices.media
             if (CarServices.mediaApp.value?.component != was.component || media.phase.value != CarMedia.Phase.READY) return@launch
             if (media.now.value.playing) return@launch
+            // The driver picked the car's own source (the radio) while Cinema was open: the music
+            // started again asked the car for its speakers, and the car left the radio for it.
+            if (CinemaNow.takenBackAt >= was.openedAt) {
+                MyCarLog.i("cinema: closed - the car took its speakers back meanwhile, the music stays paused")
+                return@launch
+            }
             MyCarLog.i("cinema: closed - the music that was playing goes on")
             media.play()
         }

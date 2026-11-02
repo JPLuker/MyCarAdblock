@@ -2,6 +2,7 @@ package io.github.sirionero.mycar.car
 
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 
 /**
  * The film Cinema is playing now, for the car taking its speakers back for good (the driver picks
@@ -11,8 +12,13 @@ import android.os.Looper
 internal object CinemaNow {
     @Volatile var pause: (() -> Unit)? = null
 
+    /** When the car last took its speakers back for good ([pauseForCar]), on elapsedRealtime: for [CinemaMusic]. */
+    @Volatile var takenBackAt = 0L
+        private set
+
     /** From the car's thread: the player is the main thread's. */
     fun pauseForCar() {
+        takenBackAt = SystemClock.elapsedRealtime()
         Handler(Looper.getMainLooper()).post { pause?.invoke() }
     }
 }
