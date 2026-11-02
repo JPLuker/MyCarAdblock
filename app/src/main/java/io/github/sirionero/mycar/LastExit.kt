@@ -54,6 +54,11 @@ internal object LastExit {
                 "importance ${exit.importance}, pss ${exit.pss / 1024} MB, rss ${exit.rss / 1024} MB)" +
                 exit.description?.let { ": $it" }.orEmpty(),
         )
+        // Android 17's memory limit for each app (based on the phone's RAM) closes it this way, with
+        // nothing in its own log: said in plain words.
+        if (exit.description.orEmpty().contains("MemoryLimiter")) {
+            MyCarLog.w("last exit: Android's memory limit closed myCar: it was using more memory than Android allows an app")
+        }
         when (exit.reason) {
             ApplicationExitInfo.REASON_CRASH_NATIVE -> exit.traceInputStream?.use { tombstone(it.readBytes()) }
             ApplicationExitInfo.REASON_ANR -> exit.traceInputStream?.use { anr(it.bufferedReader().readLines()) }
