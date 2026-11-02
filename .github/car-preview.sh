@@ -893,6 +893,12 @@ setup_phone() {
     sleep 1.2; adb exec-out screencap -p > $d/09-intro-2.png
     sleep 1.2; adb exec-out screencap -p > $d/09-intro-3.png
     sleep 2; adb exec-out screencap -p > $d/09-intro-4.png
+    # Then the intro's other pages, Next by Next (its button, or the same spot when the screen can't
+    # be read): 09-intro-page-2 is the second page, up to the voice page (7) before Start.
+    for i in 2 3 4 5 6 7; do
+        tap_text "Next" || adb shell input tap $((W * 72 / 100)) $((H - 80))
+        sleep 2.5; adb exec-out screencap -p > $d/09-intro-page-$i.png
+    done
     # After a smaller update: the intro of this release seen, an older version noted, so the flag
     # runs up on its own page (UpdateSplash) before Home.
     adb shell am force-stop "$PKG"
@@ -924,10 +930,18 @@ phone_lang() {
     mkdir -p "$d"
     for s in setup home settings help intro; do
         adb shell am force-stop "$PKG"
+        # The intro from its first page: the language before left it on a later one.
+        [ "$s" = intro ] && adb shell run-as "$PKG" rm -f shared_prefs/intro.xml
         adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen "$s" >/dev/null
         sleep 4; adb exec-out screencap -p > "$d/$s-1.png"
         adb shell input swipe 160 520 160 180 400; sleep 1.5; adb exec-out screencap -p > "$d/$s-2.png"
         adb shell input swipe 160 520 160 180 400; sleep 1.5; adb exec-out screencap -p > "$d/$s-3.png"
+    done
+    # Each page of the intro in this language, where long words have the least room: Next is at the
+    # same spot in every language (its text isn't English here).
+    for i in 2 3 4 5 6 7; do
+        adb shell input tap $((W * 72 / 100)) $((H - 80))
+        sleep 1.5; adb exec-out screencap -p > "$d/intro-page-$i.png"
     done
 }
 LANGS="it es de fr pt el ru zh-CN"
