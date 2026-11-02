@@ -109,12 +109,20 @@ EXTRA="--ez demoSong true" shoot split 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WA
 EXTRA="--ez demoSong true" shoot media 1920 720 240 "$WAIT;$WAIT;1635,200;$WAIT;1230,48;$WAIT"
 # The same at 800x480, where the tabs are narrow: "Now playing" on two lines, not "Now playi…".
 EXTRA="--ez demoSong true" shoot media-800x480 800 480 160 "$WAIT;$WAIT;703,133;$WAIT;$WAIT"
+# Its Lyrics tab (the fourth, 237px after Browse): the made-up song isn't on LRCLIB, so "Looking for
+# lyrics…", then one line, where the lyrics come from and "Now playing" back to the player.
+EXTRA="--ez demoSong true" shoot media-lyrics 1920 720 240 "$WAIT;$WAIT;1635,200;$WAIT;1704,48;$WAIT;$WAIT;$WAIT"
 # The player beside the map at Medium and Large (Settings > Size of the player beside the map).
 EXTRA="--ez demoSong true --es playerSize 1.1" shoot split-medium 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.2" shoot split-large 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.2" shoot split-large-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.4" shoot split-extra 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.4" shoot split-extra-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
+# The lyrics beside the map at Extra large, from the player's Lyrics button (the fourth of its bottom
+# row): the made-up song has none, so the cover above one line where there's room (1920x720), the line
+# alone at 800x480; 4 s later the player has the column back.
+EXTRA="--ez demoSong true --es playerSize 1.4" shoot lyrics-side 1920 720 240 "$WAIT;$WAIT;1654,627;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es playerSize 1.4" shoot lyrics-side-extra-800x480 800 480 160 "$WAIT;$WAIT;693,423;$WAIT;$WAIT;$WAIT;$WAIT"
 # The mini player over the whole map (car/MapMiniPlayer.kt). The player's X closes the column and the
 # mini player floats in the map's bottom-right corner; held on its cover and dragged to the top middle
 # (the log says where it was let go); its X puts it away (the card says how); the dock's song brings the
@@ -190,6 +198,15 @@ if [ -n "${MA_TOKEN:-}" ]; then
     LOGTAGS=Xonos EXTRA="$MA --es sidePane $XONOS" shoot xonos-side 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT"
     echo "--- Xonos inside myCar ---"
     grep -h "xonos\|Xonos\|media:" previews/xonos-inside/log.txt 2>/dev/null | head -60 || echo "xonos-inside: nothing in the log"
+    # The album played as in xonos-inside, then the Lyrics tab (the fourth): Tone 1 has words in its
+    # LYRICS tag, which come from Music Assistant first ("lyrics: found (Music Assistant)" in the log).
+    # Best on its own (shots: xonos-lyrics): Xonos playing has taken the emulator down now and then.
+    LOGTAGS=Xonos EXTRA="$MA" shoot xonos-lyrics 1920 720 240 "$WAIT;$GRID_BUTTON;$(at xonos);$WAIT;1230,48;$WAIT;1300,565;$WAIT;1808,232;$WAIT;$WAIT;1704,48;$WAIT;$WAIT;$WAIT"
+    adb shell am force-stop "$PKG"
+    case " ${ONLY:-xonos-lyrics} " in *" xonos-lyrics "*)
+        echo "--- lyrics with Xonos inside myCar ---"
+        grep -h "lyrics:" previews/xonos-lyrics/log.txt previews/xonos-lyrics/stream.txt 2>/dev/null || echo "xonos-lyrics: no lyrics line" ;;
+    esac
 else
     echo "--- no Music Assistant: Xonos's shots left out ---"
 fi
@@ -599,6 +616,31 @@ voice_check() {
     grep -h "voice check" $d/log.txt || echo "voice-check: nothing in the log"
 }
 voice_check
+
+# Lyrics: some 50 songs as the music apps write them through 0.6.8's lookup and the new one, against the
+# real lrclib.net (the cloud session can't reach it). Only when named in "shots": ~250 requests to a free service.
+lyrics_check() {
+    case " ${ONLY:-} " in *" lyrics-check "*) ;; *) return ;; esac
+    local d=previews/lyrics-check i logpid
+    mkdir -p $d
+    adb shell am force-stop "$PKG"
+    adb logcat -c
+    # Streamed: some 250 requests take minutes, and the log's buffer would lose the first songs. Not
+    # through adb() above, which gives up after three minutes.
+    timeout 420 "$ADB_BIN" logcat -s myCar > $d/log.txt 2>&1 &
+    logpid=$!
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.LyricsCheckActivity"
+    for i in $(seq 1 90); do
+        sleep 4
+        grep -q "lyrics check: done" $d/log.txt && break
+    done
+    kill $logpid 2>/dev/null
+    adb shell am force-stop "$PKG"
+    adb logcat -d -b crash > $d/crash.txt 2>&1
+    echo "--- lyrics check ---"
+    grep -h "lyrics check" $d/log.txt || echo "lyrics-check: nothing in the log"
+}
+lyrics_check
 
 # The setup list on the phone, as a new user finds it: myCar's data cleared and no permissions
 # (the install above granted them all). Last, since it wipes myCar's data. 01 the list; 02 after

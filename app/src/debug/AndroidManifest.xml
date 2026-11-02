@@ -5,6 +5,8 @@
         <activity android:name="io.github.sirionero.mycar.CarPreviewActivity" android:exported="true" />
         <!-- Debug builds only: checks the speech models' files and the phone's voices (Car preview, "voice-check"). -->
         <activity android:name="io.github.sirionero.mycar.VoiceCheckActivity" android:exported="true" />
+        <!-- Debug builds only: songs through the old and the new lyrics lookup against lrclib.net (Car preview, "lyrics-check"). -->
+        <activity android:name="io.github.sirionero.mycar.LyricsCheckActivity" android:exported="true" />
 
         <!-- Debug builds only: a stand-in voice assistant, so the Car preview workflow can check that
              myCar's microphone starts the phone's assistant as the swipe from a bottom corner does. -->
