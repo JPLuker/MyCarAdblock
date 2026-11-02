@@ -168,4 +168,6 @@
     <string name="car_web_select_chosen">Επιλεγμένο</string>
     <string name="car_player_sound_bluetooth">Ήχος μέσω Bluetooth. Πατήστε για να περνά από το myCar</string>
     <string name="car_player_sound_mycar">Ήχος μέσω myCar. Πατήστε για να πηγαίνει μέσω Bluetooth</string>
+    <string name="car_player_sound_now_mycar">Ο ήχος περνά τώρα από το myCar, για αυτό το αυτοκίνητο</string>
+    <string name="car_player_sound_now_bluetooth">Ο ήχος πηγαίνει τώρα μέσω Bluetooth, για αυτό το αυτοκίνητο</string>
 </resources>

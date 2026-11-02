@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
@@ -65,6 +66,15 @@ internal fun WebApp(content: String, tile: WebTile?) {
     var fieldText by remember { mutableStateOf<String?>(null) }
     // A new web view after the web engine's page process died (see LoggingClient.onRenderProcessGone).
     var generation by remember { mutableIntStateOf(0) }
+    // Opened full screen, for a video or a radio maybe: its sound reaches the car only through the
+    // capture, which waited while myCar's own music (Xonos) was the car's - and the browser stayed
+    // silent in the car. As Cinema does. Not a page's part on Home, which a swipe shows in passing.
+    if (tile == null) {
+        LaunchedEffect(Unit) {
+            io.github.sirionero.mycar.audio.CarAudio.askAgainOnce()
+            io.github.sirionero.mycar.audio.CarAudio.captureNow()
+        }
+    }
 
     DisposableEffect(web, tile) {
         if (tile != null) return@DisposableEffect onDispose { }
@@ -93,6 +103,9 @@ internal fun WebApp(content: String, tile: WebTile?) {
                 factory = { context ->
                     // A page's dropdown can't close myCar on the car's screen (see carWebContext).
                     WebView(carWebContext(context)).apply {
+                        // As tall as its place: with AndroidView's WRAP_CONTENT, WebView lays the
+                        // page out 0 px tall (100vh, bars fixed at the bottom, full-window pages).
+                        layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
                         settings.javaScriptEnabled = true
                         settings.domStorageEnabled = true
                         settings.loadWithOverviewMode = true
@@ -334,11 +347,17 @@ internal const val FOCUS_TRACKING_JS = """
             var el = fieldOf(e);
             if (isEditable(el)) report(el);
         });
+        // The field left: told a moment later, and only if no field has the focus then. The page
+        // losing the phone's focus (the see-through screen that reads the clipboard for Paste, a
+        // dialog on the phone) blurs the field too, but leaves it the page's active element: that
+        // isn't the driver leaving it, and the keyboard stays - with the pasted text on its way.
         document.addEventListener('focusout', function(e) {
-            if (isEditable(fieldOf(e))) {
+            if (!isEditable(fieldOf(e))) return;
+            setTimeout(function() {
+                if (isEditable(deepActive())) return;
                 shown = null;
                 window.MyCarField.blurred();
-            }
+            }, 250);
         });
         // A field focused before this script ran (autofocus, a tap while the page loaded) gets
         // no new focusin when tapped: the tap brings the keyboard up instead.

@@ -82,7 +82,8 @@ class MyCarRunner(
     @Volatile private var certificateShown = false
 
     @Volatile private var state = State.WAIT_VERSION
-    @Volatile private var lastProgress = System.currentTimeMillis()
+    /** On the clock that only goes forward, like every time the watchdog measures. */
+    @Volatile private var lastProgress = SystemClock.elapsedRealtime()
     @Volatile private var running = true
 
     @Volatile private var videoChannelId: Int = -1
@@ -246,7 +247,7 @@ class MyCarRunner(
         val messageId = ((message[0].toInt() and 0xFF) shl 8) or (message[1].toInt() and 0xFF)
         val body = message.copyOfRange(2, message.size)
 
-        lastProgress = System.currentTimeMillis()
+        lastProgress = SystemClock.elapsedRealtime()
 
         if (frame.channel != Frames.CHANNEL_CONTROL) {
             if (frame.channel == videoChannelId) {
@@ -1074,7 +1075,7 @@ class MyCarRunner(
     }
 
     private fun startVideoSource() {
-        lastKeyframeSentAt = System.currentTimeMillis() // frame #1 is always a keyframe
+        lastKeyframeSentAt = SystemClock.elapsedRealtime() // frame #1 is always a keyframe
         val index = selectedConfigIndex ?: 0
         val config = videoConfigs.getOrNull(index)
         if (config == null) {
@@ -1209,7 +1210,7 @@ class MyCarRunner(
             }
             resyncRequested = false
             resyncAttempts = 0
-            lastKeyframeSentAt = System.currentTimeMillis()
+            lastKeyframeSentAt = SystemClock.elapsedRealtime()
         }
         // Counted before it's queued: the writer may send it and the ack come back before this
         // thread runs again, and an ack counted ahead of its frame would leave the window full.
@@ -1441,8 +1442,13 @@ class MyCarRunner(
                 Thread.sleep(5_000)
                 if (!running) break
 
-                val idle = System.currentTimeMillis() - lastProgress
-                if (state != State.DONE) {
+                // Not the phone's time of day: set forward by the network mid-drive, it ended a drive
+                // with the car still talking; set back, it kept a stalled start-up for good.
+                val idle = SystemClock.elapsedRealtime() - lastProgress
+                // Over Wi-Fi a start the car turned down (the certificate, the TLS, the car's date) ends
+                // here too: the car may keep the connection open, waiting for the phone to hang up, and
+                // every message after it is dropped - the start-up stayed open for good, never starting over.
+                if (state != State.DONE || (wireless && authenticationFailed)) {
                     if (idle > 10_000) log.w("stalled in state $state for ${idle / 1000}s")
                     // Over Wi-Fi a car that stopped in the middle of the start held the session for
                     // good, and every arrival of the car after it was taken for a drive under way.
@@ -1476,7 +1482,7 @@ class MyCarRunner(
                     // some other path - a real decoder desync should never outlive this.
                     // Not while the car shows its own screen: those frames are thrown away, and
                     // its return asks for a keyframe of its own.
-                    val idleSinceKeyframe = System.currentTimeMillis() - lastKeyframeSentAt
+                    val idleSinceKeyframe = SystemClock.elapsedRealtime() - lastKeyframeSentAt
                     if (videoProjected && idleSinceKeyframe > PERIODIC_KEYFRAME_MS) {
                         videoSource?.requestSyncFrame()
                         // A still screen makes no frames, so the keyframe asked for never came: a car

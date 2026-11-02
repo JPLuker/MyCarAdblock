@@ -171,6 +171,7 @@ object CarAudio {
     /** The car went away. Everything is torn down; the next connection asks again. */
     fun release() {
         wanted = false
+        askedAgain = false
         AudioCaptureService.stop()
         _capture.value = Capture.OFF
         feed?.let {
@@ -184,6 +185,32 @@ object CarAudio {
     fun denied() {
         _capture.value = Capture.DENIED
     }
+
+    /**
+     * The driver asks again for the music, from the car's player or the phone's Home, after
+     * Android's question was turned down: a single "no" left the car without music through myCar
+     * for the whole drive, with nothing on either screen to ask once more.
+     */
+    fun askAgain() {
+        if (_capture.value != Capture.DENIED || _micBlocked.value) return
+        MyCarLog.i("audio: asking Android again for the music to the car")
+        _capture.value = Capture.OFF
+        if (wanted) request()
+    }
+
+    /**
+     * The driver opened something whose sound needs the capture (a music app, a web player,
+     * Cinema): after a "no", asked once more - once a drive, not at every app opened after it.
+     * The car's "Ask again" ([askAgain]) asks as often as tapped.
+     */
+    fun askAgainOnce() {
+        if (_capture.value != Capture.DENIED || askedAgain) return
+        askedAgain = true
+        askAgain()
+    }
+
+    /** [askAgainOnce] has asked this drive. */
+    @Volatile private var askedAgain = false
 
     /** The question can't be asked now (the phone's screen is shared): the next [request] asks it. */
     fun askLater() {
@@ -224,8 +251,10 @@ object CarAudio {
 
     internal fun deliver(pcm: ByteArray, size: Int, peak: Float) {
         _level.value = peak
-        // While myCar's own music reaches the car, it alone feeds it.
-        if (feed?.feeding == true) return
+        // While myCar's own music reaches the car, it alone feeds it - and for a moment after, for
+        // the gap between two songs, unless another app's sound is already here (see endTailFor).
+        val own = feed
+        if (own != null && own.feeding && !own.endTailFor(pcm, size)) return
         synchronized(writes) { link?.write(pcm, size) }
     }
 }

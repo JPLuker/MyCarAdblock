@@ -67,6 +67,16 @@ object BluetoothAudioCheck {
         _carDismissed.value = true
     }
 
+    /**
+     * The sound's route changed (Automatic moved it to myCar, or back): what has to be connected
+     * changed with it - the hands-free for calls only, or the music's Bluetooth too. Checked again;
+     * before, a warning raised for the music's Bluetooth stayed up after the music moved to myCar,
+     * with the hands-free connected.
+     */
+    fun recheck() {
+        main.post { if (armed && receiver != null) check() }
+    }
+
     /** "Don't show again" on the car: turns the warning off in Settings, for every car. */
     fun neverAgain() {
         CarSettings.setBluetoothWarning(false)

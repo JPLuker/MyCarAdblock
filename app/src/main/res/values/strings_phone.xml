@@ -245,4 +245,7 @@
     <string name="donate_text">myCar is free, with no ads and no tracking. If it gets you on the road, your support keeps it going.</string>
     <string name="donate_bitcoin">Support with Bitcoin</string>
     <string name="donate_card">Give once by card</string>
+    <string name="audio_not_reaching_title">Music isn\'t reaching the car</string>
+    <string name="audio_not_reaching_text">Android\'s question to send the sound through myCar was turned down, so the car gets no music.</string>
+    <string name="audio_ask_again">Ask again</string>
 </resources>

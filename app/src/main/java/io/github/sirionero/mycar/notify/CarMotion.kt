@@ -26,6 +26,17 @@ object CarMotion {
     val moving: Boolean
         get() = SystemClock.elapsedRealtime() - fixAt < STALE_MS && speed > MOVING_MS
 
+    /**
+     * For video (CarDriving), the safe way round: the last speed holds until a new fix says the car
+     * stopped. With no fix for a while - a tunnel, a ramp down to a garage - [moving] answers "not
+     * moving", right for popups, but on a car that doesn't say itself that it moves, the film showed
+     * with the car still going. At most [VIDEO_STALE_MS], or a garage kept it covered for good.
+     */
+    val movingForVideo: Boolean
+        get() = SystemClock.elapsedRealtime() - fixAt < VIDEO_STALE_MS && speed > MOVING_MS
+
+    private const val VIDEO_STALE_MS = 5 * 60_000L
+
     fun start(context: Context) {
         if (listener != null) return
         if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return

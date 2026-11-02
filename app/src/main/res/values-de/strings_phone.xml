@@ -170,4 +170,7 @@
     <string name="donate_text">myCar ist kostenlos, ohne Werbung und ohne Tracking. Wenn es dich auf die Straße bringt, hält deine Unterstützung es am Laufen.</string>
     <string name="donate_bitcoin">Mit Bitcoin unterstützen</string>
     <string name="donate_card">Einmal per Karte spenden</string>
+    <string name="audio_not_reaching_title">Die Musik kommt nicht im Auto an</string>
+    <string name="audio_not_reaching_text">Die Frage von Android, den Ton über myCar zu senden, wurde abgelehnt, deshalb bekommt das Auto keine Musik.</string>
+    <string name="audio_ask_again">Erneut fragen</string>
 </resources>

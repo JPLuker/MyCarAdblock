@@ -172,4 +172,7 @@
     <string name="donate_text">myCar бесплатный, без рекламы и слежки. Если он помогает вам в дороге, ваша поддержка помогает проекту жить.</string>
     <string name="donate_bitcoin">Поддержать через Bitcoin</string>
     <string name="donate_card">Пожертвовать картой</string>
+    <string name="audio_not_reaching_title">Музыка не доходит до автомобиля</string>
+    <string name="audio_not_reaching_text">Запрос Android на передачу звука через myCar был отклонён, поэтому автомобиль не получает музыку.</string>
+    <string name="audio_ask_again">Спросить снова</string>
 </resources>

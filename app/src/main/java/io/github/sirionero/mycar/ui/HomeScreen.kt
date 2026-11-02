@@ -120,6 +120,7 @@ fun HomeScreen(
                     if (!live) CertNoticeCard(onOpenHelp = onOpenHelp, onOpenSettings = onOpenCertificate)
                     if (!live) SetupLeftCard(onOpenSetup)
                     if (live) BluetoothMissingCard()
+                    if (live) AudioDeniedCard()
                     VoiceDownloadCard()
                     // The first drive that worked asks once to share it, right under the result.
                     val car = workedCar

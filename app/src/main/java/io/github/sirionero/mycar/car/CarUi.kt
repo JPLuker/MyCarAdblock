@@ -332,7 +332,8 @@ fun CarUi() {
                                             app == null -> LaunchedEffect(Unit) { navigator.back() }
                                             // A music service's web player: its own page is its full player.
                                             web != null -> WebMusicScreen(web)
-                                            else -> MediaScreen(app) { navigator.back() }
+                                            // The header's arrow closes the player, not a folder of its list (Back does that).
+                                            else -> MediaScreen(app) { navigator.close() }
                                         }
                                     }
                                     CarScreen.Browse -> BrowseAppScreen(navigator)

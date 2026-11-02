@@ -139,7 +139,7 @@ object CarAssistant {
             _state.value = State(Phase.ERROR, reply = AssistantLanguage.answer("Voice commands work once the call ends."))
             return
         }
-        tts?.stop()
+        stopVoice()
         _state.value = State(Phase.LISTENING, hint = languageHint(context))
         watch()
         listenOnce(
@@ -162,7 +162,7 @@ object CarAssistant {
     /** Closes the overlay from wherever it's showing: mid-listen, mid-think, or after speaking. */
     fun cancel() {
         releaseRecognizer()
-        tts?.stop()
+        stopVoice()
         _pendingCommand.value = null
         _state.value = State(Phase.IDLE)
     }
@@ -298,11 +298,11 @@ object CarAssistant {
         if (phase == Phase.SPEAKING) {
             // The engine never said it finished: ended here, or the music it paused stayed paused.
             speaking?.let { end(it, stopped = true) }
-            tts?.stop()
+            stopVoice()
             _state.value = State(Phase.IDLE)
             return
         }
-        tts?.stop()
+        stopVoice()
         val why = if (phase == Phase.LISTENING && !_state.value.ready) "The microphone isn't available right now." else "Speech recognition failed."
         _state.value = State(Phase.ERROR, reply = AssistantLanguage.answer(why))
     }
@@ -340,10 +340,13 @@ object CarAssistant {
             return
         }
         VoiceFocus.acquire(context)
-        speak(engine, text) { stopped ->
+        speak(engine, text) { _ ->
             VoiceFocus.release()
-            // Stopped part way: whoever stopped it has already moved on.
-            if (!stopped) mainHandler.post(onDone)
+            // Always, stopped part way too: a turn that cut a message read out on the car's channel
+            // for spoken prompts (DirectionsVoice) left the reply waiting for good. Whoever stopped
+            // it on purpose (Cancel, the microphone) has moved VoiceReply on, whose callbacks only
+            // act for the run they were made in.
+            mainHandler.post(onDone)
         }
     }
 
@@ -381,6 +384,14 @@ object CarAssistant {
     private fun speak(engine: TextToSpeech, text: String, ending: (stopped: Boolean) -> Unit): String {
         val id = "mycar-${++utterances}"
         endings[id] = ending
+        // The car's sound through myCar with nothing captured - myCar's own music (Xonos) goes
+        // straight into the car - and the voice came out of the phone's speaker: on the car's
+        // channel for spoken prompts instead, where the car has one.
+        if (CarSettings.pipeAudio.value && io.github.sirionero.mycar.audio.CarAudio.capture.value != io.github.sirionero.mycar.audio.CarAudio.Capture.ON &&
+            DirectionsVoice.speakForAssistant(text, VoiceLanguages.speakingLocale(AssistantLanguage.language)) { cut -> end(id, stopped = cut) }
+        ) {
+            return id
+        }
         engine.setOnUtteranceProgressListener(progress)
         if (engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, id) != TextToSpeech.SUCCESS) {
             MyCarLog.w("assistant: speech engine refused to speak")
@@ -389,7 +400,13 @@ object CarAssistant {
         return id
     }
 
-    fun stopSpeaking() { tts?.stop() }
+    fun stopSpeaking() { stopVoice() }
+
+    /** The voice stops, the phone's engine or the car's channel for prompts (see [speak]). */
+    private fun stopVoice() {
+        tts?.stop()
+        DirectionsVoice.stopAssistant()
+    }
 
     /**
      * Listens once, the same way the assistant does, and hands back what was said without acting

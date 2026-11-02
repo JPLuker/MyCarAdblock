@@ -160,8 +160,17 @@ class MyCarActivity : ComponentActivity(), Projection {
     ) { result ->
         val address = approvingCar ?: return@registerForActivityResult
         approvingCar = null
-        if (result.resultCode == RESULT_OK) io.github.sirionero.mycar.wireless.WirelessAuto.approved(this, address)
-        else io.github.sirionero.mycar.wireless.WirelessAuto.declined(this, address)
+        when {
+            result.resultCode == RESULT_OK -> io.github.sirionero.mycar.wireless.WirelessAuto.approved(this, address)
+            // Only "Don't allow" is a no. The dialog closed another way - Back, the phone turned,
+            // Android closing it - answers nothing, and the car is asked at a later drive: before,
+            // that too kept the car from ever connecting by itself, while Settings said it would.
+            // Android 13 and earlier don't tell the two apart.
+            android.os.Build.VERSION.SDK_INT < 34 ||
+                result.resultCode == android.companion.CompanionDeviceManager.RESULT_USER_REJECTED ->
+                io.github.sirionero.mycar.wireless.WirelessAuto.declined(this, address)
+            else -> io.github.sirionero.mycar.wireless.WirelessAuto.unanswered(result.resultCode)
+        }
     }
 
     /** Setting myCar as the phone's caller ID and spam app - what lets it decline a ringing call. */
@@ -245,8 +254,11 @@ class MyCarActivity : ComponentActivity(), Projection {
         // the session with it. Added before the screens' own Back handlers, which come first.
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // Also while a car is connecting: the wireless start-up lives with this screen.
-                if (runner != null || SessionStatus.state.value.phase == SessionStatus.Phase.CONNECTING) {
+                // Also while a car is connecting, or listened for after a drive: the wireless start-up
+                // lives with this screen, and a car's Bluetooth that opened it made Back close it.
+                if (runner != null || SessionStatus.state.value.phase == SessionStatus.Phase.CONNECTING ||
+                    io.github.sirionero.mycar.wireless.WirelessLink.busy
+                ) {
                     moveTaskToBack(true)
                     return
                 }
@@ -832,8 +844,11 @@ class MyCarActivity : ComponentActivity(), Projection {
     }
 
     override fun onProjectionStopped() {
-        // Before the car UI goes, while the media connection is still up.
-        io.github.sirionero.mycar.car.CarServices.pausePhoneMedia()
+        // Before the car UI goes, while the media connection is still up. Only after a drive the
+        // car showed: a start-up that ended before the picture - the car's Android Auto not ready
+        // yet, a certificate turned down, and each start-over after them - paused the phone's
+        // music, often playing on the car's Bluetooth.
+        if (surface != null) io.github.sirionero.mycar.car.CarServices.pausePhoneMedia()
         runOnUiThread {
             PhoneMirror.requestStop()
             io.github.sirionero.mycar.car.CarKeys.focusSink = null

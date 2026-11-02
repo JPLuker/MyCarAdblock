@@ -22,7 +22,7 @@ object CarDriving {
     @Volatile var override: Boolean? = null
 
     /** The phone's GPS: true while it reads the car moving. Swapped in the tests. */
-    @Volatile internal var gpsMoving: () -> Boolean = { CarMotion.moving }
+    @Volatile internal var gpsMoving: () -> Boolean = { CarMotion.movingForVideo }
 
     val videoAllowed: Boolean
         get() = override ?: ((fromCar.value ?: true) && !gpsMoving())

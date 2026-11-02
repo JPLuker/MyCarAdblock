@@ -214,7 +214,10 @@ object AssistantCommands {
         for (sep in listOf(" on ", " in ", " from ", " with ", " using ") + AssistantLanguage.appWords()) {
             val at = query.lastIndexOf(sep)
             if (at <= 0) continue
+            // A service's web player inside myCar first: it bears the service's name, as its app
+            // does, and the app's sound may never reach the car (Spotify's can't be captured).
             val apps = withContext(Dispatchers.IO) { io.github.sirionero.mycar.media.MediaCatalog.installed(context) }
+                .sortedByDescending { io.github.sirionero.mycar.webmusic.WebMusic.isInside(it.component) }
             val wanted = bestMatch(apps, query.substring(at + sep.length)) { it.label } ?: continue
             query = query.substring(0, at).trim()
             if (query.isEmpty() || query in RESUME_WORDS) {

@@ -122,7 +122,12 @@ fun MyCarApp(onDisconnect: () -> Unit, onRequestCallScreening: () -> Unit) {
     LaunchedEffect(plancia, xonos, screen) {
         if (screen != Screen.HOME || LocalNetwork.askedAtStart || LocalNetwork.allowed(context)) return@LaunchedEffect
         val urls = plancia.urls + if (xonos) Xonos.settings.load().urls else emptyList()
-        if (LocalNetwork.mayBlock(context, urls)) {
+        // A car that connects by itself needs it as much: its Wi-Fi is a local network, and the
+        // automatic start asks nothing on the way - set up before Android 17, every TCP try to
+        // the car timed out.
+        val carsByThemselves = io.github.sirionero.mycar.wireless.WirelessAuto.isOn(context) &&
+            io.github.sirionero.mycar.wireless.WirelessAuto.allowedCars(context).isNotEmpty()
+        if (LocalNetwork.mayBlock(context, urls) || (!LocalNetwork.allowed(context) && carsByThemselves)) {
             LocalNetwork.askedAtStart = true
             localNetworkPermission.launch(LocalNetwork.PERMISSION)
         }

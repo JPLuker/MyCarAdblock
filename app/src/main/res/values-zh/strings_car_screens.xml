@@ -168,4 +168,6 @@
     <string name="car_web_select_chosen">已选择</string>
     <string name="car_player_sound_bluetooth">声音通过蓝牙。点按改为通过 myCar</string>
     <string name="car_player_sound_mycar">声音通过 myCar。点按改为通过蓝牙</string>
+    <string name="car_player_sound_now_mycar">现在声音经由 myCar 传送，仅限这辆车</string>
+    <string name="car_player_sound_now_bluetooth">现在声音经由蓝牙传送，仅限这辆车</string>
 </resources>

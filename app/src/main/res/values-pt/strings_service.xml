@@ -47,10 +47,13 @@
     <string name="wireless_link_bt_no_car_detail">%1$s não abriu o Android Auto com o telefone. Verifique se o Android Auto sem fio está ativado nas configurações do carro e reconecte o telefone pelo menu Bluetooth do carro.</string>
     <string name="wireless_link_wifi_failed">Não foi possível entrar no Wi-Fi do carro</string>
     <string name="wireless_link_wifi_failed_detail">O Android não se conectou à rede de %1$s. Se apareceu um aviso “Conectar ao dispositivo”, é preciso aceitá-lo.</string>
+    <string name="wireless_link_wifi_off">O Wi-Fi do telefone está desligado</string>
+    <string name="wireless_link_wifi_off_detail">Ligue o Wi-Fi do telefone: a conexão sem fio com o carro passa pelo Wi-Fi do carro.</string>
     <string name="wireless_link_vpn">Uma VPN está bloqueando o carro</string>
     <string name="wireless_link_vpn_detail">O myCar entrou na rede de %1$s, mas uma VPN neste telefone (o Tailscale, por exemplo) não o deixa alcançar o carro. Conecte com o cabo, desative a VPN ou deixe o myCar fora dela nas configurações da VPN – aí o Plancia e o Xonos dentro do myCar não podem usar os endereços da VPN, como os nomes do Tailscale.</string>
     <string name="wireless_link_no_connection">Na rede Wi-Fi do carro, mas sem conexão</string>
     <string name="wireless_link_no_connection_detail">O myCar entrou na rede de %1$s, mas não conseguiu alcançar o Android Auto em %2$s.</string>
+    <string name="wireless_link_local_network_detail">O Android deixa o myCar fora das redes locais, e o Wi-Fi do carro é uma delas: no telefone, dê ao myCar a permissão Dispositivos próximos e conecte de novo.</string>
 
     <string name="bridge_through">Pelo app %1$s: %2$s</string>
     <string name="bridge_no_answer">ele não respondeu. Abra o app %1$s uma vez e tente de novo.</string>

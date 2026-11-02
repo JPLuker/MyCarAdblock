@@ -23,8 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
-import kotlinx.coroutines.delay
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +34,8 @@ import io.github.sirionero.mycar.Changelog
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.car.theme.GsButton
 import io.github.sirionero.mycar.car.theme.GsSwitch
-import io.github.sirionero.mycar.notify.CarMotion
+import io.github.sirionero.mycar.call.CallUiState
+import io.github.sirionero.mycar.call.CarCalls
 
 /**
  * What's new in this build, once, the first time the car screen shows after an update - or any
@@ -49,15 +48,13 @@ fun CarWhatsNew() {
     val afterUpdates by CarSettings.whatsNewAfterUpdates.collectAsState()
     val seen by CarSettings.whatsNewSeen.collectAsState()
     val open by CarSettings.whatsNewOpen.collectAsState()
-    // Polled: CarMotion is a plain value, and the card should appear once the car stops.
-    val moving by produceState(CarMotion.moving) {
-        while (true) {
-            value = CarMotion.moving
-            delay(5_000)
-        }
-    }
+    // The car's own word that it moves, then the GPS (CarDriving, as for video): on the GPS alone,
+    // with no fix yet, the card came up over the map with the car moving.
+    val moving = !rememberVideoAllowed()
     val due = afterUpdates && seen < release.versionCode && !moving
     if (!open && !due) return
+    // A ringing call first: the card and its scrim covered the call's Answer.
+    if (CarCalls.state.collectAsState().value is CallUiState.Ringing) return
     val close = { CarSettings.closeWhatsNew(release.versionCode) }
 
     Box(

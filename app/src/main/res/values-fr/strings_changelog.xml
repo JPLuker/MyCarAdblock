@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_43">
+        <item>La connexion à Spotify sur le téléphone n’est plus noire : la page s’affiche et se remplit, comme pour chaque service de musique.</item>
+        <item>Coller dans le clavier de la voiture fonctionne : le clavier reste ouvert et ce que vous avez copié sur le téléphone arrive dans le champ.</item>
+        <item>Le navigateur et Cinema affichent les pages à leur vraie hauteur : la barre du bas de YouTube, les avis sur les cookies et les pages en plein écran s’affichent comme dans un navigateur.</item>
+        <item>Connexion automatique : le téléphone dans la poche reste éveillé pendant qu’il attend la voiture, il essaie de la joindre pendant une minute entière, et un « Autoriser » fermé sans réponse ne la désactive plus pour toujours.</item>
+        <item>Avec le Wi-Fi du téléphone désactivé, myCar le dit tout de suite ; sous Android 17, il demande l’autorisation du réseau local dont le Wi-Fi de la voiture a besoin.</item>
+        <item>Musique qui n’arrive pas à la voiture après un « non » à la question d’Android : le lecteur et l’accueil du téléphone le disent, avec « Redemander ».</item>
+        <item>Avec Xonos comme musique de la voiture, les réponses de l’assistant et les messages lus s’entendent dans la voiture, et ce qui démarre après Xonos s’entend dès la première seconde.</item>
+        <item>En roulant : le prochain virage reste dans le dock pendant tout l’appel, les Nouveautés attendent que la voiture soit arrêtée, Retour remonte d’un dossier dans la liste de musique et Lecture au volant n’arrête plus un film.</item>
+        <item>Une connexion qui échoue ne met plus en pause la musique du téléphone, et les modèles vocaux se chargent après la première image de la voiture, pour un démarrage plus léger.</item>
+        <item>Plancia et Xonos dans myCar restent après un long tunnel au lieu de passer à leurs applis, et Cinema garde la vidéo masquée en roulant même quand le GPS perd le signal.</item>
+    </string-array>
     <string-array name="changelog_42">
         <item>Nouvelle section Musique dans les paramètres du téléphone : Xonos et Spotify ont chacun un interrupteur, et « Ajouter un service » propose YouTube Music, Apple Music, Amazon Music, Deezer, TIDAL, SoundCloud et Qobuz. Dans la voiture, seuls les services activés sont là ; Xonos est activé si vous l’utilisiez déjà.</item>
         <item>Spotify et les autres services jouent dans myCar avec leur propre lecteur web, disposé comme sur un ordinateur : leur son arrive dans la voiture par myCar, même quand l’app du service empêche les autres apps de l’enregistrer.</item>

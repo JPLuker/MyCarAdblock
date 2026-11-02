@@ -193,6 +193,39 @@ class DirectFeedTest {
         assertTrue("then slept ${wait / 1_000_000} ms", wait <= ms(40))
     }
 
+    @Test
+    fun `another app's sound ends the tail at once`() {
+        captureOn = true
+        val feed = feed()
+        val writer = feed.open(RATE, 2)
+        writer.write(ShortArray(CHUNK_FRAMES * 2) { 7 }, 0, CHUNK_FRAMES)
+        now = ms(20)
+        feed.pump(now)
+        // The music is over, its tail still on: the capture waits.
+        now = ms(500)
+        feed.pump(now)
+        assertTrue(feed.feeding)
+        // A quiet captured chunk changes nothing.
+        val quiet = ByteArray(CHUNK_FRAMES * 4).also { it[0] = 20 }
+        assertTrue(!feed.endTailFor(quiet, quiet.size))
+        assertTrue(feed.feeding)
+        // One with sound in it (a film starting, a message read out): the capture has the car now.
+        val loud = ByteArray(CHUNK_FRAMES * 4).also { it[101] = 0x10 }
+        assertTrue(feed.endTailFor(loud, loud.size))
+        assertTrue(!feed.feeding)
+    }
+
+    @Test
+    fun `while the music itself plays, another app's sound waits`() {
+        captureOn = true
+        val feed = feed()
+        val writer = feed.open(RATE, 2)
+        writer.write(ShortArray(CHUNK_FRAMES * 2 * 5) { 7 }, 0, CHUNK_FRAMES * 5)
+        val loud = ByteArray(CHUNK_FRAMES * 4).also { it[101] = 0x10 }
+        assertTrue(!feed.endTailFor(loud, loud.size))
+        assertTrue(feed.feeding)
+    }
+
     private companion object {
         const val RATE = 48_000
         const val CHUNK_FRAMES = RATE * DirectFeed.CHUNK_MS / 1000

@@ -152,6 +152,11 @@ internal fun SideMediaPane(app: MediaApp, now: NowPlaying, modifier: Modifier) {
         val closedHere = cur == null && CarServices.closedMedia == app.component
         if ((cur == null && !closedHere) || failed) CarServices.openMedia(app, remember = false)
     }
+    // Opened here only to show its player, it isn't remembered; played from here, it's the music
+    // the driver chose: the next drive starts with it (before, with an older app, or none).
+    LaunchedEffect(now.playing, current) {
+        if (now.playing && current?.component == app.component) CarSettings.setLastMedia(app.component.flattenToString())
+    }
     val navigator = LocalCarNavigator.current
     Box(modifier) {
         GlassDockedPlayer(now, Modifier.matchParentSize())

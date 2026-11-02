@@ -179,7 +179,15 @@ object WirelessAuto {
         watch(context, address)
     }
 
-    /** The driver said no, or closed the dialog: this car isn't asked about again until the switch goes off and on. */
+    /**
+     * Android's dialog closed with no answer: nothing is saved, and the car is asked about again at
+     * a wireless drive after this one (not in this one: see [UNANSWERED_MS]).
+     */
+    fun unanswered(code: Int) {
+        log.i("auto-connect: Android's dialog closed without an answer ($code) - asking again at a later drive")
+    }
+
+    /** The driver said no: this car isn't asked about again until the switch goes off and on. */
     fun declined(context: Context, address: String) {
         log.w("auto-connect: not allowed in Android's dialog")
         answered(context, address)
@@ -225,6 +233,12 @@ object WirelessAuto {
     fun carAppeared(context: Context, address: String) {
         if (!isOn(context)) {
             log.i("auto-connect: a car myCar knows connected over Bluetooth, but auto-connect is off")
+            return
+        }
+        // "Use myCar in the car" off, to leave the car to Android Auto: myCar's screen came up on the
+        // phone at every drive all the same, only to find it was off.
+        if (!io.github.sirionero.mycar.AppSettings.myCarEnabled(context)) {
+            log.i("auto-connect: a car myCar knows connected over Bluetooth, but myCar is switched off - not opening it")
             return
         }
         // A drive on already (the cable, most often): the car's Bluetooth coming up changes nothing,

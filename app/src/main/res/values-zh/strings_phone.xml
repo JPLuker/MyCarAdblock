@@ -169,4 +169,7 @@
     <string name="donate_text">myCar 免费，没有广告，也不跟踪你。如果它帮你顺利上路，你的支持能让它继续走下去。</string>
     <string name="donate_bitcoin">用比特币支持</string>
     <string name="donate_card">用银行卡捐赠一次</string>
+    <string name="audio_not_reaching_title">音乐没有传到车上</string>
+    <string name="audio_not_reaching_text">Android 关于通过 myCar 传送声音的请求被拒绝了，所以车上没有音乐。</string>
+    <string name="audio_ask_again">重新询问</string>
 </resources>

@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_43">
+        <item>O login do Spotify no telefone não fica mais preto: a página aparece e pode ser preenchida, como em todo serviço de música.</item>
+        <item>Colar no teclado do carro funciona: o teclado fica aberto e o que você copiou no telefone entra no campo.</item>
+        <item>O navegador e o Cinema mostram as páginas na altura real: a barra de baixo do YouTube, os avisos de cookies e as páginas de janela inteira aparecem como num navegador.</item>
+        <item>Conexão automática: o telefone no bolso fica acordado enquanto espera o carro, tenta alcançar o carro por um minuto inteiro, e um “Permitir” fechado sem resposta não a desliga mais para sempre.</item>
+        <item>Com o Wi-Fi do telefone desligado, o myCar avisa na hora; no Android 17 ele pede a permissão de rede local de que o Wi-Fi do carro precisa.</item>
+        <item>Música que não chega ao carro depois de um “não” à pergunta do Android: o player e a tela inicial do telefone avisam, com “Perguntar de novo”.</item>
+        <item>Com o Xonos como música do carro, as respostas do assistente e as mensagens lidas tocam no carro, e o que começa depois do Xonos é ouvido desde o primeiro segundo.</item>
+        <item>Dirigindo: a próxima curva fica no dock durante toda a chamada, as Novidades esperam o carro parar, Voltar sobe uma pasta na lista de músicas e o Play do volante não para mais um filme.</item>
+        <item>Uma conexão que falha não pausa mais a música do telefone, e os modelos de voz carregam depois da primeira imagem do carro, para um início mais leve.</item>
+        <item>Plancia e Xonos dentro do myCar continuam depois de um túnel longo em vez de passar para os apps, e o Cinema mantém o vídeo coberto em movimento mesmo quando o GPS perde o sinal.</item>
+    </string-array>
     <string-array name="changelog_42">
         <item>Nova seção Música nas configurações do telefone: Xonos e Spotify têm cada um um interruptor, e “Adicionar um serviço” oferece YouTube Music, Apple Music, Amazon Music, Deezer, TIDAL, SoundCloud e Qobuz. No carro ficam só os serviços ligados; o Xonos fica ligado se você já o usava.</item>
         <item>O Spotify e os outros serviços tocam dentro do myCar pelo próprio player web, com o layout de computador: o som chega ao carro pelo myCar, mesmo quando o app do serviço não deixa outros apps gravá-lo.</item>
