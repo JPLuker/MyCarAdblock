@@ -288,7 +288,9 @@ Tutti i token in un solo posto, `car/design/`:
   Anteprima: `--es sidePane <pacchetto>`, cartelle `split-plancia/`, `split-xonos/`.
   **Dimensione del lettore** (0.6.8, richiesta dell'utente; chiave `car_player_size`, "Size of the player
   beside the map" in auto e sul telefono): Piccola (com'era), Media 1,1, Grande 1,2, Molto grande 1,4 (0.6.9,
-  `PLAYER_EXTRA`, scatti `split-extra*`). Il lato accanto alla
+  `PLAYER_EXTRA`, scatti `split-extra*`; `sideScaleFor` in `car/SideScale.kt` + `SideScaleTest` la limita a quanto
+  ci sta: la mappa resta almeno `MAP_PANE_MIN_EDGE` + 24 dp e la colonna alta abbastanza; la X della colonna sopra
+  il vetro). Il lato accanto alla
   mappa ha la densità moltiplicata per quel valore e prende `MAP_SHARE`(3,1)/dimensione − 1 parti di mappa
   (`CarHomeScreen`); solo per la musica (lettore, testo): un'app con template o Plancia resta com'è.
   Anteprima `--es playerSize 1.1|1.2`, cartelle `split-medium/`, `split-large/`, `split-large-800x480/`.
@@ -299,8 +301,13 @@ Tutti i token in un solo posto, `car/design/`:
   premuta, con la locandina, indietro, pausa e avanti, che non occupi la mappa e si possa nascondere";
   `car/MapMiniPlayer.kt`, regola pura `car/MiniPlace.kt` + `MiniPlaceTest`, chiavi `car_mini_player` e
   `car_mini_player_at`): con la colonna della musica chiusa (X, brano del dock, Close di un'app accanto) e la
-  musica accesa, una pillola 276×64 dp in basso a destra della mappa; non in pan mode, solo nella pagina della
-  mappa in vista, mai durante la colonna riservata d'avvio. Sta nello slot `overMap` di `CarAppStage`, fra la
+  musica accesa, una pillola 276×64 dp sulla mappa; non in pan mode, solo nella pagina della mappa in vista,
+  mai durante la colonna riservata d'avvio, né sotto un template che copre la mappa (`isContentTemplate`: la
+  manopola la raggiungerebbe sotto l'elenco). Si muove fuori dalla striscia dei puntini delle pagine
+  (`MINI_DOTS_STRIP` 60 dp); finché il guidatore non la sposta la partenza la calcola `MiniPlace.start`: in
+  basso a destra sulle mappe grandi, sulle piccole (800x480 a Large/Extra large) a sinistra dei tasti della
+  mappa ma mai sotto la scheda a sinistra (42% della mappa, almeno 244 dp). Scatti `mini-large-800x480`,
+  `mini-xl-800x480` (`--es carScale`). Sta nello slot `overMap` di `CarAppStage`, fra la
   superficie e la chrome del template: schede e tasti dell'app restano sopra, la superficie non cambia, ogni
   tocco fuori dalla pillola va alla mappa. Gesto nostro sul passaggio Initial (`dragAfterHold`): tocco breve al
   tasto; uno scorrimento prima della pressione lunga preso e lasciato cadere (niente pagina); dopo la pressione
