@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.ArrowBack
@@ -39,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -456,19 +457,24 @@ internal fun LyricsPanel(
     // Asked again with Try again, after a lookup that couldn't reach lrclib.net: this song only, the
     // next one waits as songs skipped in a row do.
     var attempt by remember(song.key) { mutableIntStateOf(0) }
-    // Already looked up (ahead, or before): no "Looking for lyrics…" flash.
-    val lyrics by produceState<LyricsState>(Lyrics.known(song)?.let(::stateOf) ?: LyricsState.Loading, song.key, attempt) {
-        Lyrics.known(song)?.let { value = stateOf(it); return@produceState }
-        value = LyricsState.Loading
-        // Songs skipped in a row aren't looked up: only the one the driver stays on.
-        if (attempt == 0 && song.title.isNotEmpty()) delay(Lyrics.SETTLE_MS)
-        value = Lyrics.find(context, song).fold(onSuccess = ::stateOf, onFailure = { LyricsState.Unreachable })
+    // Already looked up (ahead, or before): no "Looking for lyrics…" flash. A state of its own for each
+    // song: kept across songs, the first frame of the next one showed the words of the one before.
+    val lyrics by key(song.key) {
+        produceState<LyricsState>(Lyrics.known(song)?.let(::stateOf) ?: LyricsState.Loading, attempt) {
+            Lyrics.known(song)?.let { value = stateOf(it); return@produceState }
+            value = LyricsState.Loading
+            // Songs skipped in a row aren't looked up: only the one the driver stays on.
+            if (attempt == 0 && song.title.isNotEmpty()) delay(Lyrics.SETTLE_MS)
+            value = Lyrics.find(context, song).fold(onSuccess = ::stateOf, onFailure = { LyricsState.Unreachable })
+        }
     }
-    val list = rememberLazyListState()
+    // Each song's lyrics from the top: kept, the next song opened scrolled to where the last one had got,
+    // and lyrics without times (or before their first line) stayed there.
+    val list = remember(song.key) { LazyListState() }
 
     // Ticks with playback so the highlighted line moves; only synced lyrics need it. Not while
     // paused, nor beside the map out of sight (see LocalPlayerInView): it went on ticking there.
-    var position by remember { mutableLongStateOf(0L) }
+    var position by remember(song.key) { mutableLongStateOf(now.currentPosition()) }
     val inView = LocalPlayerInView.current
     LaunchedEffect(now, inView) {
         while (true) {
@@ -514,7 +520,7 @@ internal fun LyricsPanel(
         is LyricsState.Found -> {
             val lines = state.result.lines
             val current = if (state.result.synced) lines.indexOfLast { it.timeMs <= position } else -1
-            LaunchedEffect(current) {
+            LaunchedEffect(current, list) {
                 if (current >= 0) list.animateScrollToItem((current - 1).coerceAtLeast(0))
             }
             LazyColumn(modifier, state = list, verticalArrangement = Arrangement.spacedBy(6.dp)) {
