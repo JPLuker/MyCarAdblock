@@ -171,7 +171,12 @@ Rispondi sempre in **italiano**.
   player si mostra solo il suo pannello. In cima c'è `home.png`, da `split/` (mappa vera e
   lettore): lì il badge si copre specchiando il pannello del lettore, che è simmetrico; sugli
   sfondi con linee (Waves) si riflette la parte appena a sinistra del badge, perché copiarla
-  lascerebbe un gradino nell'onda.
+  lascerebbe un gradino nell'onda. Gli altri: `launcher.png` da `motion-waves/`, `call.png` da
+  `call/`, `settings.png` da `settings/` (il terzo scatto), `wallpapers.png` da `wallpapers/` (lì il
+  badge non c'è); tutti 1600×600, ridotti da 1920×720. Rifatti per la 0.6.8 con la Car preview
+  lanciata a mano su `main`, `shots` = `vela split motion-waves wallpapers call settings`: `vela`
+  prima di `split`, perché con Vela appena installata la mappa era ancora nera dopo 15 s. Il
+  pannello del lettore piccolo a 1920×720 è simmetrico attorno a x = 1635 (il seek va da 1384 a 1886).
 
 ## Rilasci
 
