@@ -109,6 +109,13 @@ object CarServices {
     private var autoplayPending = false
 
     /**
+     * The phone's preview of the car's screen is open (Settings, no car): its car UI picks the music
+     * as a drive would, but plays nothing by itself - with Autoplay on, opening the preview started
+     * the music on the phone's speaker - and pauses no app on the phone for a web player.
+     */
+    @Volatile var phonePreview = false
+
+    /**
      * Who holds the drive's services: the car session itself and each car UI composed (the car's,
      * and the phone's preview of it). They go only when the last lets go: a car UI torn down for
      * screen sharing, or the preview closed mid-drive, used to end them all - the map unhooked,
@@ -387,7 +394,7 @@ object CarServices {
             val playing = withContext(Dispatchers.IO) { currentlyPlaying(ctx, catalog) }
             // The phone's own app of a service whose web player takes its place in the car (its app
             // ticked to stay off the grid): the music goes on in that player instead, the app paused.
-            val web = playing?.let { webFor(it.component, catalog) }
+            val web = playing?.takeUnless { phonePreview }?.let { webFor(it.component, catalog) }
             if (web != null) {
                 pausePhoneMedia("its web player takes its place in the car")
                 openMedia(web, autoplay = true, auto = true)
@@ -396,7 +403,7 @@ object CarServices {
             } else {
                 val last = CarSettings.lastMedia.value?.let(ComponentName::unflattenFromString)
                 val app = last?.let { component -> webFor(component, catalog) ?: catalog.firstOrNull { it.component == component } ?: xonosFor(component, catalog) }
-                if (app != null) openMedia(app, autoplay = CarSettings.autoplay.value, auto = true)
+                if (app != null) openMedia(app, autoplay = CarSettings.autoplay.value && !phonePreview, auto = true)
             }
         }
         _mediaDecided.value = true
