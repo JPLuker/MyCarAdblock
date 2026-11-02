@@ -398,7 +398,7 @@ private fun pages(context: Context, onRequestCallScreening: () -> Unit): List<Gu
  */
 /** How the voice download is going: a bar while it runs, a line once it's done or failed. */
 @Composable
-private fun VoiceDownloadStatus() {
+internal fun VoiceDownloadStatus() {
     val context = LocalContext.current
     val progress by SpeechModels.progress.collectAsState()
     val states = SpeechModels.recommended().map { SpeechModels.state(it).collectAsState().value }

@@ -28,6 +28,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.material3.Button
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
@@ -100,28 +106,33 @@ class WebMusicSignInActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SignInScreen(service: WebMusicService, onWeb: (WebView) -> Unit, onClose: () -> Unit) {
+    // Back on the service's player after its sign-in page: a clear end, Done (the same as the X).
+    var onPlayer by remember { mutableStateOf(false) }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.music_sign_in_title, service.name)) },
+                title = { Text(if (onPlayer) service.name else stringResource(R.string.music_sign_in_title, service.name)) },
                 navigationIcon = {
                     IconButton(onClick = onClose) {
                         Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.common_close))
                     }
+                },
+                actions = {
+                    if (onPlayer) Button(onClick = onClose, modifier = Modifier.padding(end = 8.dp)) { Text(stringResource(R.string.common_done)) }
                 },
             )
         },
     ) { padding ->
         AndroidView(
             modifier = Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding).imePadding(),
-            factory = { context -> signInWebView(context, service).also(onWeb) },
+            factory = { context -> signInWebView(context, service) { onPlayer = true }.also(onWeb) },
         )
     }
 }
 
 @SuppressLint("SetJavaScriptEnabled")
-private fun signInWebView(context: Context, service: WebMusicService): WebView = WebView(context).apply {
+private fun signInWebView(context: Context, service: WebMusicService, onPlayer: () -> Unit): WebView = WebView(context).apply {
     // As tall as its place, said outright. In an AndroidView a WebView gets WRAP_CONTENT, and then
     // WebView lays the page out 0 px tall (setForceZeroLayoutHeight): a page that fills the window
     // from its edges - Spotify's sign-in - came out black, nothing on it to see or touch.
@@ -143,6 +154,12 @@ private fun signInWebView(context: Context, service: WebMusicService): WebView =
 
         override fun onPageFinished(view: WebView, url: String?) {
             CookieManager.getInstance().flush()
+            // On the player again, its sign-in done on another site (Spotify's, Google's, Deezer's):
+            // the screen offers Done. Not a word of "signed in": the player may be there without it.
+            val signInHost = service.signIn?.let { Uri.parse(it).host }
+            if (url != null && signInHost != null && service.origins.none { Uri.parse(it).host == signInHost } &&
+                service.origins.any { url.startsWith(it) }
+            ) onPlayer()
         }
     }
     loadUrl(service.signIn ?: service.url)

@@ -192,7 +192,8 @@ internal fun SidePanePicker() {
     val apps = entries.filter { it.fitsBesideMap && it.componentId != null && !replaced(it) }.sortedBy { it.label.lowercase() }
     // Lit as beside the map: a choice saved with the Plancia or Xonos app is the one inside myCar now
     // (and back, while the app stands in); compared as saved, nothing was lit.
-    val shown = pinShown(current, entries)
+    // An app since gone (uninstalled, a service turned off) shows as the music, which the car shows.
+    val shown = pinShown(current, entries).takeIf { id -> apps.any { it.componentId == id } } ?: SidePaneChoice.MUSIC
     val options = listOf(SidePaneChoice.MUSIC to stringResource(R.string.car_side_music)) + apps.mapNotNull { e -> e.componentId?.let { it to e.shownLabel } }
     val scheme = MaterialTheme.colorScheme
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

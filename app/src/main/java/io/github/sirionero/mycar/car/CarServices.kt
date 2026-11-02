@@ -155,7 +155,9 @@ object CarServices {
             XonosAccount.adoptIfUnset(appContext)
             Xonos.repo.acquire()
         } else {
-            if (_mediaApp.value?.component?.let(Xonos::isInside) == true) closeMedia()
+            // Inside myCar or the Xonos app: off, it's in the car no more, as the switch says.
+            val music = _mediaApp.value?.component
+            if (music != null && (Xonos.isInside(music) || music.packageName == Xonos.APP_PACKAGE)) closeMedia()
             Xonos.repo.release()
         }
     }

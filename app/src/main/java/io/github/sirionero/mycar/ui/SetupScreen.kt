@@ -71,6 +71,8 @@ import io.github.sirionero.mycar.CertCatalog
 import io.github.sirionero.mycar.CertProvider
 import io.github.sirionero.mycar.KEY_MIC_ASKED
 import io.github.sirionero.mycar.R
+import androidx.compose.runtime.collectAsState
+import io.github.sirionero.mycar.speech.SpeechModels
 import io.github.sirionero.mycar.Words
 import io.github.sirionero.mycar.call.CarCalls
 import io.github.sirionero.mycar.notify.NotificationAccess
@@ -482,6 +484,7 @@ private fun MoreSection(
     ) {
         if (status(Id.SCREENING) != Status.DONE) Button(onClick = onScreening) { Text(stringResource(R.string.setup_screening_button)) }
     }
+    VoiceStep()
     StepCard(stringResource(R.string.setup_audio_title), Status.DONE, body = stringResource(R.string.setup_audio_body)) {
         AudioChoice()
     }
@@ -489,6 +492,30 @@ private fun MoreSection(
         StepCard(stringResource(R.string.setup_usage_title), if (UsageStats.asked(context)) Status.DONE else Status.TODO, body = USAGE_STATS_INTRO.text) {
             UsageStatsChoices()
         }
+    }
+}
+
+/**
+ * The voice models, as the old guide offered them: myCar's assistant is the default one, and
+ * without them its first answer in the car was "download a voice model first". Read from the
+ * downloads as they go, so the card ticks itself when they finish.
+ */
+@Composable
+private fun VoiceStep() {
+    val context = LocalContext.current
+    remember { SpeechModels.init(context) }
+    val models = SpeechModels.recommended()
+    val states = models.map { SpeechModels.state(it).collectAsState().value }
+    val ready = states.all { it == SpeechModels.State.Ready }
+    StepCard(
+        stringResource(R.string.settings_group_voice),
+        if (ready) Status.DONE else Status.TODO,
+        body = stringResource(R.string.setup_guide_voice_body, models.sumOf { it.downloadMb }),
+    ) {
+        if (!ready && states.none { it is SpeechModels.State.Downloading }) {
+            Button(onClick = { SpeechModels.downloadRecommended(context) }) { Text(stringResource(R.string.setup_guide_voice_download)) }
+        }
+        VoiceDownloadStatus()
     }
 }
 

@@ -145,7 +145,7 @@
     <string name="update_out">myCar %1$s is out</string>
     <!-- %1$d: how far, in percent -->
     <string name="update_downloading">Downloading… %1$d%%</string>
-    <string name="update_unplug_first">Unplug from the car to install. Installing closes myCar.</string>
+    <string name="update_unplug_first">Disconnect from the car to install. Installing closes myCar.</string>
     <string name="update_downloaded">Downloaded. Android asks before it installs.</string>
     <string name="update_download_now">Download it now. Android asks before it installs.</string>
     <!-- Buttons -->

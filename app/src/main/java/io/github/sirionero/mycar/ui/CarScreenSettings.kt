@@ -97,7 +97,8 @@ private fun CarHomeSection() {
     val replaced = rememberReplacedByWeb()
     val apps = entries.filter { it.fitsBesideMap && it.componentId != null && !replaced(it) }.sortedBy { it.label.lowercase() }
     // As in the car: a choice saved with the Plancia or Xonos app is the one inside myCar now.
-    val shownSide = pinShown(side, entries)
+    // An app since gone (uninstalled, a service turned off) shows as the music, as in the car.
+    val shownSide = pinShown(side, entries).takeIf { id -> apps.any { it.componentId == id } } ?: SidePaneChoice.MUSIC
     val appNames = apps.map { it.shownLabel }
     val carApps = CarApps.all.filter { it.id != "settings" }
     val carAppNames = carApps.map { it.shownLabel }
