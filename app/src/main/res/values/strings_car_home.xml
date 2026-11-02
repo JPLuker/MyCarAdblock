@@ -68,6 +68,7 @@
     <string name="car_apps_hide_from_grid">Hide from the app grid</string>
     <string name="car_apps_show_on_grid">Show on the app grid</string>
     <string name="car_apps_hidden_toast">%1$s is hidden. Settings, Hidden apps brings it back.</string>
+    <string name="car_web_music_elsewhere">%1$s is playing on another device, not in the car</string>
 
     <!-- Home's map, while it starts or when there is none (car/CarHomeScreen.kt). %1$s: the map app's name -->
     <string name="car_map_starting">Starting %1$s…</string>

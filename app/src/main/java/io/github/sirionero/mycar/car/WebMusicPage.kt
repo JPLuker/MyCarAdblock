@@ -18,12 +18,15 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
+import androidx.car.app.CarToast
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.toArgb
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import io.github.sirionero.mycar.BuildConfig
+import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.Words
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.car.design.MyCarPalette
 import io.github.sirionero.mycar.car.design.MyCarSize
@@ -132,6 +135,11 @@ internal class WebMusicPage(
     /** A button that came before the page could take it: sent once it can. */
     private var pending: Pair<String, Double?>? = null
     private var lastCrashResume = 0L
+    private var playsElsewhere = false
+    /** The car's presses so far: a newer one ends the tries of one that waited for the page. */
+    private var acts = 0
+    /** When the page last started loading: a press that waited for it is tried until [BOOT_MS] after. */
+    private var startedAt = 0L
     private var wasPlaying = false
 
     /** A voice search under way, until its first Play is pressed or isn't found. */
@@ -238,12 +246,14 @@ internal class WebMusicPage(
             reload()
             return
         }
-        send(action, seconds, retries = if (heard) 0 else RETRIES)
+        acts++
+        send(action, seconds, patient = !heard)
     }
 
     /** "Play [query]": the service's search, loaded here, then the Play of what it found first. */
     override fun search(query: String) {
         val url = service.searchUrl(query) ?: return
+        acts++
         pending = null
         searching = true
         searchedAt = SystemClock.uptimeMillis()
@@ -296,10 +306,13 @@ internal class WebMusicPage(
     }
 
     /**
-     * A button for the page. Before the page can take it, it waits; just loaded, the service's own
-     * player may not be there yet, so it's tried again for a while.
+     * A button for the page. Before the page can take it, it waits; just loaded ([patient]), the
+     * service's own player may not be there yet, so it's tried again until [BOOT_MS] after the page
+     * started - and a Play the page's own player took (its Media Session) but that plays nothing yet,
+     * the service still starting, is sent again while this is the car's music. Never a second click
+     * on the service's own button: it plays and pauses, and a song still loading would be paused.
      */
-    private fun send(action: String, seconds: Double?, retries: Int) {
+    private fun send(action: String, seconds: Double?, patient: Boolean, gen: Int = acts) {
         val w = web
         if (w == null || !heard) {
             pending = action to seconds
@@ -309,13 +322,23 @@ internal class WebMusicPage(
         if (!ours(w.url)) return
         val arg = seconds?.let { ", $it" } ?: ""
         w.evaluateJavascript("window.__mycarMusicAct ? window.__mycarMusicAct('$action'$arg) : 'no script'") { how ->
-            if ((how == "\"none\"" || how == "\"no script\"") && retries > 0) {
-                main.postDelayed({ send(action, seconds, retries - 1) }, RETRY_MS)
-            } else {
-                MyCarLog.i("music: ${service.id} $action ($how)")
+            val trying = patient && gen == acts && web === w && SystemClock.uptimeMillis() - startedAt < BOOT_MS
+            when {
+                trying && (how == "\"none\"" || how == "\"no script\"") ->
+                    main.postDelayed({ send(action, seconds, patient, gen) }, RETRY_MS)
+                trying && action == "play" && how == "\"page\"" -> main.postDelayed({
+                    if (gen == acts && web === w && !WebMusicPlayer.state(service.id).value.playing && isTheCarsMusic()) {
+                        MyCarLog.i("music: ${service.id} play: not playing yet - again")
+                        send(action, seconds, patient, gen)
+                    }
+                }, PLAY_CHECK_MS)
+                else -> MyCarLog.i("music: ${service.id} $action ($how)")
             }
         }
     }
+
+    private fun isTheCarsMusic(): Boolean =
+        CarServices.mediaApp.value?.component?.let(WebMusic::serviceFor)?.id == service.id
 
     fun destroy() {
         released = true
@@ -481,12 +504,19 @@ internal class WebMusicPage(
         }
         if (state.playing && !wasPlaying) becomeTheMusic()
         wasPlaying = state.playing
+        // Playing on another device: said once, while it lasts, to the driver whose music it is.
+        val remote = o.optBoolean("remote")
+        if (remote && !playsElsewhere) {
+            MyCarLog.i("music: ${service.id} plays on another device (Spotify Connect), not in the car's page")
+            if (isTheCarsMusic()) CarToasts.show(this, Words.get(R.string.car_web_music_elsewhere, service.name), CarToast.LENGTH_LONG)
+        }
+        playsElsewhere = remote
     }
 
     private fun sendPending() {
         val (action, seconds) = pending ?: return
         pending = null
-        send(action, seconds, RETRIES)
+        send(action, seconds, patient = true)
     }
 
     /** Playing, it's the car's music: myCar's player, the dock and the car's buttons follow it. */
@@ -503,6 +533,7 @@ internal class WebMusicPage(
             unreachable.value = false
             field.value = null
             heard = false
+            startedAt = SystemClock.uptimeMillis()
         }
 
         override fun onPageFinished(view: WebView, url: String?) {
@@ -583,8 +614,11 @@ internal class WebMusicPage(
         const val HEARD_WAIT_MS = 5_000L
         /** A page that closes again within this, playing, is opened again paused. */
         const val CRASH_RESUME_GAP_MS = 60_000L
-        const val RETRIES = 20
         const val RETRY_MS = 1_000L
+        /** How long a press that waited for the page is tried, from the page's start: a slow network too. */
+        const val BOOT_MS = 45_000L
+        /** After the page's player took a Play: playing by then, or the Play goes again. */
+        const val PLAY_CHECK_MS = 4_000L
 
         /** Narrower than this, these players fold away their parts: the page is drawn smaller instead. */
         const val MIN_WIDTH = 800

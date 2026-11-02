@@ -42,6 +42,7 @@
     <string name="car_apps_hide_from_grid">从应用网格中隐藏</string>
     <string name="car_apps_show_on_grid">在应用网格中显示</string>
     <string name="car_apps_hidden_toast">已隐藏：%1$s。可在“设置”&gt;“隐藏的应用”中恢复。</string>
+    <string name="car_web_music_elsewhere">%1$s 正在另一台设备上播放，而不是在车里</string>
 
     <string name="car_map_starting">正在启动 %1$s…</string>
     <string name="car_map_starting_unknown">正在启动地图…</string>

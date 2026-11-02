@@ -43,6 +43,7 @@
     <string name="car_apps_hide_from_grid">Nascondi dalla griglia delle app</string>
     <string name="car_apps_show_on_grid">Mostra nella griglia delle app</string>
     <string name="car_apps_hidden_toast">App nascosta: %1$s. Per farla tornare: Impostazioni, App nascoste.</string>
+    <string name="car_web_music_elsewhere">%1$s sta suonando su un altro dispositivo, non in auto</string>
 
     <string name="car_map_starting">Avvio %1$s…</string>
     <string name="car_map_starting_unknown">Avvio la mappa…</string>
