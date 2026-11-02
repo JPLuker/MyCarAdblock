@@ -120,6 +120,11 @@ object CarAssistant {
 
     private fun startOnMainThread() {
         val context = appContext ?: return
+        // A ringing call has the screen: nothing to listen for, and the ringtone would be heard as words.
+        if (CarCalls.state.value is CallUiState.Ringing) {
+            MyCarLog.i("assistant: not while a call rings")
+            return
+        }
         if (_state.value.phase == Phase.LISTENING) return
         // Still working on the last words (the model, Home Assistant): the microphone starts over
         // instead of doing nothing, which looked like the assistant had hung.
