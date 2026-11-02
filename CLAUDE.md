@@ -1154,6 +1154,16 @@ Tutti i token in un solo posto, `car/design/`:
   stesso viaggio (Wi-Fi che cade, l'auto che riavvia Android Auto). Idea della revisione: a fine sessione
   "parcheggiare" la proiezione (servizio in primo piano tenuto ~2 minuti, lettura ferma, telefono non più
   muto) e riprenderla se un'auto torna, invece di chiederla di nuovo.
+- **Dal secondo giro della notte 0.6.7, non fatti** (trovati e confermati da uno scettico, lasciati per
+  tempo o rischio): chiamate dall'auto ferme sulla scelta della SIM (doppia SIM con "Chiedi ogni volta":
+  un tasto Chiama per SIM); "Leggi"/"Rispondi" del popup che legge solo l'ultimo messaggio
+  (`VoiceReply.read` con `unreadCount`); la risposta immediata dell'altra persona presa per l'eco della
+  propria (`CarNotifications`, guardare il mittente dell'ultima riga); Assist che continua in Home
+  Assistant dopo che myCar ha smesso di aspettare (`unsubscribe_events`); "chiudi il garage" mentre Home
+  Assistant si ricollega; il token di Home Assistant confrontato per host e non per origine
+  (`PlanciaWeb`); avvio col cavo fermo su "Connecting" senza dire cosa fare; immagine che non si crea
+  dopo tre tentativi senza dirlo; cavo staccato a viaggio in corso che non passa da solo al senza fili;
+  Cinema che continua quando l'auto passa alla radio (LOSS) e non parte col focus negato.
 - Scatti `lang-*` per controllare le lingue.
 - Fatto nella 0.6.0: impostazioni del telefono in gruppi (`SettingsPage` in `ui/SettingsScreen.kt`;
   dalla 0.6.6, sotto la scheda dell'anteprima: Generali, Schermo dell'auto, Musica, Connessione, Voce,
