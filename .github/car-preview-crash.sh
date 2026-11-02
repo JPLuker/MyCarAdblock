@@ -201,3 +201,8 @@ EXTRA="$HA $PAGE3 --ez demoSong true --es miniAt 0.05,1" stress crash-webfocus-e
     "wait:9000;tap:$C_CLOSE;wait:2500;rep:15;$TO_LEFT;wait:1000-1500;focusweb;wait:300-1500;tap:250,22,900;wait:600-1200;key:4;wait:300-800;key:4;wait:500-1200;end;snap:end" 200
 EXTRA="$HA $PAGE3 --ez demoSong true" stress crash-webfocus-grid 800 480 160 \
     "wait:9000;rep:20;$TO_LEFT;wait:1000-1500;focusweb;wait:300-1500;tap:$C_FOOT;wait:600-1200;tap:$C_FOOT;wait:800-1500;end;snap:end" 200
+# Plancia beside the map (0.7.0: CarHomeScreen's planciaShown): the focus given to its page, then away
+# from it the three ways it goes - to the page left of the map and back, the app grid and back, and
+# last its Close.
+EXTRA="$HA --es sidePane mycar:plancia --es pageLayout halves --es pageParts weather,agenda" stress crash-webfocus-side 800 480 160 \
+    "wait:9000;snap:start;rep:10;focusweb;wait:300-1500;$TO_LEFT;wait:800-1500;$DRIVER;wait:800-1500;end;rep:10;focusweb;wait:300-1500;tap:$C_FOOT;wait:600-1200;tap:$C_FOOT;wait:800-1500;end;focusweb;wait:500;tapText:Close;wait:5000;snap:end" 260
