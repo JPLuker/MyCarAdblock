@@ -25,6 +25,8 @@
     <string name="connection_picture_refused_detail">O carro não quis abrir a tela dele para o myCar (código %1$s).</string>
     <string name="connection_no_picture">Sem imagem para o carro</string>
     <string name="connection_no_picture_detail">O codificador de vídeo do telefone não iniciou (%1$s). O myCar fechou a conexão: conecte de novo.</string>
+    <string name="connection_stage_stuck_cable">Ainda esperando o carro. Se a tela dele perguntar algo ou mostrar o Android Auto, responda ou toque nele; senão, desconecte o cabo e conecte de novo.</string>
+    <string name="connection_ui_failed_detail">O telefone não conseguiu desenhar a tela do carro (%1$s). O myCar encerrou a conexão: conecte de novo.</string>
     <string name="connection_picture_stopped">A imagem do carro parou</string>
     <string name="connection_picture_stopped_detail">O codificador de vídeo do telefone continua falhando (%1$s). O myCar fechou a conexão: conecte de novo.</string>
     <string name="connection_no_answer">O carro não respondeu</string>

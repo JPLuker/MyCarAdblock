@@ -96,6 +96,8 @@ object CarServices {
     fun init(appContext: Context) {
         context = appContext.applicationContext
         if (holders++ > 0) return
+        // Toasts posted between drives (after the last one ended) aren't this drive's.
+        CarToasts.clearAll()
         io.github.sirionero.mycar.notify.CarMotion.start(appContext)
         io.github.sirionero.mycar.call.CarCalls.start(appContext, inCar = true)
         CarAssistant.init(appContext)
@@ -498,6 +500,9 @@ object CarServices {
         closedMedia = null
         // A call waiting to be confirmed belongs to this drive, not to the car's next arrival.
         CallPrompt.pending.value = null
+        // A toast or the voice help up as the drive ended came back at the start of the next one.
+        CarToasts.clearAll()
+        VoiceHelp.hide()
         media.forgetLosses()
         clearSectionCache()
         navStopped = false

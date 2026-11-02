@@ -39,6 +39,16 @@ object SessionStatus {
         flow.value = Snapshot(Phase.CONNECTING, words(R.string.session_connecting), words(stage, *args))
     }
 
+    /**
+     * Replaces the stage line only while the state shown is still this "connecting": never over a
+     * picture, a failure or a disconnect written meanwhile, from another thread.
+     */
+    fun stillConnecting(@StringRes stage: Int): Boolean {
+        val seen = flow.value
+        if (seen.phase != Phase.CONNECTING) return false
+        return flow.compareAndSet(seen, Snapshot(Phase.CONNECTING, words(R.string.session_connecting), words(stage)))
+    }
+
     fun projecting() {
         flow.value = Snapshot(Phase.PROJECTING, words(R.string.session_connected), words(R.string.session_connected_detail))
     }

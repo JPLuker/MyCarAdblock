@@ -229,8 +229,14 @@ object WirelessAuto {
         return companions(manager).any { it.equals(address, ignoreCase = true) }
     }
 
+    private fun inCall(context: Context): Boolean =
+        context.checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE) == android.content.pm.PackageManager.PERMISSION_GRANTED &&
+            runCatching { context.getSystemService(android.telecom.TelecomManager::class.java)?.isInCall == true }.getOrDefault(false)
+
     /** From [CarPresenceService]: the car is here, so bring myCar up to connect to it. */
     fun carAppeared(context: Context, address: String) {
+        // First, before anything below returns: a start-up waiting on the car's going goes on.
+        WirelessLink.carHere(address)
         if (!isOn(context)) {
             log.i("auto-connect: a car myCar knows connected over Bluetooth, but auto-connect is off")
             return
@@ -258,6 +264,12 @@ object WirelessAuto {
         val upper = address.uppercase(java.util.Locale.ROOT)
         if (io.github.sirionero.mycar.connectFromOpenScreen(upper)) {
             log.i("auto-connect: connecting from myCar's screen, already open")
+            // On a call (the car's Bluetooth takes it as it connects): the call's screen stays in
+            // front. The start-up goes on behind; Android's questions wait for myCar to be opened.
+            if (inCall(context)) {
+                log.i("auto-connect: on a call - myCar's screen isn't brought up over it")
+                return
+            }
             // Brought to the front as before, with nothing to do: Android's questions that wait for
             // myCar on screen (the music's sharing, the "Allow") come up as soon as the phone is
             // unlocked, instead of only once the driver opened myCar.

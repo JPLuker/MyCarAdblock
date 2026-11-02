@@ -25,6 +25,8 @@
     <string name="connection_picture_refused_detail">汽车不肯向 myCar 开放它的屏幕（代码 %1$s）。</string>
     <string name="connection_no_picture">无法向汽车发送画面</string>
     <string name="connection_no_picture_detail">手机的视频编码器无法启动（%1$s）。myCar 已关闭连接：请重新连接。</string>
+    <string name="connection_stage_stuck_cable">仍在等待汽车。如果车机屏幕上有提问或显示 Android Auto，请回答或点按它；否则请拔下数据线后重新插上。</string>
+    <string name="connection_ui_failed_detail">手机无法绘制车机屏幕（%1$s）。myCar 已关闭连接：请重新连接。</string>
     <string name="connection_picture_stopped">汽车的画面已停止</string>
     <string name="connection_picture_stopped_detail">手机的视频编码器一直出错（%1$s）。myCar 已关闭连接：请重新连接。</string>
     <string name="connection_no_answer">汽车没有响应</string>

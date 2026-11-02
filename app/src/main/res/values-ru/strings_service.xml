@@ -25,6 +25,8 @@
     <string name="connection_picture_refused_detail">Автомобиль не открыл свой экран для myCar (код %1$s).</string>
     <string name="connection_no_picture">Нет изображения для автомобиля</string>
     <string name="connection_no_picture_detail">Видеокодер телефона не запустился (%1$s). myCar закрыл соединение: подключитесь снова.</string>
+    <string name="connection_stage_stuck_cable">Всё ещё ждём автомобиль. Если на его экране вопрос или значок Android Auto, ответьте или нажмите на него; иначе отсоедините кабель и подключите снова.</string>
+    <string name="connection_ui_failed_detail">Телефону не удалось нарисовать экран автомобиля (%1$s). myCar закрыл соединение: подключитесь снова.</string>
     <string name="connection_picture_stopped">Изображение в автомобиле остановилось</string>
     <string name="connection_picture_stopped_detail">Видеокодер телефона постоянно даёт сбой (%1$s). myCar закрыл соединение: подключитесь снова.</string>
     <string name="connection_no_answer">Автомобиль не ответил</string>

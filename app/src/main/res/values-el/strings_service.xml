@@ -25,6 +25,8 @@
     <string name="connection_picture_refused_detail">Το αυτοκίνητο δεν άνοιξε την οθόνη του στο myCar (κωδικός %1$s).</string>
     <string name="connection_no_picture">Καμία εικόνα για το αυτοκίνητο</string>
     <string name="connection_no_picture_detail">Ο κωδικοποιητής βίντεο του τηλεφώνου δεν ξεκίνησε (%1$s). Το myCar έκλεισε τη σύνδεση: συνδεθείτε ξανά.</string>
+    <string name="connection_stage_stuck_cable">Αναμονή ακόμη για το αυτοκίνητο. Αν η οθόνη του ρωτά κάτι ή δείχνει το Android Auto, απαντήστε ή πατήστε το· αλλιώς αποσυνδέστε το καλώδιο και συνδέστε το ξανά.</string>
+    <string name="connection_ui_failed_detail">Το τηλέφωνο δεν μπόρεσε να σχεδιάσει την οθόνη του αυτοκινήτου (%1$s). Το myCar έκλεισε τη σύνδεση: συνδεθείτε ξανά.</string>
     <string name="connection_picture_stopped">Η εικόνα του αυτοκινήτου σταμάτησε</string>
     <string name="connection_picture_stopped_detail">Ο κωδικοποιητής βίντεο του τηλεφώνου αποτυγχάνει συνεχώς (%1$s). Το myCar έκλεισε τη σύνδεση: συνδεθείτε ξανά.</string>
     <string name="connection_no_answer">Το αυτοκίνητο δεν απάντησε</string>

@@ -25,6 +25,8 @@
     <string name="connection_picture_refused_detail">L\'auto non ha aperto il suo schermo a myCar (codice %1$s).</string>
     <string name="connection_no_picture">Nessuna immagine per l\'auto</string>
     <string name="connection_no_picture_detail">L\'encoder video del telefono non è partito (%1$s). myCar ha chiuso la connessione: ricollegati.</string>
+    <string name="connection_stage_stuck_cable">Ancora in attesa dell\'auto. Se il suo schermo chiede qualcosa o mostra Android Auto, rispondi o toccalo; altrimenti stacca il cavo e ricollegalo.</string>
+    <string name="connection_ui_failed_detail">Il telefono non è riuscito a disegnare lo schermo dell\'auto (%1$s). myCar ha chiuso la connessione: ricollegati.</string>
     <string name="connection_picture_stopped">L\'immagine dell\'auto si è fermata</string>
     <string name="connection_picture_stopped_detail">L\'encoder video del telefono continua a non funzionare (%1$s). myCar ha chiuso la connessione: ricollegati.</string>
     <string name="connection_no_answer">L\'auto non ha risposto</string>

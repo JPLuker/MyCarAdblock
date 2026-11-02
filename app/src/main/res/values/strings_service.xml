@@ -38,6 +38,8 @@
     <string name="connection_no_picture">No picture for the car</string>
     <!-- %1$s: the error as Android says it, in English -->
     <string name="connection_no_picture_detail">The phone\'s video encoder wouldn\'t start (%1$s). myCar closed the connection: connect again.</string>
+    <string name="connection_stage_stuck_cable">Still waiting for the car. If its screen asks something or shows Android Auto, answer or tap it; otherwise unplug the cable and plug it in again.</string>
+    <string name="connection_ui_failed_detail">The phone couldn\'t draw the car\'s screen (%1$s). myCar closed the connection: connect again.</string>
     <string name="connection_picture_stopped">The car\'s picture stopped</string>
     <!-- %1$s: the error as Android says it, in English -->
     <string name="connection_picture_stopped_detail">The phone\'s video encoder keeps failing (%1$s). myCar closed the connection: connect again.</string>

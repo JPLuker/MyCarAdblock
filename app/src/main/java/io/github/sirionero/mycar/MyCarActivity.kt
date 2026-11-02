@@ -147,8 +147,9 @@ class MyCarActivity : ComponentActivity(), Projection {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == UsbManager.ACTION_USB_ACCESSORY_DETACHED) {
                 MyCarLog.w("accessory detached")
-                // A wireless session has no accessory to lose; leave it running.
-                if (wirelessSocket == null) closeAccessory()
+                // A wireless session has no accessory to lose; leave it running. Nor does a cable
+                // session the car ended already: a wireless start-up begun since stays.
+                if (wirelessSocket == null && descriptor != null) closeAccessory()
             }
         }
     }
@@ -541,14 +542,26 @@ class MyCarActivity : ComponentActivity(), Projection {
         val projector = ScreenProjector(this).also { screenProjector = it }
         // A car that gives no density got 0, which Android refuses for a display.
         val density = frameDensity.takeIf { it > 0 } ?: android.util.DisplayMetrics.DENSITY_DEFAULT
-        val shown = runCatching { projector.start(target, frameWidth, frameHeight, density) { CarUi() } }
+        val error = runCatching { projector.start(target, frameWidth, frameHeight, density) { CarUi() } }
             .onFailure { MyCarLog.e("the car's picture couldn't start", it) }
-            .isSuccess && projector.displayId != null
-        if (shown) return
+            .exceptionOrNull()
+        if (error == null && projector.displayId != null) {
+            // A later start on this surface (after screen sharing) gets its own tries.
+            projectionTries = 0
+            return
+        }
         // Left in place, nothing tried again and the car stayed black for the whole drive.
         runCatching { projector.stop() }
         screenProjector = null
-        if (projectionTries++ < 2) mainHandler.postDelayed({ if (surface === target) showCarUi() }, 1_000)
+        if (projectionTries++ < 2) {
+            mainHandler.postDelayed({ if (surface === target) showCarUi() }, 1_000)
+            return
+        }
+        // Three tries, no picture: the car stayed black for the whole drive while the phone said
+        // "connected". Ended and said, as when the encoder won't start; the car can start over.
+        MyCarLog.e("the car's picture couldn't start after 3 tries - ending the session")
+        SessionStatus.failed(R.string.connection_no_picture, R.string.connection_ui_failed_detail, error?.message ?: "no display")
+        runner?.stop()
     }
 
     /** Tries at the car's picture on this surface; see [showCarUi]. */
@@ -732,6 +745,8 @@ class MyCarActivity : ComponentActivity(), Projection {
         if (!AppSettings.myCarEnabled(this)) {
             MyCarLog.i("wireless: myCar is switched off - not connecting")
             runCatching { socket.close() }
+            // The start-up ends too: its channel, the car's network and Home's "connecting" with it.
+            io.github.sirionero.mycar.wireless.WirelessLink.stop(this)
             return
         }
         MyCarLog.i("wireless: starting a session over Wi-Fi to ${socket.inetAddress?.hostAddress}:${socket.port}")
@@ -797,10 +812,13 @@ class MyCarActivity : ComponentActivity(), Projection {
             projectionTries = 0
             frameWidth = width
             frameHeight = height
-            frameDensity = densityDpi
+            // A car that gives no density sent 0, which Android refuses for a display and the car apps
+            // divide by (the map and every app with a car screen were turned away, screen sharing too).
+            val density = densityDpi.takeIf { it > 0 } ?: android.util.DisplayMetrics.DENSITY_DEFAULT
+            frameDensity = density
             // The car's picture is up without the cable: next time it can connect by itself.
             if (wirelessSocket != null) io.github.sirionero.mycar.wireless.WirelessLink.reachedCar(this)
-            CarEnvironment.setDisplay(width, height, densityDpi)
+            CarEnvironment.setDisplay(width, height, density)
             CarEnvironment.start(this)
             // The session holds the drive's services too, so they outlast its car UI (see CarServices.init).
             if (!holdsServices) {
