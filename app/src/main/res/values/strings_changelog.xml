@@ -6,6 +6,15 @@
 -->
 <resources>
     <!-- 0.6.8-alpha -->
+    <string-array name="changelog_45">
+        <item>Mini player over the whole map: close the player beside the map and a small player floats over the map, with the cover, back, play or pause and next. Hold it, then drag it anywhere; its X hides it for the drive (the song in the dock brings the player back), and Settings can turn it off.</item>
+        <item>Song lyrics found far more often: titles cleaned of \"Remastered\", \"feat.\", \"Live\" and the names radios and videos add, and every result checked, so another song\'s lyrics never show. Instrumental tracks say so; with Xonos inside myCar, Music Assistant\'s lyrics come first.</item>
+        <item>A song without lyrics shows one short line instead of an empty panel, and beside the map the player comes back by itself.</item>
+        <item>The map gets your position with the phone locked in your pocket: myCar takes it as the car arrives. If Android still refuses, the car says so, only when you\'re stopped.</item>
+        <item>The map starts at its final width: the music\'s column is kept from the start of the drive, so the map isn\'t drawn twice.</item>
+        <item>Autoplay is on by default, and the player beside the map also comes Extra large (40% bigger).</item>
+        <item>No more \"Spotify is playing on another device\" at every song change.</item>
+    </string-array>
     <string-array name="changelog_44">
         <item>Hide an app from the car\'s app grid: hold it and choose \"Hide from the app grid\". It comes back from Settings, Hidden apps, or from the phone (Car screen, Apps on the car\'s app grid).</item>
         <item>With Spotify or another music service inside myCar, \"Hide the phone\'s Spotify app\" keeps one Spotify on the grid; its pinned icon and the choice beside the map go to the one inside myCar.</item>

@@ -287,12 +287,29 @@ Tutti i token in un solo posto, `car/design/`:
   mentre la Home è visibile: un'app aperta a tutto schermo usa lo stesso collegamento.
   Anteprima: `--es sidePane <pacchetto>`, cartelle `split-plancia/`, `split-xonos/`.
   **Dimensione del lettore** (0.6.8, richiesta dell'utente; chiave `car_player_size`, "Size of the player
-  beside the map" in auto e sul telefono): Piccola (com'era), Media 1,1, Grande 1,2. Il lato accanto alla
+  beside the map" in auto e sul telefono): Piccola (com'era), Media 1,1, Grande 1,2, Molto grande 1,4 (0.6.9,
+  `PLAYER_EXTRA`, scatti `split-extra*`). Il lato accanto alla
   mappa ha la densità moltiplicata per quel valore e prende `MAP_SHARE`(3,1)/dimensione − 1 parti di mappa
   (`CarHomeScreen`); solo per la musica (lettore, testo): un'app con template o Plancia resta com'è.
   Anteprima `--es playerSize 1.1|1.2`, cartelle `split-medium/`, `split-large/`, `split-large-800x480/`.
   Una scelta nuova per "Accanto alla mappa" riapre la colonna chiusa con la X (`showSidePane`); la X del
   testo riporta il lettore (`showSideControls`).
+- **Autoplay** (chiave `car_autoplay`) acceso di default dalla 0.6.9 (richiesta dell'utente); chi l'ha spento lo trova spento.
+- **Mini lettore sulla mappa intera** (0.6.9, richiesta dell'utente: "una nuvoletta piccola, spostabile tenendola
+  premuta, con la locandina, indietro, pausa e avanti, che non occupi la mappa e si possa nascondere";
+  `car/MapMiniPlayer.kt`, regola pura `car/MiniPlace.kt` + `MiniPlaceTest`, chiavi `car_mini_player` e
+  `car_mini_player_at`): con la colonna della musica chiusa (X, brano del dock, Close di un'app accanto) e la
+  musica accesa, una pillola 276×64 dp in basso a destra della mappa; non in pan mode, solo nella pagina della
+  mappa in vista, mai durante la colonna riservata d'avvio. Sta nello slot `overMap` di `CarAppStage`, fra la
+  superficie e la chrome del template: schede e tasti dell'app restano sopra, la superficie non cambia, ogni
+  tocco fuori dalla pillola va alla mappa. Gesto nostro sul passaggio Initial (`dragAfterHold`): tocco breve al
+  tasto; uno scorrimento prima della pressione lunga preso e lasciato cadere (niente pagina); dopo la pressione
+  lunga solo un movimento oltre lo slop la sposta (un tocco lento resta un tocco). Posto salvato come frazione
+  della mappa al rilascio. La X la nasconde per il viaggio (`CarNavigator.miniPlayerHidden`, finché lo schermo
+  dell'auto non si rifà); la riportano brano del dock, piede del dock, nuova scelta accanto alla mappa e
+  l'impostazione riaccesa. Copertina = lettore a tutto schermo. Niente barra d'avanzamento (nessun fotogramma).
+  Anteprima: tocchi `x,y,drag,x2,y2`, `--es miniAt x,y`, `--ez miniPlayer false`, `--es carTheme LIGHT`, scatti
+  `mini*`. Verificato (0.6.9): trascinamento al posto previsto, tocco lento, X e avviso, tema chiaro, 800x480.
 - **App nascoste** (0.6.8, richiesta dell'utente: "nascondere app dal menu"; `car/HiddenApps.kt`, chiave
   `car_hidden_apps`): nel menu di un'app (tenerla premuta, griglia o dock) "Hide from the app grid" /
   "Show on the app grid"; tornano da Impostazioni dell'auto > "Hidden apps" (con Show) o dal telefono
@@ -1118,6 +1135,36 @@ Tutti i token in un solo posto, `car/design/`:
   dell'auto (`CinemaNow`) e che parte dopo una chiamata (focus ritardato). **Lasciati**: i puntini delle
   pagine a 56 dp (con la decisione sulla striscia sopra i contenuti), il ripiego del cavo sul senza fili.
   Non provato in un'auto vera.
+- **Testi delle canzoni** (0.6.9, richiesta dell'utente: "evitare brutte figure"; `media/Lyrics.kt`,
+  `media/LyricsMatch.kt` con `LyricsMatchTest` e `LyricsWrongSongTest`, `media/LyricsAhead.kt`): prima Music
+  Assistant con Xonos dentro myCar (`Library.lyrics`), poi LRCLIB con al massimo poche domande (get senza album,
+  search per titolo e primo artista, titolo largo, parole). Titoli puliti (Remastered, feat., Live, From…, Official
+  Video, "ARTISTA - TITOLO" delle radio, più artisti); dopo " - " una coda è decorazione solo se lo dice all'inizio
+  o alla fine; ogni voce controllata: artista uguale solo se coincide il campo o il primo artista (un ospite o un
+  pezzo di "A & B" vale solo alla stessa durata), tempi solo con la durata entro ±3 s. "Strumentale" dal titolo o
+  da LRCLIB. Un 503 o la rete assente non diventano mai "nessun testo". Ricerche solo col testo a schermo o tenuto
+  accanto alla mappa, più il brano dopo in coda mentre il testo è a schermo (scelta dell'utente: niente ricerche
+  in sottofondo). Accanto alla mappa, senza testo una riga per qualche secondo e poi torna il lettore
+  (`lyricsGaveWay`/`lyricsBack`, `lyricsWanted`). Niente altri siti di testi (Musixmatch, Genius, NetEase,
+  lyrics.ovh: licenze/termini, NonFreeNet su F-Droid). Misura in CI (`lyrics-check`, solo a mano: ~250 richieste
+  a lrclib.net): 0.6.8 25/47 giusti e 1 sbagliato, 0.6.9 42/47 giusti, 0 sbagliati, 5 "busy" (503) del test.
+  Scatti `xonos-lyrics` (tono con tag LYRICS: "lyrics: found (Music Assistant)"), `media-lyrics`, `lyrics-side*`.
+- **Avvio della mappa** (0.6.9, dal log di un viaggio del 2 novembre: Pixel 10 Pro Android 17, VW MIB senza fili
+  via smartBox, telefono in tasca). (1) Posizione: Android dà la posizione a un servizio in primo piano avviato dal
+  background solo entro 10 s dalla creazione di una schermata di myCar (o con l'accessibilità di myCar accesa,
+  token BIND_ALLOW_BACKGROUND_ACTIVITY_STARTS); presa quando la mappa si collegava (14 s dopo) veniva rifiutata e
+  Vela restava senza posizione finché non si apriva myCar. Ora `LocationKeepAlive.holdForDrive` all'arrivo
+  dell'auto (`connectToNearbyCar`, tocco su un'auto, cavo, `SessionService.start`), tenuta per il viaggio
+  (`releaseDrive` in `SessionService.stop`; quella d'avvio va dopo 60 s se non si arriva a un viaggio), solo con
+  un'app di navigazione per auto installata; riprova all'accensione dell'accessibilità e con myCar in vista; se
+  Android rifiuta lo stesso, scheda in auto solo da fermi (`noPosition`, una volta per viaggio). Non serve
+  ACCESS_BACKGROUND_LOCATION: non dà la capability a Vela. Con myCar già aperta da un viaggio prima la finestra
+  dei 10 s non c'è (resta la scheda). Verificato in emulatore 37.0 bloccato (scatto `location-locked`): a 1 s
+  "running" (allowWiu ACTIVITY_STARTER), a 15 s rifiutato. (2) Colonna della musica riservata dall'avvio
+  (`CarServices.musicStarting`, 20 s, "Starting <app>…") così la prima superficie della mappa è già quella
+  stretta (scatto `map-start`: prima superficie 1195x720). (3) Area visibile ridetta a una superficie rifatta
+  alla stessa misura; tocchi sulla superficie nel log. (4) Spotify su un altro dispositivo: solo con l'orologio
+  che avanza sicuro e niente suonato qui da 5 s, avviso dopo 3 s (prima compariva a ogni cambio di brano).
 - **Setaccio 7** (0.6.8, stesso branch; richiesta dell'utente: "controlla anche l'assistente, l'autoplay
   delle app tipo Spotify, le notifiche che non interrompano i servizi, la mappa (Vela) non funziona più
   benissimo"): tre cacce (assistente, musica web, mappa dal lato di myCar), ogni punto verificato da uno

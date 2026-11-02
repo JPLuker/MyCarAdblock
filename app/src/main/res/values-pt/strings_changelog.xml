@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 0.6.8-alpha -->
+    <string-array name="changelog_45">
+        <item>Miniplayer sobre o mapa inteiro: ao fechar o player ao lado do mapa, um pequeno player flutua sobre o mapa com a capa, voltar, tocar ou pausar e avançar. Mantenha-o pressionado e arraste para onde quiser; o X dele o oculta durante a viagem (a música no dock traz o player de volta), e dá para desativá-lo nas Configurações.</item>
+        <item>Letras encontradas com muito mais frequência: títulos limpos de «Remastered», «feat.», «Live» e dos nomes que rádios e vídeos acrescentam, e cada resultado conferido, para nunca aparecer a letra de outra música. Faixas instrumentais avisam; com o Xonos dentro do myCar, primeiro as letras do Music Assistant.</item>
+        <item>Uma música sem letra mostra uma linha curta em vez de um painel vazio, e ao lado do mapa o player volta sozinho.</item>
+        <item>O mapa recebe sua localização com o telefone bloqueado no bolso: o myCar a pega quando o carro chega. Se o Android ainda recusar, o carro avisa, só com o carro parado.</item>
+        <item>O mapa já começa na largura final: a coluna da música fica reservada desde o início da viagem, então o mapa não é desenhado duas vezes.</item>
+        <item>A reprodução automática vem ativada, e o player ao lado do mapa também vem em Muito grande (40% maior).</item>
+        <item>Chega de «Spotify está tocando em outro dispositivo» a cada troca de música.</item>
+    </string-array>
     <string-array name="changelog_44">
         <item>Oculte um app da grade do carro: mantenha-o pressionado e escolha “Ocultar da grade de apps”. Ele volta em Configurações, Apps ocultos, ou pelo telefone (Tela do carro, Apps na grade do carro).</item>
         <item>Com o Spotify ou outro serviço de música dentro do myCar, “Ocultar o app Spotify do telefone” deixa um só Spotify na grade; o ícone fixado e a escolha ao lado do mapa passam para o de dentro do myCar.</item>

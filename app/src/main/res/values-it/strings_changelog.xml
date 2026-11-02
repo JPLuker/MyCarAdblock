@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 0.6.8-alpha -->
+    <string-array name="changelog_45">
+        <item>Mini lettore sulla mappa intera: chiuso il lettore accanto alla mappa, un piccolo lettore galleggia sulla mappa con copertina, indietro, play o pausa e avanti. Tienilo premuto e trascinalo dove vuoi; la sua X lo nasconde per il viaggio (il brano nel dock riporta il lettore), e dalle Impostazioni si può spegnere.</item>
+        <item>Testi delle canzoni trovati molto più spesso: titoli ripuliti da «Remastered», «feat.», «Live» e dai nomi che aggiungono radio e video, e ogni risultato controllato, così non compare mai il testo di un\'altra canzone. I brani strumentali lo dicono; con Xonos dentro myCar, prima i testi di Music Assistant.</item>
+        <item>Una canzone senza testo mostra una riga breve invece di un pannello vuoto, e accanto alla mappa il lettore torna da solo.</item>
+        <item>La mappa ha la posizione anche col telefono bloccato in tasca: myCar la prende quando arriva l\'auto. Se Android la rifiuta lo stesso, l\'auto lo dice, solo a macchina ferma.</item>
+        <item>La mappa parte già alla sua larghezza: la colonna della musica è tenuta dall\'inizio del viaggio, così la mappa non viene disegnata due volte.</item>
+        <item>L\'Autoplay è acceso di default, e il lettore accanto alla mappa c\'è anche Molto grande (40% più grande).</item>
+        <item>Niente più «Spotify sta suonando su un altro dispositivo» a ogni cambio di brano.</item>
+    </string-array>
     <string-array name="changelog_44">
         <item>Nascondi un\'app dalla griglia dell\'auto: tienila premuta e scegli «Nascondi dalla griglia delle app». Torna da Impostazioni, App nascoste, o dal telefono (Schermo dell\'auto, App nella griglia dell\'auto).</item>
         <item>Con Spotify o un altro servizio musicale dentro myCar, «Nascondi l\'app Spotify del telefono» lascia un solo Spotify nella griglia; la sua icona fissata e la scelta accanto alla mappa passano a quello dentro myCar.</item>

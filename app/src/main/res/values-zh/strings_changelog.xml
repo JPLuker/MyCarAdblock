@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 0.6.8-alpha -->
+    <string-array name="changelog_45">
+        <item>全屏地图上的迷你播放器：关闭地图旁的播放器后，地图上会浮现一个小播放器，带封面、上一首、播放或暂停和下一首。按住它并拖到任意位置；点 X 可在本次行程中隐藏（点按停靠栏中的歌曲可找回播放器），也可以在设置中关闭。</item>
+        <item>歌词找到的次数多得多：去掉标题中的“Remastered”“feat.”“Live”以及电台和视频添加的名称，并逐一核对结果，绝不会显示别的歌的歌词。纯音乐会注明；myCar 内的 Xonos 优先使用 Music Assistant 的歌词。</item>
+        <item>没有歌词的歌曲会显示一行简短提示，而不是空白面板；在地图旁，播放器会自动回来。</item>
+        <item>手机锁屏放在口袋里时，地图也能获得你的位置：车辆一连接，myCar 就会获取位置。如果 Android 仍然拒绝，车辆会在停车时告诉你。</item>
+        <item>地图一开始就是最终宽度：从行程开始就为音乐预留栏位，地图不会绘制两次。</item>
+        <item>自动播放默认开启，地图旁的播放器还新增了“特大”尺寸（大 40%）。</item>
+        <item>切歌时不会再出现“Spotify 正在其他设备上播放”。</item>
+    </string-array>
     <string-array name="changelog_44">
         <item>从车机应用网格中隐藏应用：长按它并选择“从应用网格中隐藏”。可在“设置”&gt;“隐藏的应用”中恢复，也可在手机上恢复（“车机屏幕”&gt;“车机应用网格中的应用”）。</item>
         <item>在 myCar 中使用 Spotify 或其他音乐服务时，“隐藏手机上的 Spotify 应用”让网格中只保留一个 Spotify；它的固定图标和地图旁的选择都会转到 myCar 中的那个。</item>
