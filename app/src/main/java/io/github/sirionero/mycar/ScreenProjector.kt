@@ -14,6 +14,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
@@ -98,12 +101,15 @@ class ScreenProjector(private val context: Context) {
         decor.setViewTreeViewModelStoreOwner(treeOwner)
         decor.setBackgroundColor(Color.BLACK)
 
-        // Android 12: the car's screen in myCar's language too (from Android 13 every screen of
-        // myCar has it).
-        val words = AppLanguage.localized(show.context)
+        // The car's screen in myCar's language too: a display of its own, it comes with the phone's
+        // (see AppLanguage.localized). Taken again when the language changes during the drive.
+        AppLanguage.recheck(context)
         show.setContentView(ComposeView(show.context).apply {
-            if (words === show.context) setContent(content)
-            else setContent { CompositionLocalProvider(LocalContext provides words, content = content) }
+            setContent {
+                val language by AppLanguage.wantedTag.collectAsState()
+                val words = remember(language) { AppLanguage.localized(show.context) }
+                CompositionLocalProvider(LocalContext provides words, content = content)
+            }
         })
         show.show()
 

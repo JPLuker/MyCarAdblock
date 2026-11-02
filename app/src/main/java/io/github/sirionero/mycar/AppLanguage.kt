@@ -72,8 +72,22 @@ enum class AppLanguage(
                 return
             }
             applyToProcess(activity)
+            recheck(activity)
             if (!SessionService.running) activity.recreate()
         }
+
+        private val wantedFlow = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
+
+        /**
+         * The language myCar's words must be in (null: the phone's), as it changes while myCar runs: for
+         * the car's screen (ScreenProjector), which Android doesn't tell. Before, a language changed during
+         * a drive reached [Words] at once and the car's screens only at the next connection, and the same
+         * card came out in two languages.
+         */
+        val wantedTag: kotlinx.coroutines.flow.StateFlow<String?> = wantedFlow
+
+        /** Reads it again: Android has changed the language (MyCarActivity hears it), or myCar has (Android 12). */
+        fun recheck(context: Context) { wantedFlow.value = wanted(context)?.tag }
 
         /** Android 12: the chosen language for the whole process, services included. */
         fun applyToProcess(context: Context) {
