@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 0.6.8-alpha -->
+    <string-array name="changelog_45">
+        <item>Mini-Player über der ganzen Karte: Schließt du den Player neben der Karte, schwebt ein kleiner Player über der Karte, mit Cover, Zurück, Wiedergabe oder Pause und Weiter. Halte ihn gedrückt und zieh ihn, wohin du willst; sein X blendet ihn für die Fahrt aus (der Titel im Dock holt den Player zurück), und in den Einstellungen lässt er sich ausschalten.</item>
+        <item>Songtexte werden viel öfter gefunden: Titel ohne „Remastered“, „feat.“, „Live“ und die Namen, die Radios und Videos anhängen, und jedes Ergebnis wird geprüft, sodass nie der Text eines anderen Songs erscheint. Instrumentale Titel sagen es; mit Xonos in myCar zuerst die Texte von Music Assistant.</item>
+        <item>Ein Song ohne Text zeigt eine kurze Zeile statt eines leeren Bereichs, und neben der Karte kommt der Player von selbst zurück.</item>
+        <item>Die Karte bekommt deinen Standort auch bei gesperrtem Handy in der Tasche: myCar holt ihn, sobald das Auto kommt. Verweigert Android ihn trotzdem, sagt es das Auto, nur im Stand.</item>
+        <item>Die Karte startet gleich in ihrer endgültigen Breite: Die Spalte der Musik wird vom Fahrtbeginn an freigehalten, so wird die Karte nicht zweimal gezeichnet.</item>
+        <item>Autoplay ist standardmäßig an, und den Player neben der Karte gibt es auch in Sehr groß (40 % größer).</item>
+        <item>Kein „Spotify spielt auf einem anderen Gerät“ mehr bei jedem Songwechsel.</item>
+    </string-array>
     <string-array name="changelog_44">
         <item>Blende eine App in der App-Übersicht des Autos aus: halte sie gedrückt und wähle „In der App-Übersicht ausblenden“. Zurück holst du sie unter Einstellungen, Ausgeblendete Apps, oder am Telefon (Bildschirm des Autos, Apps in der App-Übersicht des Autos).</item>
         <item>Mit Spotify oder einem anderen Musikdienst in myCar lässt „App „Spotify“ des Telefons ausblenden“ nur ein Spotify in der Übersicht; das angeheftete Symbol und die Wahl neben der Karte gehen an das in myCar.</item>

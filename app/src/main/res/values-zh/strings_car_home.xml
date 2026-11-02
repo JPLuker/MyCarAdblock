@@ -43,6 +43,9 @@
     <string name="car_apps_show_on_grid">在应用网格中显示</string>
     <string name="car_apps_hidden_toast">已隐藏：%1$s。可在“设置”&gt;“隐藏的应用”中恢复。</string>
     <string name="car_web_music_elsewhere">%1$s 正在另一台设备上播放，而不是在车里</string>
+    <string name="car_mini_open_player">打开播放器</string>
+    <string name="car_mini_hide">隐藏迷你播放器</string>
+    <string name="car_mini_hidden_toast">本次行程已隐藏迷你播放器。点按停靠栏中的歌曲可打开播放器。</string>
 
     <string name="car_map_starting">正在启动 %1$s…</string>
     <string name="car_map_starting_unknown">正在启动地图…</string>
@@ -178,6 +181,9 @@
     <string name="car_host_threw">%1$s 抛出异常：%2$s %3$s</string>
     <string name="car_host_location_channel">导航位置信息</string>
     <string name="car_host_location_notification">myCar 正在与车载地图共享位置信息</string>
+    <string name="car_map_no_position_title">地图没有你的位置</string>
+    <string name="car_map_no_position_locked">手机锁定时，Android 不会把位置给 myCar。现在你已停车，请解锁手机并打开 myCar。</string>
+    <string name="car_map_no_position_permission">myCar 没有位置权限。请在手机上的 myCar 中允许。</string>
 
     <string name="car_wallpaper_title">壁纸</string>
     <string name="car_wallpaper_still">静态</string>

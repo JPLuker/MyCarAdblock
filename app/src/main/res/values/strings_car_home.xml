@@ -69,6 +69,9 @@
     <string name="car_apps_show_on_grid">Show on the app grid</string>
     <string name="car_apps_hidden_toast">%1$s is hidden. Settings, Hidden apps brings it back.</string>
     <string name="car_web_music_elsewhere">%1$s is playing on another device, not in the car</string>
+    <string name="car_mini_open_player">Open the player</string>
+    <string name="car_mini_hide">Hide the mini player</string>
+    <string name="car_mini_hidden_toast">Mini player hidden for this drive. The song in the dock opens the player.</string>
 
     <!-- Home's map, while it starts or when there is none (car/CarHomeScreen.kt). %1$s: the map app's name -->
     <string name="car_map_starting">Starting %1$s…</string>
@@ -268,6 +271,10 @@
     <!-- The notification while a car map gets the phone's location (host/LocationKeepAlive.kt): the channel's name in Android's settings, and the notification's title -->
     <string name="car_host_location_channel">Navigation location</string>
     <string name="car_host_location_notification">myCar is sharing location with the car map</string>
+    <!-- On the car once it has stopped: the car map runs with no position, as Android refused myCar's location service (the phone locked; host/LocationKeepAlive.kt) or myCar has no location permission (car/BluetoothPairOverlay.kt) -->
+    <string name="car_map_no_position_title">The map has no position</string>
+    <string name="car_map_no_position_locked">Android doesn\'t give it to myCar while the phone is locked. Now that you\'ve stopped, unlock the phone and open myCar.</string>
+    <string name="car_map_no_position_permission">myCar has no location permission. Allow it in myCar on the phone.</string>
 
     <!-- The wallpaper choice in the car's settings (car/WallpaperPicker.kt, car/design/Wallpapers.kt) -->
     <string name="car_wallpaper_title">Wallpaper</string>

@@ -44,6 +44,9 @@
     <string name="car_apps_show_on_grid">Afficher dans la grille des apps</string>
     <string name="car_apps_hidden_toast">App masquée : %1$s. Pour la retrouver : Paramètres, Apps masquées.</string>
     <string name="car_web_music_elsewhere">%1$s joue sur un autre appareil, pas dans la voiture</string>
+    <string name="car_mini_open_player">Ouvrir le lecteur</string>
+    <string name="car_mini_hide">Masquer le mini-lecteur</string>
+    <string name="car_mini_hidden_toast">Mini-lecteur masqué pour ce trajet. Le titre dans le dock ouvre le lecteur.</string>
 
     <string name="car_map_starting">Démarrage de %1$s…</string>
     <string name="car_map_starting_unknown">Démarrage de la carte…</string>
@@ -179,6 +182,9 @@
     <string name="car_host_threw">%1$s a échoué : %2$s %3$s</string>
     <string name="car_host_location_channel">Position pour la navigation</string>
     <string name="car_host_location_notification">myCar partage la position avec la carte de la voiture</string>
+    <string name="car_map_no_position_title">La carte n’a pas votre position</string>
+    <string name="car_map_no_position_locked">Android ne la donne pas à myCar quand le téléphone est verrouillé. Maintenant que vous êtes à l’arrêt, déverrouillez le téléphone et ouvrez myCar.</string>
+    <string name="car_map_no_position_permission">myCar n’a pas l’autorisation de localisation. Autorisez-la dans myCar sur le téléphone.</string>
 
     <string name="car_wallpaper_title">Fond d’écran</string>
     <string name="car_wallpaper_still">Fixes</string>

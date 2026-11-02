@@ -44,6 +44,9 @@
     <string name="car_apps_show_on_grid">In der App-Übersicht anzeigen</string>
     <string name="car_apps_hidden_toast">Ausgeblendet: %1$s. Du holst sie unter „Einstellungen“, „Ausgeblendete Apps“ zurück.</string>
     <string name="car_web_music_elsewhere">%1$s spielt auf einem anderen Gerät, nicht im Auto</string>
+    <string name="car_mini_open_player">Player öffnen</string>
+    <string name="car_mini_hide">Mini-Player ausblenden</string>
+    <string name="car_mini_hidden_toast">Mini-Player für diese Fahrt ausgeblendet. Der Titel im Dock öffnet den Player.</string>
 
     <string name="car_map_starting">%1$s wird gestartet…</string>
     <string name="car_map_starting_unknown">Die Karte wird gestartet…</string>
@@ -179,6 +182,9 @@
     <string name="car_host_threw">%1$s warf: %2$s %3$s</string>
     <string name="car_host_location_channel">Standort für die Navigation</string>
     <string name="car_host_location_notification">myCar teilt den Standort mit der Karte im Auto</string>
+    <string name="car_map_no_position_title">Die Karte hat keinen Standort</string>
+    <string name="car_map_no_position_locked">Android gibt ihn myCar nicht, solange das Telefon gesperrt ist. Jetzt, wo du stehst, entsperre das Telefon und öffne myCar.</string>
+    <string name="car_map_no_position_permission">myCar hat keine Standortberechtigung. Erlaube sie in myCar auf dem Telefon.</string>
 
     <string name="car_wallpaper_title">Hintergrund</string>
     <string name="car_wallpaper_still">Statisch</string>

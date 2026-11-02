@@ -70,6 +70,10 @@ import io.github.sirionero.mycar.media.MediaApp
 import io.github.sirionero.mycar.media.MediaArt
 import io.github.sirionero.mycar.media.LyricsResult
 import io.github.sirionero.mycar.media.Lyrics
+import io.github.sirionero.mycar.media.LyricsAnswer
+import io.github.sirionero.mycar.media.LyricsAhead
+import io.github.sirionero.mycar.media.lyricsSong
+import io.github.sirionero.mycar.xonos.Xonos
 import io.github.sirionero.mycar.media.MediaEntry
 import io.github.sirionero.mycar.media.NowPlaying
 import io.github.sirionero.mycar.media.QueueTrack
@@ -208,7 +212,7 @@ fun MediaScreen(app: MediaApp, onExit: () -> Unit) {
                         Tab.NOW_PLAYING -> NowPlayingControls(now, media, Modifier.fillMaxSize())
                         Tab.BROWSE -> BrowsePanel(browse, media, app.label, Modifier.fillMaxSize())
                         Tab.QUEUE -> QueuePanel(queue, now, media, Modifier.fillMaxSize())
-                        Tab.LYRICS -> LyricsPanel(now, Modifier.fillMaxSize())
+                        Tab.LYRICS -> LyricsPanel(now, Modifier.fillMaxSize(), onPlayer = { tab = Tab.NOW_PLAYING })
                     }
                 }
             }
@@ -422,23 +426,43 @@ private val NARROW_TAB = 92.dp
 
 /**
  * The song's lyrics, fetched when this tab opens. Synced lyrics follow the playback position with
- * the current line in the accent colour; unsynced ones are plain scrolling text.
+ * the current line in the accent colour; unsynced ones are plain scrolling text. Never an empty
+ * panel: without lyrics one line says why, with the way back to the player.
  */
 @Composable
 internal fun LyricsPanel(
     now: NowPlaying,
     modifier: Modifier,
     lineStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.titleLarge,
+    /** Beside the map: the cover above the line, where there's room for it. */
+    art: android.graphics.Bitmap? = null,
+    /** The media screen: "Now playing" under "no lyrics". */
+    onPlayer: (() -> Unit)? = null,
+    /** Beside the map: told a moment after "no lyrics" or "couldn't reach", with the song's key, to give the column back to the player. */
+    onNothing: ((songKey: String) -> Unit)? = null,
+    /** The next song looked up too ([LyricsAhead]): only where the lyrics are on screen. */
+    ahead: Boolean = true,
 ) {
     val context = LocalContext.current
-    // Asked again with Try again, after a lookup that couldn't reach lrclib.net.
-    var attempt by remember { mutableIntStateOf(0) }
-    val lyrics by produceState<LyricsState>(LyricsState.Loading, now.title, now.artist, now.album, now.durationMs, attempt) {
+    // Xonos inside myCar: Music Assistant is asked first, by the track's address.
+    val app by CarServices.mediaApp.collectAsStateWithLifecycle()
+    val inside = app?.component?.let(Xonos::isInside) == true
+    // The song by the track's own tags (not a displayed "Artist • Album"): one key per song.
+    val song = remember(now.trackTitle, now.title, now.trackArtist, now.artist, now.album, now.durationMs, now.mediaId, inside) { now.lyricsSong(inside) }
+    // While they're on screen, the next song in the queue too: its lyrics show at once when it starts.
+    // Not with Xonos inside myCar: Music Assistant may have them in the track's tags, and LRCLIB would
+    // be sent the title for nothing.
+    LaunchedEffect(song.key, ahead, inside) { if (ahead && !inside) LyricsAhead.warmNext(CarServices.media) }
+    // Asked again with Try again, after a lookup that couldn't reach lrclib.net: this song only, the
+    // next one waits as songs skipped in a row do.
+    var attempt by remember(song.key) { mutableIntStateOf(0) }
+    // Already looked up (ahead, or before): no "Looking for lyrics…" flash.
+    val lyrics by produceState<LyricsState>(Lyrics.known(song)?.let(::stateOf) ?: LyricsState.Loading, song.key, attempt) {
+        Lyrics.known(song)?.let { value = stateOf(it); return@produceState }
         value = LyricsState.Loading
-        value = Lyrics.find(context, now.title, now.artist, now.album, now.durationMs).fold(
-            onSuccess = { found -> found?.let { LyricsState.Found(it) } ?: LyricsState.Missing },
-            onFailure = { LyricsState.Unreachable },
-        )
+        // Songs skipped in a row aren't looked up: only the one the driver stays on.
+        if (attempt == 0 && song.title.isNotEmpty()) delay(Lyrics.SETTLE_MS)
+        value = Lyrics.find(context, song).fold(onSuccess = ::stateOf, onFailure = { LyricsState.Unreachable })
     }
     val list = rememberLazyListState()
 
@@ -454,17 +478,39 @@ internal fun LyricsPanel(
         }
     }
 
+    val beside = onNothing != null
     when (val state = lyrics) {
-        LyricsState.Loading -> Notice(stringResource(R.string.car_lyrics_looking), null)
-        LyricsState.Missing -> Notice(
-            stringResource(if (now.title.isEmpty()) R.string.car_lyrics_nothing_playing else R.string.car_lyrics_none),
-            null,
-        )
-        LyricsState.Unreachable -> Notice(
-            stringResource(R.string.car_lyrics_unreachable),
-            stringResource(R.string.car_lyrics_unreachable_detail),
-            action = stringResource(R.string.common_retry) to { attempt++ },
-        )
+        LyricsState.Loading -> LyricsNotice(stringResource(R.string.car_lyrics_looking), null, art = art)
+        LyricsState.Missing, LyricsState.Instrumental -> {
+            val instrumental = state == LyricsState.Instrumental
+            val nothingPlaying = now.title.isEmpty()
+            LyricsNotice(
+                stringResource(
+                    when {
+                        nothingPlaying -> R.string.car_lyrics_nothing_playing
+                        instrumental -> R.string.car_lyrics_instrumental
+                        else -> R.string.car_lyrics_none
+                    },
+                ),
+                // Beside the map one short line: the explanation is for the full screen.
+                if (nothingPlaying || beside) null
+                else stringResource(if (instrumental) R.string.car_lyrics_instrumental_detail else R.string.car_lyrics_none_detail),
+                action = onPlayer?.let { stringResource(R.string.car_media_tab_now_playing) to it },
+                art = art,
+            )
+            // A moment to read it, then (beside the map) the player has the column for this song.
+            if (onNothing != null && !nothingPlaying) LaunchedEffect(song.key) { delay(NOTHING_SHOWN_MS); onNothing(song.key) }
+        }
+        LyricsState.Unreachable -> {
+            LyricsNotice(
+                stringResource(R.string.car_lyrics_unreachable),
+                if (beside) null else stringResource(R.string.car_lyrics_unreachable_detail),
+                action = stringResource(R.string.common_retry) to { attempt++ },
+                art = art,
+            )
+            // Beside the map the player isn't held hostage by a tunnel: back after a moment.
+            if (onNothing != null) LaunchedEffect(song.key, attempt) { delay(UNREACHABLE_SHOWN_MS); onNothing(song.key) }
+        }
         is LyricsState.Found -> {
             val lines = state.result.lines
             val current = if (state.result.synced) lines.indexOfLast { it.timeMs <= position } else -1
@@ -489,11 +535,60 @@ internal fun LyricsPanel(
     }
 }
 
+/** How long "no lyrics" stays beside the map before the player comes back. */
+private const val NOTHING_SHOWN_MS = 4_000L
+
+/** How long "couldn't reach the lyrics" stays beside the map before the player comes back. */
+private const val UNREACHABLE_SHOWN_MS = 6_000L
+
 private sealed interface LyricsState {
     data object Loading : LyricsState
     data object Missing : LyricsState
+    data object Instrumental : LyricsState
     data object Unreachable : LyricsState
     class Found(val result: LyricsResult) : LyricsState
+}
+
+private fun stateOf(answer: LyricsAnswer): LyricsState = when (answer) {
+    is LyricsAnswer.Found -> LyricsState.Found(answer.result)
+    LyricsAnswer.Instrumental -> LyricsState.Instrumental
+    LyricsAnswer.None -> LyricsState.Missing
+}
+
+/**
+ * The lyrics' notices: the cover above the line where there's room (1920x720), the line alone where
+ * there isn't (800x480 at the larger player sizes). Without a cover (the media screen) a [Notice].
+ */
+@Composable
+private fun LyricsNotice(title: String, detail: String?, action: Pair<String, () -> Unit>? = null, art: android.graphics.Bitmap? = null) {
+    if (art == null) {
+        Notice(title, detail, action)
+        return
+    }
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val cover = minOf(maxWidth - 48.dp, maxHeight - 120.dp, 220.dp)
+        Column(
+            Modifier.fillMaxSize().padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            if (cover >= 96.dp) {
+                Image(art.asImageBitmap(), null, Modifier.size(cover).clip(MaterialTheme.shapes.large), contentScale = ContentScale.Crop)
+                Spacer(Modifier.height(16.dp))
+            }
+            Text(title, style = MaterialTheme.typography.titleMedium, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            detail?.let {
+                Text(
+                    it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                )
+            }
+            action?.let { (label, run) ->
+                Spacer(Modifier.height(12.dp))
+                GsButton(onClick = run, tone = GsTone.Tonal) { Text(label) }
+            }
+        }
+    }
 }
 
 @Composable

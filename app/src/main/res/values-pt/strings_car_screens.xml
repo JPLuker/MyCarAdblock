@@ -10,6 +10,8 @@
     <string name="car_settings_size_extra_large">Muito grande</string>
     <string name="car_settings_size_medium">Médio</string>
     <string name="car_settings_player_size">Tamanho do player ao lado do mapa</string>
+    <string name="car_settings_mini_player">Miniplayer sobre o mapa inteiro</string>
+    <string name="car_settings_mini_player_detail">Com o player ao lado do mapa fechado, um pequeno player flutua sobre o mapa. Mantenha-o pressionado e arraste para movê-lo.</string>
     <string name="car_settings_hidden_apps">Apps ocultos</string>
     <string name="car_settings_hidden_apps_none">Nenhum. Para ocultar um app, mantenha-o pressionado na grade de apps e escolha Ocultar da grade de apps.</string>
     <string name="car_settings_hidden_apps_show">Mostrar</string>
@@ -131,7 +133,10 @@
 
     <string name="car_lyrics_looking">Procurando a letra…</string>
     <string name="car_lyrics_nothing_playing">Nada tocando.</string>
-    <string name="car_lyrics_none">Nenhuma letra encontrada para esta música.</string>
+    <string name="car_lyrics_none">Ainda não há letra para esta música.</string>
+    <string name="car_lyrics_none_detail">As letras vêm do LRCLIB, um arquivo livre escrito por quem ouve: nem todas as músicas estão lá ainda.</string>
+    <string name="car_lyrics_instrumental">Instrumental</string>
+    <string name="car_lyrics_instrumental_detail">Esta música não tem letra para cantar junto.</string>
     <string name="car_lyrics_unreachable">Não foi possível acessar a letra.</string>
     <string name="car_lyrics_unreachable_detail">Ela vem do lrclib.net: verifique a conexão do telefone.</string>
 

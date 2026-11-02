@@ -10,6 +10,8 @@
     <string name="car_settings_size_extra_large">Sehr groß</string>
     <string name="car_settings_size_medium">Mittel</string>
     <string name="car_settings_player_size">Größe des Players neben der Karte</string>
+    <string name="car_settings_mini_player">Mini-Player über der ganzen Karte</string>
+    <string name="car_settings_mini_player_detail">Ist der Player neben der Karte geschlossen, schwebt ein kleiner Player über der Karte. Halte ihn gedrückt und zieh ihn, um ihn zu verschieben.</string>
     <string name="car_settings_hidden_apps">Ausgeblendete Apps</string>
     <string name="car_settings_hidden_apps_none">Keine. Um eine App auszublenden, halte sie in der App-Übersicht gedrückt und wähle „In der App-Übersicht ausblenden“.</string>
     <string name="car_settings_hidden_apps_show">Anzeigen</string>
@@ -131,7 +133,10 @@
 
     <string name="car_lyrics_looking">Songtext wird gesucht…</string>
     <string name="car_lyrics_nothing_playing">Es läuft nichts.</string>
-    <string name="car_lyrics_none">Kein Songtext für diesen Titel gefunden.</string>
+    <string name="car_lyrics_none">Für diesen Titel gibt es noch keinen Songtext.</string>
+    <string name="car_lyrics_none_detail">Die Songtexte kommen von LRCLIB, einem freien Archiv, das Hörer schreiben: Noch ist nicht jeder Titel dabei.</string>
+    <string name="car_lyrics_instrumental">Instrumental</string>
+    <string name="car_lyrics_instrumental_detail">Dieser Titel hat keinen Text zum Mitsingen.</string>
     <string name="car_lyrics_unreachable">Der Songtext war nicht erreichbar.</string>
     <string name="car_lyrics_unreachable_detail">Er kommt von lrclib.net: Prüfe die Verbindung des Telefons.</string>
 

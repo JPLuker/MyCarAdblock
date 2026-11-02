@@ -83,6 +83,11 @@ class NowPlaying(
     val activeQueueItemId: Long = MediaSession.QueueItem.UNKNOWN_ID.toLong(),
     /** The track's heart rating, for apps that take one; null when the app doesn't rate by heart. */
     val heart: Boolean? = null,
+    /** The track's own tags (METADATA_KEY_TITLE / _ARTIST), for the lyrics: the displayed ones can be "Artist • Album". */
+    val trackTitle: String = "",
+    val trackArtist: String = "",
+    /** The app's id of the track (METADATA_KEY_MEDIA_ID): Music Assistant's address with Xonos inside myCar. */
+    val mediaId: String = "",
 ) {
     /** The app's own button for [words], matched on its id or name - how most apps offer like, shuffle and repeat. */
     fun customFor(vararg words: String) = custom.firstOrNull { a ->
@@ -433,6 +438,9 @@ class CarMedia(private val context: Context) {
             heart = if (controller?.ratingType == Rating.RATING_HEART) {
                 metadata?.getRating(MediaMetadata.METADATA_KEY_USER_RATING)?.takeIf { it.isRated }?.hasHeart() ?: false
             } else null,
+            trackTitle = text(MediaMetadata.METADATA_KEY_TITLE),
+            trackArtist = text(MediaMetadata.METADATA_KEY_ARTIST, MediaMetadata.METADATA_KEY_ALBUM_ARTIST),
+            mediaId = text(MediaMetadata.METADATA_KEY_MEDIA_ID),
         )
         logButtons()
         checkSearch()

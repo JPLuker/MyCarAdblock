@@ -198,12 +198,13 @@ class Library(private val repo: MaRepository) {
     /**
      * Il testo di un brano: quello che il brano ha già (tag o file .lrc accanto), altrimenti quello
      * dei servizi di testi attivi in Music Assistant (per esempio LRCLIB). Null se non c'è.
+     * [timeoutMs]: quanto aspettare la risposta (myCar aspetta poco, poi chiede a LRCLIB da sé).
      */
-    suspend fun lyrics(uri: String): Lyrics? {
-        val track = repo.command("music/item_by_uri") { put("uri", uri) } as? JSONObject ?: return null
+    suspend fun lyrics(uri: String, timeoutMs: Long = 60_000): Lyrics? {
+        val track = repo.command("music/item_by_uri", minOf(timeoutMs, 30_000)) { put("uri", uri) } as? JSONObject ?: return null
         if (track.str("media_type") != "track") return null
         // Risponde con [testo semplice, testo LRC].
-        val result = repo.command("metadata/get_track_lyrics", 60_000) { put("track", track) } as? JSONArray ?: return null
+        val result = repo.command("metadata/get_track_lyrics", timeoutMs) { put("track", track) } as? JSONArray ?: return null
         val plain = if (result.isNull(0)) null else result.optString(0)
         val lrc = if (result.length() < 2 || result.isNull(1)) null else result.optString(1)
         return Lyrics.of(plain, lrc)

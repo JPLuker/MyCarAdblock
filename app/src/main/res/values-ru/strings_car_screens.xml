@@ -10,6 +10,8 @@
     <string name="car_settings_size_extra_large">Очень большой</string>
     <string name="car_settings_size_medium">Средний</string>
     <string name="car_settings_player_size">Размер плеера рядом с картой</string>
+    <string name="car_settings_mini_player">Мини-плеер поверх всей карты</string>
+    <string name="car_settings_mini_player_detail">Когда плеер рядом с картой закрыт, поверх карты появляется маленький плеер. Удерживайте его и перетащите, чтобы переместить.</string>
     <string name="car_settings_hidden_apps">Скрытые приложения</string>
     <string name="car_settings_hidden_apps_none">Нет. Чтобы скрыть приложение, удерживайте его в сетке приложений и выберите «Скрыть из сетки приложений».</string>
     <string name="car_settings_hidden_apps_show">Показать</string>
@@ -131,7 +133,10 @@
 
     <string name="car_lyrics_looking">Ищем текст…</string>
     <string name="car_lyrics_nothing_playing">Ничего не играет.</string>
-    <string name="car_lyrics_none">Текст для этого трека не найден.</string>
+    <string name="car_lyrics_none">Для этого трека текста пока нет.</string>
+    <string name="car_lyrics_none_detail">Тексты берутся из LRCLIB, свободного архива, который пополняют слушатели: там пока есть не все треки.</string>
+    <string name="car_lyrics_instrumental">Инструментальная композиция</string>
+    <string name="car_lyrics_instrumental_detail">В этом треке нет слов.</string>
     <string name="car_lyrics_unreachable">Не удалось получить текст.</string>
     <string name="car_lyrics_unreachable_detail">Тексты берутся с lrclib.net: проверьте подключение телефона.</string>
 

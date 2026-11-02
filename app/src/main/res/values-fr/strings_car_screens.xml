@@ -10,6 +10,8 @@
     <string name="car_settings_size_extra_large">Très grande</string>
     <string name="car_settings_size_medium">Moyenne</string>
     <string name="car_settings_player_size">Taille du lecteur à côté de la carte</string>
+    <string name="car_settings_mini_player">Mini-lecteur sur la carte entière</string>
+    <string name="car_settings_mini_player_detail">Quand le lecteur à côté de la carte est fermé, un petit lecteur flotte sur la carte. Maintenez-le appuyé, puis faites-le glisser pour le déplacer.</string>
     <string name="car_settings_hidden_apps">Apps masquées</string>
     <string name="car_settings_hidden_apps_none">Aucune. Pour masquer une app, maintenez-la appuyée dans la grille des apps et choisissez Masquer de la grille des apps.</string>
     <string name="car_settings_hidden_apps_show">Afficher</string>
@@ -131,7 +133,10 @@
 
     <string name="car_lyrics_looking">Recherche des paroles…</string>
     <string name="car_lyrics_nothing_playing">Rien en lecture.</string>
-    <string name="car_lyrics_none">Pas de paroles pour ce titre.</string>
+    <string name="car_lyrics_none">Pas encore de paroles pour ce titre.</string>
+    <string name="car_lyrics_none_detail">Les paroles viennent de LRCLIB, une archive libre écrite par ses auditeurs : tous les titres n’y sont pas encore.</string>
+    <string name="car_lyrics_instrumental">Instrumental</string>
+    <string name="car_lyrics_instrumental_detail">Ce titre n’a pas de paroles à chanter.</string>
     <string name="car_lyrics_unreachable">Impossible d’obtenir les paroles.</string>
     <string name="car_lyrics_unreachable_detail">Elles viennent de lrclib.net : vérifiez la connexion du téléphone.</string>
 

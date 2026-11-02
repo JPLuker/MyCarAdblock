@@ -139,17 +139,24 @@ class SessionService : Service() {
         /** Someone wants the service; false once no one does. */
         private val wanted get() = holders.isNotEmpty()
 
+        /** Someone (a start-up or a drive) holds the service, whether or not it made it to the foreground. */
+        val held: Boolean get() = holders.isNotEmpty()
+
         /** A car connected: called while myCar is on screen, as its arrival opens it. */
         fun start(context: Context, wireless: Boolean = false, holder: String = DRIVE) {
             holders += holder
             val intent = Intent(context, SessionService::class.java).putExtra(EXTRA_WIRELESS, wireless)
             runCatching { context.startForegroundService(intent) }
                 .onFailure { MyCarLog.w("session: Android won't start the drive's foreground service now - ${it.message}") }
+            // The car map's position for the drive: now, while Android may still count myCar's
+            // screen as just created by the car's arrival (only posts, never throws).
+            io.github.sirionero.mycar.host.LocationKeepAlive.holdForDrive(context)
         }
 
         fun stop(context: Context, holder: String = DRIVE) {
             holders -= holder
             if (wanted) return
+            io.github.sirionero.mycar.host.LocationKeepAlive.releaseDrive(context)
             // Stopped before it called startForeground, Android takes myCar down with it: a service
             // still starting stops itself in onStartCommand instead.
             if (!running) return

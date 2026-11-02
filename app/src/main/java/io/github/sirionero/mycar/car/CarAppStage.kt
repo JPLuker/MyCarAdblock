@@ -62,6 +62,8 @@ fun CarAppStage(
     embedded: Boolean = false,
     /** The title bar's button, at its right end: Stop for an app on its own screen; none if null. */
     endLabel: String? = stringResource(R.string.car_template_stop),
+    /** Over the app's drawing and under the template's chrome, whose cards and buttons stay on top: Home's mini player. */
+    overMap: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit = {},
     onDisconnect: () -> Unit,
 ) {
     val template by connection.template.collectAsStateWithLifecycle()
@@ -73,6 +75,9 @@ fun CarAppStage(
             if (status.surfaceRequested) {
                 AppSurface(connection, frame, template, Modifier.fillMaxSize())
             }
+            // Not under a template that covers the map (a list, a search): composed there, its buttons
+            // took the knob's turns unseen, and pressing it paused or skipped behind the list.
+            if (!isContentTemplate(template)) overMap()
             TemplateChrome(template, Modifier.fillMaxSize().padding(top = if (embedded) 0.dp else CHROME_BAR))
             if (!embedded) ChromeBar(status, endLabel, onDisconnect, Modifier.align(Alignment.TopCenter))
         }
@@ -92,18 +97,7 @@ private fun AppSurface(
     template: Template?,
     modifier: Modifier = Modifier,
 ) {
-    var size by remember { mutableStateOf(0 to 0) }
     val minPanePx = with(androidx.compose.ui.platform.LocalDensity.current) { MAP_PANE_MIN_EDGE.roundToPx() }
-
-    // The app lays its map out around whatever the host covers, so a template change moves the
-    // visible area even though the surface itself hasn't changed.
-    LaunchedEffect(template, size, minPanePx) {
-        val (width, height) = size
-        if (width > 0 && height > 0) {
-            val visible = visibleAreaFor(template, width, height, minPanePx)
-            connection.reportAreas(visible = visible, stable = visible)
-        }
-    }
 
     // A fresh SurfaceView - and so a fresh Surface - for every size, the way Android Auto hands an
     // app a new surface rather than resizing the old one. A resized SurfaceView keeps the same
@@ -114,6 +108,18 @@ private fun AppSurface(
     androidx.compose.foundation.layout.BoxWithConstraints(modifier) {
         val epoch by connection.surfaceEpoch.collectAsState()
         androidx.compose.runtime.key(constraints.maxWidth, constraints.maxHeight, epoch) {
+            // Per surface: one made again at the same size (epoch) is lent with the whole surface as its
+            // visible area, and is told the real one again after that, starting from no size.
+            var size by remember { mutableStateOf(0 to 0) }
+            // The app lays its map out around whatever the host covers, so a template change moves the
+            // visible area even though the surface itself hasn't changed.
+            LaunchedEffect(template, size, minPanePx) {
+                val (width, height) = size
+                if (width > 0 && height > 0) {
+                    val visible = visibleAreaFor(template, width, height, minPanePx)
+                    connection.reportAreas(visible = visible, stable = visible)
+                }
+            }
             SurfaceHost(connection, frame, onSize = { size = it }, Modifier.fillMaxSize())
         }
     }

@@ -54,6 +54,7 @@ import io.github.sirionero.mycar.car.AppTheme
 import io.github.sirionero.mycar.car.CarApps
 import io.github.sirionero.mycar.car.CarEnvironment
 import io.github.sirionero.mycar.car.CarSettings
+import io.github.sirionero.mycar.car.MiniPlayerSetting
 import io.github.sirionero.mycar.car.NightMode
 import io.github.sirionero.mycar.car.SidePaneChoice
 import io.github.sirionero.mycar.car.Units
@@ -92,6 +93,7 @@ private fun CarHomeSection() {
     val open by CarSettings.openOnConnect.collectAsState()
     val side by SidePaneChoice.current.collectAsState()
     val playerSize by CarSettings.playerSize.collectAsState()
+    val miniPlayer by MiniPlayerSetting.on.collectAsState()
     val entries = rememberAllEntries()
     // As in the car: not the phone's app of a music service that takes its place.
     val replaced = rememberReplacedByWeb()
@@ -123,9 +125,16 @@ private fun CarHomeSection() {
                 Pick(CarSettings.PLAYER_SMALL, stringResource(R.string.car_settings_size_small)),
                 Pick(CarSettings.PLAYER_MEDIUM, stringResource(R.string.car_settings_size_medium)),
                 Pick(CarSettings.PLAYER_LARGE, stringResource(R.string.car_settings_size_large)),
+                Pick(CarSettings.PLAYER_EXTRA, stringResource(R.string.car_settings_size_extra_large)),
             ),
             playerSize,
         ) { CarSettings.setPlayerSize(it) }
+        SettingsDivider()
+        SwitchRow(
+            stringResource(R.string.car_settings_mini_player),
+            miniPlayer,
+            subtitle = stringResource(R.string.car_settings_mini_player_detail),
+        ) { MiniPlayerSetting.setOn(it) }
     }
 }
 

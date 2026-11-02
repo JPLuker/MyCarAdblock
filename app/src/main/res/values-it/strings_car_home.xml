@@ -44,6 +44,9 @@
     <string name="car_apps_show_on_grid">Mostra nella griglia delle app</string>
     <string name="car_apps_hidden_toast">App nascosta: %1$s. Per farla tornare: Impostazioni, App nascoste.</string>
     <string name="car_web_music_elsewhere">%1$s sta suonando su un altro dispositivo, non in auto</string>
+    <string name="car_mini_open_player">Apri il lettore</string>
+    <string name="car_mini_hide">Nascondi il mini lettore</string>
+    <string name="car_mini_hidden_toast">Mini lettore nascosto per questo viaggio. Il brano nel dock apre il lettore.</string>
 
     <string name="car_map_starting">Avvio %1$s…</string>
     <string name="car_map_starting_unknown">Avvio la mappa…</string>
@@ -179,6 +182,9 @@
     <string name="car_host_threw">%1$s ha generato un errore: %2$s %3$s</string>
     <string name="car_host_location_channel">Posizione per la navigazione</string>
     <string name="car_host_location_notification">myCar condivide la posizione con la mappa dell\'auto</string>
+    <string name="car_map_no_position_title">La mappa non ha la posizione</string>
+    <string name="car_map_no_position_locked">Android non la dà a myCar col telefono bloccato. Ora che sei fermo, sblocca il telefono e apri myCar.</string>
+    <string name="car_map_no_position_permission">myCar non ha il permesso della posizione. Concedilo in myCar sul telefono.</string>
 
     <string name="car_wallpaper_title">Sfondo</string>
     <string name="car_wallpaper_still">Fermi</string>

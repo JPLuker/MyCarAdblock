@@ -11,10 +11,16 @@ ALBUM="$W/music/Preview Artist/Preview Album"
 mkdir -p "$ALBUM" "$W/data"
 
 for t in 1 2 3; do
+    # Tone 1 carries its words (LRC in the LYRICS tag, which Music Assistant's filesystem reads): with Xonos
+    # inside myCar the lyrics come from Music Assistant first (shot xonos-lyrics). Tones 2 and 3 have none.
+    words=()
+    [ "$t" = 1 ] && words=(-metadata "LYRICS=[00:00.50]Preview line one
+[00:05.00]Preview line two
+[00:10.00]Preview line three")
     docker run --rm -v "$W/music:/music" --entrypoint /ffmpeg mwader/static-ffmpeg:7.1 \
         -loglevel error -y -f lavfi -i "sine=f=$((300 + t * 80)):d=60" -ac 2 -ar 48000 \
         -metadata artist="Preview Artist" -metadata album_artist="Preview Artist" \
-        -metadata album="Preview Album" -metadata title="Tone $t" -metadata track="$t" \
+        -metadata album="Preview Album" -metadata title="Tone $t" -metadata track="$t" "${words[@]}" \
         "/music/Preview Artist/Preview Album/0$t Tone $t.flac"
 done
 ls "$ALBUM"

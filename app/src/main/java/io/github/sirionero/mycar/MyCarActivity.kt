@@ -628,6 +628,8 @@ class MyCarActivity : ComponentActivity(), Projection {
             return
         }
         MyCarLog.i("accessory attached by the system - permission is implicit on this path")
+        // The car map's position comes with SessionService.start in start(), once the accessory is
+        // there and open: taken here, an attach that went nowhere started the location service.
         start(accessory)
     }
 
@@ -667,6 +669,9 @@ class MyCarActivity : ComponentActivity(), Projection {
             return
         }
         MyCarLog.i("auto-connect: connecting")
+        // Moments after the car's arrival created this screen: still inside the 10 s in which Android
+        // lets a location service started from the background lend the car map its position.
+        io.github.sirionero.mycar.host.LocationKeepAlive.holdForDrive(this, untilStartUpEnds = true)
         io.github.sirionero.mycar.wireless.WirelessLink.start(this, device, byItself = true)
     }
 

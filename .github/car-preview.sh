@@ -109,10 +109,37 @@ EXTRA="--ez demoSong true" shoot split 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WA
 EXTRA="--ez demoSong true" shoot media 1920 720 240 "$WAIT;$WAIT;1635,200;$WAIT;1230,48;$WAIT"
 # The same at 800x480, where the tabs are narrow: "Now playing" on two lines, not "Now playi…".
 EXTRA="--ez demoSong true" shoot media-800x480 800 480 160 "$WAIT;$WAIT;703,133;$WAIT;$WAIT"
+# Its Lyrics tab (the fourth, 237px after Browse): the made-up song isn't on LRCLIB, so "Looking for
+# lyrics…", then one line, where the lyrics come from and "Now playing" back to the player.
+EXTRA="--ez demoSong true" shoot media-lyrics 1920 720 240 "$WAIT;$WAIT;1635,200;$WAIT;1704,48;$WAIT;$WAIT;$WAIT"
 # The player beside the map at Medium and Large (Settings > Size of the player beside the map).
 EXTRA="--ez demoSong true --es playerSize 1.1" shoot split-medium 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.2" shoot split-large 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es playerSize 1.2" shoot split-large-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es playerSize 1.4" shoot split-extra 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es playerSize 1.4" shoot split-extra-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
+# The same with the car's screen at Extra large: the player as big as leaves the map room for an app's
+# card (MAP_PANE_MIN_EDGE) and itself room for its X over the glass.
+EXTRA="--ez demoSong true --es playerSize 1.4 --es carScale 1.5" shoot split-extra-xl-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
+# The lyrics beside the map at Extra large, from the player's Lyrics button (the fourth of its bottom
+# row): the made-up song has none, so the cover above one line where there's room (1920x720), the line
+# alone at 800x480; 4 s later the player has the column back.
+EXTRA="--ez demoSong true --es playerSize 1.4" shoot lyrics-side 1920 720 240 "$WAIT;$WAIT;1654,627;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es playerSize 1.4" shoot lyrics-side-extra-800x480 800 480 160 "$WAIT;$WAIT;693,423;$WAIT;$WAIT;$WAIT;$WAIT"
+# The mini player over the whole map (car/MapMiniPlayer.kt). The player's X closes the column and the
+# mini player floats in the map's bottom-right corner, over the page dots; held on its cover and dragged
+# to the top middle (the log says where it was let go); its X puts it away (the card says how); the dock's
+# song brings the column back, the column's X the mini player, where it was let go; a slow tap (0.9 s, not
+# moved) on its cover still opens the full player. Then at 800x480, light, where an earlier drive left it,
+# off; and at 800x480 with the car's screen at Large and Extra large (--es carScale), where the map is
+# small: it starts clear of Vela's card of places as far as it goes, under its buttons, over the trip's time.
+EXTRA="--ez demoSong true" shoot mini 1920 720 240 "$WAIT;1866,54;$WAIT;1536,582,drag,936,174;1254,174;72,279;1866,54;$WAIT;936,174,long"
+EXTRA="--ez demoSong true" shoot mini-800x480 800 480 160 "$WAIT;764,36;$WAIT;544,388,drag,460,60"
+EXTRA="--ez demoSong true --es carScale 1.25" shoot mini-large-800x480 800 480 160 "$WAIT;755,45;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es carScale 1.5" shoot mini-xl-800x480 800 480 160 "$WAIT;746,54;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es carTheme LIGHT" shoot mini-light 1920 720 240 "$WAIT;1866,54;$WAIT"
+EXTRA="--ez demoSong true --es miniAt 0.5,0" shoot mini-kept 1920 720 240 "$WAIT;1866,54;$WAIT"
+EXTRA="--ez demoSong true --ez miniPlayer false" shoot mini-off 1920 720 240 "$WAIT;1866,54;$WAIT"
 # Hiding an app from the grid: a long press on the browser for its menu, then "Hide from the app
 # grid" (the fourth button of the card in the middle of the screen), the grid without it and the
 # car saying where it comes back from. Then the settings' hidden apps, with the browser hidden.
@@ -178,6 +205,15 @@ if [ -n "${MA_TOKEN:-}" ]; then
     LOGTAGS=Xonos EXTRA="$MA --es sidePane $XONOS" shoot xonos-side 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT"
     echo "--- Xonos inside myCar ---"
     grep -h "xonos\|Xonos\|media:" previews/xonos-inside/log.txt 2>/dev/null | head -60 || echo "xonos-inside: nothing in the log"
+    # The album played as in xonos-inside, then the Lyrics tab (the fourth): Tone 1 has words in its
+    # LYRICS tag, which come from Music Assistant first ("lyrics: found (Music Assistant)" in the log).
+    # Best on its own (shots: xonos-lyrics): Xonos playing has taken the emulator down now and then.
+    LOGTAGS=Xonos EXTRA="$MA" shoot xonos-lyrics 1920 720 240 "$WAIT;$GRID_BUTTON;$(at xonos);$WAIT;1230,48;$WAIT;1300,565;$WAIT;1808,232;$WAIT;$WAIT;1704,48;$WAIT;$WAIT;$WAIT"
+    adb shell am force-stop "$PKG"
+    case " ${ONLY:-xonos-lyrics} " in *" xonos-lyrics "*)
+        echo "--- lyrics with Xonos inside myCar ---"
+        grep -h "lyrics:" previews/xonos-lyrics/log.txt previews/xonos-lyrics/stream.txt 2>/dev/null || echo "xonos-lyrics: no lyrics line" ;;
+    esac
 else
     echo "--- no Music Assistant: Xonos's shots left out ---"
 fi
@@ -260,6 +296,18 @@ for service in soundcloud youtube-music spotify; do
 done
 # Spotify's tile on the app grid, beside the other music apps ("Spotify", "Web" under it).
 EXTRA="--es webMusic spotify" shoot music-grid 1920 720 240 "$WAIT;$WAIT;$GRID_BUTTON;$WAIT"
+# The map's surfaces as a drive with music starts (CarServices.musicStarting): Vela, and Spotify's web
+# player as the drive's music (Autoplay on, as by default). The player's column is kept from the start,
+# so the map's first surface should already be the narrow one, and "Starting Spotify…" beside it; with
+# no account here no song comes, and 20 s in the map gets its whole width. No media key (--ez
+# webMusicKey false): pressed first, it opened Spotify as the driver's pick, not the drive's.
+installed $VELA && EXTRA="--es webMusic spotify --ez webMusicKey false" shoot map-start 1920 720 240 \
+    "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+if [ -d previews/map-start ]; then
+    echo "--- the map's surfaces as a drive with music starts: the first should be the narrow one ---"
+    grep -h "stage: surface\|host: lent\|media: \|preview: the car's player" \
+        previews/map-start/log.txt previews/map-start/stream.txt 2>/dev/null | cut -c1-300 | head -40
+fi
 echo "--- the music services' web players ---"
 for d in previews/music-*; do
     [ -d "$d" ] || continue
@@ -561,6 +609,42 @@ if [ -n "${HA_TOKEN:-}" ]; then
         echo "brain-locked: nothing in the log"
 fi
 
+# The car map's position with the phone locked (host/LocationKeepAlive.kt): Android lets a location
+# foreground service started from the background lend its location only within 10 s of one of the
+# app's screens being created (the trip of 2 Nov 2026, on Android 17: refused 14 s in). myCar's screen
+# opened with the phone locked by a PIN and its screen off, as the car's Bluetooth opens it in a
+# pocket; the drive's hold taken 1 s in (--ei locationProbeMs, debug only) should run, the same taken
+# 15 s in should be refused. The wallpaper picker alone, so that no car map binds and takes the service
+# first (a car map has to be installed, though: Vela). Meant for api 37.0; the two runs in at-1000/ and
+# at-15000/, each with Android's account of myCar's services (dumpsys.txt).
+case " ${ONLY:-location-locked} " in *" location-locked "*)
+    adb shell pm grant $PKG android.permission.ACCESS_FINE_LOCATION || true
+    adb shell pm grant $PKG android.permission.ACCESS_COARSE_LOCATION || true
+    rm -rf previews/location-locked previews/location-locked-runs
+    mkdir -p previews/location-locked-runs
+    for at in 1000 15000; do
+        LOGTAGS=ActivityManager \
+            BEFORE="adb shell locksettings set-pin $PIN; adb shell input keyevent KEYCODE_SLEEP; sleep 3" \
+            EXTRA="--ez wallpapers true --ei locationProbeMs $at" shoot location-locked 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT" \
+            "sleep $(( at / 1000 + 3 > 5 ? at / 1000 - 2 : 0 )); adb shell dumpsys activity services $PKG > previews/location-locked/dumpsys.txt 2>&1"
+        [ -d previews/location-locked ] && mv previews/location-locked "previews/location-locked-runs/at-$at"
+        adb shell locksettings clear --old $PIN || true
+        adb shell input keyevent KEYCODE_WAKEUP
+        adb shell wm dismiss-keyguard || true
+        sleep 2
+    done
+    mv previews/location-locked-runs previews/location-locked
+    echo "--- the car map's position with the phone locked: the drive's hold 1 s in, then 15 s in ---"
+    for at in 1000 15000; do
+        echo "[at $at ms]"
+        grep -h "preview: location\|location keep-alive\|LocationKeepAlive\|preview: displayId" \
+            "previews/location-locked/at-$at/log.txt" "previews/location-locked/at-$at/stream.txt" 2>/dev/null | cut -c1-400 | head -20
+        grep -iE "LocationKeepAlive|isForeground|foregroundServiceType|WhileInUse|Wiu" \
+            "previews/location-locked/at-$at/dumpsys.txt" 2>/dev/null | head -20
+    done
+    ;;
+esac
+
 # The assistant in another language on the car's screen (--es voiceLang, as with its model on the
 # phone): its help in Italian, in German (the longest words), at 800x480, and an answer in German.
 EXTRA="--es voiceLang it --ez voiceHelp true" shoot voice-it 1920 720 240 "$WAIT"
@@ -587,6 +671,31 @@ voice_check() {
     grep -h "voice check" $d/log.txt || echo "voice-check: nothing in the log"
 }
 voice_check
+
+# Lyrics: some 50 songs as the music apps write them through 0.6.8's lookup and the new one, against the
+# real lrclib.net (the cloud session can't reach it). Only when named in "shots": ~250 requests to a free service.
+lyrics_check() {
+    case " ${ONLY:-} " in *" lyrics-check "*) ;; *) return ;; esac
+    local d=previews/lyrics-check i logpid
+    mkdir -p $d
+    adb shell am force-stop "$PKG"
+    adb logcat -c
+    # Streamed: some 250 requests take minutes, and the log's buffer would lose the first songs. Not
+    # through adb() above, which gives up after three minutes.
+    timeout 420 "$ADB_BIN" logcat -s myCar > $d/log.txt 2>&1 &
+    logpid=$!
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.LyricsCheckActivity"
+    for i in $(seq 1 90); do
+        sleep 4
+        grep -q "lyrics check: done" $d/log.txt && break
+    done
+    kill $logpid 2>/dev/null
+    adb shell am force-stop "$PKG"
+    adb logcat -d -b crash > $d/crash.txt 2>&1
+    echo "--- lyrics check ---"
+    grep -h "lyrics check" $d/log.txt || echo "lyrics-check: nothing in the log"
+}
+lyrics_check
 
 # The setup list on the phone, as a new user finds it: myCar's data cleared and no permissions
 # (the install above granted them all). Last, since it wipes myCar's data. 01 the list; 02 after

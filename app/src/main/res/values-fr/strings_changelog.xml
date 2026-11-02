@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 0.6.8-alpha -->
+    <string-array name="changelog_45">
+        <item>Mini-lecteur sur la carte entière : quand vous fermez le lecteur à côté de la carte, un petit lecteur flotte sur la carte, avec la pochette, précédent, lecture ou pause et suivant. Maintenez-le appuyé puis faites-le glisser où vous voulez ; son X le masque pour le trajet (le titre dans le dock ramène le lecteur), et il se désactive dans les Paramètres.</item>
+        <item>Paroles trouvées bien plus souvent : titres nettoyés de « Remastered », « feat. », « Live » et des noms qu’ajoutent radios et vidéos, et chaque résultat vérifié, pour que les paroles d’une autre chanson n’apparaissent jamais. Les morceaux instrumentaux le disent ; avec Xonos dans myCar, d’abord les paroles de Music Assistant.</item>
+        <item>Une chanson sans paroles affiche une courte ligne au lieu d’un panneau vide, et à côté de la carte le lecteur revient tout seul.</item>
+        <item>La carte a votre position même avec le téléphone verrouillé dans la poche : myCar la prend à l’arrivée de la voiture. Si Android la refuse quand même, la voiture vous le dit, seulement à l’arrêt.</item>
+        <item>La carte démarre directement à sa largeur finale : la colonne de la musique est gardée dès le début du trajet, la carte n’est donc pas dessinée deux fois.</item>
+        <item>La lecture automatique est activée par défaut, et le lecteur à côté de la carte existe aussi en Très grande (40 % plus grand).</item>
+        <item>Fini « Spotify joue sur un autre appareil » à chaque changement de chanson.</item>
+    </string-array>
     <string-array name="changelog_44">
         <item>Masquez une app de la grille de la voiture : maintenez-la appuyée et choisissez « Masquer de la grille des apps ». Elle revient depuis Paramètres, Apps masquées, ou depuis le téléphone (Écran de la voiture, Apps dans la grille de la voiture).</item>
         <item>Avec Spotify ou un autre service de musique dans myCar, « Masquer l’app Spotify du téléphone » ne laisse qu’un Spotify dans la grille ; son icône épinglée et le choix à côté de la carte passent à celui de myCar.</item>

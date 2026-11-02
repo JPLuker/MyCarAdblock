@@ -181,9 +181,9 @@ class CarAppConnection(private val context: Context) {
             }
         }
 
-        // BIND_INCLUDE_CAPABILITIES only lends the location capability myCar holds at bind
-        // time, so the keep-alive has to be running first - a nav app that starts its own
-        // location service before then is refused, and MapQuest crashes on that.
+        // The keep-alive has to be running first: a nav app that starts its own location service
+        // with no capability to borrow is refused, and MapQuest crashes on that. (The capability
+        // itself follows myCar's as it changes: a keep-alive started later still reaches the app.)
         if (holdsLocation) {
             bind()
         } else {
@@ -649,7 +649,11 @@ class CarAppConnection(private val context: Context) {
     // these four. Coordinates are in surface pixels. Scroll distances follow GestureDetector's
     // convention (previous minus current), which is the opposite sign to a Compose drag.
 
-    fun surfaceClick(x: Float, y: Float) = onSurface("onClick") { it.onClick(x, y) }
+    fun surfaceClick(x: Float, y: Float) {
+        // In the log of the next drive: a tap that reached the app's surface (the map's, a browse app's).
+        MyCarLog.i("host: tap on ${component?.packageName}'s surface at ${x.toInt()},${y.toInt()}")
+        onSurface("onClick") { it.onClick(x, y) }
+    }
 
     fun surfaceScroll(distanceX: Float, distanceY: Float) =
         onSurface("onScroll") { it.onScroll(distanceX, distanceY) }

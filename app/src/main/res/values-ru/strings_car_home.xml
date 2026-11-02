@@ -46,6 +46,9 @@
     <string name="car_apps_show_on_grid">Показать в сетке приложений</string>
     <string name="car_apps_hidden_toast">Скрыто: %1$s. Вернуть можно в разделе «Настройки», «Скрытые приложения».</string>
     <string name="car_web_music_elsewhere">%1$s играет на другом устройстве, а не в машине</string>
+    <string name="car_mini_open_player">Открыть плеер</string>
+    <string name="car_mini_hide">Скрыть мини-плеер</string>
+    <string name="car_mini_hidden_toast">Мини-плеер скрыт на эту поездку. Трек в доке открывает плеер.</string>
 
     <string name="car_map_starting">Запуск %1$s…</string>
     <string name="car_map_starting_unknown">Запуск карты…</string>
@@ -181,6 +184,9 @@
     <string name="car_host_threw">%1$s: исключение %2$s %3$s</string>
     <string name="car_host_location_channel">Местоположение для навигации</string>
     <string name="car_host_location_notification">myCar передаёт местоположение карте в автомобиле</string>
+    <string name="car_map_no_position_title">У карты нет вашего местоположения</string>
+    <string name="car_map_no_position_locked">Android не передаёт его myCar, пока телефон заблокирован. Теперь, когда вы остановились, разблокируйте телефон и откройте myCar.</string>
+    <string name="car_map_no_position_permission">У myCar нет доступа к местоположению. Разрешите его в myCar на телефоне.</string>
 
     <string name="car_wallpaper_title">Обои</string>
     <string name="car_wallpaper_still">Статичные</string>

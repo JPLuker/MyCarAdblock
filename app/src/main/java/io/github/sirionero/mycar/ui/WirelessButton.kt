@@ -173,6 +173,8 @@ internal fun WirelessButton() {
                                 .fillMaxWidth()
                                 .clickable {
                                     devices = null
+                                    // myCar is on screen at the tap: the car map's position, before the phone locks.
+                                    io.github.sirionero.mycar.host.LocationKeepAlive.holdForDrive(context, untilStartUpEnds = true)
                                     WirelessLink.start(context, device)
                                 }
                                 .padding(vertical = 14.dp),

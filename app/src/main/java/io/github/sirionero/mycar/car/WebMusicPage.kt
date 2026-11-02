@@ -136,6 +136,16 @@ internal class WebMusicPage(
     private var pending: Pair<String, Double?>? = null
     private var lastCrashResume = 0L
     private var playsElsewhere = false
+    /** Since when the page has said it plays on another device (0: it doesn't say so). */
+    private var elsewhereSince = 0L
+    /** Said only once the page has kept saying it for [ELSEWHERE_SURE_MS]: a song that stops or changes here can look like it. */
+    private val sayElsewhere = Runnable {
+        if (elsewhereSince == 0L || playsElsewhere || released) return@Runnable
+        if (WebMusicPlayer.state(service.id).value.playing) return@Runnable
+        playsElsewhere = true
+        MyCarLog.i("music: ${service.id} plays on another device (Spotify Connect), not in the car's page")
+        if (isTheCarsMusic()) CarToasts.show(this@WebMusicPage, Words.get(R.string.car_web_music_elsewhere, service.name), CarToast.LENGTH_LONG)
+    }
     /** The car's presses so far: a newer one ends the tries of one that waited for the page. */
     private var acts = 0
     /** When the page last started loading: a press that waited for it is tried until [BOOT_MS] after. */
@@ -513,13 +523,25 @@ internal class WebMusicPage(
         }
         if (state.playing && !wasPlaying) becomeTheMusic()
         wasPlaying = state.playing
-        // Playing on another device: said once, while it lasts, to the driver whose music it is.
-        val remote = o.optBoolean("remote")
-        if (remote && !playsElsewhere) {
-            MyCarLog.i("music: ${service.id} plays on another device (Spotify Connect), not in the car's page")
-            if (isTheCarsMusic()) CarToasts.show(this, Words.get(R.string.car_web_music_elsewhere, service.name), CarToast.LENGTH_LONG)
+        // Playing on another device: said once to the driver whose music it is, and only once the page
+        // has said it for ELSEWHERE_SURE_MS (sayElsewhere). Said again only after it played here.
+        val remote = o.optBoolean("remote") && !state.playing
+        if (remote && elsewhereSince == 0L) {
+            elsewhereSince = SystemClock.uptimeMillis()
+            main.postDelayed(sayElsewhere, ELSEWHERE_SURE_MS)
+        } else if (!remote && elsewhereSince != 0L) {
+            if (!playsElsewhere) MyCarLog.i("music: ${service.id} looked like another device for ${SystemClock.uptimeMillis() - elsewhereSince} ms - not said")
+            elsewhereSince = 0L
+            main.removeCallbacks(sayElsewhere)
         }
-        playsElsewhere = remote
+        if (state.playing) playsElsewhere = false
+    }
+
+    /** A new page (or a page made again): what the one before said about another device goes with it. */
+    private fun forgetElsewhere() {
+        elsewhereSince = 0L
+        playsElsewhere = false
+        main.removeCallbacks(sayElsewhere)
     }
 
     private fun sendPending() {
@@ -543,6 +565,7 @@ internal class WebMusicPage(
             field.value = null
             heard = false
             startedAt = SystemClock.uptimeMillis()
+            forgetElsewhere()
         }
 
         override fun onPageFinished(view: WebView, url: String?) {
@@ -598,6 +621,7 @@ internal class WebMusicPage(
                 widthScript = null
                 heard = false
                 searching = false
+                forgetElsewhere()
                 fullScreen.value = null
                 field.value = null
                 WebMusicPlayer.report(service.id, WebPlayerState())
@@ -624,8 +648,14 @@ internal class WebMusicPage(
         /** A page that closes again within this, playing, is opened again paused. */
         const val CRASH_RESUME_GAP_MS = 60_000L
         const val RETRY_MS = 1_000L
-        /** A press on a page that has spoken, while its bar is too new to tell where it plays: tried this many times more. */
-        const val WAITS = 3
+        /**
+         * A press on a page that has spoken, while its bar can't tell yet where it plays (just shown, a new
+         * song, or the music here just stopped with the clock running on: up to about 6 s): tried this many
+         * times more, a second apart.
+         */
+        const val WAITS = 8
+        /** The page saying it plays on another device this long before the driver is told. */
+        const val ELSEWHERE_SURE_MS = 3_000L
         /** How long a press that waited for the page is tried, from the page's start: a slow network too. */
         const val BOOT_MS = 45_000L
         /** After the page's player took a Play: playing by then, or the Play goes again. */

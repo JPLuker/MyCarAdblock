@@ -58,11 +58,12 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
      * still be on the bar, not off the edge of a long list. */
     const val MAX_PINNED = 3
 
-    /** The player beside the map: Small, Medium, Large ([playerSize]). */
+    /** The player beside the map: Small, Medium, Large, Extra large ([playerSize]). */
     const val PLAYER_SMALL = 1f
     const val PLAYER_MEDIUM = 1.1f
     const val PLAYER_LARGE = 1.2f
-    val PLAYER_SIZES = listOf(PLAYER_SMALL, PLAYER_MEDIUM, PLAYER_LARGE)
+    const val PLAYER_EXTRA = 1.4f
+    val PLAYER_SIZES = listOf(PLAYER_SMALL, PLAYER_MEDIUM, PLAYER_LARGE, PLAYER_EXTRA)
 
     /** Id of the app to open on connect; [HOME] opens the launcher. */
     const val HOME = "home"
@@ -80,7 +81,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
     private val locationWarningFlow = MutableStateFlow(true)
     private val lastNavFlow = MutableStateFlow<String?>(null)
     private val lastMediaFlow = MutableStateFlow<String?>(null)
-    private val autoplayFlow = MutableStateFlow(false)
+    private val autoplayFlow = MutableStateFlow(true)
     private val playerTitleFlow = MutableStateFlow(false)
     private val themeFlow = MutableStateFlow(AppTheme.DARK)
     val appTheme: StateFlow<AppTheme> = themeFlow
@@ -242,7 +243,8 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
             AppTheme.valueOf(AppSettings.getString(app, KEY_THEME, AppTheme.DARK.name))
         }.getOrDefault(AppTheme.DARK)
         uiThemeFlow.value = AppSettings.getString(app, KEY_UI_THEME, GsThemes.default.id)
-        autoplayFlow.value = AppSettings.getString(app, KEY_AUTOPLAY, "false") == "true"
+        // On unless the driver turned it off (0.6.9: the music starts with the drive by default).
+        autoplayFlow.value = AppSettings.getString(app, KEY_AUTOPLAY, "true") == "true"
         playerTitleFlow.value = AppSettings.getString(app, KEY_PLAYER_TITLE, "false") == "true"
         CarRoutes.init(app)
         // The drive's car may have a route of its own (see carIdentified).
@@ -284,6 +286,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
         AssistantChoice.init(app)
         AssistantBrain.init(app)
         SidePaneChoice.init(app)
+        MiniPlayerSetting.init(app)
         HiddenApps.init(app)
         HomePages.init(app)
         io.github.sirionero.mycar.home.HomeAssistant.init(app)

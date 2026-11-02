@@ -26,6 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import android.media.session.PlaybackState
 import io.github.sirionero.mycar.media.MediaArt
+import io.github.sirionero.mycar.media.Lyrics
+import io.github.sirionero.mycar.media.LyricsAnswer
+import io.github.sirionero.mycar.media.lyricsSong
 import kotlinx.coroutines.delay
 import androidx.compose.material3.Icon
 import androidx.compose.animation.animateColorAsState
@@ -109,17 +112,47 @@ fun CarHome() {
     if (now.isActive) lastActive[0] = now
     val holding = sideApp == null && musicShown && !musicOn
     val shownNow = if (holding && !now.isActive && lastActive[0].isActive) lastActive[0] else now
-    val splitScreen = panel != SidePanel.NONE && (sideApp != null || musicShown)
+    // Lyrics that gave the column back for a song without any come back with the next song that has some,
+    // until the driver closes them (their X, the dock's song, the player's X).
+    if (navigator.lyricsWanted && panel == SidePanel.CONTROLS && shownNow.isActive) {
+        val context = LocalContext.current
+        val inside = mediaApp?.component?.let(io.github.sirionero.mycar.xonos.Xonos::isInside) == true
+        val song = remember(shownNow.trackTitle, shownNow.title, shownNow.trackArtist, shownNow.artist, shownNow.album, shownNow.durationMs, shownNow.mediaId, inside) { shownNow.lyricsSong(inside) }
+        LaunchedEffect(song.key) {
+            // Not the song they just gave way for: looked up again at once, it asked LRCLIB as many times more.
+            if (song.key == navigator.lyricsGaveWayFor) return@LaunchedEffect
+            delay(Lyrics.SETTLE_MS)
+            if (Lyrics.find(context, song).getOrNull() is LyricsAnswer.Found) navigator.lyricsBack()
+        }
+    }
+    // The drive's music on its way: its column from the start (see CarServices.musicStarting). Only with the
+    // music beside the map: a chosen app's column is there anyway, and one not loaded yet would come at its
+    // own width. Not for music that won't connect. After the musicShown effect above: as the song comes,
+    // musicShown is true before the wait ends, and no frame closes the column.
+    val starting by CarServices.musicStarting.collectAsStateWithLifecycle()
+    val sideChoice by SidePaneChoice.current.collectAsStateWithLifecycle()
+    LaunchedEffect(musicOn) { if (musicOn) CarServices.musicCame() }
+    val reserved = starting && sideChoice == SidePaneChoice.MUSIC && sideApp == null && mediaApp != null &&
+        phase != CarMedia.Phase.REJECTED
+    val splitScreen = panel != SidePanel.NONE && (sideApp != null || musicShown || reserved)
     // The music beside the map at the size chosen for it (Small, Medium, Large): an app's own screen
     // there keeps its size.
     val music = sideApp?.template == null && sideApp?.builtIn != BuiltInApps.Plancia
     val playerSize by CarSettings.playerSize.collectAsStateWithLifecycle()
-    val sideScale = if (music) playerSize else 1f
+    // The map alone with music on (the column closed with its X, the dock's song, or Close beside an
+    // app): the mini player floats over it instead (see MapMiniPlayer); not while the map is panned.
+    // Its song as the column would draw it: the last one during the column's hold, whatever is beside the map.
+    val miniOn by MiniPlayerSetting.on.collectAsStateWithLifecycle()
+    val panning by CarServices.nav.panMode.collectAsStateWithLifecycle()
+    val miniNow = if (musicShown && !musicOn && !now.isActive && lastActive[0].isActive) lastActive[0] else now
 
     // The map's page among the driver's own (see HomePager). No outer padding on any side, split
     // screen or not - only the gap between the two panes when the player is sharing the screen
     // with the map.
     HomePager(onHome) { inView ->
+    androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
+    // As far as it fits: the map keeps room for an app's card over it, the column for its X over the glass.
+    val sideScale = if (music) sideScaleFor(playerSize, maxWidth.value - 8f, maxHeight.value, MAP_PANE_MIN_EDGE.value + 24f) else 1f
     Row(
         Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -130,7 +163,7 @@ fun CarHome() {
                 .weight(if (splitScreen) MAP_SHARE / sideScale - 1f else 1f)
                 .fillMaxHeight(),
         ) {
-            MapPane(navStatus, frame, inView)
+            MapPane(navStatus, frame, inView, mini = miniNow.takeIf { miniPlayerShows(miniOn, navigator.miniPlayerHidden, musicShown, splitScreen, inView, panning) })
         }
         if (splitScreen) CompositionLocalProvider(LocalPlayerInView provides inView, LocalDensity provides LocalDensity.current.scaledBy(sideScale)) {
             val side = Modifier.weight(1f).fillMaxHeight()
@@ -147,21 +180,26 @@ fun CarHome() {
                     if (inView) PlanciaPane(side) else AppPlaceholder("Plancia", null, side, builtInId = BuiltInApps.Plancia.id)
                 panel == SidePanel.LYRICS -> SideLyrics(shownNow, side)
                 sideMedia != null -> SideMediaPane(sideMedia, shownNow, side)
-                else -> GlassDockedPlayer(shownNow, side)
+                else -> GlassDockedPlayer(shownNow, side, startingApp = mediaApp?.label?.takeIf { reserved && !shownNow.isActive })
             }
         }
+    }
     }
     }
 }
 
 @Composable
-private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame, inView: Boolean) {
+private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame, inView: Boolean, mini: NowPlaying? = null) {
     val navigator = LocalCarNavigator.current
     if (status.phase == CarAppConnection.Phase.RUNNING) {
         // The car's Back key reaches the map's app (its search results, a list of places) while
         // the map is the page in view; under another screen it goes on closing that screen.
         AppBackKey(CarServices.nav, active = inView)
-        CarAppStage(CarServices.nav, status, frame, embedded = true) { CarServices.stopNav() }
+        CarAppStage(
+            CarServices.nav, status, frame, embedded = true,
+            // Over the map, under the app's own cards and buttons: they stay on top of it.
+            overMap = { if (mini != null) MapMiniPlayer(mini, Modifier.fillMaxSize()) },
+        ) { CarServices.stopNav() }
         return
     }
 
@@ -226,10 +264,9 @@ private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame
             }
         }
     }
+    // No map drawn yet (starting, stopped, failed): the mini player over the message, which keeps the middle.
+    if (mini != null) MapMiniPlayer(mini, Modifier.fillMaxSize())
 }
-
-/** The side's share of the screen beside the map at Small: one part to the map's 2.1. */
-private const val MAP_SHARE = 3.1f
 
 /** How long the music's column waits, once nothing plays, before giving the map its width back. */
 private const val MUSIC_HOLD_MS = 6_000L
@@ -267,7 +304,11 @@ private fun SideLyrics(now: NowPlaying, modifier: Modifier) {
                 GsIconButton(Icons.Filled.Close, stringResource(R.string.car_home_hide_lyrics), navigator::showSideControls, size = 52.dp, iconSize = 24.dp)
             }
             Spacer(Modifier.height(12.dp))
-            LyricsPanel(now, Modifier.weight(1f).fillMaxWidth(), lineStyle = MaterialTheme.typography.headlineSmall)
+            // The next song ahead only while these are what the driver sees: not under another screen or on another page.
+            LyricsPanel(
+                now, Modifier.weight(1f).fillMaxWidth(), lineStyle = MaterialTheme.typography.headlineSmall, art = art,
+                onNothing = navigator::lyricsGaveWay, ahead = LocalPlayerInView.current && navigator.current == CarScreen.Home,
+            )
         }
     }
 }

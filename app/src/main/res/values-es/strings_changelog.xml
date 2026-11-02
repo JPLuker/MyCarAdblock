@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 0.6.8-alpha -->
+    <string-array name="changelog_45">
+        <item>Minirreproductor sobre el mapa completo: al cerrar el reproductor junto al mapa, un pequeño reproductor flota sobre el mapa con la portada, atrás, reproducir o pausa y siguiente. Mantenlo pulsado y arrástralo adonde quieras; su X lo oculta durante el viaje (la canción del dock recupera el reproductor), y se puede desactivar en Ajustes.</item>
+        <item>Letras encontradas mucho más a menudo: títulos limpios de «Remastered», «feat.», «Live» y de los nombres que añaden radios y vídeos, y cada resultado comprobado, para que nunca aparezca la letra de otra canción. Las pistas instrumentales lo indican; con Xonos dentro de myCar, primero las letras de Music Assistant.</item>
+        <item>Una canción sin letra muestra una línea breve en vez de un panel vacío, y junto al mapa el reproductor vuelve solo.</item>
+        <item>El mapa tiene tu ubicación con el teléfono bloqueado en el bolsillo: myCar la toma cuando llega el coche. Si Android aun así la rechaza, el coche te lo dice, solo con el coche parado.</item>
+        <item>El mapa empieza con su ancho final: la columna de la música se reserva desde el inicio del viaje, así el mapa no se dibuja dos veces.</item>
+        <item>La reproducción automática está activada por defecto, y el reproductor junto al mapa también viene en Muy grande (40% más grande).</item>
+        <item>Se acabó «Spotify está sonando en otro dispositivo» en cada cambio de canción.</item>
+    </string-array>
     <string-array name="changelog_44">
         <item>Oculta una app de la cuadrícula del coche: mantenla pulsada y elige «Ocultar de la cuadrícula de apps». Vuelve desde Ajustes, Apps ocultas, o desde el teléfono (Pantalla del coche, Apps en la cuadrícula del coche).</item>
         <item>Con Spotify u otro servicio de música dentro de myCar, «Ocultar la app Spotify del teléfono» deja un solo Spotify en la cuadrícula; su icono fijado y la elección junto al mapa pasan al de dentro de myCar.</item>
