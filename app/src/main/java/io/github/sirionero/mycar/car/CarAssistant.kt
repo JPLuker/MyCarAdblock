@@ -340,10 +340,13 @@ object CarAssistant {
             return
         }
         VoiceFocus.acquire(context)
-        speak(engine, text) { stopped ->
+        speak(engine, text) { _ ->
             VoiceFocus.release()
-            // Stopped part way: whoever stopped it has already moved on.
-            if (!stopped) mainHandler.post(onDone)
+            // Always, stopped part way too: a turn that cut a message read out on the car's channel
+            // for spoken prompts (DirectionsVoice) left the reply waiting for good. Whoever stopped
+            // it on purpose (Cancel, the microphone) has moved VoiceReply on, whose callbacks only
+            // act for the run they were made in.
+            mainHandler.post(onDone)
         }
     }
 
