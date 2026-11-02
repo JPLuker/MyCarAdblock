@@ -102,10 +102,13 @@ fun CarHome() {
         else if (mediaApp == null) musicShown = false
         else { delay(MUSIC_HOLD_MS); musicShown = false }
     }
-    // The last song with a title and a live state, drawn during the hold.
-    val lastActive = remember { arrayOf(now) }
+    // The last song with a title and a live state, drawn during the hold only - and only the same
+    // music app's: another app's song over this one's buttons would play when it says Pause. Beside
+    // a chosen app, always what plays now (its pane remembers the music app by it).
+    val lastActive = remember(mediaApp) { arrayOf(now) }
     if (now.isActive) lastActive[0] = now
-    val shownNow = if (now.isActive) now else lastActive[0]
+    val holding = sideApp == null && musicShown && !musicOn
+    val shownNow = if (holding && !now.isActive && lastActive[0].isActive) lastActive[0] else now
     val splitScreen = panel != SidePanel.NONE && (sideApp != null || musicShown)
     // The music beside the map at the size chosen for it (Small, Medium, Large): an app's own screen
     // there keeps its size.
