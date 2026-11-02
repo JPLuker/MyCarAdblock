@@ -913,8 +913,12 @@ Tutti i token in un solo posto, `car/design/`:
   fotogramma in più e in un effetto, fuori dall'applicazione dei cambi, le toglie il fuoco; la Home
   toglie il fuoco alle view (`View.dropInteropFocus`, mai ai controlli di Compose) quando esce dallo
   schermo e quando una pagina entra in modifica (il browser di una parte resta composto, ma la
-  modifica può toglierlo). Ogni nuova view focalizzabile (WebView) dentro le pagine del pager va
-  tolta allo stesso modo. Plancia accanto alla mappa e a tutto schermo non cadono (provato).
+  modifica può toglierlo). Plancia accanto alla mappa (`CarHomeScreen`, `planciaShown`): pannello e
+  colonna restano un fotogramma dopo lo scorrimento, la griglia, Close o il brano nel dock (trovato
+  dalla revisione: lo stesso schema, non coperto). Le pagine cambiate dal telefono mentre la Home è in
+  vista arrivano un fotogramma dopo solo se una view dentro ha il fuoco (`afterFocusLeaves`). Ogni
+  nuova view focalizzabile (WebView) dentro le pagine del pager va tolta allo stesso modo. Plancia a
+  tutto schermo è fuori dal pager. Scatto `crash-webfocus-side`.
 - **Caricamento dei modelli della voce** (0.7.0, `SpeechEngine`): uno alla volta (al microfono il
   finale dopo Kroko, non insieme), mai dopo la fine del viaggio (`generation`: `unload()` fa scadere i
   caricamenti in attesa), e prima del primo comando (`warm`) il finale solo se resta memoria
