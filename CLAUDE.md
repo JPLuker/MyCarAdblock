@@ -286,6 +286,22 @@ Tutti i token in un solo posto, `car/design/`:
   diventa l'app musicale solo se non ne suona già un'altra. Il pannello di un'app esiste solo
   mentre la Home è visibile: un'app aperta a tutto schermo usa lo stesso collegamento.
   Anteprima: `--es sidePane <pacchetto>`, cartelle `split-plancia/`, `split-xonos/`.
+  **Dimensione del lettore** (0.6.8, richiesta dell'utente; chiave `car_player_size`, "Size of the player
+  beside the map" in auto e sul telefono): Piccola (com'era), Media 1,1, Grande 1,2. Il lato accanto alla
+  mappa ha la densità moltiplicata per quel valore e prende `MAP_SHARE`(3,1)/dimensione − 1 parti di mappa
+  (`CarHomeScreen`); solo per la musica (lettore, testo): un'app con template o Plancia resta com'è.
+  Anteprima `--es playerSize 1.1|1.2`, cartelle `split-medium/`, `split-large/`, `split-large-800x480/`.
+  Una scelta nuova per "Accanto alla mappa" riapre la colonna chiusa con la X (`showSidePane`); la X del
+  testo riporta il lettore (`showSideControls`).
+- **App nascoste** (0.6.8, richiesta dell'utente: "nascondere app dal menu"; `car/HiddenApps.kt`, chiave
+  `car_hidden_apps`): nel menu di un'app (tenerla premuta, griglia o dock) "Hide from the app grid" /
+  "Show on the app grid"; tornano da Impostazioni dell'auto > "Hidden apps" (con Show) o dal telefono
+  (Schermo dell'auto > "Apps on the car's app grid", elenco a spunte, `ui/CarGridSettings.kt`). Gli id
+  sono quelli delle icone fissate (`componentId`) e valgono anche per il gemello Plancia/Xonos
+  (`hiddenAsShown`). Settings non si nasconde (`canHide`). Escono solo dalla griglia: fissata nel dock
+  un'app resta lì, la voce la apre ancora; spostare un'app salva l'ordine intero, così una nascosta tiene
+  il suo posto. Anteprima: tocchi "x,y,long" (900 ms), `--es hideApps`, `--ez hiddenApps true`, cartelle
+  `grid-hide/`, `hidden-apps/`, `hidden-apps-none/`.
 - **Pagine accanto alla mappa** (`HomePager.kt`, `HomePages.kt`, `HomeWidgets.kt`, chiave
   `car_home_pages`): la Home è una fila di pagine; quella della mappa (mappa + musica o app scelta,
   invariata) e quelle del guidatore ai suoi lati, ognuna in un **formato** (`PageLayout`, disegni e
@@ -469,6 +485,14 @@ Tutti i token in un solo posto, `car/design/`:
   WebView può essere rifiutato (YouTube Music senza account); Apple Music, Amazon Music, TIDAL e Qobuz
   vogliono un abbonamento; restrizioni per paese; i popup (`window.open`) non hanno una gestione loro.
   Non provato: con un account, l'audio verso l'auto, gli appunti sul telefono vero, in auto.
+  0.6.8, "Nascondi l'app %s del telefono" (richiesta dell'utente: "così non ci saranno due Spotify"): ogni
+  servizio ha `appPackage` (Spotify `com.spotify.music`, …); con il servizio acceso e l'app installata, una
+  spunta nella sua sezione (chiave `web_music_hide_app`, nessuna di predefinito). Spuntata, l'app del
+  telefono non c'è nella griglia né negli elenchi "Accanto alla mappa" (`WebMusic.replacing`,
+  `rememberReplacedByWeb`), e le sue icone fissate, la scelta accanto alla mappa e l'ultima musica passano
+  al servizio web (`pinShown` → `withWebMusicInside`, `CarServices.webFor`); se a inizio viaggio suona
+  l'app del telefono, va in pausa e suona il servizio web. Dopo l'accesso sul telefono, tornati sul lettore
+  del servizio (accesso su un altro sito), la barra ha "Done".
   0.6.7: l'accesso a Spotify sul telefono era nero (vedi "WebView dentro Compose"); Incolla chiudeva la
   tastiera perché la schermata trasparente degli appunti toglie il fuoco alla pagina dell'auto e il campo
   mandava `focusout`: ora il campo lasciato si dice dopo 250 ms e solo se nessun campo è attivo
