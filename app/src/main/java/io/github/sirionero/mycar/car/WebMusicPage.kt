@@ -125,6 +125,8 @@ internal class WebMusicPage(
     private val hosts = mutableListOf<FrameLayout>()
     private var loaded = false
     private var viewport = 0
+    /** The room for myCar's Back last given to the page, in its CSS pixels (see [fit]). */
+    private var backRoom = 0
     private var widthScript: ScriptHandler? = null
     private var probed = false
     private var pressedPlay = false
@@ -411,14 +413,18 @@ internal class WebMusicPage(
     private fun fit(widthPx: Int) {
         val w = web ?: return
         val css = maxOf((widthPx / density / CarSettings.scale.value).roundToInt(), MIN_WIDTH)
-        if (css != viewport) {
+        // The room for myCar's Back in the page's pixels (--mycar-back in the services' CSS).
+        val back = webBackRoomCss(density * CarSettings.scale.value, css, widthPx)
+        if (css != viewport || back != backRoom) {
             viewport = css
+            backRoom = back
+            val room = "document.documentElement && document.documentElement.style.setProperty('--mycar-back', '${back}px');"
             // For the pages to come, from their start; for this one, now.
             runCatching {
                 widthScript?.remove()
-                widthScript = WebViewCompat.addDocumentStartJavaScript(w, "window.__mycarMusicWidth = $css;", service.origins.toSet())
+                widthScript = WebViewCompat.addDocumentStartJavaScript(w, "window.__mycarMusicWidth = $css; $room", service.origins.toSet())
             }
-            w.evaluateJavascript("window.__mycarMusicViewport && window.__mycarMusicViewport($css);", null)
+            w.evaluateJavascript("window.__mycarMusicViewport && window.__mycarMusicViewport($css); $room", null)
         }
         if (!loaded) {
             loaded = true
