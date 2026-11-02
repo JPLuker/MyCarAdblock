@@ -132,14 +132,13 @@ internal fun CinemaTvSection() {
     val states by TvLists.states.collectAsState()
     var name by rememberSaveable { mutableStateOf("") }
     var address by rememberSaveable { mutableStateOf("") }
-    // Only for lists at home, as for Cinema's sites.
-    val askLocalNetwork = rememberLocalNetworkAsk(io.github.sirionero.mycar.LocalNetwork::blocks)
+    val askLocalNetwork = rememberLocalNetworkAsk()
 
     SettingsSection(
         stringResource(R.string.settings_cinema_tv_title),
         footer = stringResource(R.string.settings_cinema_tv_footer),
     ) {
-        LocalNetworkRow(lists.map { it.url }, io.github.sirionero.mycar.LocalNetwork::blocks)
+        LocalNetworkRow(lists.map { it.url })
         // A list's address is long and often holds the provider's user and password: asked first.
         var removeAsk by remember { mutableStateOf<TvList?>(null) }
         removeAsk?.let { list ->

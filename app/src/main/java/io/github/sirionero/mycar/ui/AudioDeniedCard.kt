@@ -13,6 +13,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -33,7 +34,10 @@ internal fun AudioDeniedCard() {
     val capture by CarAudio.capture.collectAsStateWithLifecycle()
     val pipe by CarSettings.pipeAudio.collectAsStateWithLifecycle()
     val blocked by CarAudio.micBlocked.collectAsStateWithLifecycle()
-    if (!pipe || blocked || capture != CarAudio.Capture.DENIED || CarAudio.consentWaits()) return
+    // Read again when the car's music changes: Xonos as the music needs no question.
+    val music by io.github.sirionero.mycar.car.CarServices.mediaApp.collectAsStateWithLifecycle()
+    val waits = remember(music, capture) { CarAudio.consentWaits() }
+    if (!pipe || blocked || capture != CarAudio.Capture.DENIED || waits) return
     // The yellow of the Bluetooth card: music is missing, nothing is broken.
     val dark = phoneDark()
     val container = if (dark) Color(0xFF4A3B00) else Color(0xFFFFE08A)

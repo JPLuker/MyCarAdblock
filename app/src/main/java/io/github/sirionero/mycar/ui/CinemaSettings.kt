@@ -53,9 +53,9 @@ internal fun CinemaSection() {
     var resetAsk by remember { mutableStateOf(false) }
     var name by rememberSaveable { mutableStateOf("") }
     var address by rememberSaveable { mutableStateOf("") }
-    // Only for addresses at home: YouTube, RaiPlay and Twitch had the warning and the question too.
-    // A home site behind a public-looking name is told in the car, where it doesn't load.
-    val askLocalNetwork = rememberLocalNetworkAsk(io.github.sirionero.mycar.LocalNetwork::blocks)
+    // Not for the suggested sites (YouTube, RaiPlay, Twitch and "More sites"), which had the warning
+    // and the question too: the driver's own sites may be at home whatever their names look like.
+    val askLocalNetwork = rememberLocalNetworkAsk(::ownSitesMayBlock)
 
     SettingsSection(
         "Cinema",
@@ -63,7 +63,7 @@ internal fun CinemaSection() {
     ) {
         // A site at home (Jellyfin, the router) needs the home network, which Android 17 keeps
         // myCar off until it's allowed.
-        LocalNetworkRow(sites.map { it.url }, io.github.sirionero.mycar.LocalNetwork::blocks)
+        LocalNetworkRow(sites.map { it.url }, ::ownSitesMayBlock)
         SettingsRow(
             stringResource(R.string.settings_cinema_parked_only),
             Modifier.toggleable(parkedOnly, role = Role.Switch) { on ->
@@ -208,3 +208,10 @@ private fun SiteRow(site: CinemaSite) {
         },
     )
 }
+
+/** The home network rule (LocalNetwork.mayBlock) for the sites the driver added, not the suggested ones. */
+private fun ownSitesMayBlock(context: android.content.Context, urls: List<String>): Boolean =
+    io.github.sirionero.mycar.LocalNetwork.mayBlock(
+        context,
+        urls.filter { url -> (io.github.sirionero.mycar.cinema.Cinema.SUGGESTED + io.github.sirionero.mycar.cinema.Cinema.MORE).none { it.url == url } },
+    )
