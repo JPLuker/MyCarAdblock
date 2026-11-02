@@ -39,8 +39,8 @@ behind it all — still or moving.
 |---|---|
 | ![The app grid over the moving Waves wallpaper, with the dock down the left](docs/screenshots/launcher.png) | ![An incoming call on the car screen, with Decline and Answer](docs/screenshots/call.png) |
 | Your car apps in one place, over a moving wallpaper. | Answer or decline a call from the car. |
-| ![The wallpaper picker: seven still wallpapers and four moving ones](docs/screenshots/wallpapers.png) | ![The car settings: open on connect, what sits beside the map, and size](docs/screenshots/settings.png) |
-| Still or moving wallpapers, all drawn by myCar. | What sits beside the map, and the size, in the car's settings. |
+| ![The wallpaper picker: seven still wallpapers and four moving ones](docs/screenshots/wallpapers.png) | ![The car settings: open on connect, what sits beside the map, and the size of the player beside it](docs/screenshots/settings.png) |
+| Still or moving wallpapers, all drawn by myCar. | What sits beside the map, and the player's size, in the car's settings. |
 
 ## Features
 
