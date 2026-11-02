@@ -12,6 +12,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONArray
 import org.json.JSONObject
@@ -73,7 +74,8 @@ fun NowPlaying.lyricsSong(xonosInside: Boolean) = SongInfo(
  * of another song, or times off by a different recording, are worse than none.
  *
  * A lookup sends the song's title, artist and length to lrclib.net: only while the lyrics are on
- * screen. Never in the background.
+ * screen, and the next song in the queue while they're on screen (LyricsAhead). Never in the
+ * background otherwise.
  *
  * Answers are kept in memory for the process and on disk under the cache directory: lyrics and
  * "instrumental" for good, "none" for [NONE_KEPT_MS] (LRCLIB grows). A lookup that couldn't reach
@@ -98,7 +100,7 @@ object Lyrics {
 
     private val answers = lru<LyricsAnswer>(200)
 
-    /** LRCLIB's entries for a question, read already: another lookup asking the same costs nothing. Small: they carry the lyrics. */
+    /** LRCLIB's entries for a question, read already: the next song's search (warm) costs nothing when it starts. Small: they carry the lyrics. */
     private val asked = lru<List<LyricsMatch.Hit>>(16)
 
     /** One lookup per song at a time, the panel's and the one ahead alike; it goes on if its asker leaves, into the cache. */
@@ -124,6 +126,23 @@ object Lyrics {
 
     /** The answer already known for [song], without asking anybody; null when there's none yet. */
     fun known(song: SongInfo): LyricsAnswer? = synchronized(answers) { answers[song.key] }
+
+    /**
+     * The song after this one, looked up ahead with the one question that doesn't need its length
+     * (LRCLIB's search by title and artist): when it starts, its lookup finds the entries here.
+     */
+    suspend fun warm(title: String, subtitle: String) {
+        // A queue's subtitle is often "Artist • Album".
+        val artist = subtitle.split(" • ", " · ", " — ").first()
+        val q = LyricsMatch.query(title, artist, "", 0) ?: return
+        if (q.main.isEmpty() || LyricsMatch.instrumentalByTitle(q)) return
+        val ask = Ask.Search(q.title, q.main)
+        val url = urlOf(ask)
+        if (synchronized(asked) { asked[url] } != null) return
+        withContext(Dispatchers.IO) {
+            runCatching { hitsOf(ask, fetch(url)) }.onSuccess { hits -> synchronized(asked) { asked[url] = hits } }
+        }
+    }
 
     private suspend fun lookUp(context: Context, song: SongInfo, query: LyricsMatch.SongQuery?, key: String): Result<LyricsAnswer> {
         readDisk(context, key)?.let { remember(key, it); return Result.success(it) }

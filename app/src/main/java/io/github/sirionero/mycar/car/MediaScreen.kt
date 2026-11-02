@@ -71,6 +71,7 @@ import io.github.sirionero.mycar.media.MediaArt
 import io.github.sirionero.mycar.media.LyricsResult
 import io.github.sirionero.mycar.media.Lyrics
 import io.github.sirionero.mycar.media.LyricsAnswer
+import io.github.sirionero.mycar.media.LyricsAhead
 import io.github.sirionero.mycar.media.lyricsSong
 import io.github.sirionero.mycar.xonos.Xonos
 import io.github.sirionero.mycar.media.MediaEntry
@@ -439,6 +440,8 @@ internal fun LyricsPanel(
     val inside = app?.component?.let(Xonos::isInside) == true
     // The song by the track's own tags (not a displayed "Artist • Album"): one key per song.
     val song = remember(now.trackTitle, now.title, now.trackArtist, now.artist, now.album, now.durationMs, now.mediaId, inside) { now.lyricsSong(inside) }
+    // While they're on screen, the next song in the queue too: its lyrics show at once when it starts.
+    LaunchedEffect(song.key) { LyricsAhead.warmNext(CarServices.media) }
     // Asked again with Try again, after a lookup that couldn't reach lrclib.net.
     var attempt by remember { mutableIntStateOf(0) }
     val lyrics by produceState<LyricsState>(LyricsState.Loading, song.key, attempt) {
