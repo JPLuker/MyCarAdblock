@@ -201,8 +201,8 @@ internal fun closeApp(slot: RunningSlot, navigator: CarNavigator) {
 
 /**
  * What a long press on an app offers - pin it to or unpin it from the nav bar, move it along the
- * launcher, hide it from the launcher or put it back, and close it if it's open - as a card in the middle of the screen with car-sized buttons, over a scrim that
- * dismisses it. Drawn in the car UI's own layout rather than a system popup window, which the
+ * launcher, hide it from the launcher or put it back, and close it if it's open - as a card in the
+ * middle of the screen with car-sized buttons, over a scrim that dismisses it. Drawn in the car UI's own layout rather than a system popup window, which the
  * car's virtual display has no reason to host well.
  */
 @Composable
