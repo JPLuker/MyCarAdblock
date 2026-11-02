@@ -5,6 +5,8 @@ import io.github.sirionero.mycar.BuildConfig
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.media.LyricsMatch.Ask
 import io.github.sirionero.mycar.xonos.Xonos
+import io.github.sirionero.mycar.xonos.data.MaException
+import io.github.sirionero.mycar.xonos.data.Problem
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -148,17 +150,27 @@ object Lyrics {
         readDisk(context, key)?.let { remember(key, it); return Result.success(it) }
         // "(Instrumental)" in the title: no words, nobody to ask.
         if (query != null && LyricsMatch.instrumentalByTitle(query)) return Result.success(LyricsAnswer.Instrumental).also { remember(key, LyricsAnswer.Instrumental) }
+        // Music Assistant that didn't answer (reconnecting, too slow) is asked again next time.
+        var maAnswered = true
         if (song.maUri.isNotEmpty()) {
-            fromMusicAssistant(song.maUri)?.let {
-                keep(context, key, it)
-                log("Music Assistant", song)
-                return Result.success(it)
+            when (val ma = fromMusicAssistant(song.maUri)) {
+                is FromMa.Got -> {
+                    keep(context, key, ma.answer)
+                    log("Music Assistant", song)
+                    return Result.success(ma.answer)
+                }
+                FromMa.Empty -> Unit
+                FromMa.Unanswered -> maAnswered = false
             }
         }
         if (query == null) return Result.success(LyricsAnswer.None)
         return runCatching { lrclib(query) }
             .onSuccess { trace ->
-                keep(context, key, trace.answer)
+                // Without Music Assistant's word LRCLIB's answer isn't kept: on disk it came before
+                // Music Assistant for good (lyrics) or a week ("none"), the track's own tags unseen.
+                // Lyrics it found stay in memory for this run.
+                if (maAnswered) keep(context, key, trace.answer)
+                else if (trace.answer is LyricsAnswer.Found) remember(key, trace.answer)
                 log("LRCLIB, question ${trace.askIndex + 1}, ${trace.requests} requests", song, trace.answer)
             }
             .onFailure { MyCarLog.w("lyrics: LRCLIB couldn't be asked: ${it.message}") }
@@ -178,20 +190,34 @@ object Lyrics {
 
     // --- Music Assistant --------------------------------------------------------------------------
 
-    private suspend fun fromMusicAssistant(uri: String): LyricsAnswer? {
-        val lyrics = withTimeoutOrNull(MA_WAIT_MS) {
-            try {
-                Xonos.library.lyrics(uri, MA_WAIT_MS - 1_000)
-            } catch (e: Exception) {
-                // The wait over, or the lookup's asker gone: not something Music Assistant said.
-                if (e is CancellationException) throw e
-                MyCarLog.w("lyrics: Music Assistant didn't answer: ${e.message}")
-                null
-            }
-        } ?: return null
-        val lines = lyrics.lines.map { LyricLine(it.timeMs, it.text) }
-        return if (lines.isEmpty()) null else LyricsAnswer.Found(LyricsResult(lines, lyrics.synced), fromMusicAssistant = true)
+    /** What Music Assistant said of a track's lyrics. */
+    private sealed interface FromMa {
+        class Got(val answer: LyricsAnswer) : FromMa
+
+        /** It answered: no lyrics, or it turned the question down. */
+        data object Empty : FromMa
+
+        /** No answer: not connected (reconnecting), the connection lost, or too slow. */
+        data object Unanswered : FromMa
     }
+
+    private suspend fun fromMusicAssistant(uri: String): FromMa = withTimeoutOrNull(MA_WAIT_MS) {
+        try {
+            val lyrics = Xonos.library.lyrics(uri, MA_WAIT_MS - 1_000)
+            val lines = lyrics?.lines.orEmpty().map { LyricLine(it.timeMs, it.text) }
+            if (lyrics == null || lines.isEmpty()) FromMa.Empty
+            else FromMa.Got(LyricsAnswer.Found(LyricsResult(lines, lyrics.synced), fromMusicAssistant = true))
+        } catch (e: Exception) {
+            // The wait over, or the lookup's asker gone: not something Music Assistant said.
+            if (e is CancellationException) throw e
+            MyCarLog.w("lyrics: Music Assistant didn't answer: ${e.message}")
+            // A refusal is its answer (an old Music Assistant, no permission); anything else is none.
+            if (e is MaException && e.problem !in UNREACHED) FromMa.Empty else FromMa.Unanswered
+        }
+    } ?: FromMa.Unanswered
+
+    /** Music Assistant's errors that mean it wasn't reached, not that it said no. */
+    private val UNREACHED = setOf(Problem.NOT_CONNECTED, Problem.LOST, Problem.NO_ANSWER, Problem.NETWORK)
 
     // --- LRCLIB -----------------------------------------------------------------------------------
 
@@ -233,6 +259,10 @@ object Lyrics {
             val hits = (if (cached) synchronized(asked) { asked[url] } else null) ?: try {
                 requests++
                 hitsOf(ask, fetch(url)).also { if (cached) synchronized(asked) { asked[url] = it } }
+            } catch (e: Busy) {
+                // It asked to slow down: no more questions this time.
+                failure = e
+                break
             } catch (e: IOException) {
                 failure = e
                 continue
@@ -264,9 +294,13 @@ object Lyrics {
         is Ask.Words -> API + "search?q=" + enc(ask.q)
     }
 
+    /** LRCLIB asked to slow down (429, 503): the lookup stops asking. */
+    private class Busy(message: String) : IOException(message)
+
     /**
      * LRCLIB's answer; "" when it has nothing (404) or won't take the question (400). Throws when it
-     * can't be asked: no network, or still busy (503 with Retry-After) after one more try.
+     * can't be asked: no network, or still busy (503 with Retry-After) after one more try - at once
+     * if it asks for more than a few seconds ([Busy]).
      */
     private fun fetch(url: String): String {
         for (attempt in 0..1) {
@@ -282,9 +316,9 @@ object Lyrics {
                     200 -> return connection.inputStream.bufferedReader().readText()
                     400, 404 -> return ""
                     429, 503 -> {
-                        if (attempt == 1) throw IOException("LRCLIB is busy ($code)")
                         val wait = connection.getHeaderField("Retry-After")?.trim()?.toLongOrNull() ?: 1
-                        Thread.sleep(wait.coerceIn(1, 3) * 1000)
+                        if (attempt == 1 || wait > 3) throw Busy("LRCLIB is busy ($code)")
+                        Thread.sleep(wait.coerceAtLeast(1) * 1000)
                     }
                     else -> throw IOException("LRCLIB answered $code")
                 }
@@ -292,7 +326,7 @@ object Lyrics {
                 connection.disconnect()
             }
         }
-        throw IOException("LRCLIB is busy")
+        throw Busy("LRCLIB is busy")
     }
 
     private fun hitsOf(ask: Ask, body: String): List<LyricsMatch.Hit> = runCatching {
