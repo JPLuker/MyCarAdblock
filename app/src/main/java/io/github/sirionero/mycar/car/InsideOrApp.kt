@@ -48,7 +48,9 @@ internal object InsideOrApp {
         Xonos.appTakesOver.value = false
         val app = context.applicationContext
         Xonos.refresh(app)
-        val plancia = TakeOver()
+        // Home Assistant tries the home address first, then the one away from home: a drive that
+        // starts away from home took 10-12 s, and the Plancia app took its place. As for Xonos.
+        val plancia = TakeOver(startGraceMs = 20_000)
         // Xonos tries its home address first, for up to 8 s, then the one away from home: a drive
         // that starts away from home took longer than 10 s to connect, and the Xonos app took its
         // place for the whole drive.
@@ -133,7 +135,10 @@ internal object InsideOrApp {
     private fun online(context: Context): Boolean {
         val manager = context.getSystemService(ConnectivityManager::class.java) ?: return false
         val caps = runCatching { manager.getNetworkCapabilities(manager.activeNetwork) }.getOrNull() ?: return false
+        // Not a mobile network suspended in a tunnel: it stays validated, and a tunnel of over a
+        // minute handed Plancia and Xonos to their apps for the rest of the drive.
         return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+            caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED) &&
             (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) || caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN))
     }
 
