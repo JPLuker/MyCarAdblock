@@ -60,6 +60,19 @@ class LyricsWrongSongTest {
     }
 
     @Test
+    fun `a live take of a sister song is not this song`() {
+        assertNull(LyricsMatch.fit(q("Sgt. Pepper's Lonely Hearts Club Band (Reprise)", "The Beatles", 79), hit("Sgt. Pepper's Lonely Hearts Club Band (Live)", "The Beatles", 150.0)))
+        assertNull(LyricsMatch.fit(q("Song (Part 1)", "Band", 200), hit("Song (Part 2) [Live]", "Band", 320.0)))
+        assertNull(LyricsMatch.fit(q("Bella ciao (Live)", "Banda", 180), hit("Bella ciao (Version française)", "Banda", 185.0)))
+        assertNull(LyricsMatch.fit(q("Despacito - Remix", "Luis Fonsi", 229), hit("Despacito (Live)", "Luis Fonsi", 282.0)))
+        // The same song live keeps its words at another length, without the times.
+        val live = LyricsMatch.fit(q("Song", "Band", 200), hit("Song (Live)", "Band", 260.0))
+        assertNotNull(live)
+        assertFalse(live!!.timed)
+        assertNotNull(LyricsMatch.fit(q("Bohemian Rhapsody - Live Aid", "Queen", 300), hit("Bohemian Rhapsody", "Queen", 354.0)))
+    }
+
+    @Test
     fun `instrumental by the title asks nobody, karaoke still gets the words`() {
         assertTrue(LyricsMatch.instrumentalByTitle(q("Brividi (Instrumental)", "Mahmood", 240)))
         assertFalse(LyricsMatch.instrumentalByTitle(q("Brividi (Karaoke Version)", "Mahmood", 240)))
