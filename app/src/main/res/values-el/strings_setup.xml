@@ -153,6 +153,11 @@
     <string name="intro_start">Έναρξη</string>
     <string name="intro_welcome_to">Καλώς ήρθατε στην έκδοση</string>
     <string name="intro_welcome_tag">alpha · με ούριο άνεμο</string>
+    <string name="intro_course">Εμείς επιλέγουμε τη ρότα μας.</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d σφάλμα βρέθηκε και διορθώθηκε από την 0.6</item>
+        <item quantity="other">%d σφάλματα βρέθηκαν και διορθώθηκαν από την 0.6</item>
+    </plurals>
     <string name="intro_music_title">Μουσική στο myCar.</string>
     <string name="intro_music_body">Το Spotify και άλλες υπηρεσίες παίζουν μέσα στο myCar, από το δικό τους πρόγραμμα αναπαραγωγής ιστού. Συνδεθείτε μία φορά στο τηλέφωνο με τον δικό σας λογαριασμό, στις Ρυθμίσεις > Μουσική. Εκεί αποκρύψτε την εφαρμογή Spotify του τηλεφώνου: ένα Spotify στο αυτοκίνητο, όχι δύο.</string>
     <string name="intro_mini_title">Ολόκληρος ο χάρτης.</string>

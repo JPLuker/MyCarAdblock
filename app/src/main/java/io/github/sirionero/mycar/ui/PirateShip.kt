@@ -110,6 +110,8 @@ internal fun PirateShip(key: Any, ink: Color, modifier: Modifier) {
                         drawWake(t, k, at.speed)
                     }
                     drawWater(t, Layer.FRONT, night)
+                    // Once it's in and its flag is up, the course it sets, ahead of the bow (see IntroCourse).
+                    drawCourse(t, v, k, at, night)
                     drawGlitter(t, behind = false, night)
                     // The sea fades into the page at the bottom and the sides.
                     drawRect(fade, blendMode = BlendMode.DstIn)
@@ -525,6 +527,56 @@ private fun DrawScope.drawWake(t: Float, k: Float, speed: Float) {
     }
 }
 
+/**
+ * The course the ship sets once it's in: gold dots on the water from past its bowsprit to a star near
+ * the right edge, drawn out from the bow, riding the swell. In pixels.
+ */
+private fun DrawScope.drawCourse(t: Float, v: Float, k: Float, at: Placement, night: Boolean) {
+    val p = ((v - COURSE_AT) / COURSE_S).coerceIn(0f, 1f)
+    if (p <= 0f) return
+    val w = size.width
+    val h = size.height
+    // From the water under the bow, on to near the right edge.
+    val from = at.x + 34f * k
+    val to = w * 0.955f
+    if (to - from < 8f * k) return
+    val gold = if (night) Color(0xFFFFE08A) else Color(0xFFFFC23D)
+    val reach = COURSE.transform(p)
+    val step = 5.2f * k
+    val count = ((to - from) / step).toInt().coerceAtLeast(1)
+    // On the water ahead of the ship, a little toward us: bowing down and back up over the way.
+    fun spot(x: Float): Offset {
+        val u = (x - from) / (to - from)
+        return Offset(x, crest(Layer.MID, x, t) + h * 0.025f + h * 0.025f * sin(PI.toFloat() * u))
+    }
+    for (i in 0..count) {
+        val u = i / count.toFloat()
+        // Each dot grows in as the course reaches it.
+        val grown = ((reach - u) * count / 2f).coerceIn(0f, 1f)
+        if (grown <= 0f) break
+        val c = spot(from + (to - from) * u)
+        drawCircle(Color(0x66041A33), radius = k * 1.55f * grown, center = c + Offset(0f, k * 0.35f))
+        drawCircle(gold.copy(alpha = grown), radius = k * 1.25f * (0.4f + 0.6f * grown), center = c)
+    }
+    // The star where it leads, twinkling once it's there.
+    val star = ((p - 0.85f) / 0.15f).coerceIn(0f, 1f)
+    if (star > 0f) {
+        val c = spot(to)
+        val r = k * 5f * star * (1f + 0.15f * sin(TWO_PI * t / 1.5f))
+        val path = Path().apply {
+            for (j in 0 until 8) {
+                val a = j * PI.toFloat() / 4f - PI.toFloat() / 2f
+                val rr = if (j % 2 == 0) r else r * 0.34f
+                val x = c.x + cos(a) * rr
+                val y = c.y + sin(a) * rr
+                if (j == 0) moveTo(x, y) else lineTo(x, y)
+            }
+            close()
+        }
+        drawPath(path, gold.copy(alpha = star))
+    }
+}
+
 /** The Jolly Roger at the main masthead, in pixels: run up from the crow's nest, then flying. */
 private fun DrawScope.drawFlag(t: Float, k: Float, hoist: Float, face: ImageBitmap, strips: Int, shades: List<ColorFilter>) {
     val left = (MAIN_X + 0.75f) * k
@@ -571,6 +623,9 @@ private const val VOYAGE_S = 5f
 private const val ARRIVE_S = 2.6f
 private const val HOIST_AT = 2.1f
 private const val HOIST_S = 1.4f
+/** The course on the water: drawn out from the bow once the flag is nearly up, in seconds of the voyage. */
+private const val COURSE_AT = 3.25f
+private const val COURSE_S = 1.3f
 /** A unit of the ship, as a part of the scene's width. */
 private const val SCALE = 0.0074f
 private const val SHIP_X = 0.45f
@@ -585,4 +640,5 @@ private const val MIZZEN_X = -20f
 private const val MIZZEN_TOP = -46f
 
 private val ARRIVE = CubicBezierEasing(0.16f, 0.84f, 0.3f, 1f)
+private val COURSE = CubicBezierEasing(0.3f, 0f, 0.2f, 1f)
 private val HOIST = CubicBezierEasing(0.25f, 0.9f, 0.3f, 1f)

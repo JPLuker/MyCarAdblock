@@ -28,6 +28,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -63,6 +66,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -103,6 +107,12 @@ object Intro {
     private const val KEY_SEEN = "seen_release"
     private const val KEY_STEP = "step"
     private const val KEY_STEP_RELEASE = "step_release"
+
+    /**
+     * Bugs found and fixed from the release before to this one (0.6.0 to 0.7.0), said on the welcome
+     * page: counted commit by commit, a doubtful one as a feature (the list is in the release notes).
+     */
+    const val BUGS_FIXED = 0
 
     /** "0.3" from "0.3.00-alpha": the intro belongs to a release, not to each patch. */
     val release: String = BuildConfig.VERSION_NAME.split('.').take(2).joinToString(".")
@@ -292,9 +302,17 @@ private fun Welcome(c: IntroColors, cq: (Float) -> Dp, cqSp: (Float) -> TextUnit
         // mast (see PirateShip), where the flag alone flew at the top before. As big as the phone
         // leaves room for above the welcome.
         val shipHeight = minOf(cq(74f), height * 0.5f)
-        PirateShip(key, c.onSurface, Modifier.align(Alignment.TopCenter).size(width = shipHeight / 0.74f, height = shipHeight))
+        // The words take the room they need at the foot; the ship what's left above them, up to its size:
+        // on a short phone it comes smaller instead of under the words.
+        Column(Modifier.fillMaxSize()) {
+        Box(Modifier.weight(1f).fillMaxWidth()) {
+            PirateShip(
+                key, c.onSurface,
+                Modifier.align(Alignment.TopCenter).heightIn(max = shipHeight).fillMaxHeight().aspectRatio(1f / 0.74f, matchHeightConstraintsFirst = true),
+            )
+        }
 
-        Column(Modifier.align(Alignment.BottomStart).padding(horizontal = cq(8f)).padding(bottom = height * 0.06f)) {
+        Column(Modifier.padding(horizontal = cq(8f)).padding(bottom = height * 0.06f)) {
             Text(stringResource(R.string.intro_welcome_to), color = c.onVariant, style = TextStyle(fontSize = cqSp(4.2f), fontWeight = FontWeight.SemiBold),
                 modifier = Modifier.up(entrance(key, 100), cq(7f)))
             Text(
@@ -308,6 +326,14 @@ private fun Welcome(c: IntroColors, cq: (Float) -> Dp, cqSp: (Float) -> TextUnit
                 modifier = Modifier.padding(top = cq(4f)).up(entrance(key, 700), cq(7f))
                     .clip(RoundedCornerShape(50)).background(c.tertiaryC).padding(horizontal = cq(4.4f), vertical = cq(2.2f)),
             )
+            // Once the ship is in: the motto by a compass, and the bugs fixed since the release before.
+            WelcomeCourse(
+                key, stringResource(R.string.intro_course),
+                Intro.BUGS_FIXED.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.intro_bugs_fixed, it, it) },
+                accent = c.primary, ink = c.onSurface, quiet = c.onVariant, cq = cq, cqSp = cqSp,
+                modifier = Modifier.padding(top = cq(4.5f)),
+            )
+        }
         }
 
         // Thrown from behind the version number, under the ship.

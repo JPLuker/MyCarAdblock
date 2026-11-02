@@ -149,6 +149,10 @@
     <string name="intro_start">开始</string>
     <string name="intro_welcome_to">欢迎来到</string>
     <string name="intro_welcome_tag">alpha · 一帆风顺</string>
+    <string name="intro_course">航向由我们自己决定。</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="other">自 0.6 以来发现并修复了 %d 个问题</item>
+    </plurals>
     <string name="intro_music_title">音乐，内置。</string>
     <string name="intro_music_body">Spotify 和其他服务通过各自的网页播放器在 myCar 中播放。用你自己的账号在手机上登录一次：设置 > 音乐。在那里隐藏手机上的 Spotify 应用：车上只有一个 Spotify，而不是两个。</string>
     <string name="intro_mini_title">整张地图。</string>

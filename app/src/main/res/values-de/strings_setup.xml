@@ -153,6 +153,11 @@
     <string name="intro_start">Loslegen</string>
     <string name="intro_welcome_to">Willkommen bei</string>
     <string name="intro_welcome_tag">alpha · in ruhigem Fahrwasser</string>
+    <string name="intro_course">Unseren Kurs bestimmen wir selbst.</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d Fehler seit 0.6 gefunden und behoben</item>
+        <item quantity="other">%d Fehler seit 0.6 gefunden und behoben</item>
+    </plurals>
     <string name="intro_music_title">Musik inklusive.</string>
     <string name="intro_music_body">Spotify und andere Dienste spielen in myCar, über ihren eigenen Web-Player. Melde dich einmal auf dem Telefon mit deinem eigenen Konto an, unter Einstellungen > Musik. Blende dort die App „Spotify“ des Telefons aus: ein Spotify im Auto, nicht zwei.</string>
     <string name="intro_mini_title">Die ganze Karte.</string>

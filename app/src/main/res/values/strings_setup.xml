@@ -212,6 +212,13 @@
     <string name="intro_welcome_to">Welcome to</string>
     <!-- A small tag under the release number (0.7), on one line; "alpha" is the release's stage. "Smooth sailing": steady and complete, said with the ship sailing in above it - an idiom of your language about sailing is welcome -->
     <string name="intro_welcome_tag">alpha · smooth sailing</string>
+    <!-- Under the release number, once the ship is in and its flag is up: the motto, by a compass whose needle settles. Said by the whole crew; an idiom of your language about setting a course or a route is welcome -->
+    <string name="intro_course">We chart our own course.</string>
+    <!-- Under the motto: how many bugs were found and fixed from 0.6 to this release -->
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d bug found and fixed since 0.6</item>
+        <item quantity="other">%d bugs found and fixed since 0.6</item>
+    </plurals>
     <!-- Intro of 0.7: one page for each big change since 0.6. Page titles are short, in very big type: about ten letters fit on a line, so no long words (a no-break space keeps "built in" together). The music page: the services' names drift past under it -->
     <string name="intro_music_title">Music, built in.</string>
     <!-- "Settings > Music": the section in the phone's settings -->

@@ -161,6 +161,13 @@
     <string name="intro_start">Начать</string>
     <string name="intro_welcome_to">Добро пожаловать в</string>
     <string name="intro_welcome_tag">альфа · на всех парусах</string>
+    <string name="intro_course">Свой курс мы выбираем сами.</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d ошибка найдена и исправлена с версии 0.6</item>
+        <item quantity="few">%d ошибки найдены и исправлены с версии 0.6</item>
+        <item quantity="many">%d ошибок найдено и исправлено с версии 0.6</item>
+        <item quantity="other">%d ошибки найдено и исправлено с версии 0.6</item>
+    </plurals>
     <string name="intro_music_title">Музыка внутри.</string>
     <string name="intro_music_body">Spotify и другие сервисы играют внутри myCar через собственный веб-плеер. Войдите один раз на телефоне со своим аккаунтом, в разделе «Настройки > Музыка». Там же скройте приложение Spotify на телефоне: в автомобиле один Spotify, а не два.</string>
     <string name="intro_mini_title">Вся карта.</string>
