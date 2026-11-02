@@ -21,6 +21,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -45,17 +47,22 @@ import io.github.sirionero.mycar.call.CarCalls
 @Composable
 fun CarWhatsNew() {
     val release = Changelog.current ?: return
+    // Its switch turned off on the card itself: the card stays until Got it, the notes still read
+    // (it doesn't close the card, as below); it still waits for the car to stop.
+    var keepShown by remember { mutableStateOf(false) }
     val afterUpdates by CarSettings.whatsNewAfterUpdates.collectAsState()
     val seen by CarSettings.whatsNewSeen.collectAsState()
     val open by CarSettings.whatsNewOpen.collectAsState()
     // The car's own word that it moves, then the GPS (CarDriving, as for video): on the GPS alone,
     // with no fix yet, the card came up over the map with the car moving.
     val moving = !rememberVideoAllowed()
-    val due = afterUpdates && seen < release.versionCode && !moving
+    val due = (afterUpdates || keepShown) && seen < release.versionCode && !moving
     if (!open && !due) return
     // A ringing call first: the card and its scrim covered the call's Answer.
     if (CarCalls.state.collectAsState().value is CallUiState.Ringing) return
     val close = { CarSettings.closeWhatsNew(release.versionCode) }
+    // The car's Back closes it, as the scrim does, instead of the screen under it.
+    CardBackKey(CardBack::whatsNew) { close() }
 
     Box(
         Modifier
@@ -96,7 +103,10 @@ fun CarWhatsNew() {
                     }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    GsSwitch(afterUpdates, CarSettings::setWhatsNewAfterUpdates)
+                    GsSwitch(afterUpdates) { on ->
+                        if (!on && !open) keepShown = true
+                        CarSettings.setWhatsNewAfterUpdates(on)
+                    }
                     Text(
                         stringResource(R.string.car_whatsnew_show_after_updates),
                         style = MaterialTheme.typography.titleMedium,

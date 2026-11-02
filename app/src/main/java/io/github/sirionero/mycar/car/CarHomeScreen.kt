@@ -219,8 +219,7 @@ private const val MAP_START_GRACE_MS = 2_000L
 
 /**
  * Lyrics alone beside the map, big enough to read at a glance. No art: that space goes to a
- * larger title and artist instead. The player goes back to the nav bar meanwhile, whose dock
- * button swaps these back out for the controls.
+ * larger title and artist instead. Their X, like the dock's song, puts the player back.
  */
 @Composable
 private fun SideLyrics(now: NowPlaying, modifier: Modifier) {
@@ -241,7 +240,8 @@ private fun SideLyrics(now: NowPlaying, modifier: Modifier) {
                         maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
                 }
-                GsIconButton(Icons.Filled.Close, stringResource(R.string.car_home_hide_lyrics), navigator::closeSidePanel, size = 48.dp, iconSize = 24.dp)
+                // The lyrics go, the player comes back: before, the X took both away, pause and skip with them.
+                GsIconButton(Icons.Filled.Close, stringResource(R.string.car_home_hide_lyrics), navigator::showSideControls, size = 52.dp, iconSize = 24.dp)
             }
             Spacer(Modifier.height(12.dp))
             LyricsPanel(now, Modifier.weight(1f).fillMaxWidth(), lineStyle = MaterialTheme.typography.headlineSmall)

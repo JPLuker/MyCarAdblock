@@ -242,7 +242,8 @@ private fun MissingPermission(context: Context, onGranted: () -> Unit) {
 private fun DialerTab(label: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
     GsIconBox(
         onClick = onClick,
-        modifier = modifier.height(44.dp),
+        // As tall as the header's Back beside them: 44 dp was under what a finger hits on a bumpy road.
+        modifier = modifier.height(56.dp),
         colors = if (selected) GsColors(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer)
         else GsColors(MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.colorScheme.onSurface),
         shape = MaterialTheme.shapes.large,

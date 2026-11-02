@@ -1,6 +1,10 @@
 package io.github.sirionero.mycar.car
 
 
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.relocation.BringIntoViewRequester
 import io.github.sirionero.mycar.car.theme.*
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
@@ -344,11 +348,22 @@ private fun ExperimentalFeatureRow(
 }
 
 /** The URL (or raw HTML) the Browser app shows. Edited with [CarKeyboard] - no phone in hand needed. */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 private fun WebPageSetting() {
     val context = LocalContext.current
     var editing by remember { mutableStateOf(false) }
     var url by remember { mutableStateOf(AppSettings.startupUrl(context)) }
+    val keyboardInView = remember { BringIntoViewRequester() }
+    // The keyboard opens under the note: brought into sight, it could open below the screen's edge
+    // and the tap seemed to do nothing. The car's Back closes it, not Settings.
+    LaunchedEffect(editing) {
+        if (editing) {
+            withFrameNanos { }
+            keyboardInView.bringIntoView()
+        }
+    }
+    BackCloses(editing) { editing = false }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.car_settings_web_page), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
@@ -381,6 +396,7 @@ private fun WebPageSetting() {
                 },
                 onSubmit = { editing = false },
                 onDismiss = { editing = false },
+                modifier = Modifier.bringIntoViewRequester(keyboardInView),
             )
         }
     }

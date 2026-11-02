@@ -129,7 +129,7 @@ fun AssistantOverlay(modifier: Modifier = Modifier) {
             if (state.missingPermission) {
                 GsButton(tone = GsTone.Tonal, onClick = { openAppSettings(context) }) { Text(stringResource(R.string.assistant_grant)) }
             }
-            GsIconButton(Icons.Filled.Close, stringResource(R.string.assistant_dismiss), CarAssistant::cancel)
+            GsIconButton(Icons.Filled.Close, stringResource(R.string.assistant_dismiss), CarAssistant::cancel, size = 56.dp, iconSize = 28.dp)
         }
     }
 }

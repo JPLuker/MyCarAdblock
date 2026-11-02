@@ -88,6 +88,7 @@ import io.github.sirionero.mycar.car.theme.LocalGsTheme
 import io.github.sirionero.mycar.media.CarMedia
 import io.github.sirionero.mycar.media.MediaArt
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
@@ -98,6 +99,9 @@ import androidx.core.graphics.drawable.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.util.Date
@@ -197,6 +201,26 @@ fun CarUi() {
         }
     }
 
+    // A ringing call takes the screen and the car's sound: the assistant, or a message being read
+    // or answered, gives way, as the app menu does (NavApps). A reply already confirmed still goes.
+    LaunchedEffect(navigator) {
+        io.github.sirionero.mycar.call.CarCalls.state.map { it is io.github.sirionero.mycar.call.CallUiState.Ringing }
+            .distinctUntilChanged()
+            .collect { ringing ->
+                if (!ringing) return@collect
+                if (VoiceReply.active) {
+                    if (VoiceReply.state.value.phase == VoiceReply.Phase.CONFIRMING) VoiceReply.sendNow() else VoiceReply.cancel()
+                }
+                if (CarAssistant.state.value.phase != CarAssistant.Phase.IDLE) CarAssistant.cancel()
+            }
+    }
+
+    // A new choice for beside the map, in the car or on the phone, shows at once: after the
+    // player's X it waited for the dock's song, as if the setting did nothing.
+    LaunchedEffect(navigator) {
+        SidePaneChoice.current.drop(1).collect { navigator.showSidePane() }
+    }
+
     // A "play X" the music app played nothing for (Spotify ignores most): said here when the
     // player's screen isn't up to say it. On Home, "Looking for X on Spotify." was the last word.
     LaunchedEffect(navigator) {
@@ -217,12 +241,14 @@ fun CarUi() {
                 // What's open over the screens goes first: Back closed the screen under it and left
                 // the call question, the assistant or its help up.
                 CarKeys.ScreenKey.BACK -> when {
+                    CardBack.whatsNew != null -> CardBack.whatsNew?.invoke()
                     WebSelect.asked.value != null -> WebSelect.cancel()
                     navigator.appMenu != null -> navigator.dismissAppMenu()
                     VoiceReply.state.value.phase != VoiceReply.Phase.IDLE -> VoiceReply.cancel()
                     CallPrompt.pending.value != null -> CallPrompt.pending.value = null
                     VoiceHelp.shown.value -> VoiceHelp.hide()
                     CarAssistant.state.value.phase != CarAssistant.Phase.IDLE -> CarAssistant.cancel()
+                    CardBack.pair != null -> CardBack.pair?.invoke()
                     else -> navigator.back()
                 }
                 // Home is the dashboard, over the map, so Back from it lands on the map.
@@ -281,6 +307,13 @@ fun CarUi() {
                     )
                 }
                 val screen = navigator.current
+                // A call under way: its banner holds the top of the screen for the whole call, so the
+                // screens and a message's card move down under it instead of losing their Back, tabs
+                // and Stop to it. The map keeps the banner over it, as always.
+                val callActive = io.github.sirionero.mycar.call.CarCalls.state.collectAsState().value is io.github.sirionero.mycar.call.CallUiState.Active
+                var callBand by remember { mutableStateOf(0.dp) }
+                val callTop = if (callActive) callBand else 0.dp
+                val bandDensity = LocalDensity.current
                 // A page's dropdown belongs to the screen it was opened on.
                 LaunchedEffect(screen) { WebSelect.cancel() }
                 val safetyWarningSeen by CarSettings.hasSeenSafetyWarning.collectAsState()
@@ -311,6 +344,7 @@ fun CarUi() {
                             Box(
                                 Modifier
                                     .fillMaxSize()
+                                    .padding(top = callTop)
                                     .background(MaterialTheme.colorScheme.background)
                                     // Keeps touches that miss this screen's controls off the map.
                                     .pointerInput(Unit) { detectTapGestures { } }
@@ -356,11 +390,14 @@ fun CarUi() {
                         // The dashboard is already listing them, so it needs no popup.
                         NotificationPopup(
                             showNew = screen !is CarScreen.Notifications && screen != CarScreen.Dashboard,
-                            modifier = Modifier.align(Alignment.TopEnd),
+                            modifier = Modifier.align(Alignment.TopEnd).padding(top = callTop),
                         )
                         // Above the popup: a call is more urgent than any notification.
                         VoiceHelpOverlay(Modifier.align(Alignment.Center))
-                        CallOverlay(Modifier.align(Alignment.TopCenter))
+                        CallOverlay(
+                            Modifier.align(Alignment.TopCenter)
+                                .onSizeChanged { callBand = with(bandDensity) { it.height.toDp() } },
+                        )
                         AssistantOverlay(Modifier.align(Alignment.BottomCenter))
                         if (io.github.sirionero.mycar.BuildConfig.DEBUG) {
                             // Bottom corner, not top: a screen's own header almost always puts

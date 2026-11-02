@@ -184,6 +184,7 @@ private val LIVE = setOf(CarAppConnection.Phase.BINDING, CarAppConnection.Phase.
 /** The car settings' row for what shares the screen with the map: music, then each app that fits. */
 @Composable
 internal fun SidePanePicker() {
+    val navigator = LocalCarNavigator.current
     val current by SidePaneChoice.current.collectAsState()
     val entries = rememberAllEntries()
     // Not the phone's app of a music service that takes its place: one Spotify, as on the grid.
@@ -200,7 +201,8 @@ internal fun SidePanePicker() {
             options.forEach { (id, label) ->
                 val on = id == shown
                 GsIconBox(
-                    onClick = { SidePaneChoice.set(id) },
+                    // The lit one tapped again brings back a column closed with its X.
+                    onClick = { SidePaneChoice.set(id); navigator.showSidePane() },
                     modifier = Modifier.widthIn(min = 150.dp).height(64.dp),
                     colors = if (on) GsColors(scheme.primaryContainer, scheme.onPrimaryContainer)
                     else GsColors(scheme.surfaceContainerHigh, scheme.onSurface),
