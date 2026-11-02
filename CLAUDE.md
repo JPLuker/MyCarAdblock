@@ -1055,7 +1055,13 @@ Tutti i token in un solo posto, `car/design/`:
   stesso viaggio (la domanda di Android a ogni ricollegamento: servirebbe "parcheggiare" la proiezione),
   il margine di `AudioUnderflow` tenuto tra due Start, il servizio in primo piano preso al tocco di
   Connetti, un'auto che se ne va prima che parta l'ascolto dopo il viaggio, la fascia del seek nel lettore
-  accanto alla mappa (cambierebbe l'aspetto scelto). Non provato in un'auto vera.
+  accanto alla mappa (cambierebbe l'aspetto scelto). Secondo giro (chiamate e messaggi, Plancia, Cinema,
+  cavo e avvio): la lettura di un messaggio interrotta da una svolta non blocca più la risposta
+  (`CarAssistant.say` chiama sempre il seguito; i callback di `VoiceReply` valgono solo per il loro giro),
+  risposta in corso chiusa a fine viaggio come col microfono, rete mobile sospesa in galleria non più
+  "in rete" (`NET_CAPABILITY_NOT_SUSPENDED`: una galleria passava Plancia e Xonos alle app), Plancia con
+  20 s all'avvio come Xonos, video coperto in marcia anche senza fix GPS (`CarMotion.movingForVideo`,
+  l'ultima velocità vale fino a un fix nuovo, al massimo 5 minuti). Non provato in un'auto vera.
 - **Prima connessione** (`ui/SetupScreen.kt`, `setup/`): una lista sola, "Set up myCar", al primo
   avvio (al posto di `CertSetupScreen` + le pagine di `SetupGuideScreen`, ancora nel codice finché
   la nuova non è provata sul telefono) e ogni volta che si torna con "Take me back to the initial
@@ -1139,7 +1145,11 @@ Tutti i token in un solo posto, `car/design/`:
   non trovato leggendo il codice. Escluso: il display virtuale di myCar non si spegne col telefono
   (privato, `FLAG_NEVER_BLANK` in `VirtualDisplayAdapter`), la `Presentation` non dipende dalla
   schermata di myCar (token suo). Serve il log di un viaggio così (Impostazioni > Aiuto e strumenti >
-  Log in tempo reale > Precedenti > Condividi).
+  Log in tempo reale > Precedenti > Condividi). Ipotesi principale (secondo giro della notte 0.6.7): i
+  fotogrammi chiave di recupero (ogni 5 s) non portano SPS/PPS, che vanno solo nel CodecConfig iniziale;
+  un'auto che lo perde e non ripete PROJECTED (che rimanda CodecConfig, `pictureAgain`) resta nera.
+  Rimedi possibili, da provare col log: rimandare il CodecConfig prima dei fotogrammi chiave nei primi
+  30 s, o `KEY_PREPEND_HEADER_TO_SYNC_FRAMES` nell'encoder; toccano il video di tutte le auto.
 - **Audio tramite myCar a ogni ricollegamento**: la domanda di Android si rifà a ogni sessione nuova dello
   stesso viaggio (Wi-Fi che cade, l'auto che riavvia Android Auto). Idea della revisione: a fine sessione
   "parcheggiare" la proiezione (servizio in primo piano tenuto ~2 minuti, lettura ferma, telefono non più
