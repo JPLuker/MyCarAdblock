@@ -459,7 +459,8 @@ object WirelessLink {
      * Android Auto service no longer takes the car from Android Auto. A drive that's up stays.
      */
     fun stopUnlessDriving(context: Context) {
-        if (tcp != null || (!busy && network == null)) return
+        // A start-over waiting its 3 s is a start-up too: left alone it started again regardless.
+        if (tcp != null || (!busy && network == null && !startingOver)) return
         log.i("myCar turned off - the wireless start-up stops")
         stop(context)
     }
