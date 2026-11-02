@@ -182,6 +182,13 @@ class CarNavigator(startId: String) {
 
     fun showMiniPlayer() { miniPlayerHidden = false }
 
+    /**
+     * Whether the dock has room for the song playing: on a short screen at a large size it may not
+     * (CarDock), and the mini player's X then says the player comes back from the app grid instead.
+     */
+    var dockShowsSong by mutableStateOf(true)
+        internal set
+
     /** Component id of the app whose long-press menu (pin, close) is open, or null. */
     var appMenu by mutableStateOf<String?>(null)
         private set

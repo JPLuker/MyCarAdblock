@@ -72,6 +72,8 @@
     <string name="car_mini_open_player">Open the player</string>
     <string name="car_mini_hide">Hide the mini player</string>
     <string name="car_mini_hidden_toast">Mini player hidden for this drive. The song in the dock opens the player.</string>
+    <!-- The same, when the dock has no room for the song (a short screen at a large size): the button at its foot opens the app grid and, there, brings the player back -->
+    <string name="car_mini_hidden_toast_grid">Mini player hidden for this drive. The button at the foot of the dock brings the player back from the app grid.</string>
 
     <!-- Home's map, while it starts or when there is none (car/CarHomeScreen.kt). %1$s: the map app's name -->
     <string name="car_map_starting">Starting %1$s…</string>

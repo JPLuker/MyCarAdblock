@@ -47,6 +47,7 @@
     <string name="car_mini_open_player">Άνοιγμα του προγράμματος αναπαραγωγής</string>
     <string name="car_mini_hide">Απόκρυψη του μίνι προγράμματος αναπαραγωγής</string>
     <string name="car_mini_hidden_toast">Το μίνι πρόγραμμα αναπαραγωγής κρύφτηκε για αυτή τη διαδρομή. Το τραγούδι στο Dock ανοίγει το πρόγραμμα αναπαραγωγής.</string>
+    <string name="car_mini_hidden_toast_grid">Το μίνι πρόγραμμα αναπαραγωγής κρύφτηκε για αυτή τη διαδρομή. Το κουμπί στο κάτω μέρος του Dock επαναφέρει το πρόγραμμα αναπαραγωγής από το πλέγμα εφαρμογών.</string>
 
     <string name="car_map_starting">Εκκίνηση του %1$s…</string>
     <string name="car_map_starting_unknown">Εκκίνηση του χάρτη…</string>

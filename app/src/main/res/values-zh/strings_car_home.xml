@@ -46,6 +46,7 @@
     <string name="car_mini_open_player">打开播放器</string>
     <string name="car_mini_hide">隐藏迷你播放器</string>
     <string name="car_mini_hidden_toast">本次行程已隐藏迷你播放器。点按停靠栏中的歌曲可打开播放器。</string>
+    <string name="car_mini_hidden_toast_grid">本次行程已隐藏迷你播放器。在应用网格中点按停靠栏底部的按钮，即可让播放器回来。</string>
 
     <string name="car_map_starting">正在启动 %1$s…</string>
     <string name="car_map_starting_unknown">正在启动地图…</string>

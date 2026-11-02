@@ -47,6 +47,7 @@
     <string name="car_mini_open_player">Abrir o player</string>
     <string name="car_mini_hide">Ocultar o miniplayer</string>
     <string name="car_mini_hidden_toast">Miniplayer oculto nesta viagem. A música no dock abre o player.</string>
+    <string name="car_mini_hidden_toast_grid">Miniplayer oculto nesta viagem. O botão na base do dock traz o player de volta a partir da grade de apps.</string>
 
     <string name="car_map_starting">Iniciando %1$s…</string>
     <string name="car_map_starting_unknown">Iniciando o mapa…</string>

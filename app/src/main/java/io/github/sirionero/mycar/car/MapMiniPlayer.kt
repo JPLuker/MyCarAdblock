@@ -203,7 +203,9 @@ internal fun MapMiniPlayer(now: NowPlaying, modifier: Modifier = Modifier) {
                     PlainButton(
                         {
                             navigator.hideMiniPlayer()
-                            CarToasts.show(MiniPlayerSetting, Words.get(R.string.car_mini_hidden_toast), CarToast.LENGTH_LONG)
+                            // Where the player comes back from: the song in the dock, or, with no room for it there, the app grid.
+                            val back = if (navigator.dockShowsSong) R.string.car_mini_hidden_toast else R.string.car_mini_hidden_toast_grid
+                            CarToasts.show(MiniPlayerSetting, Words.get(back), CarToast.LENGTH_LONG)
                         },
                         stringResource(R.string.car_mini_hide),
                         CLOSE,

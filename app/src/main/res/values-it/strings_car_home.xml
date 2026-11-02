@@ -47,6 +47,7 @@
     <string name="car_mini_open_player">Apri il lettore</string>
     <string name="car_mini_hide">Nascondi il mini lettore</string>
     <string name="car_mini_hidden_toast">Mini lettore nascosto per questo viaggio. Il brano nel dock apre il lettore.</string>
+    <string name="car_mini_hidden_toast_grid">Mini lettore nascosto per questo viaggio. Il tasto in fondo al dock riporta il lettore dalla griglia delle app.</string>
 
     <string name="car_map_starting">Avvio %1$s…</string>
     <string name="car_map_starting_unknown">Avvio la mappa…</string>

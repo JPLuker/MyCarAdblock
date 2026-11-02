@@ -47,6 +47,7 @@
     <string name="car_mini_open_player">Player öffnen</string>
     <string name="car_mini_hide">Mini-Player ausblenden</string>
     <string name="car_mini_hidden_toast">Mini-Player für diese Fahrt ausgeblendet. Der Titel im Dock öffnet den Player.</string>
+    <string name="car_mini_hidden_toast_grid">Mini-Player für diese Fahrt ausgeblendet. Die Taste unten im Dock holt den Player aus der App-Übersicht zurück.</string>
 
     <string name="car_map_starting">%1$s wird gestartet…</string>
     <string name="car_map_starting_unknown">Die Karte wird gestartet…</string>
