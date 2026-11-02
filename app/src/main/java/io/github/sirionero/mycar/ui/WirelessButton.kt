@@ -92,7 +92,11 @@ internal fun WirelessButton() {
         val location = setOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
         val missing = buildList {
             if (WIRELESS_PERMISSIONS.any { it !in location && !ok(it) }) add(stringResource(R.string.setup_group_nearby_devices))
-            if (WIRELESS_PERMISSIONS.any { it in location && !ok(it) }) add(stringResource(R.string.setup_group_location))
+            if (WIRELESS_PERMISSIONS.any { it in location && !ok(it) }) {
+                // Approximate allowed, precise not: Android shows Location as allowed, and its "Use
+                // precise location" switch is what's off.
+                add(stringResource(if (ok(Manifest.permission.ACCESS_COARSE_LOCATION)) R.string.setup_group_precise_location else R.string.setup_group_location))
+            }
         }
         Text(
             if (missing.isEmpty() || missing == listOf(stringResource(R.string.setup_group_nearby_devices))) {

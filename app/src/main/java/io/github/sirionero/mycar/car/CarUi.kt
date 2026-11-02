@@ -202,14 +202,17 @@ fun CarUi() {
     }
 
     // A ringing call takes the screen and the car's sound: the assistant, or a message being read
-    // or answered, gives way, as the app menu does (NavApps). A reply already confirmed still goes.
+    // or answered, gives way, as the app menu does (NavApps). A reply already counting down still goes.
     LaunchedEffect(navigator) {
         io.github.sirionero.mycar.call.CarCalls.state.map { it is io.github.sirionero.mycar.call.CallUiState.Ringing }
             .distinctUntilChanged()
             .collect { ringing ->
                 if (!ringing) return@collect
                 if (VoiceReply.active) {
-                    if (VoiceReply.state.value.phase == VoiceReply.Phase.CONFIRMING) VoiceReply.sendNow() else VoiceReply.cancel()
+                    val reply = VoiceReply.state.value
+                    // Sent only once its countdown runs: while it's still read back the driver hasn't
+                    // heard it, nor had a moment to say "cancel" or "change it".
+                    if (reply.phase == VoiceReply.Phase.CONFIRMING && reply.until > 0L) VoiceReply.sendNow() else VoiceReply.cancel()
                 }
                 if (CarAssistant.state.value.phase != CarAssistant.Phase.IDLE) CarAssistant.cancel()
             }
@@ -242,10 +245,11 @@ fun CarUi() {
                 // the call question, the assistant or its help up.
                 CarKeys.ScreenKey.BACK -> when {
                     CardBack.whatsNew != null -> CardBack.whatsNew?.invoke()
-                    WebSelect.asked.value != null -> WebSelect.cancel()
+                    // Not the two drawn under a Bluetooth/location/pairing card: the card first.
+                    WebSelect.asked.value != null && CardBack.pair == null -> WebSelect.cancel()
                     navigator.appMenu != null -> navigator.dismissAppMenu()
                     VoiceReply.state.value.phase != VoiceReply.Phase.IDLE -> VoiceReply.cancel()
-                    CallPrompt.pending.value != null -> CallPrompt.pending.value = null
+                    CallPrompt.pending.value != null && CardBack.pair == null -> CallPrompt.pending.value = null
                     VoiceHelp.shown.value -> VoiceHelp.hide()
                     CarAssistant.state.value.phase != CarAssistant.Phase.IDLE -> CarAssistant.cancel()
                     CardBack.pair != null -> CardBack.pair?.invoke()

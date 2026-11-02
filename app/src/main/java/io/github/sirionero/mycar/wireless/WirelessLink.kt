@@ -385,9 +385,11 @@ object WirelessLink {
         // wasn't there, with "the car didn't connect" at the end. A car back within that keeps it.
         if (autoStart && !quiet && !pictured && rfcomm == null && tcp == null && network == null) {
             goneAddress = address
+            val turn = ++goneTurn
             val run = startRun
             main.postDelayed({
-                if (run == startRun && goneAddress.equals(address, ignoreCase = true) &&
+                // This very going, 30 s on: an earlier one's timer doesn't act on a later going.
+                if (run == startRun && turn == goneTurn && goneAddress.equals(address, ignoreCase = true) &&
                     rfcomm == null && tcp == null && network == null && !pictured
                 ) {
                     log.i("Bluetooth: ${name(device)} went and didn't come back - the automatic start-up stops")
@@ -404,6 +406,9 @@ object WirelessLink {
 
     /** The car whose Bluetooth went during an automatic start-up, until it's back or the start-up stops. */
     @Volatile private var goneAddress: String? = null
+
+    /** Bumped at each going of the car, so a timer from an earlier going doesn't act on a later one. */
+    @Volatile private var goneTurn = 0
 
     /**
      * A drive with a car that calls the phone is over (the session and the Bluetooth channel both),

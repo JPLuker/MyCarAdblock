@@ -229,6 +229,7 @@
 
     <string name="voice_model_language_title">Φωνή: %1$s</string>
     <string name="voice_model_language_ready">Το myCar είναι στα %1$s, οπότε ο βοηθός του αυτοκινήτου ακούει και απαντά στα %1$s, με το %2$s.</string>
+    <string name="voice_model_language_phone">Το myCar είναι στα %1$s, οπότε ο βοηθός του αυτοκινήτου ακούει και απαντά στα %1$s, με την αναγνώριση φωνής του τηλεφώνου.</string>
     <string name="voice_model_language_ready_try">Το myCar είναι στα %1$s, οπότε ο βοηθός του αυτοκινήτου ακούει και απαντά στα %1$s, με το %2$s. Δοκιμάστε «%3$s».</string>
     <string name="voice_model_language_missing">Το myCar είναι στα %1$s. Με το %2$s (%3$d MB) ο βοηθός του αυτοκινήτου ακούει και απαντά στα %1$s· μέχρι τότε καταλαβαίνει μόνο αγγλικά.</string>
     <string name="voice_model_language_tts">Απαντά με τη φωνή μετατροπής κειμένου σε ομιλία του ίδιου του τηλεφώνου για τα %1$s. Αν δεν ακούγεται σωστά, επιλέξτε ή κατεβάστε αυτή τη φωνή στις ρυθμίσεις μετατροπής κειμένου σε ομιλία του Android.</string>

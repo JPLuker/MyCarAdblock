@@ -172,6 +172,7 @@ object CarAudio {
     fun release() {
         wanted = false
         askedAgain = false
+        _waitsForMyCar.value = false
         AudioCaptureService.stop()
         _capture.value = Capture.OFF
         feed?.let {
@@ -215,6 +216,19 @@ object CarAudio {
     /** The question can't be asked now (the phone's screen is shared): the next [request] asks it. */
     fun askLater() {
         if (_capture.value == Capture.ASKING) _capture.value = Capture.OFF
+    }
+
+    private val _waitsForMyCar = MutableStateFlow(false)
+
+    /**
+     * Android's question waits for myCar to be on the phone's screen (asked while it was behind):
+     * the player says to open it. Set by the activity; otherwise the question is on the phone's
+     * screen already, or another one before it.
+     */
+    val waitsForMyCar: StateFlow<Boolean> = _waitsForMyCar.asStateFlow()
+
+    fun waitsForMyCar(waiting: Boolean) {
+        _waitsForMyCar.value = waiting
     }
 
     private val _micBlocked = MutableStateFlow(false)

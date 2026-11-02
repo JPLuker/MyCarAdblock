@@ -43,6 +43,7 @@ internal fun MusicNotReaching(playing: Boolean, modifier: Modifier = Modifier) {
     val capture by CarAudio.capture.collectAsState()
     val pipe by CarSettings.pipeAudio.collectAsState()
     val blocked by CarAudio.micBlocked.collectAsState()
+    val waitsForMyCar by CarAudio.waitsForMyCar.collectAsState()
     // Android's question still waiting (unanswered on the phone, or asked with myCar not in front):
     // said after a moment, not during the question answered at once.
     var waitedLong by remember { mutableStateOf(false) }
@@ -58,7 +59,9 @@ internal fun MusicNotReaching(playing: Boolean, modifier: Modifier = Modifier) {
     val title = when {
         capture == CarAudio.Capture.DENIED && blocked -> R.string.settings_mic_blocked_title
         capture == CarAudio.Capture.DENIED -> R.string.audio_not_reaching_title
-        capture == CarAudio.Capture.ASKING && waitedLong -> R.string.activity_toast_open_for_music
+        // "Open myCar" only when it isn't open: with the question on the phone's screen, it just isn't reaching.
+        capture == CarAudio.Capture.ASKING && waitedLong ->
+            if (waitsForMyCar) R.string.activity_toast_open_for_music else R.string.audio_not_reaching_title
         else -> return
     }
     // Only a "no" can be asked again from here: the microphone blocked is the phone's settings, and

@@ -310,6 +310,7 @@
     <string name="voice_model_language_title">Voice: %1$s</string>
     <!-- %1$s: myCar's language, %2$s: a model's name -->
     <string name="voice_model_language_ready">myCar is in %1$s, so the car\'s assistant listens and answers in %1$s, with %2$s.</string>
+    <string name="voice_model_language_phone">myCar is in %1$s, so the car\'s assistant listens and answers in %1$s, with the phone\'s speech recognition.</string>
     <!-- %1$s: myCar's language, %2$s: a model's name, %3$s: something to say to the assistant, in that language -->
     <string name="voice_model_language_ready_try">myCar is in %1$s, so the car\'s assistant listens and answers in %1$s, with %2$s. Try “%3$s”.</string>
     <!-- %1$s: myCar's language, %2$s: a model's name, %3$d: its size in megabytes -->

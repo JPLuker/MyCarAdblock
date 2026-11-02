@@ -353,7 +353,12 @@ class MyCarActivity : ComponentActivity(), Projection {
         // The capture question that waited for myCar to be on screen. Not from onStart: there the
         // lifecycle still reads CREATED - it moves to STARTED only once onStart has returned.
         if (consentPending) {
-            if (CarAudio.stillWanted) requestAudioCapture() else consentPending = false
+            if (CarAudio.stillWanted) {
+                requestAudioCapture()
+            } else {
+                consentPending = false
+                CarAudio.waitsForMyCar(false)
+            }
         }
         if (capturePending) {
             if (runner != null) requestCapture() else capturePending = false
@@ -437,10 +442,12 @@ class MyCarActivity : ComponentActivity(), Projection {
         // Android keeping one projection. The car asks again when the sharing ends.
         if (MirrorService.sharing) {
             consentPending = false
+            CarAudio.waitsForMyCar(false)
             CarAudio.askLater()
             return
         }
         if (!lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) {
+            CarAudio.waitsForMyCar(true)
             if (!consentPending) {
                 consentPending = true
                 MyCarLog.i("audio: myCar isn't on the phone's screen - the capture question waits for it")
@@ -448,6 +455,7 @@ class MyCarActivity : ComponentActivity(), Projection {
             }
             return
         }
+        CarAudio.waitsForMyCar(false)
         if (questionUp) {
             consentPending = true
             return
@@ -548,6 +556,10 @@ class MyCarActivity : ComponentActivity(), Projection {
         if (error == null && projector.displayId != null) {
             // A later start on this surface (after screen sharing) gets its own tries.
             projectionTries = 0
+            // The car's picture is up without the cable: next time it can connect by itself. Only now:
+            // a session ended after three failed tries showed the car nothing, and starts over as one
+            // that ended before the picture.
+            if (wirelessSocket != null) io.github.sirionero.mycar.wireless.WirelessLink.reachedCar(this)
             return
         }
         // Left in place, nothing tried again and the car stayed black for the whole drive.
@@ -779,6 +791,7 @@ class MyCarActivity : ComponentActivity(), Projection {
     private fun closeAccessory(stopWireless: Boolean) {
         // Questions waiting for myCar to be opened belong to this drive: the next one asks (and says so) afresh.
         consentPending = false
+        CarAudio.waitsForMyCar(false)
         capturePending = false
         runner?.stop()
         SessionReport.print()
@@ -816,8 +829,6 @@ class MyCarActivity : ComponentActivity(), Projection {
             // divide by (the map and every app with a car screen were turned away, screen sharing too).
             val density = densityDpi.takeIf { it > 0 } ?: android.util.DisplayMetrics.DENSITY_DEFAULT
             frameDensity = density
-            // The car's picture is up without the cable: next time it can connect by itself.
-            if (wirelessSocket != null) io.github.sirionero.mycar.wireless.WirelessLink.reachedCar(this)
             CarEnvironment.setDisplay(width, height, density)
             CarEnvironment.start(this)
             // The session holds the drive's services too, so they outlast its car UI (see CarServices.init).

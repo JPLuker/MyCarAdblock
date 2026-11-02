@@ -229,6 +229,7 @@
 
     <string name="voice_model_language_title">Voz: %1$s</string>
     <string name="voice_model_language_ready">O myCar está em %1$s, então o assistente do carro ouve e responde em %1$s, com o %2$s.</string>
+    <string name="voice_model_language_phone">O myCar está em %1$s, então o assistente do carro ouve e responde em %1$s, com o reconhecimento de voz do telefone.</string>
     <string name="voice_model_language_ready_try">O myCar está em %1$s, então o assistente do carro ouve e responde em %1$s, com o %2$s. Experimente “%3$s”.</string>
     <string name="voice_model_language_missing">O myCar está em %1$s. Com o %2$s (%3$d MB), o assistente do carro ouve e responde em %1$s; até lá, ele só entende inglês.</string>
     <string name="voice_model_language_tts">Ele responde em %1$s com a voz sintetizada do próprio telefone. Se soar estranha, escolha ou baixe essa voz nas configurações de conversão de texto em voz do Android.</string>

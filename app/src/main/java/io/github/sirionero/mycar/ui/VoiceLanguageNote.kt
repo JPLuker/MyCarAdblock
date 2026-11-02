@@ -1,5 +1,6 @@
 package io.github.sirionero.mycar.ui
 
+import android.speech.SpeechRecognizer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,12 +45,16 @@ internal fun VoiceLanguageNote() {
     val live by SpeechModels.selected.collectAsState()
     val liveState by SpeechModels.state(live).collectAsState()
     val systemSpeech by CarSettings.systemSpeech.collectAsState()
-    val liveReady = systemSpeech || liveState == SpeechModels.State.Ready
+    // The phone's own recognizer chosen, and there: it listens in the language without any model.
+    val recognizer = remember { SpeechRecognizer.isRecognitionAvailable(context) }
+    val phoneListens = systemSpeech && recognizer
+    val liveReady = phoneListens || liveState == SpeechModels.State.Ready
     val example = AssistantLanguage.help(phone)?.firstOrNull()?.first
     SettingsSection(title = stringResource(R.string.voice_model_language_title, name)) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(
                 when {
+                    phoneListens -> stringResource(R.string.voice_model_language_phone, name)
                     !liveReady -> stringResource(R.string.setup_guide_voice_body, live.downloadMb + (if (model == null) needed.downloadMb else 0))
                     model == null -> stringResource(R.string.voice_model_language_missing, name, stringResource(needed.title), needed.downloadMb)
                     example != null -> stringResource(R.string.voice_model_language_ready_try, name, stringResource(model.title), example)
@@ -65,6 +70,7 @@ internal fun VoiceLanguageNote() {
             val downloading = listOf(state, liveState).filterIsInstance<SpeechModels.State.Downloading>().firstOrNull()
             when {
                 downloading != null -> LinearProgressIndicator(progress = { downloading.percent / 100f }, modifier = Modifier.fillMaxWidth())
+                phoneListens -> Unit
                 model == null || !liveReady -> Button(onClick = {
                     // download() leaves alone a model already there or on its way.
                     if (!liveReady) SpeechModels.download(context, live)

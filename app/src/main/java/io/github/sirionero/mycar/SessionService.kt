@@ -45,7 +45,9 @@ class SessionService : Service() {
             // still reaching the car, or after the car turned the certificate down, disagreed with it.
             if (watch == null) {
                 watch = kotlinx.coroutines.MainScope().launch {
-                    SessionStatus.state.collect { if (running) manager.notify(NOTIFICATION_ID, build(it)) }
+                    // Not once the service is let go (stop() empties the holders before stopService): the
+                    // drive's end posted a "not connected" that belonged to no service and stayed.
+                    SessionStatus.state.collect { if (running && wanted) manager.notify(NOTIFICATION_ID, build(it)) }
                 }
             }
             hold(intent?.getBooleanExtra(EXTRA_WIRELESS, false) == true)
@@ -60,6 +62,8 @@ class SessionService : Service() {
         // First, on the main thread as its updates are: none lands after the service is gone.
         watch?.cancel()
         watch = null
+        // And should one have slipped through: gone with the service.
+        runCatching { getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID) }
         running = false
         runCatching { wakeLock?.release() }
         runCatching { wifiLock?.release() }

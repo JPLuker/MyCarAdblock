@@ -430,7 +430,12 @@ private class Playback(private val context: Context, private val media: CinemaMe
     }
 
     fun pause() {
-        if (released || !playing) return
+        if (released) return
+        // Waiting for the phone's sound (a call): the car's LOSS, or a lasting loss, means it doesn't
+        // start then either.
+        if (pausedForFocus && !playing) audio.abandonAudioFocusRequest(focus)
+        pausedForFocus = false
+        if (!playing) return
         runCatching { player.pause() }
         playing = false
         leave()

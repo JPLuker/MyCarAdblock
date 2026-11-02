@@ -229,6 +229,7 @@
 
     <string name="voice_model_language_title">Voce: %1$s</string>
     <string name="voice_model_language_ready">myCar è in %1$s, quindi l\'assistente dell\'auto ascolta e risponde in %1$s, con %2$s.</string>
+    <string name="voice_model_language_phone">myCar è in %1$s, quindi l\'assistente dell\'auto ascolta e risponde in %1$s, con il riconoscimento vocale del telefono.</string>
     <string name="voice_model_language_ready_try">myCar è in %1$s, quindi l\'assistente dell\'auto ascolta e risponde in %1$s, con %2$s. Prova a dire «%3$s».</string>
     <string name="voice_model_language_missing">myCar è in %1$s. Con %2$s (%3$d MB) l\'assistente dell\'auto ascolta e risponde in %1$s; fino ad allora capisce solo l\'inglese.</string>
     <string name="voice_model_language_tts">Risponde con la voce della sintesi vocale del telefono in %1$s. Se non suona bene, scegli o scarica quella voce nelle impostazioni di sintesi vocale di Android.</string>

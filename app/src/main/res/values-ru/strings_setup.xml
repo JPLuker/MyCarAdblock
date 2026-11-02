@@ -55,6 +55,7 @@
     <string name="setup_group_call_logs">Список вызовов</string>
     <string name="setup_group_contacts">Контакты</string>
     <string name="setup_group_location">Местоположение</string>
+    <string name="setup_group_precise_location">Точное местоположение</string>
     <string name="setup_group_microphone">Микрофон</string>
     <string name="setup_group_nearby_devices">Устройства поблизости</string>
 

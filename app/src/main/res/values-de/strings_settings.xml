@@ -229,6 +229,7 @@
 
     <string name="voice_model_language_title">Sprachsteuerung: %1$s</string>
     <string name="voice_model_language_ready">myCar ist auf %1$s eingestellt, also versteht und spricht der Assistent im Auto %1$s, mit %2$s.</string>
+    <string name="voice_model_language_phone">myCar ist auf %1$s eingestellt, also versteht und spricht der Assistent im Auto %1$s, mit der Spracherkennung des Telefons.</string>
     <string name="voice_model_language_ready_try">myCar ist auf %1$s eingestellt, also versteht und spricht der Assistent im Auto %1$s, mit %2$s. Probier „%3$s“.</string>
     <string name="voice_model_language_missing">myCar ist auf %1$s eingestellt. Mit %2$s (%3$d MB) versteht und spricht der Assistent im Auto %1$s; bis dahin versteht er nur Englisch.</string>
     <string name="voice_model_language_tts">Er antwortet mit der Stimme der Sprachausgabe des Telefons für %1$s. Klingt sie falsch, wähle oder lade diese Stimme in den Android-Einstellungen für die Sprachausgabe.</string>

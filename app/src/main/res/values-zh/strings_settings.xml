@@ -227,6 +227,7 @@
 
     <string name="voice_model_language_title">语音：%1$s</string>
     <string name="voice_model_language_ready">myCar 的语言是%1$s，所以车上的助手会用%1$s听你说话并回答，使用的模型是 %2$s。</string>
+    <string name="voice_model_language_phone">myCar 的语言是%1$s，所以车上的助手会用%1$s听你说话并回答，使用手机的语音识别。</string>
     <string name="voice_model_language_ready_try">myCar 的语言是%1$s，所以车上的助手会用%1$s听你说话并回答，使用的模型是 %2$s。试试说“%3$s”。</string>
     <string name="voice_model_language_missing">myCar 的语言是%1$s。下载 %2$s（%3$d MB）后，车上的助手会用%1$s听你说话并回答；在此之前，它只听得懂英语。</string>
     <string name="voice_model_language_tts">它会用手机自带的%1$s语音（文字转语音）来回答。如果听起来不对，请在 Android 的文字转语音设置中选择或下载这种语音。</string>

@@ -233,6 +233,7 @@
 
     <string name="voice_model_language_title">Голос: %1$s</string>
     <string name="voice_model_language_ready">myCar настроен на %1$s язык, поэтому и помощник в автомобиле переходит на %1$s язык: он слушает и отвечает с помощью %2$s.</string>
+    <string name="voice_model_language_phone">myCar настроен на %1$s язык, поэтому и помощник в автомобиле переходит на %1$s язык: он слушает и отвечает с помощью распознавания речи телефона.</string>
     <string name="voice_model_language_ready_try">myCar настроен на %1$s язык, поэтому и помощник в автомобиле переходит на %1$s язык: он слушает и отвечает с помощью %2$s. Попробуйте: «%3$s».</string>
     <string name="voice_model_language_missing">myCar настроен на %1$s язык. С моделью %2$s (%3$d МБ) помощник в автомобиле тоже перейдёт на %1$s язык, а пока он понимает только английский.</string>
     <string name="voice_model_language_tts">Отвечает он голосом синтеза речи телефона (%1$s язык). Если звучит неправильно, выберите или скачайте этот голос в настройках синтеза речи Android.</string>
