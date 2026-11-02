@@ -5,7 +5,7 @@
         <item>Corretto un crash che chiudeva myCar e il collegamento: arrivava dopo un tocco nella pagina di Plancia, in una pagina accanto alla mappa, tornando poi alla mappa o alla griglia delle app.</item>
         <item>Se myCar si chiude da sola, all\'avvio dopo il log dice perché Android l\'ha chiusa (un crash, la memoria, nessuna risposta), così si può correggere.</item>
         <item>I modelli della voce si caricano uno alla volta, mai dopo la fine del viaggio, e prima del primo comando solo se avanza memoria.</item>
-        <item>Mini lettore: sugli schermi piccoli parte lontano dai tasti della mappa, e i tasti sbiaditi della mappa non prendono più i tocchi destinati alla mappa.</item>
+        <item>Mini lettore: sugli schermi piccoli parte lontano dai tasti della mappa, lasciato sotto di loro si sposta appena fuori, e i tasti sbiaditi della mappa non prendono più i tocchi destinati alla mappa.</item>
         <item>Testi: ogni brano parte dalla prima riga, e la versione live di un\'altra canzone non porta più le sue parole.</item>
         <item>Spotify e gli altri servizi musicali: «metti …» aspetta la pagina fino a 25 secondi, e un Play ancora in attesa non parte se nel frattempo hai cambiato musica.</item>
         <item>Scegliere la radio dell\'auto ferma un video o una radio in Cinema o nel browser, e non ripartono da soli. L\'Autoplay fa partire la musica solo quando il suono ha una strada verso l\'auto.</item>

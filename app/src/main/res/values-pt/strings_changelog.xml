@@ -5,7 +5,7 @@
         <item>Corrigido um travamento que fechava o myCar e a conexão: acontecia depois de um toque na página do Plancia, numa página ao lado do mapa, e da volta ao mapa ou à grade de apps.</item>
         <item>Se o myCar fechar sozinho, a próxima abertura escreve no registro por que o Android o fechou (um travamento, a memória, sem resposta), para que possa ser corrigido.</item>
         <item>Os modelos de voz carregam um de cada vez, nunca depois do fim da viagem, e antes do primeiro comando só se sobrar memória.</item>
-        <item>Miniplayer: em telas pequenas ele aparece longe dos botões do mapa, e os botões esmaecidos do mapa não pegam mais os toques destinados ao mapa.</item>
+        <item>Miniplayer: em telas pequenas ele aparece longe dos botões do mapa, solto embaixo deles ele se afasta só o necessário, e os botões esmaecidos do mapa não pegam mais os toques destinados ao mapa.</item>
         <item>Letras: cada música começa pela primeira linha, e a versão ao vivo de outra música não traz mais a letra dela.</item>
         <item>Spotify e os outros serviços de música: «toque …» espera a página por até 25 segundos, e um Play ainda esperando não começa se você tiver trocado a música nesse meio-tempo.</item>
         <item>Escolher o rádio do carro para um vídeo ou uma rádio no Cinema ou no navegador, e eles não voltam a tocar sozinhos. A reprodução automática começa a música só quando o som tem um caminho até o carro.</item>

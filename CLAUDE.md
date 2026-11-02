@@ -330,7 +330,9 @@ Tutti i token in un solo posto, `car/design/`:
   (`MINI_DOTS_STRIP` 60 dp); finché il guidatore non la sposta la partenza la calcola `MiniPlace.start`: in
   basso a destra sulle mappe grandi, sulle piccole (800x480 a Large/Extra large) a sinistra dei tasti della
   mappa ma mai sotto la scheda a sinistra (42% della mappa, almeno 244 dp); dove accanto alla scheda non ci sta
-  (800x480 a Extra large: 173 dp per 276) si disegna in scala (`MiniPlace.fitScale`, mai sotto 0,6). Scatti `mini-large-800x480`,
+  (800x480 a Extra large: 173 dp per 276) si disegna in scala (`MiniPlace.fitScale`, mai sotto 0,6). Lasciata
+  sotto la riga delle azioni dell'app o accanto ai tasti della mappa (che le stanno sopra: Pausa diventava
+  Search) si sposta appena fuori al rilascio (`MiniPlace.clearOfButtons`, 0.7.0). Scatti `mini-large-800x480`,
   `mini-xl-800x480` (`--es carScale`). Sta nello slot `overMap` di `CarAppStage`, fra la
   superficie e la chrome del template: schede e tasti dell'app restano sopra, la superficie non cambia, ogni
   tocco fuori dalla pillola va alla mappa. Gesto nostro sul passaggio Initial (`dragAfterHold`): tocco breve al
@@ -1362,6 +1364,11 @@ Tutti i token in un solo posto, `car/design/`:
 - Auto-updater delle build GitHub: rilasci di `sirionero/mycar`; disattivato nella build F-Droid.
 
 ## Backlog
+
+- **Puntini delle pagine sopra le parti** (revisione degli scatti della 0.7.0): sulle pagine del guidatore
+  la pillola dei puntini e della matita sta sopra il fondo delle parti; a 800x480 copre la tessera in basso
+  di Plancia (un tocco va ai puntini). Da valutare: farla svanire anche lì come sulla mappa, o lasciarle
+  la sua striscia sotto le parti.
 
 - **Spotify Web e "Nascondi l'app del telefono" a inizio viaggio** (dalla caccia della 0.7.0, da provare
   con un account Premium): myCar mette in pausa l'app Spotify del telefono e apre Spotify Web con

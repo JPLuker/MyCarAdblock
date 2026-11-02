@@ -10,7 +10,7 @@ myCar 0.7.0-alpha: the release that gathers the whole 0.6 series, and the steadi
 - The phone's speech recognition switched on in a phone that has none (GrapheneOS) no longer locks the language: the assistant listens with myCar's models.
 
 ## In the car
-- **Mini player**: on low, narrow maps (800x480, Extra large) it starts left of the map's buttons instead of under them, where the map's "-" covered Next and the X. The map's faded buttons take only taps on themselves, not on the space between them. While the music's column waits, a song stopped by its app shows Play, so a tap doesn't start it again.
+- **Mini player**: on low, narrow maps (800x480, Extra large) it starts left of the map's buttons instead of under them, where the map's "-" covered Next and the X. Let go under the app's row of actions or beside the map's buttons, it moves just clear of them (they're drawn over it: a tap on Pause went to Search). The map's faded buttons take only taps on themselves, not on the space between them. While the music's column waits, a song stopped by its app shows Play, so a tap doesn't start it again.
 - On a narrow map the button with text in the map's action row (Search) gives way, not the last icon.
 - During a call the pages beside the map and their menu stay below the call's bar. What's new waits for a call to end; opened by hand, it closes with the drive.
 - Changing myCar's language during a drive changes the car's screen at once.
