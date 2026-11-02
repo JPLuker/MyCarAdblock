@@ -4,12 +4,15 @@ import android.content.Context
 import io.github.sirionero.mycar.BuildConfig
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.media.LyricsMatch.Ask
+import io.github.sirionero.mycar.xonos.Xonos
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -60,8 +63,10 @@ fun NowPlaying.lyricsSong(xonosInside: Boolean) = SongInfo(
 )
 
 /**
- * Lyrics for the song playing, from LRCLIB (lrclib.net), a free community archive that needs no key,
- * open source (MIT): media apps almost never publish lyrics in their session.
+ * Lyrics for the song playing. With Xonos inside myCar, Music Assistant first: the track's own tags,
+ * the .lrc beside it, the lyrics services set up there. Then LRCLIB (lrclib.net), a free community
+ * archive that needs no key, open source (MIT): media apps almost never publish lyrics in their
+ * session.
  *
  * LRCLIB is asked at most [LyricsMatch.MAX_ASKS] questions per song (see LyricsMatch.plan), and
  * every entry it gives is checked against the song (LyricsMatch.fit) before it's shown: the lyrics
@@ -82,6 +87,9 @@ object Lyrics {
     /** Songs skipped in a row aren't looked up: a song not known yet waits this long on screen before its lookup. */
     const val SETTLE_MS = 700L
 
+    /** Music Assistant has this long to answer before LRCLIB is asked: without a network its own services can take tens of seconds. */
+    private const val MA_WAIT_MS = 8_000L
+
     /** A lookup stops asking LRCLIB after this long: a slow network, the server busy. */
     private const val LOOKUP_BUDGET_MS = 15_000L
 
@@ -100,7 +108,7 @@ object Lyrics {
     /** Success with [LyricsAnswer.None]: there are none for this song. A failure: LRCLIB couldn't be asked. */
     suspend fun find(context: Context, song: SongInfo): Result<LyricsAnswer> {
         val query = LyricsMatch.query(song.title, song.artist, song.album, song.durationMs)
-        if (query == null) return Result.success(LyricsAnswer.None)
+        if (query == null && song.maUri.isEmpty()) return Result.success(LyricsAnswer.None)
         val key = song.key
         synchronized(answers) { answers[key] }?.let { return Result.success(it) }
         val job = synchronized(running) {
@@ -117,10 +125,17 @@ object Lyrics {
     /** The answer already known for [song], without asking anybody; null when there's none yet. */
     fun known(song: SongInfo): LyricsAnswer? = synchronized(answers) { answers[song.key] }
 
-    private fun lookUp(context: Context, song: SongInfo, query: LyricsMatch.SongQuery?, key: String): Result<LyricsAnswer> {
+    private suspend fun lookUp(context: Context, song: SongInfo, query: LyricsMatch.SongQuery?, key: String): Result<LyricsAnswer> {
         readDisk(context, key)?.let { remember(key, it); return Result.success(it) }
         // "(Instrumental)" in the title: no words, nobody to ask.
         if (query != null && LyricsMatch.instrumentalByTitle(query)) return Result.success(LyricsAnswer.Instrumental).also { remember(key, LyricsAnswer.Instrumental) }
+        if (song.maUri.isNotEmpty()) {
+            fromMusicAssistant(song.maUri)?.let {
+                keep(context, key, it)
+                log("Music Assistant", song)
+                return Result.success(it)
+            }
+        }
         if (query == null) return Result.success(LyricsAnswer.None)
         return runCatching { lrclib(query) }
             .onSuccess { trace ->
@@ -140,6 +155,23 @@ object Lyrics {
         // The song's name only in the debug build: the log is shared for help.
         val which = if (BuildConfig.DEBUG) " for \"${song.title}\" by \"${song.artist}\"" else ""
         MyCarLog.i("lyrics: $what ($where)$which")
+    }
+
+    // --- Music Assistant --------------------------------------------------------------------------
+
+    private suspend fun fromMusicAssistant(uri: String): LyricsAnswer? {
+        val lyrics = withTimeoutOrNull(MA_WAIT_MS) {
+            try {
+                Xonos.library.lyrics(uri, MA_WAIT_MS - 1_000)
+            } catch (e: Exception) {
+                // The wait over, or the lookup's asker gone: not something Music Assistant said.
+                if (e is CancellationException) throw e
+                MyCarLog.w("lyrics: Music Assistant didn't answer: ${e.message}")
+                null
+            }
+        } ?: return null
+        val lines = lyrics.lines.map { LyricLine(it.timeMs, it.text) }
+        return if (lines.isEmpty()) null else LyricsAnswer.Found(LyricsResult(lines, lyrics.synced), fromMusicAssistant = true)
     }
 
     // --- LRCLIB -----------------------------------------------------------------------------------
