@@ -18,6 +18,7 @@ import android.os.Looper
 import android.os.PowerManager
 import android.os.SystemClock
 import android.provider.Settings
+import io.github.sirionero.mycar.BuildConfig
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.Protobuf
 import io.github.sirionero.mycar.R
@@ -515,7 +516,8 @@ object WirelessLink {
     @SuppressLint("MissingPermission")
     private fun run(context: Context, device: BluetoothDevice, mine: Int, byItself: Boolean) {
         val name = name(device)
-        log.i("--- wireless start-up with $name (${device.address}) ---")
+        // The car's Bluetooth address only in the debug build: logs get shared, in public too.
+        log.i("--- wireless start-up with $name (${if (BuildConfig.DEBUG) device.address else "…" + device.address.takeLast(5)}) ---")
         if (!quiet) SessionStatus.connecting(R.string.wireless_link_bt_reaching, name)
         val listenMs = when {
             quiet -> AGAIN_LISTEN_MS
@@ -616,7 +618,9 @@ object WirelessLink {
                             Protobuf.varint(((6 shl 3) or 2).toLong()) + Protobuf.varint(ids.size.toLong()) + ids
                         send(output, MSG_VERSION_RESPONSE, reply)
                         log.i("-> VersionResponse")
-                        log.hex("   reply", reply)
+                        // With the phone's id (its serial, twice) only in the debug build: logs get shared.
+                        if (BuildConfig.DEBUG) log.hex("   reply", reply)
+                        else log.i("   reply: version ${Wire.varint(f, 1) ?: 1}.${Wire.varint(f, 2) ?: 0}, status $STATUS_SUCCESS (the phone's id left out)")
                     }
                     MSG_START_REQUEST -> {
                         val f = Wire.fields(body)
@@ -640,7 +644,15 @@ object WirelessLink {
                         val password = text(2)
                         val bssid = text(3)
                         val security = Wire.varint(f, 4) ?: -1
-                        log.i("<- InfoResponse: ssid=\"$ssid\" bssid=$bssid security=$security password=${if (password.isEmpty()) "none" else "(${password.length} chars)"}")
+                        // The car's Wi-Fi address (BSSID) only in the debug build: logs get shared, and it
+                        // places the car on maps of networks. Whether there's one is what setBssid needs.
+                        val shownBssid = when {
+                            BuildConfig.DEBUG -> bssid
+                            bssid.isEmpty() -> "none"
+                            bssid == "00:00:00:00:00:00" -> "zeros"
+                            else -> "(set)"
+                        }
+                        log.i("<- InfoResponse: ssid=\"$ssid\" bssid=$shownBssid security=$security password=${if (password.isEmpty()) "none" else "(${password.length} chars)"}")
                         // ZLink head units send the Wi-Fi details again once the stream is up. Asking
                         // Android for the network again releases the one carrying the stream, which
                         // aborts it a second in; a phone running Android Auto carries on. A car
