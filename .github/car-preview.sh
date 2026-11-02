@@ -996,13 +996,15 @@ phone_lang() {
         [ "$s" = intro ] && adb shell run-as "$PKG" rm -f shared_prefs/intro.xml
         adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen "$s" >/dev/null
         sleep 4; adb exec-out screencap -p > "$d/$s-1.png"
-        adb shell input swipe 160 520 160 180 400; sleep 1.5; adb exec-out screencap -p > "$d/$s-2.png"
-        adb shell input swipe 160 520 160 180 400; sleep 1.5; adb exec-out screencap -p > "$d/$s-3.png"
+        # From above the fixed bar at the foot (setup's big button): started on it, the list didn't move.
+        adb shell input swipe 160 430 160 110 400; sleep 1.5; adb exec-out screencap -p > "$d/$s-2.png"
+        adb shell input swipe 160 430 160 110 400; sleep 1.5; adb exec-out screencap -p > "$d/$s-3.png"
     done
     # Each page of the intro in this language, where long words have the least room: Next is at the
     # same spot in every language (its text isn't English here).
     for i in 2 3 4 5 6 7; do
-        adb shell input tap $((W * 72 / 100)) $((H - 80))
+        # On the button (570-621 at 640 high): at H-80 the tap fell between the dots and it.
+        adb shell input tap $((W * 72 / 100)) $((H - 45))
         sleep 1.5; adb exec-out screencap -p > "$d/intro-page-$i.png"
     done
 }
