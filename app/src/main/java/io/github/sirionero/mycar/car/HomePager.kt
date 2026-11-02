@@ -86,6 +86,7 @@ import io.github.sirionero.mycar.car.theme.gsColors
 import io.github.sirionero.mycar.host.CarAppConnection
 import io.github.sirionero.mycar.host.TemplateApp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 /**
@@ -144,6 +145,13 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
     LaunchedEffect(pager) {
         snapshotFlow { latest.getOrNull(pager.currentPage)?.layout == PageLayout.MAP }
             .collect { navigator.onMapPage = it }
+    }
+    // In the log, the page each turn settles on: a drive's log then says where Home was when something went.
+    LaunchedEffect(pager) {
+        snapshotFlow { pager.settledPage }.drop(1).collect { index ->
+            val page = latest.getOrNull(index)
+            io.github.sirionero.mycar.MyCarLog.i("home: page ${index + 1} of ${latest.size}, ${page?.layout?.id}${page?.slots?.let { " $it" }.orEmpty()}")
+        }
     }
     LaunchedEffect(onHome) {
         if (!onHome) {

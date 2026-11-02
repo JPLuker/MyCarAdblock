@@ -218,6 +218,7 @@ class MyCarActivity : ComponentActivity(), Projection {
         MyCarLog.init(this)
         MyCarLog.installCrashHandler()
         MyCarLog.i("myCar ready")
+        LastExit.log(this)
         io.github.sirionero.mycar.wireless.WirelessLink.onConnected = { socket ->
             runOnUiThread { startWireless(socket) }
         }

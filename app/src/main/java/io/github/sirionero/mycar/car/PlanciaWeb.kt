@@ -162,6 +162,7 @@ internal class PlanciaWeb(context: Context, dark: Boolean) {
         val w = web ?: return
         val target = hosts.lastOrNull()
         if (w.parent === target) return
+        MyCarLog.i(if (target == null) "plancia: the page out of sight" else "plancia: the page in sight (${hosts.size} place(s))")
         (w.parent as? ViewGroup)?.removeView(w)
         target?.addView(w, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
     }
