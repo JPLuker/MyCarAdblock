@@ -5,4 +5,6 @@
     <string name="language_phone">Idioma do telefone (%1$s)</string>
     <string name="language_footer">O myCar no telefone e na tela do carro, e o seu assistente de voz, neste idioma.</string>
     <string name="language_close">Fechar</string>
+    <string name="language_pirate">Fala de pirata</string>
+    <string name="language_pirate_detail">Cada texto do myCar em termos piratas, no idioma acima. Nós escolhemos nossas rotas, arrr.</string>
 </resources>

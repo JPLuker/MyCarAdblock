@@ -92,6 +92,40 @@ for lang in LANGS:
         need = NEEDED.get(lang, {"one", "other"})
         if not need <= set(forms):
             print(lang, name, "forms", sorted(forms), "need", sorted(need)); problems += 1
+# Pirate speak (AppLanguage.PIRATE): values-b+<language>+pirate, any part of the language's texts
+# (the rest comes from the language's own folder), with the same placeholders and plural forms.
+pirates = 0
+for lang in ["en"] + LANGS:
+    folder = os.path.join(RES, f"values-b+{lang}+pirate")
+    if not os.path.isdir(folder):
+        continue
+    for path in sorted(glob.glob(os.path.join(folder, "strings*.xml"))):
+        raw = open(path, encoding="utf-8").read()
+        for key, attrs, text in re.findall(r'<string name="([^"]+)"([^>]*)>(.*?)</string>', raw, re.S):
+            if 'formatted="false"' not in attrs and not aapt_format_ok(text):
+                print(lang + "+pirate", key, "percent signs aapt reads as placeholders"); problems += 1
+    own_strings, own_plurals, _ = (base, base_plurals, fixed) if lang == "en" else load(os.path.join(RES, f"values-{lang}"))
+    strings, plurals, _ = load(folder)
+    pirates += len(strings)
+    for key, text in strings.items():
+        if key not in own_strings:
+            print(lang + "+pirate", key, "not a text of", lang); problems += 1
+            continue
+        if sorted(FMT.findall(text)) != sorted(FMT.findall(own_strings[key])):
+            print(lang + "+pirate", key, "placeholders differ:", text); problems += 1
+        if (re.search(r"(?<!\\)'", unquoted(text)) or re.search(r'(?<!\\)"', unquoted(text))):
+            print(lang + "+pirate", key, "apostrophe or quote without a backslash"); problems += 1
+    for name, forms in plurals.items():
+        if name not in own_plurals:
+            print(lang + "+pirate", name, "not a plural of", lang); problems += 1
+        elif set(forms) != set(own_plurals[name]):
+            print(lang + "+pirate", name, "forms", sorted(forms), "not", sorted(own_plurals[name])); problems += 1
+        else:
+            for q, text in forms.items():
+                if sorted(FMT.findall(text)) != sorted(FMT.findall(own_plurals[name][q])):
+                    print(lang + "+pirate", name, q, "placeholders differ:", text); problems += 1
 problems += len(DUPLICATES)
+if pirates:
+    print(f"pirate speak: {pirates} texts")
 print(f"{len(base)} strings, {len(base_plurals)} plurals, {len(LANGS)} languages: " + ("all good" if not problems else f"{problems} problems"))
 sys.exit(1 if problems else 0)

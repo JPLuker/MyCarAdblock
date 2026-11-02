@@ -50,6 +50,11 @@ internal fun LanguageSection() {
             Modifier.clickable { open = true },
             icon = ImageVector.vectorResource(R.drawable.sym_language),
         )
+        // Pirate speak: every text in pirate terms, in the language above (see AppLanguage.PIRATE).
+        val pirate = remember(open, config) { AppLanguage.pirate(context) }
+        SwitchRow(stringResource(R.string.language_pirate), pirate, stringResource(R.string.language_pirate_detail)) { on ->
+            (context as? Activity)?.let { AppLanguage.choose(it, chosen, pirate = on) }
+        }
     }
     if (open) {
         AlertDialog(

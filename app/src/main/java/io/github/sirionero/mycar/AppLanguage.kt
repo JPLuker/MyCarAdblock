@@ -39,6 +39,28 @@ enum class AppLanguage(
 
     companion object {
         private const val KEY = "app_language"
+        private const val KEY_PIRATE = "app_language_pirate"
+
+        /**
+         * Pirate speak (the user's wish: every text in pirate terms, the emblem of free choice) is a way
+         * of speaking each language, not a language of its own: the BCP 47 variant "pirate", whose
+         * words are in res/values-b+<language>+pirate. A text not written there yet comes from the
+         * language's own folder, as Android falls back to it.
+         */
+        const val PIRATE = "pirate"
+
+        /** Pirate speak is on (see [PIRATE]). */
+        fun pirate(context: Context): Boolean {
+            if (Build.VERSION.SDK_INT >= 33) {
+                val locales = context.getSystemService(LocaleManager::class.java)?.applicationLocales
+                return locales != null && !locales.isEmpty && locales[0].variant.equals(PIRATE, ignoreCase = true)
+            }
+            return AppSettings.getString(context, KEY_PIRATE, "") == "on"
+        }
+
+        /** [language], spoken the pirate way if [pirate]. */
+        fun localeFor(language: AppLanguage, pirate: Boolean): Locale =
+            if (!pirate) language.locale else Locale.Builder().setLocale(language.locale).setVariant(PIRATE).build()
 
         /** The one chosen in Settings; null for the phone's. */
         fun chosen(context: Context): AppLanguage? {
@@ -64,11 +86,15 @@ enum class AppLanguage(
          * Android 12 myCar does, and its screen starts again unless a drive is under way (it would
          * end the drive), in which case the next start is in the new language.
          */
-        fun choose(activity: Activity, language: AppLanguage?) {
+        fun choose(activity: Activity, language: AppLanguage?, pirate: Boolean = pirate(activity)) {
             AppSettings.putString(activity, KEY, language?.tag.orEmpty())
+            AppSettings.putString(activity, KEY_PIRATE, if (pirate) "on" else "")
             if (Build.VERSION.SDK_INT >= 33) {
+                // Android keeps one language for myCar: pirate speak with the phone's language is the
+                // pirate way of the language myCar is in now.
+                val spoken = language ?: if (pirate) current(activity) else null
                 activity.getSystemService(LocaleManager::class.java)?.applicationLocales =
-                    if (language == null) LocaleList.getEmptyLocaleList() else LocaleList.forLanguageTags(language.tag)
+                    if (spoken == null) LocaleList.getEmptyLocaleList() else LocaleList(localeFor(spoken, pirate))
                 return
             }
             applyToProcess(activity)
@@ -87,12 +113,12 @@ enum class AppLanguage(
         val wantedTag: kotlinx.coroutines.flow.StateFlow<String?> = wantedFlow
 
         /** Reads it again: Android has changed the language (MyCarActivity hears it), or myCar has (Android 12). */
-        fun recheck(context: Context) { wantedFlow.value = wanted(context)?.tag }
+        fun recheck(context: Context) { wantedFlow.value = wanted(context)?.toLanguageTag() }
 
         /** Android 12: the chosen language for the whole process, services included. */
         fun applyToProcess(context: Context) {
             if (Build.VERSION.SDK_INT >= 33) return
-            val locale = chosen(context)?.locale ?: phoneLocale()
+            val locale = wanted(context) ?: phoneLocale()
             Locale.setDefault(locale)
             val resources = context.applicationContext.resources
             val config = Configuration(resources.configuration).apply { setLocale(locale) }
@@ -103,8 +129,8 @@ enum class AppLanguage(
         /** Android 12: [base] in the chosen language, for an activity's attachBaseContext. */
         fun wrap(base: Context): Context {
             if (Build.VERSION.SDK_INT >= 33) return base
-            val language = chosen(base) ?: return base
-            return inLanguage(base, language)
+            val locale = wanted(base) ?: return base
+            return inLanguage(base, locale)
         }
 
         private var appWords: Pair<String, Resources>? = null
@@ -115,10 +141,11 @@ enum class AppLanguage(
          * settings (a turn of the phone, dark mode) doesn't take back to the phone's language.
          */
         fun resources(app: Context): Resources {
-            val language = wanted(app) ?: return app.resources
-            if (speaks(app, language)) return app.resources
-            appWords?.let { (tag, words) -> if (tag == language.tag) return words }
-            return inLanguage(app, language).resources.also { appWords = language.tag to it }
+            val locale = wanted(app) ?: return app.resources
+            if (speaks(app, locale)) return app.resources
+            val wantedTag = locale.toLanguageTag()
+            appWords?.let { (tag, words) -> if (tag == wantedTag) return words }
+            return inLanguage(app, locale).resources.also { appWords = wantedTag to it }
         }
 
         /**
@@ -128,9 +155,9 @@ enum class AppLanguage(
          * a context made for another display). Display, density and theme stay [context]'s.
          */
         fun localized(context: Context): Context {
-            val language = wanted(context) ?: return context
-            if (speaks(context, language)) return context
-            val words = inLanguage(context, language).resources
+            val locale = wanted(context) ?: return context
+            if (speaks(context, locale)) return context
+            val words = inLanguage(context, locale).resources
             return object : ContextWrapper(context) {
                 override fun getResources(): Resources = words
             }
@@ -141,14 +168,20 @@ enum class AppLanguage(
          * Android gives the process (its default locale, which the chosen language sets; read without
          * asking the system, as [Words] does it for every text), before it the one chosen here.
          */
-        private fun wanted(context: Context): AppLanguage? =
-            if (Build.VERSION.SDK_INT >= 33) of(Locale.getDefault()) else chosen(context)
+        private fun wanted(context: Context): Locale? {
+            // From Android 13 the default locale is the one Android gives myCar, pirate variant and all.
+            if (Build.VERSION.SDK_INT >= 33) return Locale.getDefault().takeIf { of(it) != null }
+            val language = chosen(context) ?: if (pirate(context)) current(context) else return null
+            return localeFor(language, pirate(context))
+        }
 
-        /** [context]'s words are already in [language]. */
-        private fun speaks(context: Context, language: AppLanguage): Boolean =
-            context.resources.configuration.locales[0]?.language == language.locale.language
+        /** [context]'s words are already in [locale]: its language, and pirate speak or not. */
+        private fun speaks(context: Context, locale: Locale): Boolean {
+            val own = context.resources.configuration.locales[0] ?: return false
+            return own.language == locale.language && own.variant.equals(locale.variant, ignoreCase = true)
+        }
 
-        private fun inLanguage(context: Context, language: AppLanguage): Context =
-            context.createConfigurationContext(Configuration(context.resources.configuration).apply { setLocale(language.locale) })
+        private fun inLanguage(context: Context, locale: Locale): Context =
+            context.createConfigurationContext(Configuration(context.resources.configuration).apply { setLocale(locale) })
     }
 }

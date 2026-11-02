@@ -5,4 +5,6 @@
     <string name="language_phone">Γλώσσα του τηλεφώνου (%1$s)</string>
     <string name="language_footer">Το myCar στο τηλέφωνο και στην οθόνη του αυτοκινήτου, και ο φωνητικός βοηθός του, σε αυτή τη γλώσσα.</string>
     <string name="language_close">Κλείσιμο</string>
+    <string name="language_pirate">Πειρατική γλώσσα</string>
+    <string name="language_pirate_detail">Κάθε κείμενο του myCar σε πειρατική γλώσσα, στη γλώσσα παραπάνω. Εμείς επιλέγουμε τη ρότα μας, αρρρ.</string>
 </resources>
