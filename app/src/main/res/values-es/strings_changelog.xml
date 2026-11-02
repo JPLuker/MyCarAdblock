@@ -10,6 +10,7 @@
         <item>Con Xonos como música del coche, las respuestas del asistente y los mensajes leídos se oyen en el coche, y lo que empieza después de Xonos se oye desde el primer segundo.</item>
         <item>Al volante: el próximo giro sigue en el dock durante toda la llamada, las Novedades esperan a que el coche se pare, Atrás sube una carpeta en la lista de música y el Play del volante ya no detiene una película.</item>
         <item>Una conexión que falla ya no pausa la música del teléfono, y los modelos de voz se cargan después de la primera imagen del coche, para un arranque más ligero.</item>
+        <item>Plancia y Xonos dentro de myCar siguen tras un túnel largo en lugar de pasar a sus apps, y Cinema mantiene el vídeo tapado en marcha aunque el GPS pierda la señal.</item>
     </string-array>
     <string-array name="changelog_42">
         <item>Nueva sección Música en los ajustes del teléfono: Xonos y Spotify tienen cada uno un interruptor, y «Añadir un servicio» ofrece YouTube Music, Apple Music, Amazon Music, Deezer, TIDAL, SoundCloud y Qobuz. En el coche solo están los servicios activados; Xonos está activado si ya lo usabas.</item>

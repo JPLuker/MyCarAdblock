@@ -10,6 +10,7 @@
         <item>Xonos 作为车上音乐时，助手的回答和朗读的消息在车上播放；Xonos 之后开始的内容从第一秒就能听到。</item>
         <item>驾驶时：整个通话期间下一个转弯都留在停靠栏中，新功能介绍会等车停下再显示，返回键在音乐列表中返回上一级文件夹，方向盘上的播放键不再打断电影。</item>
         <item>连接失败不再暂停手机音乐，语音模型在车上出现第一张画面之后才加载，启动更轻快。</item>
+        <item>myCar 内的 Plancia 和 Xonos 在长隧道之后仍然保留，不再交给各自的应用；即使 GPS 失去信号，行驶中 Cinema 也会继续遮住视频。</item>
     </string-array>
     <string-array name="changelog_42">
         <item>手机设置中新增“音乐”部分：Xonos 和 Spotify 各有一个开关，“添加服务”提供 YouTube Music、Apple Music、Amazon Music、Deezer、TIDAL、SoundCloud 和 Qobuz。车上只显示已开启的服务；如果你已在使用 Xonos，它会保持开启。</item>
