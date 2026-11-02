@@ -53,6 +53,7 @@
     <string name="wireless_link_vpn_detail">myCar ist im Netz von %1$s, aber ein VPN auf diesem Telefon (zum Beispiel Tailscale) lässt es das Auto nicht erreichen. Verbinde per Kabel, schalte das VPN aus oder nimm myCar in dessen Einstellungen davon aus – dann können Plancia und Xonos in myCar die Adressen des VPN, wie Tailscale-Namen, nicht nutzen.</string>
     <string name="wireless_link_no_connection">WLAN des Autos verbunden, aber keine Verbindung</string>
     <string name="wireless_link_no_connection_detail">myCar ist im Netz von %1$s, konnte Android Auto unter %2$s aber nicht erreichen.</string>
+    <string name="wireless_link_local_network_detail">Android hält myCar von lokalen Netzwerken fern, und das WLAN des Autos ist eins: Erlaube myCar auf dem Telefon die Berechtigung Geräte in der Nähe und verbinde dich dann neu.</string>
 
     <string name="bridge_through">Über die %1$s-App: %2$s</string>
     <string name="bridge_no_answer">sie hat nicht geantwortet. Öffne die %1$s-App einmal und versuche es dann erneut.</string>

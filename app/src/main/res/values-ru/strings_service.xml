@@ -53,6 +53,7 @@
     <string name="wireless_link_vpn_detail">myCar подключился к сети %1$s, но VPN на этом телефоне (например, Tailscale) не даёт ему связаться с автомобилем. Подключитесь кабелем, выключите VPN или исключите из него myCar в настройках VPN — тогда Plancia и Xonos внутри myCar не смогут использовать адреса VPN, например имена Tailscale.</string>
     <string name="wireless_link_no_connection">Wi-Fi автомобиля подключён, но соединения нет</string>
     <string name="wireless_link_no_connection_detail">myCar подключился к сети %1$s, но не смог связаться с Android Auto по адресу %2$s.</string>
+    <string name="wireless_link_local_network_detail">Android не пускает myCar в локальные сети, а Wi-Fi автомобиля — одна из них: на телефоне дайте myCar разрешение «Устройства поблизости» и подключитесь снова.</string>
 
     <string name="bridge_through">Через приложение %1$s: %2$s</string>
     <string name="bridge_no_answer">оно не ответило. Откройте приложение %1$s один раз и попробуйте снова.</string>

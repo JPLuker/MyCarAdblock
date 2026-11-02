@@ -313,9 +313,15 @@ object WirelessLink {
                 listenAgain(context)
                 return
             }
-            if (!startOver(context, mine, "the car closed the Bluetooth channel before a drive") && !quiet && !saidWhy) {
-                // Nothing follows: "talking to the car" stayed up for good, and only Disconnect cleared it.
-                car?.let { SessionStatus.failed(R.string.wireless_link_bt_no_car, R.string.wireless_link_bt_no_car_detail, name(it)) }
+            if (!startOver(context, mine, "the car closed the Bluetooth channel before a drive")) {
+                if (quiet) {
+                    // The listening after a drive said "talking to the car" when the channel opened:
+                    // its last start-over over, that went too, or it stayed up for good.
+                    if (SessionStatus.state.value.phase == SessionStatus.Phase.CONNECTING) SessionStatus.disconnected()
+                } else if (!saidWhy) {
+                    // Nothing follows: "talking to the car" stayed up for good, and only Disconnect cleared it.
+                    car?.let { SessionStatus.failed(R.string.wireless_link_bt_no_car, R.string.wireless_link_bt_no_car_detail, name(it)) }
+                }
             }
         }
     }
@@ -706,7 +712,10 @@ object WirelessLink {
         joined = true
         // The phone's Wi-Fi off: no app can turn it on, so the car's network never came - a minute's
         // wait, a message about a prompt or a password, and minutes of start-overs. Said at once.
-        if (context.getSystemService(android.net.wifi.WifiManager::class.java)?.isWifiEnabled == false) {
+        // Off for good only: one still turning on (a routine that turns it on with the car's
+        // Bluetooth) gets its minute, as before.
+        val wifiState = context.getSystemService(android.net.wifi.WifiManager::class.java)?.wifiState
+        if (wifiState == android.net.wifi.WifiManager.WIFI_STATE_DISABLED || wifiState == android.net.wifi.WifiManager.WIFI_STATE_DISABLING) {
             log.w("Wi-Fi: the phone's Wi-Fi is off - the car's network can't come")
             runCatching { send(output, MSG_CONNECTION_STATUS, Protobuf.varintField(1, -1)) }
             SessionStatus.failed(R.string.wireless_link_wifi_off, R.string.wireless_link_wifi_off_detail)
@@ -948,7 +957,7 @@ object WirelessLink {
         // every try timed out, and no start-over mends that. Said as it is, with what to allow.
         if (!io.github.sirionero.mycar.LocalNetwork.allowed(context)) {
             log.w("TCP: Android doesn't let myCar reach local networks (Nearby devices) - the car's Wi-Fi is one")
-            SessionStatus.failed(Words.get(R.string.wireless_link_no_connection), io.github.sirionero.mycar.LocalNetwork.HINT)
+            SessionStatus.failed(R.string.wireless_link_no_connection, R.string.wireless_link_local_network_detail)
             return
         }
         // Not behind a VPN, which no start-over gets past.

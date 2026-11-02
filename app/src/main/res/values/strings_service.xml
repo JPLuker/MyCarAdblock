@@ -75,6 +75,7 @@
     <string name="wireless_link_no_connection">Car\'s Wi-Fi joined, but no connection</string>
     <!-- %2$s: the car's address, like 192.168.1.1:5288 -->
     <string name="wireless_link_no_connection_detail">myCar joined %1$s\'s network but couldn\'t reach Android Auto at %2$s.</string>
+    <string name="wireless_link_local_network_detail">Android keeps myCar off local networks, and the car\'s Wi-Fi is one: on the phone, allow myCar\'s Nearby devices permission, then connect again.</string>
 
     <!--
       With Tailscale leaving myCar out, Plancia and Xonos inside myCar reach their servers through
