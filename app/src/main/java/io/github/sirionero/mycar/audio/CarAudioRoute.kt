@@ -69,6 +69,7 @@ object CarAudioRoute {
         projecting = false
         sawCall = false
         callWaits = 0
+        dropCallWaits = 0
         main.removeCallbacksAndMessages(settling)
         stopWatching()
         CarSettings.forgetCarLink()
@@ -146,6 +147,7 @@ object CarAudioRoute {
                 // which then moved the sound to myCar for the rest of the drive, seconds before the
                 // car brought its Bluetooth music back.
                 if (inCall()) sawCall = true
+                dropCallWaits = 0
                 main.removeCallbacksAndMessages(settling)
                 main.postDelayed({ checkDropped() }, settling, DROP_MS)
             }
@@ -158,9 +160,14 @@ object CarAudioRoute {
         if (!projecting || !onBluetooth || bluetoothMusic()) {
             // Back (or nothing to watch): a call seen this time doesn't lengthen the next drop's wait.
             sawCall = false
+            dropCallWaits = 0
             return
         }
-        if (inCall()) {
+        // An app can leave the phone "in communication" for good (as settle knows), and the music then
+        // never moved to myCar for the rest of the drive: that waits at most half an hour. Not a
+        // phone call, which always ends: cut short, a long one would move the sound and put Android's
+        // question up mid-call.
+        if (inCall() && (audio?.mode != AudioManager.MODE_IN_COMMUNICATION || dropCallWaits++ < MAX_DROP_CALL_WAITS)) {
             sawCall = true
             main.postDelayed({ checkDropped() }, settling, DROP_MS)
             return
@@ -176,6 +183,10 @@ object CarAudioRoute {
         CarSettings.useCarLink(true)
         stopWatching()
     }
+
+    /** Waits "in communication" once the Bluetooth music connection dropped, [DROP_MS] each: half an hour. */
+    private var dropCallWaits = 0
+    private const val MAX_DROP_CALL_WAITS = 180
 
     /** A call was on while the Bluetooth music connection was gone (see [checkDropped]). */
     private var sawCall = false
