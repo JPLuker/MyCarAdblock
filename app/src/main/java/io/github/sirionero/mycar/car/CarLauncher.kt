@@ -326,7 +326,9 @@ internal fun launchEntry(entry: Entry, navigator: CarNavigator, frame: CarEnviro
             navigator.browse(entry.label)
         }
     }
-    entry.media?.let { CarServices.openMedia(it); navigator.media() }
+    // A web music service plays what its bar holds as it opens, Autoplay or not: its page, paused on
+    // the last song, has no other sign it was opened to listen. Nothing chosen there: its Play does nothing.
+    entry.media?.let { CarServices.openMedia(it, autoplay = entry.webMusic != null); navigator.media() }
     entry.messaging?.let { navigator.messages(it.packageName, it.label) }
 }
 
