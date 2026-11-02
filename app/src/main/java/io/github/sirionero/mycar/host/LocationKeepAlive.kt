@@ -107,7 +107,7 @@ class LocationKeepAlive : Service() {
 
         /** The drive's own hold: see [holdForDrive]. */
         private var driveHold = false
-        /** [driveHold] taken as the car's Bluetooth (or a tap, or the cable) started a start-up, before SessionService holds it. */
+        /** [driveHold] taken as the car's Bluetooth (or a tap) started a start-up, before SessionService holds it. */
         private var startUpOnly = false
         private var appContext: Context? = null
         /** The driver said OK to the car's "no position" card this drive: it doesn't come back. */
@@ -134,7 +134,7 @@ class LocationKeepAlive : Service() {
         private val startUpCheck = object : Runnable {
             override fun run() {
                 if (!driveHold || !startUpOnly) return
-                if (WirelessLink.busy || SessionService.held) {
+                if (WirelessLink.busy || WirelessLink.startingOver || SessionService.held) {
                     main.postDelayed(this, START_UP_CHECK_MS)
                     return
                 }
@@ -189,7 +189,7 @@ class LocationKeepAlive : Service() {
         /**
          * The drive's hold, taken as the car arrives: from [SessionService.start] (the car's
          * Bluetooth channel, the cable, the car's picture) and, earlier still, as a start-up begins
-         * ([untilStartUpEnds]: the car's Bluetooth opening myCar, a tap on a car, the cable) - given
+         * ([untilStartUpEnds]: the car's Bluetooth opening myCar, a tap on a car) - given
          * back by itself if that start-up never reaches a drive. Android lets this service lend its
          * location with the phone locked only if started within 10 s of myCar's screen being
          * created: taken once the map bound (14 s later through a slow Wi-Fi) it was refused, and
@@ -216,12 +216,23 @@ class LocationKeepAlive : Service() {
             }
         }
 
-        /** No one holds the drive's service any more: the drive's hold goes too. */
+        /** No one holds the drive's service any more: the drive's hold goes too, or a wireless start-up's it becomes. */
         fun releaseDrive(context: Context) {
             val app = context.applicationContext
             main.post {
                 // Taken again meanwhile: a start-up's end on WirelessLink's thread racing a drive's start.
                 if (!driveHold || SessionService.held) return@post
+                // A wireless start-up still going (a tap on a car while another held the service) or
+                // about to start over (the car's Wi-Fi didn't come, a certificate turned down): the hold
+                // stays, as a start-up's again. Given back, it was taken anew from the background,
+                // past Android's 10 s, and refused: the map had no position for the drive. Not for the
+                // listening after a drive, which lasts 10 minutes.
+                if ((WirelessLink.busy && !WirelessLink.listeningQuietly) || WirelessLink.startingOver) {
+                    startUpOnly = true
+                    main.removeCallbacks(startUpCheck)
+                    main.postDelayed(startUpCheck, START_UP_CHECK_MS)
+                    return@post
+                }
                 driveHold = false
                 startUpOnly = false
                 main.removeCallbacks(startUpCheck)

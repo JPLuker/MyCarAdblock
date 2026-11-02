@@ -117,6 +117,9 @@ object WirelessLink {
     /** Only listening for a car after its drive (see [listenAgain]): a car coming back may start afresh. */
     val listeningQuietly: Boolean get() = quiet && busy && rfcomm == null && tcp == null
 
+    /** The current start-up waits to start over ([startOver]): not over, though its thread may be. */
+    val startingOver: Boolean get() = overPending == startRun
+
     /** The car of the current start-up, for [reachedCar]. */
     @Volatile private var car: BluetoothDevice? = null
     /** Set when Android drops the car's network mid-try, so the rest don't bind to a dead one. */
@@ -148,6 +151,8 @@ object WirelessLink {
     @Volatile private var retriesLeft = 0
     /** The start-up a start-over is already on its way for, so two failures don't post two. */
     @Volatile private var retryFor = -1
+    /** The start-up whose start-over is waiting its [RETRY_DELAY_MS]; -1 once the wait is over. */
+    @Volatile private var overPending = -1
     /** The current start-up got as far as the car showing myCar ([reachedCar]); [drove] is only the TCP. */
     @Volatile private var pictured = false
     /** The current start-up has the car's Wi-Fi details and address, and asked for the network. */
@@ -359,7 +364,9 @@ object WirelessLink {
         // "waiting for the car" on Home for 5 minutes, and ended with "the car didn't connect".
         val wasQuiet = quiet
         stayAwake(app, RETRY_DELAY_MS + 5_000L)
+        overPending = mine
         main.postDelayed({
+            if (overPending == mine) overPending = -1
             // Stopped, started anew or driving meanwhile (the cable, a tap, Disconnect): that one decides.
             if (mine != startRun || tcp != null) return@postDelayed
             start(app, device, byItself = true, quiet = wasQuiet, again = true)
