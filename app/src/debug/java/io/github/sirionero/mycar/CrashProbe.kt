@@ -29,7 +29,12 @@ internal object CrashProbe {
     }
 
     fun install(root: () -> View?) {
-        root()?.viewTreeObserver?.addOnGlobalFocusChangeListener { old, new -> logStack("focus ${name(old)} -> ${name(new)}") }
+        root()?.viewTreeObserver?.addOnGlobalFocusChangeListener { old, new ->
+            logStack("focus ${name(old)} -> ${name(new)}")
+            // Focus gone from a view being taken off the screen: a node part-way through losing a child
+            // (detached already, still in its parent's list) shows here, with its parent's measure state.
+            if (new == null) runCatching { midRemoval(root()) }.onFailure { Log.w(TAG, "preview: mid-removal not read", it) }
+        }
         val previous = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, e ->
             if (e.message?.contains("attached to an owner") == true) {
@@ -81,7 +86,7 @@ internal object CrashProbe {
         walk(rootNode)
         Log.e(TAG, "preview: on the crash, ${laying.size} node(s) still laying out")
         laying.forEach { node ->
-            Log.e(TAG, "preview: laying out: ${describeNode(node)}")
+            Log.e(TAG, "preview: laying out: ${describeNode(node)} (node ${Integer.toHexString(System.identityHashCode(node))})")
             (children.invoke(node) as List<*>).forEachIndexed { i, child ->
                 child ?: return@forEachIndexed
                 Log.e(TAG, "preview:   child $i: ${describeNode(child)}; texts ${texts(child, children)}")
@@ -94,6 +99,49 @@ internal object CrashProbe {
                 level++
             }
         }
+    }
+
+    /**
+     * Every node with a child no longer attached in its list: a removal under way (LayoutNode.removeAt
+     * detaches a child, and runs its callbacks, before taking it off the list). Its measurePending says
+     * whether it has been measured again since the detach asked for it.
+     */
+    private fun midRemoval(view: View?) {
+        val compose = composeView(view) ?: return
+        val rootNode = compose.javaClass.getMethod("getRoot").invoke(compose) ?: return
+        val type = rootNode.javaClass
+        val children = getter(type, "getFoldedChildren")
+        val attached = type.getMethod("isAttached")
+        val measurePending = getter(type, "getMeasurePending")
+        val layoutPending = getter(type, "getLayoutPending")
+        val parent = getter(type, "getParent")
+        var found = 0
+        fun walk(node: Any) {
+            (children.invoke(node) as List<*>).forEach { child ->
+                child ?: return@forEach
+                if (attached.invoke(child) == false) {
+                    found++
+                    Log.w(TAG, "preview: mid-removal: a detached child still listed: ${describeNode(child)}")
+                    // The node losing it and the ones above: the subtree's root still attached, and its
+                    // parent, whose measure the detach asked for first.
+                    var up: Any? = node
+                    var level = 0
+                    while (up != null && level < 6) {
+                        Log.w(
+                            TAG,
+                            "preview: mid-removal:   up $level: ${describeNode(up)} (node ${Integer.toHexString(System.identityHashCode(up))}), " +
+                                "measurePending ${measurePending.invoke(up)}, layoutPending ${layoutPending.invoke(up)}",
+                        )
+                        up = parent.invoke(up)
+                        level++
+                    }
+                } else {
+                    walk(child)
+                }
+            }
+        }
+        walk(rootNode)
+        Log.w(TAG, "preview: mid-removal: $found node(s) with a detached child in their list")
     }
 
     private fun describeNode(node: Any): String {
