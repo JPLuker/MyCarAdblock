@@ -246,28 +246,28 @@ internal fun RightEdgeControls(
         animationSpec = androidx.compose.animation.core.tween(if (visible) 150 else 500),
         label = "mapControls",
     )
+    // Faded out, a touch on a button only wakes them; one on the room between them goes on to the map and
+    // to what lies over it there (the mini player, a card's rows). Over the whole column, it took those too.
+    val asleep = if (visible) Modifier else Modifier.pointerInput(Unit) {
+        awaitPointerEventScope {
+            while (true) {
+                awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
+            }
+        }
+    }
     Column(
         modifier
             .alpha(alpha)
-            .onFocusChanged { holdsFocus = it.hasFocus }
-            .let { base ->
-                if (visible) base else base.pointerInput(Unit) {
-                    awaitPointerEventScope {
-                        while (true) {
-                            awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
-                        }
-                    }
-                }
-            },
+            .onFocusChanged { holdsFocus = it.hasFocus },
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         if (actions.isNotEmpty()) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(asleep, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 actions.forEach { ActionButton(it) }
             }
         }
-        mapActions.forEach { ActionButton(it) }
+        mapActions.forEach { ActionButton(it, modifier = asleep) }
     }
 }
 
