@@ -297,9 +297,14 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, onClose: () -> Un
                 }
             }
         }
+        // The car taking its speakers back for good (the radio): the site's video pauses, as the
+        // player's film does. It has no media session for the phone's pause to reach, and ran on.
+        val pause = web?.let(CinemaNow::pausePage)
+        if (pause != null) CinemaNow.pause = pause
         onDispose {
             navigator.backInterceptor = null
             fullScreen?.second?.onCustomViewHidden()
+            if (pause != null && CinemaNow.pause === pause) CinemaNow.pause = null
         }
     }
 

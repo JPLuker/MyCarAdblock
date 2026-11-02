@@ -87,7 +87,14 @@ internal fun WebApp(content: String, tile: WebTile?) {
                 false
             }
         }
-        onDispose { navigator.backInterceptor = null }
+        // The car taking its speakers back for good (the radio): a page's radio or video pauses, as
+        // Cinema's (see CinemaNow). Full screen only, as the capture above.
+        val pause = web?.let(CinemaNow::pausePage)
+        if (pause != null) CinemaNow.pause = pause
+        onDispose {
+            navigator.backInterceptor = null
+            if (pause != null && CinemaNow.pause === pause) CinemaNow.pause = null
+        }
     }
 
     Column(Modifier.fillMaxSize()) {
