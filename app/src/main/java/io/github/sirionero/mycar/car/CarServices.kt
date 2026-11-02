@@ -155,7 +155,7 @@ object CarServices {
         // The Plancia and Xonos apps in place of the ones inside myCar, if those can't connect.
         InsideOrApp.start(appContext)
         // Loaded ahead of the first command, so the first reply isn't slower than the rest - but not
-        // while the car's first picture is being made: up to some 700 MB of voice models read and set
+        // while the car's first picture is being made: hundreds of MB of voice models read and set
         // up took the phone's cores and storage at the very moment the car connected. Not at all when
         // the phone's own speech recognition does the listening.
         speechWarm.removeCallbacks(warmSpeech)
@@ -168,6 +168,8 @@ object CarServices {
     private val speechWarm = android.os.Handler(android.os.Looper.getMainLooper())
     private val warmSpeech = Runnable {
         val app = context ?: return@Runnable
+        // The phone's preview of the car's screen alone (Settings, no car): no voice models for it.
+        if (phonePreview && !io.github.sirionero.mycar.SessionService.running) return@Runnable
         io.github.sirionero.mycar.speech.SpeechEngine.warm(
             app,
             io.github.sirionero.mycar.speech.VoiceLanguages.effective(

@@ -2,6 +2,7 @@ package io.github.sirionero.mycar.speech
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioFormat
@@ -9,6 +10,7 @@ import android.media.AudioManager
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.media.ToneGenerator
+import android.os.Debug
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -29,6 +31,7 @@ import com.k2fsa.sherpa.onnx.OnlineRecognizerConfig
 import com.k2fsa.sherpa.onnx.OnlineTransducerModelConfig
 import java.io.File
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.max
 
 /**
@@ -97,14 +100,22 @@ object SpeechEngine {
     private val idleUnload = Runnable { unloadFinal("after ${IDLE_UNLOAD_MS / 60_000} minutes without use") }
     @Volatile private var run = 0
 
-    /** Loads the model ahead of time, so the first command doesn't wait for it; [language] is the one the assistant will listen in. */
+    /** Bumped by [unload]: a warm-up whose loads haven't started yet doesn't start them after it. */
+    private val generation = AtomicInteger()
+
+    /** Loads the models ahead of time, so the first command doesn't wait for them; [language] is the one the assistant will listen in. */
     fun warm(context: Context, language: VoiceLanguage = VoiceLanguage.EN) {
         val app = context.applicationContext
         SpeechModels.init(app)
+        val gen = generation.get()
         // Kroko first, alone: loading both at once slowed it from a fraction of a second to six.
         worker.execute {
+            if (gen != generation.get()) return@execute
             ensureLoaded(app)
             finalWorker.execute {
+                // The car went away (or the models changed) while Kroko loaded: no ~800 MB for nobody,
+                // held five minutes after the drive. And ahead of any command only with memory to spare.
+                if (gen != generation.get() || !roomForFinal(app, language)) return@execute
                 ensureFinalLoaded(app, language)
                 // A drive may never use it: it goes after the same idle minutes as after a command,
                 // instead of holding its memory until the car disconnects.
@@ -112,6 +123,28 @@ object SpeechEngine {
                 main.postDelayed(idleUnload, IDLE_UNLOAD_MS)
             }
         }
+    }
+
+    /**
+     * Whether the final model may load before any command. Its weights sit in myCar's own memory
+     * (read in, not mapped from the file: ~800 MB for Parakeet's 640 MB on disk), so only with room
+     * to spare after it; short of that it loads at the first command, as after [IDLE_UNLOAD_MS].
+     */
+    private fun roomForFinal(context: Context, language: VoiceLanguage): Boolean {
+        val model = SpeechModels.finalFor(context, language) ?: return false
+        val manager = context.getSystemService(ActivityManager::class.java) ?: return true
+        val mem = ActivityManager.MemoryInfo().also { manager.getMemoryInfo(it) }
+        val need = model.files.sumOf { File(SpeechModels.dir(context, model), it).length() } * 5 / 4
+        if (!mem.lowMemory && mem.availMem - need > maxOf(4 * mem.threshold, 2L shl 30)) return true
+        MyCarLog.i("speech: ${model.label} waits for the first command, ${mem.availMem shr 20} MB free")
+        return false
+    }
+
+    /** What Android counts as available, in MB, for the line before a load. */
+    private fun freeMb(context: Context): Long {
+        val mem = ActivityManager.MemoryInfo()
+        context.getSystemService(ActivityManager::class.java)?.getMemoryInfo(mem) ?: return -1
+        return mem.availMem shr 20
     }
 
     private fun unloadFinal(why: String) {
@@ -129,6 +162,7 @@ object SpeechEngine {
 
     /** Drops the loaded models: the driver picked another or deleted one, or the car went away. */
     fun unload() {
+        generation.incrementAndGet()
         main.removeCallbacks(idleUnload)
         run++
         worker.execute {
@@ -172,15 +206,16 @@ object SpeechEngine {
         }
         val id = ++run
         fun post(block: () -> Unit) { main.post { if (id == run) block() } }
-        // Brings Parakeet back if it was unloaded, while the driver talks.
         main.removeCallbacks(idleUnload)
-        finalWorker.execute { ensureFinalLoaded(app, language) }
         worker.execute {
             if (id != run) return@execute
             if (!SpeechModels.isReady(app, SpeechModels.selected.value)) return@execute post { onError(NOT_DOWNLOADED) }
             val r = ensureLoaded(app) ?: return@execute post { onError(NOT_LOADED) }
             // Cancelled while the model loaded (X, Back, a call): no beep, the music not paused.
             if (id != run) return@execute
+            // Parakeet back if it was unloaded, while the driver talks - after Kroko, never beside it:
+            // two loads at once slowed Kroko to seconds and stacked their memory.
+            finalWorker.execute { if (id == run) ensureFinalLoaded(app, language) }
             VoiceFocus.acquire(app)
             val text = try {
                 if (cue) cue()
@@ -350,6 +385,7 @@ object SpeechEngine {
         if (!SpeechModels.isReady(context, model)) return null
         val dir = SpeechModels.dir(context, model)
         fun path(name: String) = File(dir, name).absolutePath
+        MyCarLog.i("speech: loading ${model.label} (${language.code}), ${freeMb(context)} MB free")
         val started = SystemClock.uptimeMillis()
         return runCatching {
             OfflineRecognizer(
@@ -387,7 +423,7 @@ object SpeechEngine {
             finalRecognizer = it
             loadedFinal = model
             loadedLanguage = language
-            MyCarLog.i("speech: loaded ${model.label} (${language.code}) in ${SystemClock.uptimeMillis() - started} ms")
+            MyCarLog.i("speech: loaded ${model.label} (${language.code}) in ${SystemClock.uptimeMillis() - started} ms, native heap ${Debug.getNativeHeapAllocatedSize() shr 20} MB")
         }.onFailure {
             MyCarLog.e("speech: couldn't load ${model.label}", it)
         }.getOrNull()
@@ -401,6 +437,7 @@ object SpeechEngine {
         if (!SpeechModels.isReady(context, model)) return null
         val dir = SpeechModels.dir(context, model)
         fun path(name: String) = File(dir, name).absolutePath
+        MyCarLog.i("speech: loading ${model.label}, ${freeMb(context)} MB free")
         val started = SystemClock.uptimeMillis()
         return runCatching {
             OnlineRecognizer(
