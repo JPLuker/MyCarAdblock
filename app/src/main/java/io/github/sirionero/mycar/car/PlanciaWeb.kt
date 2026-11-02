@@ -113,6 +113,17 @@ internal class PlanciaWeb(context: Context, dark: Boolean) {
         place()
     }
 
+    /**
+     * Takes away the focus a tap in the page gave it, before its part leaves the screen (see
+     * LeaveWithoutFocus.kt). Returns what had it, for the log, or null if nothing did.
+     */
+    fun dropFocus(): String? {
+        val w = web ?: return null
+        if (!w.hasFocus()) return null
+        w.clearFocus()
+        return "Plancia's page"
+    }
+
     fun openMenu() {
         _menu.value = true
     }
