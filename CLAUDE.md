@@ -82,6 +82,14 @@ Rispondi sempre in **italiano**.
   scelte; parte con un'attesa: il primo tocco subito dopo l'avvio diventava una pressione lunga),
   `pages-layouts/` (matita, "Layout", elenco dei formati, "Half left"), `layout-<formato>/`
   e `layout-800x480/` (la pagina a sinistra della mappa in quel formato, `--es pageLayout <id>`); l'anteprima riparte ogni volta dalle pagine pronte (`HomePages.reset()`).
+  `--es pageParts plancia,agenda,weather` (con `pageLayout`) dice cosa mostra ogni parte; il tocco
+  `"x,y,swipe,x2,y2"` è uno scorrimento rapido (8 passi da 16 ms). Scatti `plancia-swipe/`,
+  `plancia-swipe-800x480/`, `plancia-swipe-spotify/`: pagina in tre parti (Plancia, agenda, meteo),
+  aperta dal puntino e lasciata scorrendo verso la mappa otto volte; `alive.txt` (funzione `alive`)
+  dice se myCar gira ancora a fine scatto e, se no, crash, tombstone, uscite registrate da Android,
+  memoria. Verificato (0.7, API 37.0 e 34): nessuna caduta. `last-exit-crash/` + `last-exit/`:
+  `--ei crashAfterMs` (solo debug) manda a myCar un SIGSEGV, lo scatto dopo scrive come è finito
+  (`LastExit`): verificato su Android 17, segnale, frame e righe dal tombstone.
   Assistente: `assistant/` (Impostazioni al posto di un assistente-activity, `phone-screen.png`),
   `assistant-google/` (l'app Google dell'emulatore: schermo del telefono dopo il microfono e dopo lo
   scorrimento dall'angolo, `phone-mic.png` / `phone-swipe.png`), `assistant-mic/` +
@@ -865,6 +873,18 @@ Tutti i token in un solo posto, `car/design/`:
   non riparte né richiede: a fine condivisione la chiede `CarUi`. Accanto alla mappa l'app musicale
   prende il posto solo della scelta automatica del viaggio quando non si collega
   (`mediaAutoPicked`), mai di un'app scelta dal guidatore.
+- **Come è finito il processo di prima** (0.7, `LastExit.kt`): un crash nativo (motore web, grafica,
+  sherpa-onnx) o Android che chiude myCar non lasciano righe nel log: il file si ferma. All'avvio
+  (`MyCarActivity`, e l'anteprima) myCar scrive le uscite nuove da `ApplicationExitInfo` ("last exit:"
+  motivo, ora, pss/rss, descrizione), solo dei suoi processi e dei crash del motore web (le pagine web
+  chiuse con lei, "isolated not needed", coprivano il motivo vero); per un crash nativo il tombstone
+  (protobuf: segnale, abort, thread, 24 frame, ultime righe di avviso), per un ANR lo stack di main.
+  Android 17 ha un limite di memoria per app basato sulla RAM (Memory Limiter: motivo OTHER,
+  descrizione "MemoryLimiter:AnonSwap"): lo dice con una riga a sé. Nel log anche la pagina della Home
+  su cui si ferma ogni cambio ("home: page") e Plancia che entra o esce dalla vista. Nato dalle cadute
+  di 0.6.8/0.6.9 (Pixel 10 Pro, Android 17): log fermi senza eccezione e senza alcun tocco prima (la
+  seconda a 1 s dall'inizio del caricamento di Parakeet multilingual, 640 MB); lo scorrimento dalla
+  pagina in tre parti non cade in emulatore.
 - **Motore da Gearslip** (0.5.18, branch `fix/engine`): delle 116 modifiche di Gearslip dopo il fork
   (0.3.01 → 0.3.31) si portano solo quelle che non possono cambiare come si collega un'auto che oggi va
   (richiesta dell'utente: "porta quello che ha senso, non cose che potrebbero rompere il nostro
