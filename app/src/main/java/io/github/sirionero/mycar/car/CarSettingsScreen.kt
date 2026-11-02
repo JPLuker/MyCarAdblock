@@ -70,6 +70,7 @@ fun CarSettingsScreen() {
     val locationWarning by CarSettings.locationWarning.collectAsState()
     val autoplay by CarSettings.autoplay.collectAsState()
     val playerSize by CarSettings.playerSize.collectAsState()
+    val miniPlayer by MiniPlayerSetting.on.collectAsState()
     val theme by CarSettings.appTheme.collectAsState()
     val uiTheme by CarSettings.uiTheme.collectAsState()
     val experimentalFeatures by CarSettings.experimentalFeaturesEnabled.collectAsState()
@@ -109,6 +110,12 @@ fun CarSettingsScreen() {
             ),
             playerSize,
         ) { CarSettings.setPlayerSize(it) }
+
+        ChoiceRow(
+            stringResource(R.string.car_settings_mini_player),
+            listOf(false to stringResource(R.string.common_off), true to stringResource(R.string.common_on)),
+            miniPlayer,
+        ) { MiniPlayerSetting.setOn(it) }
 
         HomePagesSettings()
 

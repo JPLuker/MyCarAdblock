@@ -44,6 +44,9 @@
     <string name="car_apps_show_on_grid">In der App-Übersicht anzeigen</string>
     <string name="car_apps_hidden_toast">Ausgeblendet: %1$s. Du holst sie unter „Einstellungen“, „Ausgeblendete Apps“ zurück.</string>
     <string name="car_web_music_elsewhere">%1$s spielt auf einem anderen Gerät, nicht im Auto</string>
+    <string name="car_mini_open_player">Player öffnen</string>
+    <string name="car_mini_hide">Mini-Player ausblenden</string>
+    <string name="car_mini_hidden_toast">Mini-Player für diese Fahrt ausgeblendet. Der Titel im Dock öffnet den Player.</string>
 
     <string name="car_map_starting">%1$s wird gestartet…</string>
     <string name="car_map_starting_unknown">Die Karte wird gestartet…</string>

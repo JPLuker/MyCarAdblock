@@ -232,6 +232,10 @@ fun CarUi() {
     LaunchedEffect(navigator) {
         SidePaneChoice.current.drop(1).collect { navigator.showSidePane() }
     }
+    // The mini player turned back on, in the car or on the phone, shows at once: its X had put it away for the drive.
+    LaunchedEffect(navigator) {
+        MiniPlayerSetting.on.drop(1).collect { if (it) navigator.showMiniPlayer() }
+    }
 
     // A "play X" the music app played nothing for (Spotify ignores most): said here when the
     // player's screen isn't up to say it. On Home, "Looking for X on Spotify." was the last word.

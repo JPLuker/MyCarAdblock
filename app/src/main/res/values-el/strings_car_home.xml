@@ -44,6 +44,9 @@
     <string name="car_apps_show_on_grid">Εμφάνιση στο πλέγμα εφαρμογών</string>
     <string name="car_apps_hidden_toast">Κρυφή εφαρμογή: %1$s. Για να επανέλθει: Ρυθμίσεις, Κρυφές εφαρμογές.</string>
     <string name="car_web_music_elsewhere">Το %1$s παίζει σε άλλη συσκευή, όχι στο αυτοκίνητο</string>
+    <string name="car_mini_open_player">Άνοιγμα του προγράμματος αναπαραγωγής</string>
+    <string name="car_mini_hide">Απόκρυψη του μίνι προγράμματος αναπαραγωγής</string>
+    <string name="car_mini_hidden_toast">Το μίνι πρόγραμμα αναπαραγωγής κρύφτηκε για αυτή τη διαδρομή. Το τραγούδι στο Dock ανοίγει το πρόγραμμα αναπαραγωγής.</string>
 
     <string name="car_map_starting">Εκκίνηση του %1$s…</string>
     <string name="car_map_starting_unknown">Εκκίνηση του χάρτη…</string>

@@ -44,6 +44,9 @@
     <string name="car_apps_show_on_grid">Mostrar na grade de apps</string>
     <string name="car_apps_hidden_toast">App oculto: %1$s. Para trazê-lo de volta: Configurações, Apps ocultos.</string>
     <string name="car_web_music_elsewhere">%1$s está tocando em outro dispositivo, não no carro</string>
+    <string name="car_mini_open_player">Abrir o player</string>
+    <string name="car_mini_hide">Ocultar o miniplayer</string>
+    <string name="car_mini_hidden_toast">Miniplayer oculto nesta viagem. A música no dock abre o player.</string>
 
     <string name="car_map_starting">Iniciando %1$s…</string>
     <string name="car_map_starting_unknown">Iniciando o mapa…</string>

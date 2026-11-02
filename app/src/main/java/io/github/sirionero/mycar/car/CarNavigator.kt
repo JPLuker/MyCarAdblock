@@ -114,6 +114,7 @@ class CarNavigator(startId: String) {
      * With lyrics already there it swaps them for the controls; with the controls there it closes.
      */
     fun togglePlayerDock() {
+        showMiniPlayer()
         if (current != CarScreen.Home || !onMapPage) {
             sidePanel = SidePanel.CONTROLS
             home()
@@ -124,6 +125,7 @@ class CarNavigator(startId: String) {
 
     /** Home with the player beside the map: where the dock's foot leads back to from the app grid. */
     fun homeWithPlayer() {
+        showMiniPlayer()
         sidePanel = SidePanel.CONTROLS
         home()
     }
@@ -137,9 +139,25 @@ class CarNavigator(startId: String) {
      * The column beside the map back, if the driver closed it: a new choice for it ("Beside the
      * map", in the car or on the phone) shows at once instead of waiting for the dock. Lyrics stay.
      */
-    fun showSidePane() { if (sidePanel == SidePanel.NONE) sidePanel = SidePanel.CONTROLS }
+    fun showSidePane() {
+        showMiniPlayer()
+        if (sidePanel == SidePanel.NONE) sidePanel = SidePanel.CONTROLS
+    }
 
     fun closeSidePanel() { sidePanel = SidePanel.NONE }
+
+    /**
+     * The mini player over the whole map ([MapMiniPlayer]) put away with its X, for the drive (for as
+     * long as this navigator: a car screen rebuilt starts a new one, as for the column). Whatever brings
+     * the column back - the dock's song, the dock's foot from the grid, a new choice for beside the map -
+     * and the setting turned on again let it show once more.
+     */
+    var miniPlayerHidden by mutableStateOf(false)
+        private set
+
+    fun hideMiniPlayer() { miniPlayerHidden = true }
+
+    fun showMiniPlayer() { miniPlayerHidden = false }
 
     /** Component id of the app whose long-press menu (pin, close) is open, or null. */
     var appMenu by mutableStateOf<String?>(null)

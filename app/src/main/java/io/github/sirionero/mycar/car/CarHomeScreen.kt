@@ -115,6 +115,12 @@ fun CarHome() {
     val music = sideApp?.template == null && sideApp?.builtIn != BuiltInApps.Plancia
     val playerSize by CarSettings.playerSize.collectAsStateWithLifecycle()
     val sideScale = if (music) playerSize else 1f
+    // The map alone with music on (the column closed with its X, the dock's song, or Close beside an
+    // app): the mini player floats over it instead (see MapMiniPlayer); not while the map is panned.
+    // Its song as the column would draw it: the last one during the column's hold, whatever is beside the map.
+    val miniOn by MiniPlayerSetting.on.collectAsStateWithLifecycle()
+    val panning by CarServices.nav.panMode.collectAsStateWithLifecycle()
+    val miniNow = if (musicShown && !musicOn && !now.isActive && lastActive[0].isActive) lastActive[0] else now
 
     // The map's page among the driver's own (see HomePager). No outer padding on any side, split
     // screen or not - only the gap between the two panes when the player is sharing the screen
@@ -130,7 +136,7 @@ fun CarHome() {
                 .weight(if (splitScreen) MAP_SHARE / sideScale - 1f else 1f)
                 .fillMaxHeight(),
         ) {
-            MapPane(navStatus, frame, inView)
+            MapPane(navStatus, frame, inView, mini = miniNow.takeIf { miniPlayerShows(miniOn, navigator.miniPlayerHidden, musicShown, splitScreen, inView, panning) })
         }
         if (splitScreen) CompositionLocalProvider(LocalPlayerInView provides inView, LocalDensity provides LocalDensity.current.scaledBy(sideScale)) {
             val side = Modifier.weight(1f).fillMaxHeight()
@@ -155,13 +161,17 @@ fun CarHome() {
 }
 
 @Composable
-private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame, inView: Boolean) {
+private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame, inView: Boolean, mini: NowPlaying? = null) {
     val navigator = LocalCarNavigator.current
     if (status.phase == CarAppConnection.Phase.RUNNING) {
         // The car's Back key reaches the map's app (its search results, a list of places) while
         // the map is the page in view; under another screen it goes on closing that screen.
         AppBackKey(CarServices.nav, active = inView)
-        CarAppStage(CarServices.nav, status, frame, embedded = true) { CarServices.stopNav() }
+        CarAppStage(
+            CarServices.nav, status, frame, embedded = true,
+            // Over the map, under the app's own cards and buttons: they stay on top of it.
+            overMap = { if (mini != null) MapMiniPlayer(mini, Modifier.fillMaxSize()) },
+        ) { CarServices.stopNav() }
         return
     }
 
@@ -226,6 +236,8 @@ private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame
             }
         }
     }
+    // No map drawn yet (starting, stopped, failed): the mini player over the message, which keeps the middle.
+    if (mini != null) MapMiniPlayer(mini, Modifier.fillMaxSize())
 }
 
 /** The side's share of the screen beside the map at Small: one part to the map's 2.1. */

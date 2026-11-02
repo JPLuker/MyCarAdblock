@@ -44,6 +44,9 @@
     <string name="car_apps_show_on_grid">Afficher dans la grille des apps</string>
     <string name="car_apps_hidden_toast">App masquée : %1$s. Pour la retrouver : Paramètres, Apps masquées.</string>
     <string name="car_web_music_elsewhere">%1$s joue sur un autre appareil, pas dans la voiture</string>
+    <string name="car_mini_open_player">Ouvrir le lecteur</string>
+    <string name="car_mini_hide">Masquer le mini-lecteur</string>
+    <string name="car_mini_hidden_toast">Mini-lecteur masqué pour ce trajet. Le titre dans le dock ouvre le lecteur.</string>
 
     <string name="car_map_starting">Démarrage de %1$s…</string>
     <string name="car_map_starting_unknown">Démarrage de la carte…</string>

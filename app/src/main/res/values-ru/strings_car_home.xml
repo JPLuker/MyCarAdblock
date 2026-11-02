@@ -46,6 +46,9 @@
     <string name="car_apps_show_on_grid">Показать в сетке приложений</string>
     <string name="car_apps_hidden_toast">Скрыто: %1$s. Вернуть можно в разделе «Настройки», «Скрытые приложения».</string>
     <string name="car_web_music_elsewhere">%1$s играет на другом устройстве, а не в машине</string>
+    <string name="car_mini_open_player">Открыть плеер</string>
+    <string name="car_mini_hide">Скрыть мини-плеер</string>
+    <string name="car_mini_hidden_toast">Мини-плеер скрыт на эту поездку. Трек в доке открывает плеер.</string>
 
     <string name="car_map_starting">Запуск %1$s…</string>
     <string name="car_map_starting_unknown">Запуск карты…</string>

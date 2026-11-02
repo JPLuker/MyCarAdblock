@@ -62,6 +62,8 @@ fun CarAppStage(
     embedded: Boolean = false,
     /** The title bar's button, at its right end: Stop for an app on its own screen; none if null. */
     endLabel: String? = stringResource(R.string.car_template_stop),
+    /** Over the app's drawing and under the template's chrome, whose cards and buttons stay on top: Home's mini player. */
+    overMap: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit = {},
     onDisconnect: () -> Unit,
 ) {
     val template by connection.template.collectAsStateWithLifecycle()
@@ -73,6 +75,7 @@ fun CarAppStage(
             if (status.surfaceRequested) {
                 AppSurface(connection, frame, template, Modifier.fillMaxSize())
             }
+            overMap()
             TemplateChrome(template, Modifier.fillMaxSize().padding(top = if (embedded) 0.dp else CHROME_BAR))
             if (!embedded) ChromeBar(status, endLabel, onDisconnect, Modifier.align(Alignment.TopCenter))
         }
