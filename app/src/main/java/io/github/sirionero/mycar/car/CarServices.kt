@@ -75,6 +75,32 @@ object CarServices {
     private val _mediaDecided = MutableStateFlow(false)
     val mediaDecided: StateFlow<Boolean> = _mediaDecided.asStateFlow()
 
+    /**
+     * The drive's own music still to say its song - a web player or Xonos inside myCar once its page or
+     * server is up, an app told to play: Home keeps the player's column for it from the start, so the
+     * map's app is lent its final width at once. Each width is a new surface, and Vela builds its map
+     * again (2 Nov 2026: 720 px at 13:03:45, 437 px 6 s later when Spotify Web said its song). Until its
+     * first song ([musicCame]), [MUSIC_START_MS], or the music closed.
+     */
+    private val _musicStarting = MutableStateFlow(false)
+    val musicStarting: StateFlow<Boolean> = _musicStarting.asStateFlow()
+    private val musicWait = android.os.Handler(android.os.Looper.getMainLooper())
+    private val musicWaitOver = Runnable { _musicStarting.value = false }
+
+    private fun expectMusic(on: Boolean) {
+        musicWait.removeCallbacks(musicWaitOver)
+        _musicStarting.value = on
+        if (on) musicWait.postDelayed(musicWaitOver, MUSIC_START_MS)
+    }
+
+    /** The music said its song: the column is the music's now. */
+    fun musicCame() {
+        if (_musicStarting.value) expectMusic(false)
+    }
+
+    /** Spotify Web said its song 6.4 s into the drive; Xonos through the bridge connects in up to ~15 s. */
+    private const val MUSIC_START_MS = 20_000L
+
     /** Set when the driver stops the map by hand, so going Home doesn't immediately restart it. */
     private var navStopped = false
 
@@ -277,6 +303,9 @@ object CarServices {
         }
 
         _mediaApp.value = app
+        // The drive's first pick, before its song: myCar's own players say it only once their page or
+        // server is up, Autoplay or not; a phone app at once or never, so only when it's told to play.
+        if (auto && !_mediaDecided.value && (autoplay || inside(app.component))) expectMusic(true)
         autoplayPending = autoplay
         media.connect(app)
         // Not torn down and rebuilt per app: the capture covers whatever the phone plays, so
@@ -311,6 +340,7 @@ object CarServices {
     fun closeMedia() {
         closedMedia = _mediaApp.value?.component
         mediaAutoPicked = false
+        expectMusic(false)
         if (media.now.value.playing) media.togglePlay()
         media.disconnect()
         _mediaApp.value = null
@@ -412,7 +442,11 @@ object CarServices {
         val app = withContext(Dispatchers.IO) { MediaCatalog.installed(ctx) }
             .firstOrNull { it.component.packageName == Xonos.APP_PACKAGE } ?: return
         if (_mediaApp.value !== inside) return
+        // Xonos's column still kept for its first song: kept for the app's (Xonos gives way 20 s in, as
+        // the wait ends: closed and opened again, the map would be lent two more surfaces).
+        val waiting = _musicStarting.value
         openMedia(app, autoplay = CarSettings.autoplay.value || media.now.value.playing, remember = false, auto = mediaAutoPicked)
+        if (waiting) expectMusic(true)
     }
 
     /**
@@ -495,6 +529,7 @@ object CarServices {
         CarAudio.release()
         _mediaApp.value = null
         _mediaDecided.value = false
+        expectMusic(false)
         mediaAutoPicked = false
         closedBrowse = emptySet()
         closedMedia = null

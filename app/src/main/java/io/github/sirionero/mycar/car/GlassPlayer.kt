@@ -76,7 +76,7 @@ import io.github.sirionero.mycar.media.NowPlaying
  * shows its icon instead.
  */
 @Composable
-internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier) {
+internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp: String? = null) {
     val navigator = LocalCarNavigator.current
     val media = CarServices.media
     val context = LocalContext.current
@@ -148,7 +148,8 @@ internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        now.title,
+                        // The column kept for the drive's music before its first song: "Starting Spotify…".
+                        if (startingApp != null && !now.isActive) stringResource(R.string.car_map_starting, startingApp) else now.title,
                         style = MaterialTheme.typography.titleMedium.copy(shadow = TEXT_SHADOW),
                         fontWeight = FontWeight.Bold,
                         color = Color.White,

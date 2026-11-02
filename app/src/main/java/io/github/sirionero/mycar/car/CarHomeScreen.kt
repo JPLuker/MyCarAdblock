@@ -123,7 +123,16 @@ fun CarHome() {
             if (Lyrics.find(context, song).getOrNull() is LyricsAnswer.Found) navigator.lyricsBack()
         }
     }
-    val splitScreen = panel != SidePanel.NONE && (sideApp != null || musicShown)
+    // The drive's music on its way: its column from the start (see CarServices.musicStarting). Only with the
+    // music beside the map: a chosen app's column is there anyway, and one not loaded yet would come at its
+    // own width. Not for music that won't connect. After the musicShown effect above: as the song comes,
+    // musicShown is true before the wait ends, and no frame closes the column.
+    val starting by CarServices.musicStarting.collectAsStateWithLifecycle()
+    val sideChoice by SidePaneChoice.current.collectAsStateWithLifecycle()
+    LaunchedEffect(musicOn) { if (musicOn) CarServices.musicCame() }
+    val reserved = starting && sideChoice == SidePaneChoice.MUSIC && sideApp == null && mediaApp != null &&
+        phase != CarMedia.Phase.REJECTED
+    val splitScreen = panel != SidePanel.NONE && (sideApp != null || musicShown || reserved)
     // The music beside the map at the size chosen for it (Small, Medium, Large): an app's own screen
     // there keeps its size.
     val music = sideApp?.template == null && sideApp?.builtIn != BuiltInApps.Plancia
@@ -167,7 +176,7 @@ fun CarHome() {
                     if (inView) PlanciaPane(side) else AppPlaceholder("Plancia", null, side, builtInId = BuiltInApps.Plancia.id)
                 panel == SidePanel.LYRICS -> SideLyrics(shownNow, side)
                 sideMedia != null -> SideMediaPane(sideMedia, shownNow, side)
-                else -> GlassDockedPlayer(shownNow, side)
+                else -> GlassDockedPlayer(shownNow, side, startingApp = mediaApp?.label?.takeIf { reserved && !shownNow.isActive })
             }
         }
     }
