@@ -129,6 +129,9 @@ case " ${ONLY:-last-exit} " in *" last-exit "*)
     grep -h "last exit" previews/last-exit/log.txt 2>/dev/null | cut -c1-250 | head -50 || echo "last-exit: nothing" ;;
 esac
 
+# The hunt for "LayoutNode should be attached to an owner": scripted shots, only when named (crash-*).
+source .github/car-preview-crash.sh
+
 # Home, then the app grid (dock's foot), then the dashboard (the clock at its top).
 shoot 800x480 800 480 160 "48,436;48,44"
 shoot 1920x720 1920 720 240 "$GRID_BUTTON;72,66"

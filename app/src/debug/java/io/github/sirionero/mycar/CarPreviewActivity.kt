@@ -116,7 +116,12 @@ class CarPreviewActivity : ComponentActivity() {
                     "agenda" -> io.github.sirionero.mycar.car.PageContent.AGENDA
                     "browser" -> io.github.sirionero.mycar.car.PageContent.BROWSER
                     "plancia" -> io.github.sirionero.mycar.car.PageContent.PLANCIA
-                    else -> null
+                    // "app:it.plancia.ha": that car app's service (the crash-grid-app shot).
+                    else -> name.trim().takeIf { it.startsWith("app:") }?.let { app ->
+                        packageManager.queryIntentServices(
+                            android.content.Intent(androidx.car.app.CarAppService.SERVICE_INTERFACE).setPackage(app.removePrefix("app:")), 0,
+                        ).firstOrNull()?.serviceInfo?.let { android.content.ComponentName(it.packageName, it.name).flattenToString() }
+                    }
                 }
                 laid = laid.withSlot(1, slot, content)
             }
@@ -316,6 +321,13 @@ class CarPreviewActivity : ComponentActivity() {
             }, ms.toLong())
         }
         MyCarLog.i("preview: displayId=${p.displayId}")
+        // --es script "wait:9000;tap:48,116;...": the car's touches and events from a script, with the
+        // car's timing (see PreviewScript); --ei seed for its random numbers. The crash-* shots.
+        intent.getStringExtra("script")?.let { script ->
+            PreviewScript(p, { latest }, requireNotNull(getExternalFilesDir(null)), intent.getIntExtra("seed", 7)) {
+                p.start(imageReader.surface, w, h, dpi) { CarUi() }
+            }.start(script)
+        }
         if (intent.getBooleanExtra("hide", false)) p.setOverlayVisible(false)
 
         intent.getStringExtra("launch")?.let { pkg ->
