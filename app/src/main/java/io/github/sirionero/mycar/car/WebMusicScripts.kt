@@ -157,6 +157,10 @@ internal object WebMusicScripts {
     ['play', 'playing', 'pause', 'ended', 'durationchange', 'seeked', 'emptied'].forEach(function (type) {
       el.addEventListener(type, schedule);
     });
+    // Music here starting, stopping or changing song: for a moment after, a clock that runs on is still ours.
+    ['play', 'playing', 'pause', 'ended', 'emptied', 'waiting'].forEach(function (type) {
+      el.addEventListener(type, function () { if (!el.muted && !el.loop) localAt = Date.now(); });
+    });
   }
   if (window.HTMLMediaElement) {
     var play = HTMLMediaElement.prototype.play;
@@ -232,9 +236,12 @@ internal object WebMusicScripts {
       }
     }
     if (duration > 0) at = Math.max(0, Math.min(at, duration));
-    // The bar's clock running with nothing playing here that says so: the service plays somewhere
-    // else (Spotify Connect: the phone's app), and its bar is that device's remote.
-    var remote = !playing && said !== 'playing' && said !== 'paused' && Date.now() < clockRunsUntil;
+    // The bar's clock running for sure with nothing playing here that says so, and nothing played here
+    // for a few seconds (a song that stops or changes here leaves it running a moment): the service plays
+    // somewhere else (Spotify Connect: the phone's app), and its bar is that device's remote.
+    var stamp = Date.now();
+    if (playing) localAt = stamp;
+    var remote = !playing && said !== 'playing' && said !== 'paused' && clockRuns() && stamp - localAt > HERE_MS;
     return {
       type: 'state',
       title: clip(title, 300),
@@ -250,12 +257,36 @@ internal object WebMusicScripts {
   }
 
   // Whether the bar's clock moves on by itself, read once a second: only its digits, any language.
-  var clockMs = null, clockRunsUntil = 0, clockSeen = 0;
+  // clockSteps: its steps forward in a row; clockSame: the reads in a row showing the same time. Running
+  // for sure: two steps, each within 2.5 s of the one before. Stopped for sure: the same time at three
+  // reads - a running clock can be read twice in the same second. Gone back (a new song) or jumped (a
+  // seek): nothing known until it says again. localAt: when music last played here (HERE_MS).
+  var clockMs = null, clockRunsUntil = 0, clockSteps = 0, clockSame = 0, localAt = -Infinity, HERE_MS = 5000;
   function watchClock() {
-    var c = BAR && clock(text(byTestId(BAR.position)));
-    if (c && !c.left && clockMs !== null && c.ms > clockMs && c.ms - clockMs <= 3000) clockRunsUntil = Date.now() + 2500;
-    clockMs = (c && !c.left) ? c.ms : null;
-    clockSeen = (c && !c.left) ? clockSeen + 1 : 0;
+    var c = BAR && clock(text(byTestId(BAR.position))), now = Date.now();
+    if (!c || c.left) {
+      clockMs = null; clockSteps = 0; clockSame = 0; clockRunsUntil = 0;
+      return;
+    }
+    if (clockMs !== null && c.ms === clockMs) {
+      if (++clockSame >= 3) clockSteps = 0;
+    } else if (clockMs !== null && c.ms > clockMs && c.ms - clockMs <= 3000) {
+      clockSteps = now < clockRunsUntil ? clockSteps + 1 : 1;
+      clockRunsUntil = now + 2500;
+      clockSame = 1;
+    } else {
+      clockSteps = 0; clockRunsUntil = 0; clockSame = 1;
+    }
+    clockMs = c.ms;
+  }
+  function clockRuns() { return Date.now() < clockRunsUntil && clockSteps >= 2; }
+  // Not yet known whether the bar's music runs here, on another device or nowhere: a clock not read yet
+  // (the bar just came, or came back), just started, back at 0:00 (a new song), maybe stopping (the same
+  // time twice), or running on just after the music here stopped.
+  function unsettled() {
+    if (clockMs === null) return true;
+    if (clockRuns()) return Date.now() - localAt <= HERE_MS || clockSame >= 2;
+    return clockSame < 3;
   }
 
   // Said when something changes, and when the position jumps (a seek): not every second.
@@ -290,17 +321,19 @@ internal object WebMusicScripts {
         return 'page';
       } catch (e) {}
     }
-    // Playing on another device counts as playing: one button plays and pauses, and a Play would stop it.
-    var s = snapshot(), on = s.playing || s.remote;
-    if ((action === 'play' && on) || (action === 'pause' && !on)) return 'already';
+    var s = snapshot();
+    if (action === 'play' && s.playing) return 'already';
     var button = BUTTONS[action] && byTestId(BUTTONS[action]);
-    // The bar's one play/pause button, with its clock just shown: read twice first (a second
-    // apart) to know whether it runs - playing on another device - or a click would pause it there.
+    // The bar's one play/pause button, while its clock can't tell where the music is (unsettled): a
+    // click could play or pause the wrong way - another device's music, or a song starting here.
     if (button && !button.disabled && !s.playing && (action === 'play' || action === 'pause') &&
-        BUTTONS[action] === BAR.playPause && clockSeen < 2) {
+        BUTTONS[action] === BAR.playPause && unsettled()) {
       var c = clock(text(byTestId(BAR.position)));
       if (c && !c.left) return 'wait';
     }
+    // Playing on another device counts as playing: one button plays and pauses, and a Play would stop it.
+    var on = s.playing || s.remote;
+    if ((action === 'play' && on) || (action === 'pause' && !on)) return 'already';
     if (button && !button.disabled) {
       button.click();
       schedule();
