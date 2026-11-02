@@ -845,7 +845,12 @@ class CarMedia(private val context: Context) {
         const val SESSION_RETRIES_LAUNCHED = 16
         /** How long an app gets to start playing a search before myCar says it didn't. */
         const val SEARCH_WAIT_MS = 6_000L
-        const val WEB_SEARCH_WAIT_MS = 15_000L
+        /**
+         * A web player: its search's page loads, then up to 12 tries for its first Play, then the song
+         * starts - past 15 s on a slow network, and the car said "nothing played" as it began. Past
+         * the 20 s its page holds the car's Play for the search (WebMusicPage.SEARCH_HOLD_MS).
+         */
+        const val WEB_SEARCH_WAIT_MS = 25_000L
         const val SEARCH_NOTICE_MS = 6_000L
         /** How soon after an app went away to connect to it again. */
         const val RELINK_WAIT_MS = 1_000L
