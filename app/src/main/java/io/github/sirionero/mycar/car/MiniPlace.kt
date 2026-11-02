@@ -30,6 +30,10 @@ internal data class MiniPlace(val x: Float, val y: Float) {
          * size) the corner can be under the map's buttons (top right) or beside the trip's time card
          * (bottom left; see TemplateChrome): it moves left of the buttons, but never over the card a map
          * shows at its left (a list of places, a search), which hides it whole - and above the trip's time.
+         * Where there's no room between the card and the buttons and it would sit under the buttons most
+         * maps have (800x480 at Extra large), left of the buttons all the same: they're always there, the
+         * card only with a list open, and under them its first touch only woke them and its X sat under
+         * the map's zoom.
          */
         fun start(areaW: Float, areaH: Float, ownW: Float, ownH: Float): MiniPlace {
             val roomW = areaW - ownW
@@ -39,6 +43,7 @@ internal data class MiniPlace(val x: Float, val y: Float) {
             if (y < BUTTONS_REACH) {
                 val besideCard = maxOf((areaW + 2 * MINI_EDGE) * PANE_FRACTION, PANE_MIN_EDGE) - MINI_EDGE + GAP
                 x = maxOf(roomW - BUTTONS_STEP, besideCard).coerceAtMost(roomW)
+                if (besideCard > roomW - BUTTONS_STEP && y < BUTTONS_REACH_MOST) x = (roomW - BUTTONS_STEP).coerceAtLeast(0f)
             }
             if (x < TRIP_CARD_WIDTH) y = minOf(y, roomH - TRIP_CARD_RISE)
             if (x == roomW && y == roomH) return CORNER
@@ -85,6 +90,8 @@ private const val TRIP_CARD_WIDTH = 240f
 private const val TRIP_CARD_RISE = 40f
 /** How far down the map's buttons at the top right reach: an app's row of actions and four map buttons, 54 dp each. */
 private const val BUTTONS_REACH = 302f
+/** How far down they reach on most maps: an app's row of actions and three map buttons, as Vela has. */
+private const val BUTTONS_REACH_MOST = 240f
 /** How far left of the area's right edge the mini player ends to clear those buttons (their width, and 8 dp). */
 private const val BUTTONS_STEP = 62f
 /** The card at a map's left (MapPaneLayout) ends at this fraction of the map's width, or at least at [PANE_MIN_EDGE] (MAP_PANE_MIN_EDGE). */

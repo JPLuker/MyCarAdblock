@@ -58,13 +58,24 @@ class MiniPlaceTest {
         assertTrue(x + MINI_WIDTH <= w - MINI_EDGE + 0.5f)
     }
 
-    @Test fun startsAsFarFromAMapsCardAsItGoesAndAboveTheTripAtExtraLarge() {
-        // 800x480 at Extra large: 437x320, where nothing leaves room for it beside the card.
+    @Test fun startsLeftOfTheButtonsAndAboveTheTripAtExtraLarge() {
+        // 800x480 at Extra large: 437x320, where nothing leaves room for it between the card and the
+        // buttons, drawn smaller as there (fitScale).
         val (w, h) = 437.33f to 320f
-        val (x, y) = topLeft(startOn(w, h), w, h)
-        assertEquals(w - MINI_EDGE - MINI_WIDTH, x, 0.5f)
+        val areaW = w - 2 * MINI_EDGE
+        val areaH = h - MINI_EDGE - MINI_DOTS_STRIP
+        val fit = MiniPlace.fitScale(areaW)
+        val ownW = MINI_WIDTH * fit
+        val ownH = MINI_HEIGHT * fit
+        val place = MiniPlace.start(areaW, areaH, ownW, ownH)
+        val x = MINI_EDGE + place.x * (areaW - ownW)
+        val y = MINI_EDGE + place.y * (areaH - ownH)
+        // Left of the map's buttons (54 dp, 12 from the edge, 8 apart): under them its first touch only
+        // woke them, and its X sat under Vela's zoom out.
+        assertTrue("$x", x + ownW <= w - 12f - 54f - 8f + 0.5f)
+        assertTrue("$x", x >= MINI_EDGE)
         // Above the trip's time card (about 80 dp, 12 from the bottom) and the page dots.
-        assertTrue("$y", y + MINI_HEIGHT <= h - 12f - 80f)
+        assertTrue("$y", y + ownH <= h - 12f - 80f)
     }
 
     @Test fun startsLeftOfTheButtonsOnAShortWideMap() {
