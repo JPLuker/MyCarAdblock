@@ -159,6 +159,15 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
             choosing = null
         }
     }
+    // The page being changed taken away on the phone (or the ready-made pages put back): the changing
+    // ends with it. Left on, Home stayed unswipeable with its car apps as icons, and a page added on the
+    // phone (the same id again) opened for changing by itself.
+    LaunchedEffect(pages) {
+        if (editing != null && pages.none { it.id == editing }) {
+            editing = null
+            choosing = null
+        }
+    }
     // Each page changed starts without the list of layouts open.
     LaunchedEffect(editing) { choosingLayout = false }
     // Back on one of the driver's pages turns to the map's; while a page is being changed, it closes
