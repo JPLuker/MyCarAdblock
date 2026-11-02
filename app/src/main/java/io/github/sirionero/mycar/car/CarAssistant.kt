@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.Words
+import io.github.sirionero.mycar.mirror.PhoneMirror
 import io.github.sirionero.mycar.call.CallUiState
 import io.github.sirionero.mycar.call.CarCalls
 import io.github.sirionero.mycar.speech.SpeechEngine
@@ -143,6 +144,12 @@ object CarAssistant {
         }
         // The driver may have picked another assistant, which then takes the button instead.
         if (AssistantChoice.startOther(context)) return
+        // While the phone's screen is shared there's no car screen to show the assistant or act on
+        // the words: the sharing ends, and the car's screen, back in a moment, takes it from here.
+        if (PhoneMirror.active.value) {
+            MyCarLog.i("assistant: the phone's screen was shared - back to myCar's screen")
+            PhoneMirror.requestStop()
+        }
 
         if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO) !=
             PackageManager.PERMISSION_GRANTED
