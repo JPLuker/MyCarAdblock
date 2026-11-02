@@ -179,6 +179,8 @@ object SpeechEngine {
             if (id != run) return@execute
             if (!SpeechModels.isReady(app, SpeechModels.selected.value)) return@execute post { onError(NOT_DOWNLOADED) }
             val r = ensureLoaded(app) ?: return@execute post { onError(NOT_LOADED) }
+            // Cancelled while the model loaded (X, Back, a call): no beep, the music not paused.
+            if (id != run) return@execute
             VoiceFocus.acquire(app)
             val text = try {
                 if (cue) cue()
