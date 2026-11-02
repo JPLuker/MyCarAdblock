@@ -8,6 +8,8 @@
     <string name="car_settings_size_normal">Normal</string>
     <string name="car_settings_size_large">Groß</string>
     <string name="car_settings_size_extra_large">Sehr groß</string>
+    <string name="car_settings_size_medium">Mittel</string>
+    <string name="car_settings_player_size">Größe des Players neben der Karte</string>
     <string name="car_settings_hidden_apps">Ausgeblendete Apps</string>
     <string name="car_settings_hidden_apps_none">Keine. Um eine App auszublenden, halte sie in der App-Übersicht gedrückt und wähle In der App-Übersicht ausblenden.</string>
     <string name="car_settings_hidden_apps_show">Anzeigen</string>

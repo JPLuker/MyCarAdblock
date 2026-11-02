@@ -8,6 +8,8 @@
     <string name="car_settings_size_normal">Normale</string>
     <string name="car_settings_size_large">Grande</string>
     <string name="car_settings_size_extra_large">Molto grande</string>
+    <string name="car_settings_size_medium">Media</string>
+    <string name="car_settings_player_size">Dimensione del lettore accanto alla mappa</string>
     <string name="car_settings_hidden_apps">App nascoste</string>
     <string name="car_settings_hidden_apps_none">Nessuna. Per nascondere un\'app, tienila premuta nella griglia delle app e scegli Nascondi dalla griglia delle app.</string>
     <string name="car_settings_hidden_apps_show">Mostra</string>

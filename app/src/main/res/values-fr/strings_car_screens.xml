@@ -8,6 +8,8 @@
     <string name="car_settings_size_normal">Normale</string>
     <string name="car_settings_size_large">Grande</string>
     <string name="car_settings_size_extra_large">Très grande</string>
+    <string name="car_settings_size_medium">Moyenne</string>
+    <string name="car_settings_player_size">Taille du lecteur à côté de la carte</string>
     <string name="car_settings_hidden_apps">Apps masquées</string>
     <string name="car_settings_hidden_apps_none">Aucune. Pour masquer une app, maintenez-la appuyée dans la grille des apps et choisissez Masquer de la grille des apps.</string>
     <string name="car_settings_hidden_apps_show">Afficher</string>

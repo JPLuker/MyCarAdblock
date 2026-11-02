@@ -8,6 +8,8 @@
     <string name="car_settings_size_normal">Normal</string>
     <string name="car_settings_size_large">Grande</string>
     <string name="car_settings_size_extra_large">Muito grande</string>
+    <string name="car_settings_size_medium">Médio</string>
+    <string name="car_settings_player_size">Tamanho do player ao lado do mapa</string>
     <string name="car_settings_hidden_apps">Apps ocultos</string>
     <string name="car_settings_hidden_apps_none">Nenhum. Para ocultar um app, mantenha-o pressionado na grade de apps e escolha Ocultar da grade de apps.</string>
     <string name="car_settings_hidden_apps_show">Mostrar</string>

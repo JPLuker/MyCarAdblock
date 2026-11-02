@@ -47,6 +47,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.sirionero.mycar.R
@@ -88,6 +90,11 @@ fun CarHome() {
     // music player while something plays.
     val sideApp = rememberSidePaneApp()
     val splitScreen = panel != SidePanel.NONE && (sideApp != null || (phase == CarMedia.Phase.READY && now.isActive))
+    // The music beside the map at the size chosen for it (Small, Medium, Large): an app's own screen
+    // there keeps its size.
+    val music = sideApp?.template == null && sideApp?.builtIn != BuiltInApps.Plancia
+    val playerSize by CarSettings.playerSize.collectAsStateWithLifecycle()
+    val sideScale = if (music) playerSize else 1f
 
     // The map's page among the driver's own (see HomePager). No outer padding on any side, split
     // screen or not - only the gap between the two panes when the player is sharing the screen
@@ -99,12 +106,13 @@ fun CarHome() {
     ) {
         Box(
             Modifier
-                .weight(if (splitScreen) 2.1f else 1f)
+                // The side a third of the screen, as it always was, times its size: the map takes the rest.
+                .weight(if (splitScreen) MAP_SHARE / sideScale - 1f else 1f)
                 .fillMaxHeight(),
         ) {
             MapPane(navStatus, frame, inView)
         }
-        if (splitScreen) CompositionLocalProvider(LocalPlayerInView provides inView) {
+        if (splitScreen) CompositionLocalProvider(LocalPlayerInView provides inView, LocalDensity provides LocalDensity.current.scaledBy(sideScale)) {
             val side = Modifier.weight(1f).fillMaxHeight()
             val sideTemplate = sideApp?.template
             val sideMedia = sideApp?.media
@@ -199,6 +207,12 @@ private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame
         }
     }
 }
+
+/** The side's share of the screen beside the map at Small: one part to the map's 2.1. */
+private const val MAP_SHARE = 3.1f
+
+/** Everything drawn [scale] times bigger: the player beside the map at Medium or Large. */
+private fun Density.scaledBy(scale: Float): Density = if (scale == 1f) this else Density(density * scale, fontScale)
 
 /** How long the map may sit idle at the start of a drive before Home offers to reopen it. */
 private const val MAP_START_GRACE_MS = 2_000L

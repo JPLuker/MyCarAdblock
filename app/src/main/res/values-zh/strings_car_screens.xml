@@ -8,6 +8,8 @@
     <string name="car_settings_size_normal">标准</string>
     <string name="car_settings_size_large">大</string>
     <string name="car_settings_size_extra_large">特大</string>
+    <string name="car_settings_size_medium">中</string>
+    <string name="car_settings_player_size">地图旁播放器的大小</string>
     <string name="car_settings_hidden_apps">隐藏的应用</string>
     <string name="car_settings_hidden_apps_none">无。要隐藏某个应用，在应用网格中长按它，然后选择“从应用网格中隐藏”。</string>
     <string name="car_settings_hidden_apps_show">显示</string>

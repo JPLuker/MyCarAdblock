@@ -65,6 +65,7 @@ fun CarSettingsScreen() {
     val bluetoothWarning by CarSettings.bluetoothWarning.collectAsState()
     val locationWarning by CarSettings.locationWarning.collectAsState()
     val autoplay by CarSettings.autoplay.collectAsState()
+    val playerSize by CarSettings.playerSize.collectAsState()
     val theme by CarSettings.appTheme.collectAsState()
     val uiTheme by CarSettings.uiTheme.collectAsState()
     val experimentalFeatures by CarSettings.experimentalFeaturesEnabled.collectAsState()
@@ -93,6 +94,16 @@ fun CarSettingsScreen() {
         ) { CarSettings.setOpenOnConnect(it) }
 
         SidePanePicker()
+
+        ChoiceRow(
+            stringResource(R.string.car_settings_player_size),
+            listOf(
+                CarSettings.PLAYER_SMALL to stringResource(R.string.car_settings_size_small),
+                CarSettings.PLAYER_MEDIUM to stringResource(R.string.car_settings_size_medium),
+                CarSettings.PLAYER_LARGE to stringResource(R.string.car_settings_size_large),
+            ),
+            playerSize,
+        ) { CarSettings.setPlayerSize(it) }
 
         HomePagesSettings()
 

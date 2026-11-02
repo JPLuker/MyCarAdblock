@@ -91,6 +91,7 @@ internal fun CarScreenSettings() {
 private fun CarHomeSection() {
     val open by CarSettings.openOnConnect.collectAsState()
     val side by SidePaneChoice.current.collectAsState()
+    val playerSize by CarSettings.playerSize.collectAsState()
     val entries = rememberAllEntries()
     // As in the car: not the phone's app of a music service that takes its place.
     val replaced = rememberReplacedByWeb()
@@ -114,6 +115,16 @@ private fun CarHomeSection() {
                 apps.mapIndexedNotNull { i, app -> app.componentId?.let { Pick(it, appNames[i]) } },
             shownSide,
         ) { SidePaneChoice.set(it) }
+        SettingsDivider()
+        PickRow(
+            stringResource(R.string.car_settings_player_size),
+            listOf(
+                Pick(CarSettings.PLAYER_SMALL, stringResource(R.string.car_settings_size_small)),
+                Pick(CarSettings.PLAYER_MEDIUM, stringResource(R.string.car_settings_size_medium)),
+                Pick(CarSettings.PLAYER_LARGE, stringResource(R.string.car_settings_size_large)),
+            ),
+            playerSize,
+        ) { CarSettings.setPlayerSize(it) }
     }
 }
 
