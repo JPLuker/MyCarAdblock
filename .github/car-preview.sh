@@ -109,6 +109,17 @@ EXTRA="--ez demoSong true" shoot split 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WA
 EXTRA="--ez demoSong true" shoot media 1920 720 240 "$WAIT;$WAIT;1635,200;$WAIT;1230,48;$WAIT"
 # The same at 800x480, where the tabs are narrow: "Now playing" on two lines, not "Now playi…".
 EXTRA="--ez demoSong true" shoot media-800x480 800 480 160 "$WAIT;$WAIT;703,133;$WAIT;$WAIT"
+# The player beside the map at Medium and Large (Settings > Size of the player beside the map).
+EXTRA="--ez demoSong true --es playerSize 1.1" shoot split-medium 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es playerSize 1.2" shoot split-large 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es playerSize 1.2" shoot split-large-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
+# Hiding an app from the grid: a long press on the browser for its menu, then "Hide from the app
+# grid" (the fourth button of the card in the middle of the screen), the grid without it and the
+# car saying where it comes back from. Then the settings' hidden apps, with the browser hidden.
+shoot grid-hide 1920 720 240 "$GRID_BUTTON;$(at browser),long;960,447;$WAIT"
+EXTRA="--es hideApps mycar:web --ez hiddenApps true" shoot hidden-apps 1920 720 240 "$WAIT"
+EXTRA="--ez hiddenApps true" shoot hidden-apps-none 800 480 160 "$WAIT"
+
 # Home with an app chosen to sit beside the map instead (car Settings > Beside the map).
 installed $PLANCIA && EXTRA="--es sidePane $PLANCIA" shoot split-plancia 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 installed $XONOS && EXTRA="--es sidePane $XONOS" shoot split-xonos 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
@@ -623,6 +634,10 @@ phone_settings() {
     tap_text "Car screen"; sleep 3; adb exec-out screencap -p > $d/04-car.png
     tap_text "Open on connect"; sleep 1.5; adb exec-out screencap -p > $d/05-open-on-connect.png
     tap_text "Close"; sleep 1
+    # The player beside the map: Small, Medium, Large.
+    scroll_to "Size of the player beside the map" && tap_text "Size of the player beside the map"
+    sleep 1.5; adb exec-out screencap -p > $d/05-player-size.png
+    tap_text "Close"; sleep 1
     scroll_to "Page 1" && tap_text "Page 1"; sleep 1.5
     # The page opened out below the fold: brought up, so its parts can be tapped.
     adb shell input swipe 160 520 160 200 400; sleep 1.5; adb exec-out screencap -p > $d/06-page.png
@@ -630,6 +645,14 @@ phone_settings() {
     tap_text "Close"; sleep 1
     tap_text "Weather"; sleep 1.5; adb exec-out screencap -p > $d/08-part.png
     tap_text "Close"; sleep 1
+    # The apps on the car's grid, each with a tick (none hidden), under the pages.
+    for i in 1 2 3 4 5 6 7 8; do
+        tap_match 'text="Apps on the car' && break
+        adb shell input swipe 160 380 160 260 400; sleep 1
+    done
+    sleep 1.5; adb exec-out screencap -p > $d/08-grid-apps.png
+    adb shell input swipe 160 520 160 220 400; sleep 1.5; adb exec-out screencap -p > $d/08-grid-apps-2.png
+    tap_text "Done"; sleep 1
     for i in 1 2 3 4 5 6 7; do
         adb shell input swipe 160 520 160 220 400; sleep 1.5; adb exec-out screencap -p > $d/09-car-$i.png
     done

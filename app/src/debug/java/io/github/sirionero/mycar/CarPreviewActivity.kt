@@ -133,6 +133,16 @@ class CarPreviewActivity : ComponentActivity() {
         io.github.sirionero.mycar.AppSettings.setStartupUrl(this, intent.getStringExtra("startUrl").orEmpty())
         // Xonos on in the car every run (Music, on the phone): the shots tap it where it is on the grid.
         io.github.sirionero.mycar.xonos.Xonos.setEnabled(this, true)
+        // --es playerSize 1.2: the player beside the map at that size (Medium 1.1, Large 1.2); Small
+        // every other run.
+        io.github.sirionero.mycar.car.CarSettings.setPlayerSize(
+            intent.getStringExtra("playerSize")?.toFloatOrNull()?.takeIf { it in io.github.sirionero.mycar.car.CarSettings.PLAYER_SIZES }
+                ?: io.github.sirionero.mycar.car.CarSettings.PLAYER_SMALL,
+        )
+        // No app hidden from the grid to start with: the shots tap the apps where they always are.
+        // --es hideApps mycar:web,mycar:cinema: those off it.
+        io.github.sirionero.mycar.car.HiddenApps.reset()
+        intent.getStringExtra("hideApps")?.split(',')?.filter { it.isNotBlank() }?.forEach(io.github.sirionero.mycar.car.HiddenApps::hide)
         // --ez webMusicPlay true: a music service's page presses its first "Play" a few seconds in (no
         // account plays here). Set every run.
         io.github.sirionero.mycar.car.WebMusicPreview.play = intent.getBooleanExtra("webMusicPlay", false)
@@ -174,8 +184,9 @@ class CarPreviewActivity : ComponentActivity() {
         CarEnvironment.setDisplay(w, h, dpi)
         CarEnvironment.start(this)
 
+        // "x,y" taps, "x,y,long" holds the finger down long enough for a long press (an app's menu).
         val taps = intent.getStringExtra("taps").orEmpty().split(";").filter { it.isNotBlank() }
-            .map { it.split(",").let { p -> p[0].toFloat() to p[1].toFloat() } }
+            .map { it.split(",").let { p -> Triple(p[0].toFloat(), p[1].toFloat(), p.getOrNull(2) == "long") } }
 
         val imageReader = ImageReader.newInstance(w, h, PixelFormat.RGBA_8888, 3)
         reader = imageReader
@@ -192,12 +203,15 @@ class CarPreviewActivity : ComponentActivity() {
         val p = ScreenProjector(this).also { projector = it }
         // --ez player true: the docked player alone, with a made-up song (see PlayerPreview).
         // --ez wallpapers true: the wallpaper picker alone, below the fold in the car's settings.
+        // --ez hiddenApps true: the settings' hidden apps alone, below the fold too.
         val playerOnly = intent.getBooleanExtra("player", false)
         val wallpapersOnly = intent.getBooleanExtra("wallpapers", false)
+        val hiddenAppsOnly = intent.getBooleanExtra("hiddenApps", false)
         p.start(imageReader.surface, w, h, dpi) {
             when {
                 playerOnly -> io.github.sirionero.mycar.car.PlayerPreview()
                 wallpapersOnly -> io.github.sirionero.mycar.car.WallpaperPickerPreview()
+                hiddenAppsOnly -> io.github.sirionero.mycar.car.HiddenAppsPreview()
                 else -> CarUi()
             }
         }
@@ -297,11 +311,11 @@ class CarPreviewActivity : ComponentActivity() {
 
         main.postDelayed({
             snap()
-            taps.forEachIndexed { i, (x, y) ->
+            taps.forEachIndexed { i, (x, y, long) ->
                 main.postDelayed({
                     val point = listOf(TouchPoint(0, x, y))
                     p.dispatchTouch(MotionEvent.ACTION_DOWN, 0, point)
-                    main.postDelayed({ p.dispatchTouch(MotionEvent.ACTION_UP, 0, point) }, 80)
+                    main.postDelayed({ p.dispatchTouch(MotionEvent.ACTION_UP, 0, point) }, if (long) 900L else 80L)
                 }, 2500L * (i + 1))
                 main.postDelayed({ snap() }, 2500L * (i + 1) + 1500)
             }

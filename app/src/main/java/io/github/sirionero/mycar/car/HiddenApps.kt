@@ -47,6 +47,9 @@ internal object HiddenApps {
 
     fun hide(id: String) = save(flow.value + id)
 
+    /** Every app back on the grid: the car preview, before each shot. */
+    fun reset() = save(emptySet())
+
     private fun save(ids: Set<String>) {
         flow.value = ids
         app?.let { AppSettings.putString(it, KEY, ids.joinToString(",")) }
