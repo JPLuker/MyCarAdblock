@@ -29,9 +29,17 @@ internal object LastExit {
         val manager = context.getSystemService(ActivityManager::class.java) ?: return
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val told = prefs.getLong(TOLD, 0L)
-        // This process's own start is not an ending: only those before it, newest first.
-        val exits = manager.getHistoricalProcessExitReasons(null, 0, 8)
+        // This process's own start is not an ending: only those before it, newest first. Android lists
+        // the web engine's page processes here too, ended with myCar ("isolated not needed"): only
+        // myCar's own, and those of the web engine that crashed.
+        val own = context.packageName
+        val exits = manager.getHistoricalProcessExitReasons(null, 0, 16)
             .filter { it.pid != android.os.Process.myPid() && it.timestamp > told }
+            .filter {
+                val name = it.processName.orEmpty()
+                name == own || name.startsWith("$own:") ||
+                    it.reason == ApplicationExitInfo.REASON_CRASH_NATIVE || it.reason == ApplicationExitInfo.REASON_CRASH
+            }
         if (exits.isEmpty()) return
         // The first time, only the latest: the older ones are from before this was written.
         val shown = if (told == 0L) exits.take(1) else exits.take(3)
