@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -47,6 +48,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.sirionero.mycar.R
@@ -87,7 +90,31 @@ fun CarHome() {
     // Beside the map: the app chosen for it in the car's settings, always; or, by default, the
     // music player while something plays.
     val sideApp = rememberSidePaneApp()
-    val splitScreen = panel != SidePanel.NONE && (sideApp != null || (phase == CarMedia.Phase.READY && now.isActive))
+    // The music's column closes only after a short hold: an app that relinks, a change of music app,
+    // the gap between two songs or a web page that reloads would otherwise close it and open it again,
+    // and every width of the map is a new surface for its app (two hand-overs: Vela redraws the map).
+    // Opening stays immediate; music closed by the driver (no music app any more) closes it at once.
+    val mediaApp by CarServices.mediaApp.collectAsStateWithLifecycle()
+    val musicOn = phase == CarMedia.Phase.READY && now.isActive
+    var musicShown by remember { mutableStateOf(musicOn) }
+    LaunchedEffect(musicOn, mediaApp) {
+        if (musicOn) musicShown = true
+        else if (mediaApp == null) musicShown = false
+        else { delay(MUSIC_HOLD_MS); musicShown = false }
+    }
+    // The last song with a title and a live state, drawn during the hold only - and only the same
+    // music app's: another app's song over this one's buttons would play when it says Pause. Beside
+    // a chosen app, always what plays now (its pane remembers the music app by it).
+    val lastActive = remember(mediaApp) { arrayOf(now) }
+    if (now.isActive) lastActive[0] = now
+    val holding = sideApp == null && musicShown && !musicOn
+    val shownNow = if (holding && !now.isActive && lastActive[0].isActive) lastActive[0] else now
+    val splitScreen = panel != SidePanel.NONE && (sideApp != null || musicShown)
+    // The music beside the map at the size chosen for it (Small, Medium, Large): an app's own screen
+    // there keeps its size.
+    val music = sideApp?.template == null && sideApp?.builtIn != BuiltInApps.Plancia
+    val playerSize by CarSettings.playerSize.collectAsStateWithLifecycle()
+    val sideScale = if (music) playerSize else 1f
 
     // The map's page among the driver's own (see HomePager). No outer padding on any side, split
     // screen or not - only the gap between the two panes when the player is sharing the screen
@@ -99,12 +126,13 @@ fun CarHome() {
     ) {
         Box(
             Modifier
-                .weight(if (splitScreen) 2.1f else 1f)
+                // The side a third of the screen, as it always was, times its size: the map takes the rest.
+                .weight(if (splitScreen) MAP_SHARE / sideScale - 1f else 1f)
                 .fillMaxHeight(),
         ) {
             MapPane(navStatus, frame, inView)
         }
-        if (splitScreen) CompositionLocalProvider(LocalPlayerInView provides inView) {
+        if (splitScreen) CompositionLocalProvider(LocalPlayerInView provides inView, LocalDensity provides LocalDensity.current.scaledBy(sideScale)) {
             val side = Modifier.weight(1f).fillMaxHeight()
             val sideTemplate = sideApp?.template
             val sideMedia = sideApp?.media
@@ -117,9 +145,9 @@ fun CarHome() {
                 // Plancia inside myCar: its one page goes wherever it's on screen, so here too only in view.
                 sideApp?.builtIn == BuiltInApps.Plancia ->
                     if (inView) PlanciaPane(side) else AppPlaceholder("Plancia", null, side, builtInId = BuiltInApps.Plancia.id)
-                panel == SidePanel.LYRICS -> SideLyrics(now, side)
-                sideMedia != null -> SideMediaPane(sideMedia, now, side)
-                else -> GlassDockedPlayer(now, side)
+                panel == SidePanel.LYRICS -> SideLyrics(shownNow, side)
+                sideMedia != null -> SideMediaPane(sideMedia, shownNow, side)
+                else -> GlassDockedPlayer(shownNow, side)
             }
         }
     }
@@ -200,13 +228,21 @@ private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame
     }
 }
 
+/** The side's share of the screen beside the map at Small: one part to the map's 2.1. */
+private const val MAP_SHARE = 3.1f
+
+/** How long the music's column waits, once nothing plays, before giving the map its width back. */
+private const val MUSIC_HOLD_MS = 6_000L
+
+/** Everything drawn [scale] times bigger: the player beside the map at Medium or Large. */
+private fun Density.scaledBy(scale: Float): Density = if (scale == 1f) this else Density(density * scale, fontScale)
+
 /** How long the map may sit idle at the start of a drive before Home offers to reopen it. */
 private const val MAP_START_GRACE_MS = 2_000L
 
 /**
  * Lyrics alone beside the map, big enough to read at a glance. No art: that space goes to a
- * larger title and artist instead. The player goes back to the nav bar meanwhile, whose dock
- * button swaps these back out for the controls.
+ * larger title and artist instead. Their X, like the dock's song, puts the player back.
  */
 @Composable
 private fun SideLyrics(now: NowPlaying, modifier: Modifier) {
@@ -227,7 +263,8 @@ private fun SideLyrics(now: NowPlaying, modifier: Modifier) {
                         maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
                 }
-                GsIconButton(Icons.Filled.Close, stringResource(R.string.car_home_hide_lyrics), navigator::closeSidePanel, size = 48.dp, iconSize = 24.dp)
+                // The lyrics go, the player comes back: before, the X took both away, pause and skip with them.
+                GsIconButton(Icons.Filled.Close, stringResource(R.string.car_home_hide_lyrics), navigator::showSideControls, size = 52.dp, iconSize = 24.dp)
             }
             Spacer(Modifier.height(12.dp))
             LyricsPanel(now, Modifier.weight(1f).fillMaxWidth(), lineStyle = MaterialTheme.typography.headlineSmall)

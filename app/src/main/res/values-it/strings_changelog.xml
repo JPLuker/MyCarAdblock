@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.6.8-alpha -->
+    <string-array name="changelog_44">
+        <item>Nascondi un\'app dalla griglia dell\'auto: tienila premuta e scegli «Nascondi dalla griglia delle app». Torna da Impostazioni, App nascoste, o dal telefono (Schermo dell\'auto, App nella griglia dell\'auto).</item>
+        <item>Con Spotify o un altro servizio musicale dentro myCar, «Nascondi l\'app Spotify del telefono» lascia un solo Spotify nella griglia; la sua icona fissata e la scelta accanto alla mappa passano a quello dentro myCar.</item>
+        <item>Il lettore accanto alla mappa in tre dimensioni, Piccola, Media e Grande (più grande del 10% e del 20%), nelle impostazioni dell\'auto e sul telefono.</item>
+        <item>Durante una chiamata gli schermi stanno sotto la sua barra, così Indietro, le linguette e Stop restano a portata di mano, e una chiamata che squilla chiude l\'assistente.</item>
+        <item>Collegamento da solo: col telefono in tasca myCar continua ad ascoltare l\'auto dopo il viaggio, un tentativo che riparte non mostra più la scheda rossa e spegnere myCar ferma un avvio in corso.</item>
+        <item>Messaggi col motivo vero: il certificato o la data dell\'auto senza fili, un avvio col cavo che si ferma (con cosa fare) e uno schermo dell\'auto che non si riesce a disegnare (myCar chiude e lo dice, invece dello schermo nero).</item>
+        <item>Audio: le indicazioni seguono la strada di ogni auto e tacciono durante le chiamate; Cinema si ferma quando l\'auto passa alla radio e parte quando finisce una chiamata.</item>
+        <item>Voce: il telefono dice che l\'assistente è pronto solo con tutti i modelli che gli servono, e la prima configurazione offre di nuovo il download della voce.</item>
+        <item>La mappa resta ferma quando cambia la musica: la colonna del lettore aspetta qualche secondo prima di chiudersi, così Vela e le altre mappe tengono la loro superficie, e accanto al lettore l\'area in cui disegnano è quella giusta.</item>
+        <item>Spotify e gli altri servizi musicali dentro myCar: aperti, suonano il brano della loro barra, l\'Autoplay aspetta che la pagina sia pronta, la musica riparte dopo che lo schermo dell\'auto si rifà, e myCar dice quando Spotify suona su un altro dispositivo.</item>
+        <item>Assistente: una sola pausa dalla domanda alla risposta, niente ascolto mentre squilla una chiamata, la voce torna al viaggio dopo se il motore vocale del telefono si era fermato, e il tasto voce durante la condivisione dello schermo riporta a myCar.</item>
+        <item>Inoltre: la X del testo riporta il lettore, una nuova scelta accanto alla mappa si vede subito, il tasto Indietro dell\'auto chiude Novità e le schede del Bluetooth, e «Fatto» dopo l\'accesso a un servizio musicale. Lo schermo dell\'auto è nella lingua scelta per myCar anche quando il telefono ne usa un\'altra.</item>
+    </string-array>
     <string-array name="changelog_43">
         <item>L\'accesso a Spotify sul telefono non è più nero: la pagina si vede e si compila, come per ogni servizio musicale.</item>
         <item>Incolla nella tastiera dell\'auto funziona: la tastiera resta aperta e quello che hai copiato sul telefono entra nel campo.</item>

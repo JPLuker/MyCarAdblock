@@ -71,6 +71,12 @@ import io.github.sirionero.mycar.CertCatalog
 import io.github.sirionero.mycar.CertProvider
 import io.github.sirionero.mycar.KEY_MIC_ASKED
 import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.speech.VoiceLanguages
+import io.github.sirionero.mycar.speech.VoiceLanguage
+import io.github.sirionero.mycar.car.CarSettings
+import android.speech.SpeechRecognizer
+import androidx.compose.runtime.collectAsState
+import io.github.sirionero.mycar.speech.SpeechModels
 import io.github.sirionero.mycar.Words
 import io.github.sirionero.mycar.call.CarCalls
 import io.github.sirionero.mycar.notify.NotificationAccess
@@ -482,6 +488,7 @@ private fun MoreSection(
     ) {
         if (status(Id.SCREENING) != Status.DONE) Button(onClick = onScreening) { Text(stringResource(R.string.setup_screening_button)) }
     }
+    VoiceStep()
     StepCard(stringResource(R.string.setup_audio_title), Status.DONE, body = stringResource(R.string.setup_audio_body)) {
         AudioChoice()
     }
@@ -489,6 +496,49 @@ private fun MoreSection(
         StepCard(stringResource(R.string.setup_usage_title), if (UsageStats.asked(context)) Status.DONE else Status.TODO, body = USAGE_STATS_INTRO.text) {
             UsageStatsChoices()
         }
+    }
+}
+
+/**
+ * The voice models, as the old guide offered them: myCar's assistant is the default one, and
+ * without them its first answer in the car was "download a voice model first". Read from the
+ * downloads as they go, so the card ticks itself when they finish.
+ */
+@Composable
+private fun VoiceStep() {
+    val context = LocalContext.current
+    remember { SpeechModels.init(context) }
+    val phone = VoiceLanguages.phone()
+    val models = SpeechModels.recommended(phone)
+    // Every model's state, so a download or a delete anywhere recounts what's ready.
+    val states = SpeechModels.Model.entries.map { SpeechModels.state(it).collectAsState().value }
+    val live by SpeechModels.selected.collectAsState()
+    val chosen by SpeechModels.final.collectAsState()
+    val systemSpeech by CarSettings.systemSpeech.collectAsState()
+    val final = remember(states, chosen) { SpeechModels.finalFor(context, phone) }
+    val liveReady = states[live.ordinal] == SpeechModels.State.Ready
+    // English with no final model chosen listens with the live one alone.
+    val finalReady = if (final == null) phone == VoiceLanguage.EN && chosen == null else states[final.ordinal] == SpeechModels.State.Ready
+    // Ready as the assistant is: the phone's own recognizer, or the models it listens with (the
+    // driver's own choice counts, not only the recommended pair).
+    val recognizer = remember { SpeechRecognizer.isRecognitionAvailable(context) }
+    val ready = (systemSpeech && recognizer) || (liveReady && finalReady)
+    StepCard(
+        stringResource(R.string.settings_group_voice),
+        if (ready) Status.DONE else Status.TODO,
+        body = stringResource(R.string.setup_guide_voice_body, models.sumOf { it.downloadMb }),
+    ) {
+        if (!ready && states.none { it is SpeechModels.State.Downloading }) {
+            Button(onClick = {
+                // Only what's missing; a final model the driver chose that knows the language stays chosen.
+                if (!liveReady) SpeechModels.download(context, live)
+                if (!finalReady) {
+                    SpeechModels.download(context, models.last())
+                    if (final == null) SpeechModels.selectFinal(context, models.last())
+                }
+            }) { Text(stringResource(R.string.setup_guide_voice_download)) }
+        }
+        VoiceDownloadStatus()
     }
 }
 

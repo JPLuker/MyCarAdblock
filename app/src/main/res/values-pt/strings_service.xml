@@ -25,12 +25,16 @@
     <string name="connection_picture_refused_detail">O carro não quis abrir a tela dele para o myCar (código %1$s).</string>
     <string name="connection_no_picture">Sem imagem para o carro</string>
     <string name="connection_no_picture_detail">O codificador de vídeo do telefone não iniciou (%1$s). O myCar fechou a conexão: conecte de novo.</string>
+    <string name="connection_stage_stuck_cable">Ainda esperando o carro. Se a tela dele perguntar algo ou mostrar o Android Auto, responda ou toque nele; senão, desconecte o cabo e conecte de novo.</string>
+    <string name="connection_ui_failed_detail">O telefone não conseguiu desenhar a tela do carro (%1$s). O myCar encerrou a conexão: conecte de novo.</string>
     <string name="connection_picture_stopped">A imagem do carro parou</string>
     <string name="connection_picture_stopped_detail">O codificador de vídeo do telefone continua falhando (%1$s). O myCar fechou a conexão: conecte de novo.</string>
     <string name="connection_no_answer">O carro não respondeu</string>
     <string name="connection_no_answer_detail">A conexão abriu, mas o carro não enviou nada. Se o Android perguntar qual app abrir para o carro, escolha o myCar.</string>
+    <string name="connection_no_answer_wireless_detail">A conexão pelo Wi-Fi do carro abriu, mas o carro não enviou nada. Conecte de novo; se continuar acontecendo, desligue e ligue o carro.</string>
     <string name="connection_hung_up_setup">O carro encerrou a conexão durante a configuração</string>
     <string name="connection_hung_up_setup_detail">O carro encerrou a conexão enquanto ela era protegida. Isso geralmente significa que ele recusou o certificado.</string>
+    <string name="connection_hung_up_setup_link_detail">A conexão foi encerrada enquanto era protegida, mais provavelmente pelo cabo ou pelo Wi-Fi do carro do que pelo certificado. Conecte de novo.</string>
     <string name="connection_hung_up_after_cert">O carro encerrou a conexão após o certificado</string>
     <string name="connection_hung_up_after_cert_detail">O carro aceitou o certificado, mas encerrou a conexão antes do fim da configuração.</string>
 
@@ -50,7 +54,7 @@
     <string name="wireless_link_wifi_off">O Wi-Fi do telefone está desligado</string>
     <string name="wireless_link_wifi_off_detail">Ligue o Wi-Fi do telefone: a conexão sem fio com o carro passa pelo Wi-Fi do carro.</string>
     <string name="wireless_link_vpn">Uma VPN está bloqueando o carro</string>
-    <string name="wireless_link_vpn_detail">O myCar entrou na rede de %1$s, mas uma VPN neste telefone (o Tailscale, por exemplo) não o deixa alcançar o carro. Conecte com o cabo, desative a VPN ou deixe o myCar fora dela nas configurações da VPN – aí o Plancia e o Xonos dentro do myCar não podem usar os endereços da VPN, como os nomes do Tailscale.</string>
+    <string name="wireless_link_vpn_detail">O myCar entrou na rede de %1$s, mas uma VPN neste telefone (o Tailscale, por exemplo) não o deixa alcançar o carro. Conecte com o cabo, desative a VPN ou deixe o myCar fora dela nas configurações da VPN: aí o Plancia e o Xonos dentro do myCar alcançam os endereços do Tailscale pelos apps Plancia e Xonos, se estiverem no telefone.</string>
     <string name="wireless_link_no_connection">Na rede Wi-Fi do carro, mas sem conexão</string>
     <string name="wireless_link_no_connection_detail">O myCar entrou na rede de %1$s, mas não conseguiu alcançar o Android Auto em %2$s.</string>
     <string name="wireless_link_local_network_detail">O Android deixa o myCar fora das redes locais, e o Wi-Fi do carro é uma delas: no telefone, dê ao myCar a permissão Dispositivos próximos e conecte de novo.</string>

@@ -310,6 +310,7 @@
     <string name="voice_model_language_title">Voice: %1$s</string>
     <!-- %1$s: myCar's language, %2$s: a model's name -->
     <string name="voice_model_language_ready">myCar is in %1$s, so the car\'s assistant listens and answers in %1$s, with %2$s.</string>
+    <string name="voice_model_language_phone">myCar is in %1$s, so the car\'s assistant listens and answers in %1$s, with the phone\'s speech recognition.</string>
     <!-- %1$s: myCar's language, %2$s: a model's name, %3$s: something to say to the assistant, in that language -->
     <string name="voice_model_language_ready_try">myCar is in %1$s, so the car\'s assistant listens and answers in %1$s, with %2$s. Try “%3$s”.</string>
     <!-- %1$s: myCar's language, %2$s: a model's name, %3$d: its size in megabytes -->
@@ -411,6 +412,13 @@
     <string name="settings_car_pages_header">Your pages either side of the map on the car\'s Home. Change them here, or in the car with the pencil beside the dots.</string>
     <string name="settings_car_pages_ready_text">Your pages give way to the ready-made ones: the weather and the agenda left of the map, and on its right Plancia beside the browser, when Plancia is set up or installed.</string>
     <string name="settings_car_fit_offline">Connect to the car to fit its screen: the car shows each change as you make it.</string>
+    <string name="settings_grid_apps">Apps on the car\'s app grid</string>
+    <string name="settings_grid_apps_all">All shown</string>
+    <plurals name="settings_grid_apps_hidden">
+        <item quantity="one">%d hidden</item>
+        <item quantity="other">%d hidden</item>
+    </plurals>
+    <string name="settings_grid_apps_note">Untick an app to keep it off the car\'s app grid. In the car: hold an app and choose Hide from the app grid. An app pinned to the dock stays there.</string>
     <string name="theme_title">Theme</string>
     <string name="theme_footer">How myCar looks on the phone. The car\'s screen has its own, in the car\'s settings.</string>
     <string name="theme_phone">Like the phone</string>
@@ -433,6 +441,8 @@
     <string name="music_sign_in_title">%1$s: sign in</string>
     <string name="music_sign_out">Sign out</string>
     <string name="music_sign_out_detail">Of this service in myCar, on the phone and in the car</string>
+    <string name="music_hide_app">Hide the phone\'s %1$s app</string>
+    <string name="music_hide_app_detail">The car\'s app grid keeps only %1$s inside myCar: the %1$s app on this phone isn\'t shown, so there aren\'t two.</string>
     <string name="music_sign_out_title">Sign out of %1$s?</string>
     <string name="music_sign_out_text">myCar forgets its sign-in to %1$s and what its pages kept. Your account stays as it is.</string>
     <string name="music_add">Add a service</string>

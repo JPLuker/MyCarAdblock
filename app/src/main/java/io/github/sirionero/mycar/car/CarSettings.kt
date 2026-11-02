@@ -28,6 +28,7 @@ enum class AppTheme { PHONE, LIGHT, DARK }
 object CarSettings {
 
     private const val KEY_SCALE = "car_scale"
+    private const val KEY_PLAYER_SIZE = "car_player_size"
     private const val KEY_OPEN = "car_open_on_connect"
     private const val KEY_NIGHT = "car_night_mode"
     /** Before Automatic: "true" for USB, "false" for Bluetooth. Read once, to carry the choice over. */
@@ -57,12 +58,19 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
      * still be on the bar, not off the edge of a long list. */
     const val MAX_PINNED = 3
 
+    /** The player beside the map: Small, Medium, Large ([playerSize]). */
+    const val PLAYER_SMALL = 1f
+    const val PLAYER_MEDIUM = 1.1f
+    const val PLAYER_LARGE = 1.2f
+    val PLAYER_SIZES = listOf(PLAYER_SMALL, PLAYER_MEDIUM, PLAYER_LARGE)
+
     /** Id of the app to open on connect; [HOME] opens the launcher. */
     const val HOME = "home"
 
     private lateinit var app: Context
 
     private val scaleFlow = MutableStateFlow(1f)
+    private val playerSizeFlow = MutableStateFlow(PLAYER_SMALL)
     private val openFlow = MutableStateFlow(HOME)
     private val nightFlow = MutableStateFlow(NightMode.AUTO)
     private val audioRouteFlow = MutableStateFlow(AudioRoute.AUTO)
@@ -153,6 +161,13 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
     val playerTitle: StateFlow<Boolean> = playerTitleFlow
 
     val scale: StateFlow<Float> = scaleFlow
+
+    /**
+     * How big the music player beside the map is drawn, over the rest of the car's screen: Small
+     * (as it always was), Medium a tenth bigger, Large a fifth. The column grows by as much and the
+     * map gives up the room.
+     */
+    val playerSize: StateFlow<Float> = playerSizeFlow
     val openOnConnect: StateFlow<String> = openFlow
     val nightMode: StateFlow<NightMode> = nightFlow
 
@@ -219,6 +234,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
     fun init(context: Context) {
         app = context.applicationContext
         scaleFlow.value = AppSettings.getString(app, KEY_SCALE, "1.0").toFloatOrNull() ?: 1f
+        playerSizeFlow.value = AppSettings.getString(app, KEY_PLAYER_SIZE, "").toFloatOrNull()?.takeIf { it in PLAYER_SIZES } ?: PLAYER_SMALL
         openFlow.value = AppSettings.getString(app, KEY_OPEN, HOME)
         lastNavFlow.value = AppSettings.getString(app, KEY_LAST_NAV, "").ifEmpty { null }
         lastMediaFlow.value = AppSettings.getString(app, KEY_LAST_MEDIA, "").ifEmpty { null }
@@ -268,6 +284,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
         AssistantChoice.init(app)
         AssistantBrain.init(app)
         SidePaneChoice.init(app)
+        HiddenApps.init(app)
         HomePages.init(app)
         io.github.sirionero.mycar.home.HomeAssistant.init(app)
         io.github.sirionero.mycar.cinema.Cinema.init(app)
@@ -280,6 +297,11 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
     fun setScale(value: Float) {
         scaleFlow.value = value
         AppSettings.putString(app, KEY_SCALE, value.toString())
+    }
+
+    fun setPlayerSize(value: Float) {
+        playerSizeFlow.value = value
+        AppSettings.putString(app, KEY_PLAYER_SIZE, value.toString())
     }
 
     fun setOpenOnConnect(id: String) {
@@ -359,6 +381,16 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
         val saved = savedRoute()
         audioRouteFlow.value = saved
         pipeAudioFlow.value = saved == AudioRoute.CAR_LINK
+        followRouteForDirections()
+    }
+
+    /**
+     * Spoken directions not set by hand follow the drive's route, as [setAudioRoute] makes them: a
+     * route kept for one car came in after the default was worked out from the global one, and turns
+     * were spoken twice (Bluetooth, the map app's voice too) or not at all (through myCar).
+     */
+    private fun followRouteForDirections() {
+        if (!speakDirectionsChosen) speakDirectionsFlow.value = audioRouteFlow.value != AudioRoute.BLUETOOTH
     }
 
     /** The route kept for the drive's car, while it's connected. */
@@ -375,6 +407,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
         io.github.sirionero.mycar.MyCarLog.i("audio: this car's own route - ${route.id}")
         audioRouteFlow.value = route
         pipeAudioFlow.value = route == AudioRoute.CAR_LINK
+        followRouteForDirections()
     }
 
     /**

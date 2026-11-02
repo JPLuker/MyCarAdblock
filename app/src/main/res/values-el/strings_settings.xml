@@ -229,6 +229,7 @@
 
     <string name="voice_model_language_title">Φωνή: %1$s</string>
     <string name="voice_model_language_ready">Το myCar είναι στα %1$s, οπότε ο βοηθός του αυτοκινήτου ακούει και απαντά στα %1$s, με το %2$s.</string>
+    <string name="voice_model_language_phone">Το myCar είναι στα %1$s, οπότε ο βοηθός του αυτοκινήτου ακούει και απαντά στα %1$s, με την αναγνώριση φωνής του τηλεφώνου.</string>
     <string name="voice_model_language_ready_try">Το myCar είναι στα %1$s, οπότε ο βοηθός του αυτοκινήτου ακούει και απαντά στα %1$s, με το %2$s. Δοκιμάστε «%3$s».</string>
     <string name="voice_model_language_missing">Το myCar είναι στα %1$s. Με το %2$s (%3$d MB) ο βοηθός του αυτοκινήτου ακούει και απαντά στα %1$s· μέχρι τότε καταλαβαίνει μόνο αγγλικά.</string>
     <string name="voice_model_language_tts">Απαντά με τη φωνή μετατροπής κειμένου σε ομιλία του ίδιου του τηλεφώνου για τα %1$s. Αν δεν ακούγεται σωστά, επιλέξτε ή κατεβάστε αυτή τη φωνή στις ρυθμίσεις μετατροπής κειμένου σε ομιλία του Android.</string>
@@ -301,6 +302,13 @@
     <string name="settings_car_pages_header">Οι σελίδες σας δεξιά και αριστερά από τον χάρτη, στην Αρχική του αυτοκινήτου. Αλλάξτε τες εδώ ή στο αυτοκίνητο, με το μολύβι δίπλα στις τελείες.</string>
     <string name="settings_car_pages_ready_text">Οι σελίδες σας αντικαθίστανται από τις έτοιμες: ο καιρός και η ατζέντα αριστερά από τον χάρτη και, δεξιά του, το Plancia δίπλα στον περιηγητή, αν το Plancia έχει ρυθμιστεί ή εγκατασταθεί.</string>
     <string name="settings_car_fit_offline">Συνδεθείτε στο αυτοκίνητο για να προσαρμόσετε την οθόνη του: το αυτοκίνητο δείχνει κάθε αλλαγή καθώς την κάνετε.</string>
+    <string name="settings_grid_apps">Εφαρμογές στο πλέγμα του αυτοκινήτου</string>
+    <string name="settings_grid_apps_all">Εμφανίζονται όλες</string>
+    <plurals name="settings_grid_apps_hidden">
+        <item quantity="one">%d κρυφή</item>
+        <item quantity="other">%d κρυφές</item>
+    </plurals>
+    <string name="settings_grid_apps_note">Καταργήστε την επιλογή μιας εφαρμογής για να μη φαίνεται στο πλέγμα εφαρμογών του αυτοκινήτου. Στο αυτοκίνητο: κρατήστε πατημένη μια εφαρμογή και επιλέξτε «Απόκρυψη από το πλέγμα εφαρμογών». Μια εφαρμογή καρφιτσωμένη στο Dock μένει εκεί.</string>
     <string name="theme_title">Θέμα</string>
     <string name="theme_footer">Η εμφάνιση του myCar στο τηλέφωνο. Η οθόνη του αυτοκινήτου έχει τη δική της, στις ρυθμίσεις του αυτοκινήτου.</string>
     <string name="theme_phone">Όπως το τηλέφωνο</string>
@@ -320,6 +328,8 @@
     <string name="music_sign_in_title">%1$s: σύνδεση</string>
     <string name="music_sign_out">Αποσύνδεση</string>
     <string name="music_sign_out_detail">Από αυτή την υπηρεσία στο myCar, στο τηλέφωνο και στο αυτοκίνητο</string>
+    <string name="music_hide_app">Απόκρυψη της εφαρμογής %1$s του τηλεφώνου</string>
+    <string name="music_hide_app_detail">Στο πλέγμα εφαρμογών του αυτοκινήτου μένει μόνο το %1$s μέσα στο myCar: η εφαρμογή %1$s αυτού του τηλεφώνου δεν εμφανίζεται, έτσι δεν υπάρχουν δύο.</string>
     <string name="music_sign_out_title">Αποσύνδεση από το %1$s;</string>
     <string name="music_sign_out_text">Το myCar ξεχνά τη σύνδεση στο %1$s και ό,τι κράτησαν οι σελίδες του. Ο λογαριασμός σας μένει ως έχει.</string>
     <string name="music_add">Προσθήκη υπηρεσίας</string>

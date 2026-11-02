@@ -79,9 +79,11 @@ internal val Entry.fitsBesideMap: Boolean
 internal fun rememberSidePaneApp(): Entry? {
     val choice by SidePaneChoice.current.collectAsState()
     val entries = rememberAllEntries()
+    val hideApp by io.github.sirionero.mycar.webmusic.WebMusic.hideApp.collectAsState()
     if (choice == SidePaneChoice.MUSIC) return null
-    return remember(choice, entries) {
-        val id = withXonosInside(withPlanciaInside(choice, entries), entries)
+    return remember(choice, entries, hideApp) {
+        // A choice saved with the Plancia or Xonos app, or a music service's app, as it shows now.
+        val id = pinShown(choice, entries)
         entries.find { it.componentId == id && it.fitsBesideMap }
     }
 }
@@ -182,12 +184,16 @@ private val LIVE = setOf(CarAppConnection.Phase.BINDING, CarAppConnection.Phase.
 /** The car settings' row for what shares the screen with the map: music, then each app that fits. */
 @Composable
 internal fun SidePanePicker() {
+    val navigator = LocalCarNavigator.current
     val current by SidePaneChoice.current.collectAsState()
     val entries = rememberAllEntries()
-    val apps = entries.filter { it.fitsBesideMap && it.componentId != null }.sortedBy { it.label.lowercase() }
+    // Not the phone's app of a music service that takes its place: one Spotify, as on the grid.
+    val replaced = rememberReplacedByWeb()
+    val apps = entries.filter { it.fitsBesideMap && it.componentId != null && !replaced(it) }.sortedBy { it.label.lowercase() }
     // Lit as beside the map: a choice saved with the Plancia or Xonos app is the one inside myCar now
     // (and back, while the app stands in); compared as saved, nothing was lit.
-    val shown = withXonosInside(withPlanciaInside(current, entries), entries)
+    // An app since gone (uninstalled, a service turned off) shows as the music, which the car shows.
+    val shown = pinShown(current, entries).takeIf { id -> apps.any { it.componentId == id } } ?: SidePaneChoice.MUSIC
     val options = listOf(SidePaneChoice.MUSIC to stringResource(R.string.car_side_music)) + apps.mapNotNull { e -> e.componentId?.let { it to e.shownLabel } }
     val scheme = MaterialTheme.colorScheme
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -196,7 +202,8 @@ internal fun SidePanePicker() {
             options.forEach { (id, label) ->
                 val on = id == shown
                 GsIconBox(
-                    onClick = { SidePaneChoice.set(id) },
+                    // The lit one tapped again brings back a column closed with its X.
+                    onClick = { SidePaneChoice.set(id); navigator.showSidePane() },
                     modifier = Modifier.widthIn(min = 150.dp).height(64.dp),
                     colors = if (on) GsColors(scheme.primaryContainer, scheme.onPrimaryContainer)
                     else GsColors(scheme.surfaceContainerHigh, scheme.onSurface),

@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.car.app.model.CarIcon
 import androidx.car.app.navigation.model.NavigationTemplate
 import androidx.car.app.navigation.model.RoutingInfo
+import io.github.sirionero.mycar.speech.VoiceFocus
 import io.github.sirionero.mycar.host.CarAppConnection
 import io.github.sirionero.mycar.host.display
 import io.github.sirionero.mycar.host.text
@@ -88,6 +89,7 @@ import io.github.sirionero.mycar.car.theme.LocalGsTheme
 import io.github.sirionero.mycar.media.CarMedia
 import io.github.sirionero.mycar.media.MediaArt
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
@@ -98,6 +100,9 @@ import androidx.core.graphics.drawable.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.util.Date
@@ -175,26 +180,57 @@ fun CarUi() {
         // Assistant, which held every request after it until it answered.
         CarAssistant.pendingCommand.collectLatest { heard ->
             if (heard != null) {
-                // Whatever a command meets (a provider that fails, an app that throws), the drive
-                // goes on: an exception here used to end myCar.
-                val reply = try {
-                    AssistantCommands.handle(appContext, navigator, frameForAssistant, heard)
-                } catch (e: kotlinx.coroutines.CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    MyCarLog.e("assistant: \"$heard\" failed", e)
-                    "Something went wrong. Try again."
+                // One pause from the question to the answer: the listening gives the music its focus
+                // back once the words are read, and Home Assistant (or an app connecting for "play X")
+                // let it play again in between, then the answer paused it once more.
+                VoiceFocus.acquire(appContext)
+                try {
+                    // Whatever a command meets (a provider that fails, an app that throws), the drive
+                    // goes on: an exception here used to end myCar.
+                    val reply = try {
+                        AssistantCommands.handle(appContext, navigator, frameForAssistant, heard)
+                    } catch (e: kotlinx.coroutines.CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        MyCarLog.e("assistant: \"$heard\" failed", e)
+                        "Something went wrong. Try again."
+                    }
+                    // None of myCar's commands: the driver's Home Assistant may know, or run it.
+                    val answer = if (AssistantCommands.missed(reply) && AssistantBrain.ready) {
+                        CarAssistant.askingHome(heard)
+                        AssistantBrain.ask(heard)
+                    } else {
+                        null
+                    }
+                    if (answer != null) CarAssistant.replyAsSaid(heard, answer.text) else CarAssistant.reply(reply)
+                } finally {
+                    VoiceFocus.release()
                 }
-                // None of myCar's commands: the driver's Home Assistant may know, or run it.
-                val answer = if (AssistantCommands.missed(reply) && AssistantBrain.ready) {
-                    CarAssistant.askingHome(heard)
-                    AssistantBrain.ask(heard)
-                } else {
-                    null
-                }
-                if (answer != null) CarAssistant.replyAsSaid(heard, answer.text) else CarAssistant.reply(reply)
             }
         }
+    }
+
+    // A ringing call takes the screen and the car's sound: the assistant, or a message being read
+    // or answered, gives way, as the app menu does (NavApps). A reply already counting down still goes.
+    LaunchedEffect(navigator) {
+        io.github.sirionero.mycar.call.CarCalls.state.map { it is io.github.sirionero.mycar.call.CallUiState.Ringing }
+            .distinctUntilChanged()
+            .collect { ringing ->
+                if (!ringing) return@collect
+                if (VoiceReply.active) {
+                    val reply = VoiceReply.state.value
+                    // Sent only once its countdown runs: while it's still read back the driver hasn't
+                    // heard it, nor had a moment to say "cancel" or "change it".
+                    if (reply.phase == VoiceReply.Phase.CONFIRMING && reply.until > 0L) VoiceReply.sendNow() else VoiceReply.cancel()
+                }
+                if (CarAssistant.state.value.phase != CarAssistant.Phase.IDLE) CarAssistant.cancel()
+            }
+    }
+
+    // A new choice for beside the map, in the car or on the phone, shows at once: after the
+    // player's X it waited for the dock's song, as if the setting did nothing.
+    LaunchedEffect(navigator) {
+        SidePaneChoice.current.drop(1).collect { navigator.showSidePane() }
     }
 
     // A "play X" the music app played nothing for (Spotify ignores most): said here when the
@@ -217,12 +253,15 @@ fun CarUi() {
                 // What's open over the screens goes first: Back closed the screen under it and left
                 // the call question, the assistant or its help up.
                 CarKeys.ScreenKey.BACK -> when {
-                    WebSelect.asked.value != null -> WebSelect.cancel()
+                    CardBack.whatsNew != null -> CardBack.whatsNew?.invoke()
+                    // Not the two drawn under a Bluetooth/location/pairing card: the card first.
+                    WebSelect.asked.value != null && CardBack.pair == null -> WebSelect.cancel()
                     navigator.appMenu != null -> navigator.dismissAppMenu()
                     VoiceReply.state.value.phase != VoiceReply.Phase.IDLE -> VoiceReply.cancel()
-                    CallPrompt.pending.value != null -> CallPrompt.pending.value = null
+                    CallPrompt.pending.value != null && CardBack.pair == null -> CallPrompt.pending.value = null
                     VoiceHelp.shown.value -> VoiceHelp.hide()
                     CarAssistant.state.value.phase != CarAssistant.Phase.IDLE -> CarAssistant.cancel()
+                    CardBack.pair != null -> CardBack.pair?.invoke()
                     else -> navigator.back()
                 }
                 // Home is the dashboard, over the map, so Back from it lands on the map.
@@ -281,6 +320,13 @@ fun CarUi() {
                     )
                 }
                 val screen = navigator.current
+                // A call under way: its banner holds the top of the screen for the whole call, so the
+                // screens and a message's card move down under it instead of losing their Back, tabs
+                // and Stop to it. The map keeps the banner over it, as always.
+                val callActive = io.github.sirionero.mycar.call.CarCalls.state.collectAsState().value is io.github.sirionero.mycar.call.CallUiState.Active
+                var callBand by remember { mutableStateOf(0.dp) }
+                val callTop = if (callActive) callBand else 0.dp
+                val bandDensity = LocalDensity.current
                 // A page's dropdown belongs to the screen it was opened on.
                 LaunchedEffect(screen) { WebSelect.cancel() }
                 val safetyWarningSeen by CarSettings.hasSeenSafetyWarning.collectAsState()
@@ -311,6 +357,7 @@ fun CarUi() {
                             Box(
                                 Modifier
                                     .fillMaxSize()
+                                    .padding(top = callTop)
                                     .background(MaterialTheme.colorScheme.background)
                                     // Keeps touches that miss this screen's controls off the map.
                                     .pointerInput(Unit) { detectTapGestures { } }
@@ -356,11 +403,14 @@ fun CarUi() {
                         // The dashboard is already listing them, so it needs no popup.
                         NotificationPopup(
                             showNew = screen !is CarScreen.Notifications && screen != CarScreen.Dashboard,
-                            modifier = Modifier.align(Alignment.TopEnd),
+                            modifier = Modifier.align(Alignment.TopEnd).padding(top = callTop),
                         )
                         // Above the popup: a call is more urgent than any notification.
                         VoiceHelpOverlay(Modifier.align(Alignment.Center))
-                        CallOverlay(Modifier.align(Alignment.TopCenter))
+                        CallOverlay(
+                            Modifier.align(Alignment.TopCenter)
+                                .onSizeChanged { callBand = with(bandDensity) { it.height.toDp() } },
+                        )
                         AssistantOverlay(Modifier.align(Alignment.BottomCenter))
                         if (io.github.sirionero.mycar.BuildConfig.DEBUG) {
                             // Bottom corner, not top: a screen's own header almost always puts

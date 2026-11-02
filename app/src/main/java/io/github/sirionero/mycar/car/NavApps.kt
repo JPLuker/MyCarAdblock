@@ -50,6 +50,8 @@ import io.github.sirionero.mycar.host.CarAppConnection
 import io.github.sirionero.mycar.media.CarMedia
 import io.github.sirionero.mycar.CarFocus
 import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.Words
+import androidx.car.app.CarToast
 import io.github.sirionero.mycar.call.CallUiState
 import io.github.sirionero.mycar.call.CarCalls
 import androidx.compose.ui.graphics.SolidColor
@@ -199,8 +201,8 @@ internal fun closeApp(slot: RunningSlot, navigator: CarNavigator) {
 
 /**
  * What a long press on an app offers - pin it to or unpin it from the nav bar, move it along the
- * launcher, and close it if it's open - as a card in the middle of the screen with car-sized buttons, over a scrim that
- * dismisses it. Drawn in the car UI's own layout rather than a system popup window, which the
+ * launcher, hide it from the launcher or put it back, and close it if it's open - as a card in the
+ * middle of the screen with car-sized buttons, over a scrim that dismisses it. Drawn in the car UI's own layout rather than a system popup window, which the
  * car's virtual display has no reason to host well.
  */
 @Composable
@@ -294,6 +296,7 @@ internal fun AppMenu(navigator: CarNavigator, running: Map<String, RunningSlot>)
                     )
                 }
                 if (navigator.current == CarScreen.Apps) MoveButtons(id)
+                if (HiddenApps.canHide(entry)) HideButton(id, entry.shownLabel, navigator)
                 if (slot != null) {
                     GsButton(
                         onClick = {
@@ -315,19 +318,55 @@ internal fun AppMenu(navigator: CarNavigator, running: Map<String, RunningSlot>)
 }
 
 /**
+ * Takes the app off the app grid, or puts it back: from the grid, or from the dock where a hidden
+ * app can still be pinned. Hidden, the car says where it comes back from.
+ */
+@Composable
+private fun HideButton(id: String, name: String, navigator: CarNavigator) {
+    val hidden by HiddenApps.ids.collectAsState()
+    val entries = rememberAllEntries()
+    val isHidden = id in hiddenAsShown(hidden, entries)
+    GsButton(
+        onClick = {
+            if (isHidden) {
+                HiddenApps.show(id, entries)
+            } else {
+                HiddenApps.hide(id)
+                CarToasts.show(HiddenApps, Words.get(R.string.car_apps_hidden_toast, name), CarToast.LENGTH_LONG)
+            }
+            navigator.dismissAppMenu()
+        },
+        tone = GsTone.Tonal,
+        modifier = Modifier.fillMaxWidth().height(56.dp),
+    ) {
+        Text(
+            stringResource(if (isHidden) R.string.car_apps_show_on_grid else R.string.car_apps_hide_from_grid),
+            style = MaterialTheme.typography.titleMedium,
+        )
+    }
+}
+
+/**
  * Moves the app one place left or right on the launcher. The menu stays open so a tile can be
  * walked several places, and the grid behind the scrim shows where it went.
  */
 @Composable
 private fun MoveButtons(id: String) {
     val custom by CarSettings.appOrder.collectAsState()
-    val order = launcherOrder(rememberAllEntries(), rememberVehicleDataShown(), custom).mapNotNull { it.componentId }
+    // The grid as it's drawn: a move trades places with the app shown next to it, not a hidden one.
+    val all = rememberAllEntries()
+    val offGrid = rememberOffTheGrid(all)
+    val vehicleData = rememberVehicleDataShown()
+    val order = launcherOrder(all.filterNot(offGrid), vehicleData, custom).mapNotNull { it.componentId }
     val index = order.indexOf(id)
     if (index < 0) return
     fun move(by: Int) {
         val next = order.toMutableList()
         java.util.Collections.swap(next, index, index + by)
-        CarSettings.setAppOrder(next)
+        // Saved over the whole order: an app off the grid keeps its place for when it comes back.
+        val shown = order.toSet()
+        val moved = next.iterator()
+        CarSettings.setAppOrder(launcherOrder(all, vehicleData, custom).mapNotNull { it.componentId }.map { if (it in shown) moved.next() else it })
     }
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         GsButton(

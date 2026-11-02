@@ -86,8 +86,24 @@ internal fun WirelessButton() {
     }
 
     if (denied) {
+        // Named as Android names them: on Android 12 it can be the precise location still off (the
+        // setup takes the approximate one), with Nearby devices already allowed.
+        val ok = { p: String -> ContextCompat.checkSelfPermission(context, p) == PackageManager.PERMISSION_GRANTED }
+        val location = setOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+        val missing = buildList {
+            if (WIRELESS_PERMISSIONS.any { it !in location && !ok(it) }) add(stringResource(R.string.setup_group_nearby_devices))
+            if (WIRELESS_PERMISSIONS.any { it in location && !ok(it) }) {
+                // Approximate allowed, precise not: Android shows Location as allowed, and its "Use
+                // precise location" switch is what's off.
+                add(stringResource(if (ok(Manifest.permission.ACCESS_COARSE_LOCATION)) R.string.setup_group_precise_location else R.string.setup_group_location))
+            }
+        }
         Text(
-            stringResource(R.string.wireless_button_denied),
+            if (missing.isEmpty() || missing == listOf(stringResource(R.string.setup_group_nearby_devices))) {
+                stringResource(R.string.wireless_button_denied)
+            } else {
+                stringResource(R.string.setup_drive_still_off, missing.joinToString(stringResource(R.string.common_list_separator)))
+            },
             style = MaterialTheme.typography.bodyMedium,
         )
         // Once Android stops asking, the only way back is the app's own permission settings.

@@ -112,7 +112,12 @@ internal fun PlanciaView(modifier: Modifier) {
 
 /** Why [url] won't answer, known while still trying it: Tailscale leaving myCar out, or Android 17's home network. */
 private fun connectingHint(context: Context, url: String): String? = when {
-    Tailnet.reach(context) == Tailnet.Reach.VPN_LEAVES_MYCAR_OUT -> Tailnet.explain(context, listOf(url), Tailnet.Failure.NO_SUCH_HOST)
+    // Through the Plancia app's bridge (myCar left out of Tailscale on purpose, see bridge/Bridges):
+    // nothing to explain while it tries, and a failure says the bridge's own reason. "Let myCar in
+    // and use the cable" told the driver to undo the set-up the bridge is for.
+    Tailnet.reach(context) == Tailnet.Reach.VPN_LEAVES_MYCAR_OUT ->
+        if (io.github.sirionero.mycar.bridge.Bridges.plancia.available(context)) null
+        else Tailnet.explain(context, listOf(url), Tailnet.Failure.NO_SUCH_HOST)
     LocalNetwork.mayBlock(context, listOf(url)) -> LocalNetwork.HINT
     else -> null
 }

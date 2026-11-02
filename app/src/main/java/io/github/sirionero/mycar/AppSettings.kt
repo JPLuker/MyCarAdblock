@@ -62,6 +62,8 @@ object AppSettings {
     fun setMyCarEnabled(context: Context, value: Boolean) {
         prefs(context).edit().putBoolean(KEY_MYCAR_ENABLED, value).apply()
         applyMyCarEnabled(context)
+        // Off: a wireless start-up under way stops too, not only the next ones.
+        if (!value) io.github.sirionero.mycar.wireless.WirelessLink.stopUnlessDriving(context)
     }
 
     /**

@@ -40,6 +40,10 @@
     <string name="car_apps_move_left">A la izquierda</string>
     <string name="car_apps_move_right">A la derecha</string>
     <string name="car_apps_reset_order">Restablecer el orden</string>
+    <string name="car_apps_hide_from_grid">Ocultar de la cuadrícula de apps</string>
+    <string name="car_apps_show_on_grid">Mostrar en la cuadrícula de apps</string>
+    <string name="car_apps_hidden_toast">App oculta: %1$s. Para recuperarla: Ajustes, Apps ocultas.</string>
+    <string name="car_web_music_elsewhere">%1$s está sonando en otro dispositivo, no en el coche</string>
 
     <string name="car_map_starting">Iniciando %1$s…</string>
     <string name="car_map_starting_unknown">Iniciando el mapa…</string>

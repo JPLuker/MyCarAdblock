@@ -101,25 +101,38 @@ enum class AppLanguage(
          * settings (a turn of the phone, dark mode) doesn't take back to the phone's language.
          */
         fun resources(app: Context): Resources {
-            if (Build.VERSION.SDK_INT >= 33) return app.resources
-            val language = chosen(app) ?: return app.resources
+            val language = wanted(app) ?: return app.resources
+            if (speaks(app, language)) return app.resources
             appWords?.let { (tag, words) -> if (tag == language.tag) return words }
             return inLanguage(app, language).resources.also { appWords = language.tag to it }
         }
 
         /**
-         * Android 12: [context] with its words in myCar's language, for a screen Android doesn't
-         * give them to (the car's, on a display of its own). Display, density and theme stay
-         * [context]'s.
+         * [context] with its words in myCar's language, for a screen Android doesn't give them to:
+         * the car's, on a display of its own, which comes with the phone's language on Android 12 and
+         * on later ones too (Android 13 gives the language chosen for myCar to its activities, not to
+         * a context made for another display). Display, density and theme stay [context]'s.
          */
         fun localized(context: Context): Context {
-            if (Build.VERSION.SDK_INT >= 33) return context
-            val language = chosen(context) ?: return context
+            val language = wanted(context) ?: return context
+            if (speaks(context, language)) return context
             val words = inLanguage(context, language).resources
             return object : ContextWrapper(context) {
                 override fun getResources(): Resources = words
             }
         }
+
+        /**
+         * The language myCar's words must be in, null for the phone's own: from Android 13 the one
+         * Android gives the process (its default locale, which the chosen language sets; read without
+         * asking the system, as [Words] does it for every text), before it the one chosen here.
+         */
+        private fun wanted(context: Context): AppLanguage? =
+            if (Build.VERSION.SDK_INT >= 33) of(Locale.getDefault()) else chosen(context)
+
+        /** [context]'s words are already in [language]. */
+        private fun speaks(context: Context, language: AppLanguage): Boolean =
+            context.resources.configuration.locales[0]?.language == language.locale.language
 
         private fun inLanguage(context: Context, language: AppLanguage): Context =
             context.createConfigurationContext(Configuration(context.resources.configuration).apply { setLocale(language.locale) })

@@ -11,6 +11,7 @@ import android.content.pm.ServiceInfo
 import android.net.wifi.WifiManager
 import android.os.IBinder
 import android.os.PowerManager
+import kotlinx.coroutines.launch
 
 /**
  * Keeps the drive in the foreground while the phone's screen is elsewhere, for as long as a car is
@@ -27,13 +28,7 @@ class SessionService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(NotificationChannel(CHANNEL, Words.get(R.string.channel_session), NotificationManager.IMPORTANCE_LOW))
-        val open = PendingIntent.getActivity(this, 0, Intent(this, MyCarActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
-        val notification = Notification.Builder(this, CHANNEL)
-            .setSmallIcon(R.drawable.sym_directions_car)
-            .setContentTitle(Words.get(R.string.session_notification_title))
-            .setContentIntent(open)
-            .setOngoing(true)
-            .build()
+        val notification = build(SessionStatus.state.value)
         // Refused if myCar was no longer in front by the time this runs (the phone locked at once):
         // the drive goes on as before, without it.
         runCatching {
@@ -46,6 +41,15 @@ class SessionService : Service() {
             }
             running = true
             MyCarLog.i("session: in the foreground for the drive")
+            // The notification says what Home says, as it changes: "connected" while a start-up was
+            // still reaching the car, or after the car turned the certificate down, disagreed with it.
+            if (watch == null) {
+                watch = kotlinx.coroutines.MainScope().launch {
+                    // Not once the service is let go (stop() empties the holders before stopService): the
+                    // drive's end posted a "not connected" that belonged to no service and stayed.
+                    SessionStatus.state.collect { if (running && wanted) manager.notify(NOTIFICATION_ID, build(it)) }
+                }
+            }
             hold(intent?.getBooleanExtra(EXTRA_WIRELESS, false) == true)
         }.onFailure {
             MyCarLog.w("session: couldn't keep the drive in the foreground - ${it.message}")
@@ -55,12 +59,35 @@ class SessionService : Service() {
     }
 
     override fun onDestroy() {
+        // First, on the main thread as its updates are: none lands after the service is gone.
+        watch?.cancel()
+        watch = null
+        // And should one have slipped through: gone with the service.
+        runCatching { getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID) }
         running = false
         runCatching { wakeLock?.release() }
         runCatching { wifiLock?.release() }
         wakeLock = null
         wifiLock = null
         super.onDestroy()
+    }
+
+    private var watch: kotlinx.coroutines.Job? = null
+
+    /** "myCar is connected to the car" once the car shows myCar; before that, or after a failure, Home's own words. */
+    private fun build(s: SessionStatus.Snapshot): Notification {
+        val open = PendingIntent.getActivity(this, 0, Intent(this, MyCarActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
+        val builder = Notification.Builder(this, CHANNEL)
+            .setSmallIcon(R.drawable.sym_directions_car)
+            .setContentIntent(open)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+        if (s.phase == SessionStatus.Phase.PROJECTING) {
+            builder.setContentTitle(Words.get(R.string.session_notification_title))
+        } else {
+            builder.setContentTitle(s.headline).setContentText(s.detail.ifEmpty { null })
+        }
+        return builder.build()
     }
 
     private var wakeLock: PowerManager.WakeLock? = null

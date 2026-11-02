@@ -81,6 +81,7 @@
     <string name="setup_group_call_logs">Call logs</string>
     <string name="setup_group_contacts">Contacts</string>
     <string name="setup_group_location">Location</string>
+    <string name="setup_group_precise_location">Precise location</string>
     <string name="setup_group_microphone">Microphone</string>
     <string name="setup_group_nearby_devices">Nearby devices</string>
 

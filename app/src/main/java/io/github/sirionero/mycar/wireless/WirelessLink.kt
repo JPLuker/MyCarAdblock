@@ -90,6 +90,12 @@ object WirelessLink {
     private const val KNOCK_MS = 8_000L
     /** The same after a drive ([quiet]): the car may be gone, so less often. */
     private const val QUIET_KNOCK_MS = 15_000L
+    /** How long a car's Bluetooth may be gone before an automatic start-up with nothing from it stops. */
+    private const val GONE_GRACE_MS = 30_000L
+    /** The listening after a drive, awake: to publish the service again for a car that calls the phone. */
+    private const val QUIET_PUBLISH_MS = 10_000L
+    /** ... and for one that waits to be called: a short stop. */
+    private const val QUIET_AWAKE_MS = 180_000L
     /** A Bluetooth channel on which the car says nothing that leads to its Wi-Fi this long is closed. */
     private const val CHANNEL_QUIET_MS = 30_000L
     /** A start-up the car's Bluetooth began starts over this many times when a later step fails. */
@@ -154,7 +160,10 @@ object WirelessLink {
      * drive's service keeps it awake from there) or the start-up ends. In a pocket, with the screen
      * off, the phone went to sleep: the calls to the car every few seconds and a start-over's short
      * wait count only the time awake, so they stopped until something else woke the phone - often
-     * the driver, taking it out to tap Disconnect and Connect. Not for the listening after a drive.
+     * the driver, taking it out to tap Disconnect and Connect. The listening after a drive holds it a
+     * little: long enough to publish the service again for a car that calls the phone (its call wakes
+     * the phone), a short stop's worth for one that waits to be called (the calls to it are its only
+     * way back); and every start-over, as the car has only just answered.
      */
     @Volatile private var awake: PowerManager.WakeLock? = null
 
@@ -208,7 +217,8 @@ object WirelessLink {
      * [again]: a start-over of one of those ([startOver]), which keeps counting its tries.
      */
     fun start(context: Context, device: BluetoothDevice, byItself: Boolean = false, quiet: Boolean = false, again: Boolean = false) {
-        stop(context)
+        // A start-over goes on saying "connecting": not a moment of "not connected" between two tries.
+        stop(context, say = !(again && !quiet))
         againFor = device
         drove = false
         this.quiet = quiet
@@ -218,6 +228,7 @@ object WirelessLink {
         pictured = false
         joined = false
         saidWhy = false
+        goneAddress = null
         synchronized(ends) {
             channelOver = false
             releaseWithChannel = false
@@ -226,6 +237,7 @@ object WirelessLink {
         car = device
         // The wait for the car, then its Wi-Fi (up to a minute) and the TCP tries (a minute).
         if (!quiet) stayAwake(app, (if (byItself) AUTO_LISTEN_MS else LISTEN_MS) + 180_000L)
+        else stayAwake(app, if (WirelessAuto.callsPhone(app, device.address)) QUIET_PUBLISH_MS else QUIET_AWAKE_MS)
         // Taken here, not in the thread: a start-up stopped before its thread ran is old already.
         val mine = startRun
         worker = Thread({
@@ -318,8 +330,11 @@ object WirelessLink {
                     // The listening after a drive said "talking to the car" when the channel opened:
                     // its last start-over over, that went too, or it stayed up for good.
                     if (SessionStatus.state.value.phase == SessionStatus.Phase.CONNECTING) SessionStatus.disconnected()
-                } else if (!saidWhy) {
+                } else if (!saidWhy && !drove) {
                     // Nothing follows: "talking to the car" stayed up for good, and only Disconnect cleared it.
+                    // Only for a start that never reached a session: one on the car's Wi-Fi has said
+                    // its own reason already (MyCarRunner: the certificate, the car's date), and this
+                    // took its place, blaming the car's Bluetooth.
                     car?.let { SessionStatus.failed(R.string.wireless_link_bt_no_car, R.string.wireless_link_bt_no_car_detail, name(it)) }
                 }
             }
@@ -343,7 +358,7 @@ object WirelessLink {
         // The listening after a drive stays that: started over as a plain start-up it showed
         // "waiting for the car" on Home for 5 minutes, and ended with "the car didn't connect".
         val wasQuiet = quiet
-        if (!wasQuiet) stayAwake(app, RETRY_DELAY_MS + 5_000L)
+        stayAwake(app, RETRY_DELAY_MS + 5_000L)
         main.postDelayed({
             // Stopped, started anew or driving meanwhile (the cable, a tap, Disconnect): that one decides.
             if (mine != startRun || tcp != null) return@postDelayed
@@ -359,10 +374,41 @@ object WirelessLink {
      */
     fun carGone(context: Context, address: String) {
         val device = car ?: return
-        if (!device.address.equals(address, ignoreCase = true) || !listeningQuietly) return
-        log.i("Bluetooth: ${name(device)} went - no more listening for it after the drive")
-        stop(context)
+        if (!device.address.equals(address, ignoreCase = true)) return
+        if (listeningQuietly) {
+            log.i("Bluetooth: ${name(device)} went - no more listening for it after the drive")
+            stop(context)
+            return
+        }
+        // A start-up the car's Bluetooth began, with nothing from the car yet (no channel, no Wi-Fi):
+        // gone for 30 s, the driver has left - it stopped only after 5 minutes of calling a car that
+        // wasn't there, with "the car didn't connect" at the end. A car back within that keeps it.
+        if (autoStart && !quiet && !pictured && rfcomm == null && tcp == null && network == null) {
+            goneAddress = address
+            val turn = ++goneTurn
+            val run = startRun
+            main.postDelayed({
+                // This very going, 30 s on: an earlier one's timer doesn't act on a later going.
+                if (run == startRun && turn == goneTurn && goneAddress.equals(address, ignoreCase = true) &&
+                    rfcomm == null && tcp == null && network == null && !pictured
+                ) {
+                    log.i("Bluetooth: ${name(device)} went and didn't come back - the automatic start-up stops")
+                    stop(context.applicationContext)
+                }
+            }, GONE_GRACE_MS)
+        }
     }
+
+    /** The car's Bluetooth back (Android's companion watch): a start-up waiting on its going goes on. */
+    fun carHere(address: String) {
+        if (goneAddress.equals(address, ignoreCase = true)) goneAddress = null
+    }
+
+    /** The car whose Bluetooth went during an automatic start-up, until it's back or the start-up stops. */
+    @Volatile private var goneAddress: String? = null
+
+    /** Bumped at each going of the car, so a timer from an earlier going doesn't act on a later one. */
+    @Volatile private var goneTurn = 0
 
     /**
      * A drive with a car that calls the phone is over (the session and the Bluetooth channel both),
@@ -379,6 +425,8 @@ object WirelessLink {
         val app = context.applicationContext
         // A car that waits to be called too: its service is called now and then while it listens.
         if (!WirelessAuto.mayConnect(app, device.address)) return
+        // "Use myCar in the car" off: the car is Android Auto's now.
+        if (!io.github.sirionero.mycar.AppSettings.myCarEnabled(app)) return
         val run = startRun
         main.post {
             // Started or stopped meanwhile (the cable, a tap, Disconnect): that one decides.
@@ -386,6 +434,16 @@ object WirelessLink {
             log.i("Bluetooth: the drive is over - listening for ${name(device)} for ${AGAIN_LISTEN_MS / 60_000} minutes, in case it starts again")
             start(app, device, byItself = true, quiet = true)
         }
+    }
+
+    /**
+     * "Use myCar in the car" turned off: a start-up or the listening after a drive stops, so myCar's
+     * Android Auto service no longer takes the car from Android Auto. A drive that's up stays.
+     */
+    fun stopUnlessDriving(context: Context) {
+        if (tcp != null || (!busy && network == null)) return
+        log.i("myCar turned off - the wireless start-up stops")
+        stop(context)
     }
 
     private fun releaseNetwork(context: Context) {
@@ -396,8 +454,11 @@ object WirelessLink {
         activeSsid = null
     }
 
-    /** Closes the Bluetooth channel, the socket and the Wi-Fi request. Safe to call any time. */
-    fun stop(context: Context) {
+    /**
+     * Closes the Bluetooth channel, the socket and the Wi-Fi request. Safe to call any time. [say]
+     * puts Home's card back to "not connected" if a start-up was under way.
+     */
+    fun stop(context: Context, say: Boolean = true) {
         tcpRun++
         startRun++
         againFor = null
@@ -420,7 +481,7 @@ object WirelessLink {
         // Stopped before the car's session began, so nothing else resets Home's card.
         if (starting) {
             log.i("wireless start-up stopped")
-            SessionStatus.disconnected()
+            if (say) SessionStatus.disconnected()
         }
     }
 
@@ -752,7 +813,8 @@ object WirelessLink {
                     log.i("-> StartResponse (phone at $phoneIp), ConnectionStatus: success")
                 }.onFailure { log.w("Bluetooth: couldn't report the Wi-Fi join (${it.message})") }
                 val run = ++tcpRun
-                Thread({ connectTcp(context, output, name, net, ip, port, run, mine) }, "mycar-wireless-tcp").start()
+                val cb = this
+                Thread({ connectTcp(context, output, name, net, ip, port, run, mine, cb) }, "mycar-wireless-tcp").start()
             }
 
             override fun onUnavailable() {
@@ -760,12 +822,15 @@ object WirelessLink {
                 if (network === this && tcp == null) giveBackService(context)
                 log.w("Wi-Fi: couldn't join \"$ssid\" (declined, out of range, or wrong password)")
                 runCatching { send(output, MSG_CONNECTION_STATUS, Protobuf.varintField(1, -1)) }
-                SessionStatus.failed(
-                    R.string.wireless_link_wifi_failed,
-                    R.string.wireless_link_wifi_failed_detail,
-                    name,
-                )
-                startOver(context, mine, "the car's Wi-Fi didn't come")
+                // Said only when nothing follows: before a start-over Home turned red for 3 s, as
+                // if it were over, and Disconnect went from it.
+                if (!startOver(context, mine, "the car's Wi-Fi didn't come")) {
+                    SessionStatus.failed(
+                        R.string.wireless_link_wifi_failed,
+                        R.string.wireless_link_wifi_failed_detail,
+                        name,
+                    )
+                }
             }
 
             // Android can hold an app's traffic back on a network it has joined (battery or data
@@ -871,7 +936,10 @@ object WirelessLink {
         }
     }
 
-    private fun connectTcp(context: Context, output: OutputStream, name: String, net: Network, ip: String, port: Int, run: Int, mine: Int) {
+    private fun connectTcp(
+        context: Context, output: OutputStream, name: String, net: Network, ip: String, port: Int, run: Int, mine: Int,
+        cb: ConnectivityManager.NetworkCallback,
+    ) {
         SessionStatus.connecting(R.string.wireless_link_wifi_reaching, name)
         lostNetwork = null
         var last: Exception? = null
@@ -944,13 +1012,25 @@ object WirelessLink {
             }
         }
         log.e("TCP: gave up on $ip:$port", last)
-        if (run == tcpRun) giveBackService(context)
+        // Stopped meanwhile (Disconnect, the cable, a tap), or a newer join that will say its own.
+        if (run != tcpRun) return
+        giveBackService(context)
+        // Nothing follows: the car's network goes, or the phone stayed on it (off its home Wi-Fi)
+        // and the channel's end, finding the request still there, kept it until the next tap.
+        // Said first: the channel's end then adds nothing over the reason.
+        fun endJoin(noStartOver: Boolean) = synchronized(ends) {
+            if (network !== cb) return@synchronized
+            if (noStartOver) retriesLeft = 0
+            saidWhy = true
+            releaseNetwork(context)
+        }
         if (vpnActive(context)) {
             SessionStatus.failed(
                 R.string.wireless_link_vpn,
                 R.string.wireless_link_vpn_detail,
                 name,
             )
+            endJoin(noStartOver = true)
             return
         }
         // Android 17 keeps myCar off local networks until it's allowed, the car's Wi-Fi among them:
@@ -958,14 +1038,16 @@ object WirelessLink {
         if (!io.github.sirionero.mycar.LocalNetwork.allowed(context)) {
             log.w("TCP: Android doesn't let myCar reach local networks (Nearby devices) - the car's Wi-Fi is one")
             SessionStatus.failed(R.string.wireless_link_no_connection, R.string.wireless_link_local_network_detail)
+            endJoin(noStartOver = true)
             return
         }
-        // Not behind a VPN, which no start-over gets past.
-        if (run == tcpRun) startOver(context, mine, "no TCP to the car")
+        // Not behind a VPN, which no start-over gets past. Said only when nothing follows.
+        if (startOver(context, mine, "no TCP to the car")) return
         SessionStatus.failed(
             R.string.wireless_link_no_connection,
             R.string.wireless_link_no_connection_detail,
             name, "$ip:$port",
         )
+        endJoin(noStartOver = false)
     }
 }

@@ -64,8 +64,8 @@ import io.github.sirionero.mycar.car.design.Wallpapers
 import io.github.sirionero.mycar.car.fitsBesideMap
 import io.github.sirionero.mycar.car.rememberAllEntries
 import io.github.sirionero.mycar.car.theme.GsThemes
-import io.github.sirionero.mycar.car.withPlanciaInside
-import io.github.sirionero.mycar.car.withXonosInside
+import io.github.sirionero.mycar.car.pinShown
+import io.github.sirionero.mycar.car.rememberReplacedByWeb
 
 /**
  * The car screen's settings on the phone: whatever the Settings app on the car changes, here too,
@@ -77,6 +77,7 @@ import io.github.sirionero.mycar.car.withXonosInside
 internal fun CarScreenSettings() {
     CarHomeSection()
     CarPagesSection()
+    CarGridSection()
     CarLookSection()
     CarWallpaperSection()
     CarDriveSection()
@@ -90,10 +91,14 @@ internal fun CarScreenSettings() {
 private fun CarHomeSection() {
     val open by CarSettings.openOnConnect.collectAsState()
     val side by SidePaneChoice.current.collectAsState()
+    val playerSize by CarSettings.playerSize.collectAsState()
     val entries = rememberAllEntries()
-    val apps = entries.filter { it.fitsBesideMap && it.componentId != null }.sortedBy { it.label.lowercase() }
+    // As in the car: not the phone's app of a music service that takes its place.
+    val replaced = rememberReplacedByWeb()
+    val apps = entries.filter { it.fitsBesideMap && it.componentId != null && !replaced(it) }.sortedBy { it.label.lowercase() }
     // As in the car: a choice saved with the Plancia or Xonos app is the one inside myCar now.
-    val shownSide = withXonosInside(withPlanciaInside(side, entries), entries) ?: side
+    // An app since gone (uninstalled, a service turned off) shows as the music, as in the car.
+    val shownSide = pinShown(side, entries).takeIf { id -> apps.any { it.componentId == id } } ?: SidePaneChoice.MUSIC
     val appNames = apps.map { it.shownLabel }
     val carApps = CarApps.all.filter { it.id != "settings" }
     val carAppNames = carApps.map { it.shownLabel }
@@ -111,6 +116,16 @@ private fun CarHomeSection() {
                 apps.mapIndexedNotNull { i, app -> app.componentId?.let { Pick(it, appNames[i]) } },
             shownSide,
         ) { SidePaneChoice.set(it) }
+        SettingsDivider()
+        PickRow(
+            stringResource(R.string.car_settings_player_size),
+            listOf(
+                Pick(CarSettings.PLAYER_SMALL, stringResource(R.string.car_settings_size_small)),
+                Pick(CarSettings.PLAYER_MEDIUM, stringResource(R.string.car_settings_size_medium)),
+                Pick(CarSettings.PLAYER_LARGE, stringResource(R.string.car_settings_size_large)),
+            ),
+            playerSize,
+        ) { CarSettings.setPlayerSize(it) }
     }
 }
 

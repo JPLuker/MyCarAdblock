@@ -173,8 +173,9 @@ object VoiceReply {
             lingerThenIdle(id)
             return
         }
-        // Android hands every app but the dialer a silent microphone during a call.
-        if (CarCalls.state.value is CallUiState.Active) {
+        // Android hands every app but the dialer a silent microphone during a call; while it rings,
+        // the ringtone would be taken for the reply.
+        if (CarCalls.state.value !is CallUiState.None) {
             val id = begin(State(Phase.ERROR, n, error = AssistantLanguage.answer("Voice reply works once the call ends.")))
             lingerThenIdle(id)
             return

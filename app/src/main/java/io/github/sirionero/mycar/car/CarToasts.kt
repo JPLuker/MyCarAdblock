@@ -28,6 +28,13 @@ internal object CarToasts {
     private val _waiting = MutableStateFlow(0)
     val waiting: StateFlow<Int> = _waiting.asStateFlow()
 
+    /** Nothing left over for the next drive: the car's screen is gone, and its toasts with it. */
+    fun clearAll() {
+        queue.clear()
+        current.value = null
+        _waiting.value = 0
+    }
+
     fun show(owner: Any, text: String, duration: Int) {
         if (text.isBlank()) return
         // Longer than a phone toast: the driver only glances at the screen now and then.

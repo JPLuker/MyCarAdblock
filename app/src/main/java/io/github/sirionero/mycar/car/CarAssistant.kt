@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.Words
+import io.github.sirionero.mycar.mirror.PhoneMirror
 import io.github.sirionero.mycar.call.CallUiState
 import io.github.sirionero.mycar.call.CarCalls
 import io.github.sirionero.mycar.speech.SpeechEngine
@@ -62,8 +63,12 @@ object CarAssistant {
 
     private var appContext: Context? = null
     private var recognizer: SpeechRecognizer? = null
+    /** The phone's recognizer has the music paused, as myCar's own engine does (VoiceFocus). */
+    private var systemFocus = false
     private var tts: TextToSpeech? = null
-    private var ttsReady = false
+    @Volatile private var ttsReady = false
+    /** The engine didn't start, or stopped speaking (updated in the background): made anew next drive. */
+    @Volatile private var ttsFailed = false
     /** The language the voice was last set to, so it's set again only when that changes. */
     private var voiceIn: VoiceLanguage? = null
 
@@ -86,9 +91,18 @@ object CarAssistant {
 
     fun init(context: Context) {
         appContext = context.applicationContext
-        if (tts != null) return
+        // Started again, at the next drive, after a start that failed or an engine that went away
+        // (updated in the background, Android never binds it again), as DirectionsVoice does:
+        // otherwise answers and messages stayed silent until myCar's process went.
+        if (tts != null && !ttsFailed) return
+        tts?.shutdown()
+        voiceIn = null
+        ttsReady = false
+        ttsFailed = false
         tts = TextToSpeech(appContext) { status ->
             ttsReady = status == TextToSpeech.SUCCESS
+            ttsFailed = !ttsReady
+            if (ttsFailed) MyCarLog.w("assistant: text-to-speech didn't start (status $status) - trying again next drive")
             if (ttsReady) mainHandler.post(::syncLanguage)
         }
         syncLanguage()
@@ -109,6 +123,11 @@ object CarAssistant {
 
     private fun startOnMainThread() {
         val context = appContext ?: return
+        // A ringing call has the screen: nothing to listen for, and the ringtone would be heard as words.
+        if (CarCalls.state.value is CallUiState.Ringing) {
+            MyCarLog.i("assistant: not while a call rings")
+            return
+        }
         if (_state.value.phase == Phase.LISTENING) return
         // Still working on the last words (the model, Home Assistant): the microphone starts over
         // instead of doing nothing, which looked like the assistant had hung.
@@ -127,6 +146,12 @@ object CarAssistant {
         }
         // The driver may have picked another assistant, which then takes the button instead.
         if (AssistantChoice.startOther(context)) return
+        // While the phone's screen is shared there's no car screen to show the assistant or act on
+        // the words: the sharing ends, and the car's screen, back in a moment, takes it from here.
+        if (PhoneMirror.active.value) {
+            MyCarLog.i("assistant: the phone's screen was shared - back to myCar's screen")
+            PhoneMirror.requestStop()
+        }
 
         if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO) !=
             PackageManager.PERMISSION_GRANTED
@@ -224,11 +249,21 @@ object CarAssistant {
             return
         }
         appContext?.let(VoiceFocus::acquire)
-        speaking = speak(engine, text) { stopped ->
+        speaking = speak(engine, text) { stopped, refused ->
             VoiceFocus.release()
             // Still this answer on screen: done speaking, or cut short by a message read aloud. Not
             // when the microphone or Cancel stopped it, which have moved the overlay on already.
             if (mine == replies && _state.value.phase == Phase.SPEAKING) {
+                // Not said, the engine refused: on screen long enough to read, as with no engine.
+                if (refused) {
+                    mainHandler.postDelayed({
+                        if (mine == replies && _state.value.phase == Phase.SPEAKING) {
+                            _state.value = _state.value.copy(phase = Phase.IDLE)
+                            then()
+                        }
+                    }, SILENT_REPLY_MS)
+                    return@speak
+                }
                 _state.value = _state.value.copy(phase = Phase.IDLE)
                 if (!stopped) mainHandler.post(then)
             }
@@ -340,7 +375,7 @@ object CarAssistant {
             return
         }
         VoiceFocus.acquire(context)
-        speak(engine, text) { _ ->
+        speak(engine, text) { _, _ ->
             VoiceFocus.release()
             // Always, stopped part way too: a turn that cut a message read out on the car's channel
             // for spoken prompts (DirectionsVoice) left the reply waiting for good. Whoever stopped
@@ -352,8 +387,11 @@ object CarAssistant {
 
     private var utterances = 0
 
-    /** What to do when each utterance ends, by its id; true when it was stopped part way. */
-    private val endings = java.util.concurrent.ConcurrentHashMap<String, (stopped: Boolean) -> Unit>()
+    /**
+     * What to do when each utterance ends, by its id: stopped part way, or refused by the engine
+     * (never said).
+     */
+    private val endings = java.util.concurrent.ConcurrentHashMap<String, (stopped: Boolean, refused: Boolean) -> Unit>()
 
     /**
      * One listener for every utterance, which finds its own ending by id. With a listener per
@@ -372,8 +410,8 @@ object CarAssistant {
         }
     }
 
-    private fun end(utteranceId: String?, stopped: Boolean) {
-        endings.remove(utteranceId ?: return)?.invoke(stopped)
+    private fun end(utteranceId: String?, stopped: Boolean, refused: Boolean = false) {
+        endings.remove(utteranceId ?: return)?.invoke(stopped, refused)
     }
 
     /**
@@ -381,21 +419,30 @@ object CarAssistant {
      * engine went away mid-drive) sends no callback at all: it ends at once, or the voice focus
      * stayed taken and the music paused for the rest of the drive.
      */
-    private fun speak(engine: TextToSpeech, text: String, ending: (stopped: Boolean) -> Unit): String {
+    private fun speak(engine: TextToSpeech, text: String, ending: (stopped: Boolean, refused: Boolean) -> Unit): String {
         val id = "mycar-${++utterances}"
         endings[id] = ending
         // The car's sound through myCar with nothing captured - myCar's own music (Xonos) goes
         // straight into the car - and the voice came out of the phone's speaker: on the car's
         // channel for spoken prompts instead, where the car has one.
         if (CarSettings.pipeAudio.value && io.github.sirionero.mycar.audio.CarAudio.capture.value != io.github.sirionero.mycar.audio.CarAudio.Capture.ON &&
-            DirectionsVoice.speakForAssistant(text, VoiceLanguages.speakingLocale(AssistantLanguage.language)) { cut -> end(id, stopped = cut) }
+            DirectionsVoice.speakForAssistant(text, VoiceLanguages.speakingLocale(AssistantLanguage.language)) { cut, refused ->
+                end(id, stopped = cut, refused = refused)
+            }
         ) {
             return id
         }
         engine.setOnUtteranceProgressListener(progress)
         if (engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, id) != TextToSpeech.SUCCESS) {
-            MyCarLog.w("assistant: speech engine refused to speak")
-            end(id, stopped = false)
+            // A text too long for any engine says nothing about the engine; otherwise it went away
+            // (updated in the background) and is made again at the next drive.
+            if (text.length < TextToSpeech.getMaxSpeechInputLength()) {
+                MyCarLog.w("assistant: speech engine refused to speak - starting it again next drive")
+                ttsFailed = true
+            } else {
+                MyCarLog.w("assistant: too long to speak (${text.length} characters)")
+            }
+            end(id, stopped = false, refused = true)
         }
         return id
     }
@@ -406,6 +453,8 @@ object CarAssistant {
     private fun stopVoice() {
         tts?.stop()
         DirectionsVoice.stopAssistant()
+        // Ended here, not left to the engine's callbacks: one that never came kept the music paused.
+        endings.keys.toList().forEach { end(it, stopped = true) }
     }
 
     /**
@@ -492,6 +541,11 @@ object CarAssistant {
                 partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()?.let(onPartial)
             }
         })
+        // The music paused while the phone's recognizer listens, as with myCar's own: it heard the song.
+        if (!systemFocus) {
+            VoiceFocus.acquire(context)
+            systemFocus = true
+        }
         r.startListening(
             Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -520,6 +574,10 @@ object CarAssistant {
         SpeechEngine.cancel()
         recognizer?.let { runCatching { it.cancel() }; it.destroy() }
         recognizer = null
+        if (systemFocus) {
+            systemFocus = false
+            VoiceFocus.release()
+        }
     }
 
     private fun errorMessage(code: Int): String = when (code) {

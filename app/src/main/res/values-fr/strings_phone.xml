@@ -101,7 +101,7 @@
     <string name="update_title">Mises à jour</string>
     <string name="update_out">myCar %1$s est disponible</string>
     <string name="update_downloading">Téléchargement… %1$d %%</string>
-    <string name="update_unplug_first">Débranchez le téléphone de la voiture pour installer. L’installation ferme myCar.</string>
+    <string name="update_unplug_first">Déconnectez-vous de la voiture pour installer. L’installation ferme myCar.</string>
     <string name="update_downloaded">Téléchargée. Android demande avant d’installer.</string>
     <string name="update_download_now">Téléchargez-la maintenant. Android demande avant d’installer.</string>
     <string name="update_install">Installer</string>

@@ -42,6 +42,10 @@
     <string name="car_apps_move_left">Переместить влево</string>
     <string name="car_apps_move_right">Переместить вправо</string>
     <string name="car_apps_reset_order">Сбросить порядок приложений</string>
+    <string name="car_apps_hide_from_grid">Скрыть из сетки приложений</string>
+    <string name="car_apps_show_on_grid">Показать в сетке приложений</string>
+    <string name="car_apps_hidden_toast">Скрыто: %1$s. Вернуть можно в разделе «Настройки», «Скрытые приложения».</string>
+    <string name="car_web_music_elsewhere">%1$s играет на другом устройстве, а не в машине</string>
 
     <string name="car_map_starting">Запуск %1$s…</string>
     <string name="car_map_starting_unknown">Запуск карты…</string>

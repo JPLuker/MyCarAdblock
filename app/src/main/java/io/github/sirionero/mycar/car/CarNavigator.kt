@@ -130,6 +130,15 @@ class CarNavigator(startId: String) {
 
     fun showSideLyrics() { sidePanel = SidePanel.LYRICS }
 
+    /** The player beside the map again, in place of the lyrics: the lyrics' X. */
+    fun showSideControls() { sidePanel = SidePanel.CONTROLS }
+
+    /**
+     * The column beside the map back, if the driver closed it: a new choice for it ("Beside the
+     * map", in the car or on the phone) shows at once instead of waiting for the dock. Lyrics stay.
+     */
+    fun showSidePane() { if (sidePanel == SidePanel.NONE) sidePanel = SidePanel.CONTROLS }
+
     fun closeSidePanel() { sidePanel = SidePanel.NONE }
 
     /** Component id of the app whose long-press menu (pin, close) is open, or null. */

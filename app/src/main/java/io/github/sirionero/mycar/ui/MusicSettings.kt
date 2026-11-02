@@ -93,6 +93,7 @@ private fun WebMusicPart(service: WebMusicService) {
             stringResource(if (isOn) R.string.music_service_on else R.string.music_service_off),
         ) { WebMusic.setOn(service.id, it) }
         if (isOn) {
+            HideAppRow(service)
             SettingsDivider()
             SettingsRow(
                 stringResource(R.string.music_sign_in),
@@ -117,6 +118,28 @@ private fun WebMusicPart(service: WebMusicService) {
             onDismiss = { signOutAsk = false },
         )
     }
+}
+
+/**
+ * With the service's own app on this phone: a tick to keep that app off the car's app grid, so the
+ * grid has one Spotify, the one inside myCar. Its pins and its choice beside the map go to this one.
+ */
+@Composable
+private fun HideAppRow(service: WebMusicService) {
+    val context = LocalContext.current
+    val pkg = service.appPackage ?: return
+    // Apps with a launcher icon are visible to myCar (its <queries>).
+    val installed = remember(pkg) { runCatching { context.packageManager.getApplicationInfo(pkg, 0) }.isSuccess }
+    if (!installed) return
+    val hide by WebMusic.hideApp.collectAsState()
+    val checked = service.id in hide
+    SettingsDivider()
+    SettingsRow(
+        stringResource(R.string.music_hide_app, service.name),
+        Modifier.toggleable(checked, role = Role.Checkbox) { WebMusic.setHideApp(service.id, it) },
+        subtitle = stringResource(R.string.music_hide_app_detail, service.name),
+        trailing = { Checkbox(checked = checked, onCheckedChange = null) },
+    )
 }
 
 /** "Add a service": the other services' web players, ticked to put each in the car. */

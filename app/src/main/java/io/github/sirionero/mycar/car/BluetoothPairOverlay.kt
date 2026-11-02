@@ -60,11 +60,13 @@ internal fun BluetoothPairOverlay() {
                 ),
                 secondary = stringResource(R.string.bluetooth_dont_show_again) to BluetoothAudioCheck::neverAgain,
                 primary = stringResource(R.string.common_ok) to BluetoothAudioCheck::dismissOnCar,
+                onBack = BluetoothAudioCheck::dismissOnCar,
             ) else if (locationDue) PairCard(
                 title = stringResource(R.string.bluetooth_location_off_title),
                 body = stringResource(R.string.bluetooth_location_off_body),
                 secondary = stringResource(R.string.bluetooth_dont_show_again) to LocationCheck::neverAgain,
                 primary = stringResource(R.string.common_ok) to LocationCheck::dismissOnCar,
+                onBack = LocationCheck::dismissOnCar,
             )
         }
         CarBluetooth.Prompt.ASK -> PairCard(
@@ -72,18 +74,23 @@ internal fun BluetoothPairOverlay() {
             body = stringResource(if (bluetoothAudio) R.string.bluetooth_pair_body_calls_music else R.string.bluetooth_pair_body_calls),
             secondary = stringResource(R.string.common_not_now) to CarBluetooth::notNow,
             primary = stringResource(R.string.bluetooth_pair) to CarBluetooth::pair,
+            // Not now would turn this car down for good: Back leaves the choice to the driver.
+            onBack = {},
         )
         CarBluetooth.Prompt.PAIRING -> PairCard(
             title = stringResource(R.string.bluetooth_confirm_title),
             body = stringResource(R.string.bluetooth_confirm_body),
             secondary = null,
             primary = stringResource(R.string.bluetooth_hide) to CarBluetooth::hide,
+            onBack = CarBluetooth::hide,
         )
     }
 }
 
 @Composable
-private fun PairCard(title: String, body: String, secondary: Pair<String, () -> Unit>?, primary: Pair<String, () -> Unit>) {
+private fun PairCard(title: String, body: String, secondary: Pair<String, () -> Unit>?, primary: Pair<String, () -> Unit>, onBack: () -> Unit) {
+    // The car's Back answers the card (OK for this trip, Hide), never the screen under it.
+    CardBackKey(CardBack::pair, onBack)
     Box(
         Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).clickable(
             indication = null,

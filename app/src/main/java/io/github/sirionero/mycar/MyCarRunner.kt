@@ -53,6 +53,8 @@ class MyCarRunner(
      * (the Wi-Fi socket; a blocked read returns). Called when the session gives up or stops itself.
      */
     private val closeTransport: (() -> Unit)? = null,
+    /** Whether a car accepted this certificate before (see [CertRotation.acceptedBefore]). */
+    private val certAcceptedBefore: (CertProvider.Identity) -> Boolean = { false },
 ) {
     private val log = MyCarLog.tagged("PROTO")
 
@@ -94,6 +96,10 @@ class MyCarRunner(
     @Volatile private var videoSource: VideoSource? = null
     /** New encoders made after one died mid-drive; see [onEncoderFailed]. */
     private var videoRestarts = 0
+    private var lastVideoRestartAt = 0L
+    /** When this session began, and whether a stalled cable start-up has said what to do. */
+    private val startedAt = SystemClock.elapsedRealtime()
+    @Volatile private var stuckSaid = false
     @Volatile private var inFlight = 0
     /** Guards [inFlight]: the encoder thread waits on it for the head unit's acks. */
     private val ackLock = Object()
@@ -463,7 +469,8 @@ class MyCarRunner(
                 )
                 SessionStatus.failed(
                     R.string.connection_car_date,
-                    R.string.connection_car_date_detail,
+                    // No cable to plug in again over Wi-Fi.
+                    if (wireless) R.string.cert_notice_clock_text else R.string.connection_car_date_detail,
                 )
                 state = State.DONE
                 authenticationFailed = true
@@ -619,7 +626,10 @@ class MyCarRunner(
             sendControl = { id, body -> send(id, body, encrypted = true) },
             // The driver picked the radio or another source on the car: pause the phone's music
             // as Android Auto does, instead of letting it play on to no one.
-            onTakenBack = { CarServices.pausePhoneMedia("the car switched to another source") },
+            onTakenBack = {
+                CarServices.pausePhoneMedia("the car switched to another source")
+                io.github.sirionero.mycar.car.CinemaNow.pauseForCar()
+            },
         )
         if (CarSettings.pipeAudio.value) {
             openChannel(media.serviceId)
@@ -1090,8 +1100,15 @@ class MyCarRunner(
 
         val start = Protobuf.varintField(1, SESSION_ID.toLong()) +
             Protobuf.varintField(2, index.toLong())
-        send(MSG_MEDIA_START, start, encrypted = true, channel = videoChannelId)
-        log.i("-> Start(session_id=$SESSION_ID, configuration_index=$index -> $config)")
+        // An encoder made again while the car shows its own screen (its Home, the radio): Start waits
+        // for the car to hand the screen back, which sends it with the codec's setup. A car that
+        // drives its screen from Start could switch to a still picture of myCar with nothing after it.
+        if (videoProjected) {
+            send(MSG_MEDIA_START, start, encrypted = true, channel = videoChannelId)
+            log.i("-> Start(session_id=$SESSION_ID, configuration_index=$index -> $config)")
+        } else {
+            log.i("the car shows its own screen - Start waits until it hands the screen back")
+        }
         // The car crops its margins off the frame, so keep the UI out of them unless a vehicle
         // profile has its own tuned insets.
         if (vehicleProfile?.insets.let { it == null || it == Insets.NONE }) {
@@ -1109,10 +1126,13 @@ class MyCarRunner(
             mode = if (useProjection) VideoSource.Mode.SURFACE else VideoSource.Mode.TEST_CARD,
             wireless = wireless,
             onCodecConfig = { csd ->
+                // Kept first: the screen handed back sends the latest one.
                 lastCodecConfig = csd
-                send(MSG_MEDIA_CODEC_CONFIG, csd, encrypted = true, channel = videoChannelId)
-                log.i("-> CodecConfig (${csd.size} bytes SPS/PPS)")
-                log.hex("   csd", csd, limit = 64)
+                if (videoProjected) {
+                    send(MSG_MEDIA_CODEC_CONFIG, csd, encrypted = true, channel = videoChannelId)
+                    log.i("-> CodecConfig (${csd.size} bytes SPS/PPS)")
+                    log.hex("   csd", csd, limit = 64)
+                }
             },
             onFrame = { data, presentationTimeUs, keyFrame ->
                 sendVideoFrame(data, presentationTimeUs, keyFrame)
@@ -1156,6 +1176,11 @@ class MyCarRunner(
         if (stopped) return
         Thread({
             if (stopped) return@Thread
+            // Counted within a while only: in a long drive three encoders lost hours apart (a video
+            // call at a stop, the camera) ended it as if the phone kept failing.
+            val now = SystemClock.elapsedRealtime()
+            if (now - lastVideoRestartAt > VIDEO_RESTART_WINDOW_MS) videoRestarts = 0
+            lastVideoRestartAt = now
             if (videoRestarts >= MAX_VIDEO_RESTARTS) {
                 log.e("the encoder failed again - no more restarts")
                 SessionStatus.failed(R.string.connection_picture_stopped, R.string.connection_picture_stopped_detail, error.message.toString())
@@ -1398,12 +1423,20 @@ class MyCarRunner(
             State.DONE -> SessionStatus.disconnected()
             State.WAIT_VERSION -> SessionStatus.failed(
                 R.string.connection_no_answer,
-                R.string.connection_no_answer_detail,
+                // Android's "which app" question is the cable's only: over Wi-Fi it led nowhere.
+                if (wireless) R.string.connection_no_answer_wireless_detail else R.string.connection_no_answer_detail,
             )
-            State.TLS_HANDSHAKE, State.WAIT_AUTH -> SessionStatus.failed(
-                R.string.connection_hung_up_setup,
-                R.string.connection_hung_up_setup_detail,
-            )
+            State.TLS_HANDSHAKE, State.WAIT_AUTH -> {
+                // Not the certificate, most likely: the car never got it, myCar gave up on a car that
+                // stalled, or a car took this very certificate before. "It turned the certificate
+                // down" sent the driver to change one that works.
+                val known = presented?.let { runCatching { certAcceptedBefore(it) }.getOrDefault(false) } == true
+                SessionStatus.failed(
+                    R.string.connection_hung_up_setup,
+                    if (!certificateShown || gaveUp || known) R.string.connection_hung_up_setup_link_detail
+                    else R.string.connection_hung_up_setup_detail,
+                )
+            }
             State.WAIT_SDR -> SessionStatus.failed(
                 R.string.connection_hung_up_after_cert,
                 R.string.connection_hung_up_after_cert_detail,
@@ -1458,6 +1491,17 @@ class MyCarRunner(
                     // Wi-Fi still up). It pinged before, so this much silence means it's gone.
                     giveUp("the car has said nothing for ${idle / 1000}s")
                 }
+                // Over the cable a start that stalls, or a car that waits for a tap on its Android
+                // Auto, kept "connecting" for good: after a while Home says what to do. Only the
+                // line on the phone changes.
+                if (!wireless && !stuckSaid && !videoStarted && !authenticationFailed && !stopped &&
+                    SystemClock.elapsedRealtime() - startedAt > STUCK_HINT_MS
+                ) {
+                    if (SessionStatus.stillConnecting(R.string.connection_stage_stuck_cable)) {
+                        stuckSaid = true
+                        log.w("cable start-up still in $state after ${STUCK_HINT_MS / 1000}s - telling the driver")
+                    }
+                }
 
                 // Stream health. Without this a drive cannot tell "streaming fine" from
                 // "stalled after three frames" - the per-frame logging is deliberately sparse.
@@ -1498,6 +1542,10 @@ class MyCarRunner(
     private companion object {
         /** New encoders after one dies mid-drive, before giving up on the picture. */
         const val MAX_VIDEO_RESTARTS = 2
+        /** Encoder restarts further apart than this start counting again. */
+        const val VIDEO_RESTART_WINDOW_MS = 10 * 60_000L
+        /** A cable start-up still not on the car's screen after this long says what to do. */
+        const val STUCK_HINT_MS = 45_000L
 
         /**
          * The protocol version myCar answers every car with, as (major, minor), or null to echo

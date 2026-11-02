@@ -53,6 +53,7 @@
     <string name="setup_group_call_logs">Anruflisten</string>
     <string name="setup_group_contacts">Kontakte</string>
     <string name="setup_group_location">Standort</string>
+    <string name="setup_group_precise_location">Genauer Standort</string>
     <string name="setup_group_microphone">Mikrofon</string>
     <string name="setup_group_nearby_devices">Geräte in der Nähe</string>
 

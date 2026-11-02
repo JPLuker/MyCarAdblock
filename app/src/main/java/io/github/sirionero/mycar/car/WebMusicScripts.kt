@@ -232,6 +232,9 @@ internal object WebMusicScripts {
       }
     }
     if (duration > 0) at = Math.max(0, Math.min(at, duration));
+    // The bar's clock running with nothing playing here that says so: the service plays somewhere
+    // else (Spotify Connect: the phone's app), and its bar is that device's remote.
+    var remote = !playing && said !== 'playing' && said !== 'paused' && Date.now() < clockRunsUntil;
     return {
       type: 'state',
       title: clip(title, 300),
@@ -239,10 +242,20 @@ internal object WebMusicScripts {
       album: clip(meta && meta.album, 300),
       art: biggestArt(meta) || absolute(cover && cover.src),
       playing: playing,
+      remote: remote,
       position: Math.round(at),
       duration: Math.round(duration),
       seek: typeof handlers.seekto === 'function'
     };
+  }
+
+  // Whether the bar's clock moves on by itself, read once a second: only its digits, any language.
+  var clockMs = null, clockRunsUntil = 0, clockSeen = 0;
+  function watchClock() {
+    var c = BAR && clock(text(byTestId(BAR.position)));
+    if (c && !c.left && clockMs !== null && c.ms > clockMs && c.ms - clockMs <= 3000) clockRunsUntil = Date.now() + 2500;
+    clockMs = (c && !c.left) ? c.ms : null;
+    clockSeen = (c && !c.left) ? clockSeen + 1 : 0;
   }
 
   // Said when something changes, and when the position jumps (a seek): not every second.
@@ -254,7 +267,7 @@ internal object WebMusicScripts {
     var s;
     try { s = snapshot(); } catch (e) { return; }
     var now = Date.now();
-    var key = [s.title, s.artist, s.album, s.art, s.playing, s.duration, s.seek].join('\n');
+    var key = [s.title, s.artist, s.album, s.art, s.playing, s.remote, s.duration, s.seek].join('\n');
     var expected = lastPosition + (lastPlaying ? now - lastAt : 0);
     if (key === last && Math.abs(s.position - expected) < 2500) return;
     last = key;
@@ -263,7 +276,7 @@ internal object WebMusicScripts {
     lastPlaying = s.playing;
     car.postMessage(JSON.stringify(s));
   }
-  setInterval(function () { fit(); send(); }, 1000);
+  setInterval(function () { try { watchClock(); } catch (e) {} fit(); send(); }, 1000);
 
   // A button from myCar's player, the dock or the car's wheel: the page's own handler, as a
   // computer's media keys would call it; without one, the service's own button on the page.
@@ -277,9 +290,17 @@ internal object WebMusicScripts {
         return 'page';
       } catch (e) {}
     }
-    var playing = snapshot().playing;
-    if ((action === 'play' && playing) || (action === 'pause' && !playing)) return 'already';
+    // Playing on another device counts as playing: one button plays and pauses, and a Play would stop it.
+    var s = snapshot(), on = s.playing || s.remote;
+    if ((action === 'play' && on) || (action === 'pause' && !on)) return 'already';
     var button = BUTTONS[action] && byTestId(BUTTONS[action]);
+    // The bar's one play/pause button, with its clock just shown: read twice first (a second
+    // apart) to know whether it runs - playing on another device - or a click would pause it there.
+    if (button && !button.disabled && !s.playing && (action === 'play' || action === 'pause') &&
+        BUTTONS[action] === BAR.playPause && clockSeen < 2) {
+      var c = clock(text(byTestId(BAR.position)));
+      if (c && !c.left) return 'wait';
+    }
     if (button && !button.disabled) {
       button.click();
       schedule();

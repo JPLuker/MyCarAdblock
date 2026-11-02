@@ -97,6 +97,9 @@ internal fun CarDock(navigator: CarNavigator, modifier: Modifier = Modifier) {
     val entries = rememberAllEntries()
     val running = rememberRunningApps()
     val pinnedIds by CarSettings.pinnedApps.collectAsState()
+    // pinShown reads the music services' "hide the phone's app" ticks: read here, so a tick on the
+    // phone moves a pin at once.
+    io.github.sirionero.mycar.webmusic.WebMusic.hideApp.collectAsState().value
     val frame by CarEnvironment.frame.collectAsState()
     // A call's card covers the top of the map, the next turn's arrow and distance with it - ringing,
     // and for the whole call once answered: the next turn is here meanwhile.
@@ -176,11 +179,12 @@ internal fun CarDock(navigator: CarNavigator, modifier: Modifier = Modifier) {
 
 /**
  * The app a pin shows as: one saved with the Plancia or Xonos app is the one inside myCar once
- * that's set up, and the app again while it stands in for it (see InsideOrApp). Read as saved, the
- * pin vanished from the dock and still took one of its places.
+ * that's set up, and the app again while it stands in for it (see InsideOrApp); one saved with a
+ * music service's app is its web player while that takes the app's place (see [withWebMusicInside]).
+ * Read as saved, the pin vanished from the dock and still took one of its places.
  */
 internal fun pinShown(id: String, entries: List<Entry>): String =
-    withXonosInside(withPlanciaInside(id, entries), entries) ?: id
+    withWebMusicInside(withXonosInside(withPlanciaInside(id, entries), entries), entries) ?: id
 
 /** One slot in the dock's middle, keyed so a slot keeps its state as others come and go above it. */
 private class DockSlot(val key: String, val content: @Composable () -> Unit)

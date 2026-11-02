@@ -41,6 +41,12 @@ object WebMusicPlayer {
     /** Set by the car screen while it's up. */
     var pages: Pages? = null
 
+    /**
+     * The services that were playing when the car's screen was rebuilt (a new encoder, screen sharing
+     * ended): the new screen plays them again, in the same drive. Their pages go with the old screen.
+     */
+    var resumeAfterRebuild: List<WebMusicService> = emptyList()
+
     private val states = mutableMapOf<String, MutableStateFlow<WebPlayerState>>()
     private val attached = mutableMapOf<String, Page>()
     private val main = Handler(Looper.getMainLooper())

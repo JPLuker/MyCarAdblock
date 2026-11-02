@@ -326,7 +326,9 @@ internal fun launchEntry(entry: Entry, navigator: CarNavigator, frame: CarEnviro
             navigator.browse(entry.label)
         }
     }
-    entry.media?.let { CarServices.openMedia(it); navigator.media() }
+    // A web music service plays what its bar holds as it opens, Autoplay or not: its page, paused on
+    // the last song, has no other sign it was opened to listen. Nothing chosen there: its Play does nothing.
+    entry.media?.let { CarServices.openMedia(it, autoplay = entry.webMusic != null); navigator.media() }
     entry.messaging?.let { navigator.messages(it.packageName, it.label) }
 }
 
@@ -356,7 +358,9 @@ fun CarLauncher() {
     }
 
     val appOrder by CarSettings.appOrder.collectAsState()
-    val tiles = launcherOrder(all, showVehicleData, appOrder).map(::tileOf)
+    // Apps the driver hid, and a music service's own app beside its web player, stay off the grid.
+    val offGrid = rememberOffTheGrid(all)
+    val tiles = launcherOrder(all.filterNot(offGrid), showVehicleData, appOrder).map(::tileOf)
 
     Box(Modifier.fillMaxSize()) {
         rememberWallpaper()?.let { WallpaperBackground(it, Modifier.matchParentSize()) }

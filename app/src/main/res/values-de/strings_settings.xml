@@ -229,6 +229,7 @@
 
     <string name="voice_model_language_title">Sprachsteuerung: %1$s</string>
     <string name="voice_model_language_ready">myCar ist auf %1$s eingestellt, also versteht und spricht der Assistent im Auto %1$s, mit %2$s.</string>
+    <string name="voice_model_language_phone">myCar ist auf %1$s eingestellt, also versteht und spricht der Assistent im Auto %1$s, mit der Spracherkennung des Telefons.</string>
     <string name="voice_model_language_ready_try">myCar ist auf %1$s eingestellt, also versteht und spricht der Assistent im Auto %1$s, mit %2$s. Probier „%3$s“.</string>
     <string name="voice_model_language_missing">myCar ist auf %1$s eingestellt. Mit %2$s (%3$d MB) versteht und spricht der Assistent im Auto %1$s; bis dahin versteht er nur Englisch.</string>
     <string name="voice_model_language_tts">Er antwortet mit der Stimme der Sprachausgabe des Telefons für %1$s. Klingt sie falsch, wähle oder lade diese Stimme in den Android-Einstellungen für die Sprachausgabe.</string>
@@ -301,6 +302,13 @@
     <string name="settings_car_pages_header">Deine Seiten links und rechts der Karte auf dem Startbildschirm des Autos. Ändere sie hier oder im Auto mit dem Stift neben den Punkten.</string>
     <string name="settings_car_pages_ready_text">Deine Seiten weichen den fertigen: Wetter und Termine links der Karte und rechts Plancia neben dem Browser, wenn Plancia eingerichtet oder installiert ist.</string>
     <string name="settings_car_fit_offline">Verbinde dich mit dem Auto, um seinen Bildschirm anzupassen: Das Auto zeigt jede Änderung, während du sie machst.</string>
+    <string name="settings_grid_apps">Apps in der App-Übersicht des Autos</string>
+    <string name="settings_grid_apps_all">Alle sichtbar</string>
+    <plurals name="settings_grid_apps_hidden">
+        <item quantity="one">%d ausgeblendet</item>
+        <item quantity="other">%d ausgeblendet</item>
+    </plurals>
+    <string name="settings_grid_apps_note">Entferne den Haken bei einer App, damit sie nicht in der App-Übersicht des Autos erscheint. Im Auto: Halte eine App gedrückt und wähle „In der App-Übersicht ausblenden“. Eine im Dock angeheftete App bleibt dort.</string>
     <string name="theme_title">Design</string>
     <string name="theme_footer">So sieht myCar auf dem Telefon aus. Der Bildschirm des Autos hat sein eigenes, in den Einstellungen des Autos.</string>
     <string name="theme_phone">Wie das Telefon</string>
@@ -320,6 +328,8 @@
     <string name="music_sign_in_title">%1$s: anmelden</string>
     <string name="music_sign_out">Abmelden</string>
     <string name="music_sign_out_detail">Von diesem Dienst in myCar, auf dem Telefon und im Auto</string>
+    <string name="music_hide_app">App „%1$s“ des Telefons ausblenden</string>
+    <string name="music_hide_app_detail">In der App-Übersicht des Autos bleibt nur %1$s in myCar: Die App „%1$s“ dieses Telefons erscheint dort nicht, so gibt es sie nicht doppelt.</string>
     <string name="music_sign_out_title">Von %1$s abmelden?</string>
     <string name="music_sign_out_text">myCar vergisst die Anmeldung bei %1$s und was seine Seiten gespeichert haben. Dein Konto bleibt, wie es ist.</string>
     <string name="music_add">Dienst hinzufügen</string>

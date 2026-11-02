@@ -53,6 +53,7 @@
     <string name="setup_group_call_logs">Αρχεία καταγραφής κλήσεων</string>
     <string name="setup_group_contacts">Επαφές</string>
     <string name="setup_group_location">Τοποθεσία</string>
+    <string name="setup_group_precise_location">Ακριβής τοποθεσία</string>
     <string name="setup_group_microphone">Μικρόφωνο</string>
     <string name="setup_group_nearby_devices">Συσκευές σε κοντινή απόσταση</string>
 

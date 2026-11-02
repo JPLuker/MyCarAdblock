@@ -48,6 +48,8 @@ class WebMusicService(
      * that don't depend on the page's language. Before [ANY_PLAY].
      */
     val firstPlay: List<String> = emptyList(),
+    /** Its own app on the phone, which the car's app grid can leave out for this one ([WebMusic.hideApp]). */
+    val appPackage: String? = null,
 ) {
     class Bar(
         val playPause: String,
@@ -88,6 +90,7 @@ object WebMusic {
 
     val SPOTIFY = WebMusicService(
         "spotify", "Spotify", "https://open.spotify.com/",
+        appPackage = "com.spotify.music",
         signIn = "https://accounts.spotify.com/login?continue=https%3A%2F%2Fopen.spotify.com%2F",
         origins = listOf("https://open.spotify.com"),
         domains = listOf("spotify.com"),
@@ -115,6 +118,7 @@ object WebMusic {
         SPOTIFY,
         WebMusicService(
             "youtube-music", "YouTube Music", "https://music.youtube.com/",
+            appPackage = "com.google.android.apps.youtube.music",
             signIn = "https://accounts.google.com/ServiceLogin?service=youtube&continue=https%3A%2F%2Fmusic.youtube.com%2F",
             origins = listOf("https://music.youtube.com"),
             domains = listOf("youtube.com", "google.com"),
@@ -126,6 +130,7 @@ object WebMusic {
         ),
         WebMusicService(
             "apple-music", "Apple Music", "https://music.apple.com/",
+            appPackage = "com.apple.android.music",
             origins = listOf("https://music.apple.com"),
             domains = listOf("apple.com"),
             needs = R.string.music_needs_apple,
@@ -135,6 +140,7 @@ object WebMusic {
         ),
         WebMusicService(
             "amazon-music", "Amazon Music", "https://music.amazon.com/",
+            appPackage = "com.amazon.mp3",
             origins = AMAZON.map { "https://music.amazon.$it" },
             domains = AMAZON.map { "amazon.$it" },
             needs = R.string.music_needs_amazon,
@@ -144,6 +150,7 @@ object WebMusic {
         ),
         WebMusicService(
             "deezer", "Deezer", "https://www.deezer.com/",
+            appPackage = "deezer.android.app",
             signIn = "https://account.deezer.com/login/",
             origins = listOf("https://www.deezer.com"),
             domains = listOf("deezer.com"),
@@ -151,6 +158,7 @@ object WebMusic {
         ),
         WebMusicService(
             "tidal", "TIDAL", "https://listen.tidal.com/",
+            appPackage = "com.aspiro.tidal",
             origins = listOf("https://listen.tidal.com"),
             domains = listOf("tidal.com"),
             needs = R.string.music_needs_tidal,
@@ -158,6 +166,7 @@ object WebMusic {
         ),
         WebMusicService(
             "soundcloud", "SoundCloud", "https://soundcloud.com/",
+            appPackage = "com.soundcloud.android",
             signIn = "https://soundcloud.com/signin",
             origins = listOf("https://soundcloud.com"),
             domains = listOf("soundcloud.com"),
@@ -166,6 +175,7 @@ object WebMusic {
         ),
         WebMusicService(
             "qobuz", "Qobuz", "https://play.qobuz.com/",
+            appPackage = "com.qobuz.music",
             signIn = "https://play.qobuz.com/login",
             origins = listOf("https://play.qobuz.com"),
             domains = listOf("qobuz.com"),
@@ -178,9 +188,11 @@ object WebMusic {
 
     private const val KEY_ADDED = "web_music_added"
     private const val KEY_ON = "web_music_on"
+    private const val KEY_HIDE_APP = "web_music_hide_app"
     private var app: Context? = null
     private val addedFlow = MutableStateFlow<Set<String>>(emptySet())
     private val onFlow = MutableStateFlow<Set<String>>(emptySet())
+    private val hideAppFlow = MutableStateFlow<Set<String>>(emptySet())
 
     /** Listed in the phone's Music settings, besides Spotify, which always is. */
     val added: StateFlow<Set<String>> = addedFlow.asStateFlow()
@@ -188,10 +200,17 @@ object WebMusic {
     /** On: in the car. None to start with. */
     val on: StateFlow<Set<String>> = onFlow.asStateFlow()
 
+    /**
+     * The services whose own app on the phone stays off the car's app grid while they're on, so
+     * there aren't two Spotify there: ticked on the phone, none to start with.
+     */
+    val hideApp: StateFlow<Set<String>> = hideAppFlow.asStateFlow()
+
     fun init(context: Context) {
         val app = context.applicationContext.also { this.app = it }
         addedFlow.value = read(app, KEY_ADDED)
         onFlow.value = read(app, KEY_ON)
+        hideAppFlow.value = read(app, KEY_HIDE_APP)
     }
 
     /** The services in the car now, in the catalog's order. */
@@ -201,6 +220,18 @@ object WebMusic {
         onFlow.value = if (on) onFlow.value + id else onFlow.value - id
         app?.let { write(it, KEY_ON, onFlow.value) }
     }
+
+    fun setHideApp(id: String, hide: Boolean) {
+        hideAppFlow.value = if (hide) hideAppFlow.value + id else hideAppFlow.value - id
+        app?.let { write(it, KEY_HIDE_APP, hideAppFlow.value) }
+    }
+
+    /**
+     * The service on in the car that takes the place of the phone's app [packageName] (its own app,
+     * ticked to be hidden); null when that app stays, as any other.
+     */
+    fun replacing(packageName: String?, on: Set<String> = onFlow.value, hide: Set<String> = hideAppFlow.value): WebMusicService? =
+        packageName?.let { pkg -> CATALOG.firstOrNull { it.appPackage == pkg && it.id in on && it.id in hide } }
 
     /** Listed on the phone, and on in the car. */
     fun add(id: String) {

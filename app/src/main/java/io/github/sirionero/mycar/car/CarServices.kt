@@ -96,6 +96,8 @@ object CarServices {
     fun init(appContext: Context) {
         context = appContext.applicationContext
         if (holders++ > 0) return
+        // Toasts posted between drives (after the last one ended) aren't this drive's.
+        CarToasts.clearAll()
         io.github.sirionero.mycar.notify.CarMotion.start(appContext)
         io.github.sirionero.mycar.call.CarCalls.start(appContext, inCar = true)
         CarAssistant.init(appContext)
@@ -155,7 +157,9 @@ object CarServices {
             XonosAccount.adoptIfUnset(appContext)
             Xonos.repo.acquire()
         } else {
-            if (_mediaApp.value?.component?.let(Xonos::isInside) == true) closeMedia()
+            // Inside myCar or the Xonos app: off, it's in the car no more, as the switch says.
+            val music = _mediaApp.value?.component
+            if (music != null && (Xonos.isInside(music) || music.packageName == Xonos.APP_PACKAGE)) closeMedia()
             Xonos.repo.release()
         }
     }
@@ -294,7 +298,7 @@ object CarServices {
         val ctx = context ?: return false
         val last = CarSettings.lastMedia.value?.let(ComponentName::unflattenFromString) ?: return false
         val app = withContext(Dispatchers.IO) { MediaCatalog.installed(ctx) }
-            .let { catalog -> catalog.firstOrNull { it.component == last } ?: xonosFor(last, catalog) } ?: return false
+            .let { catalog -> webFor(last, catalog) ?: catalog.firstOrNull { it.component == last } ?: xonosFor(last, catalog) } ?: return false
         openMedia(app, autoplay = autoplay)
         return true
     }
@@ -351,11 +355,17 @@ object CarServices {
             // a driver who started a song before plugging in shouldn't have to go open its tile by
             // hand just to see what's already going.
             val playing = withContext(Dispatchers.IO) { currentlyPlaying(ctx, catalog) }
-            if (playing != null) {
+            // The phone's own app of a service whose web player takes its place in the car (its app
+            // ticked to stay off the grid): the music goes on in that player instead, the app paused.
+            val web = playing?.let { webFor(it.component, catalog) }
+            if (web != null) {
+                pausePhoneMedia("its web player takes its place in the car")
+                openMedia(web, autoplay = true, auto = true)
+            } else if (playing != null) {
                 openMedia(playing, auto = true)
             } else {
                 val last = CarSettings.lastMedia.value?.let(ComponentName::unflattenFromString)
-                val app = last?.let { component -> catalog.firstOrNull { it.component == component } ?: xonosFor(component, catalog) }
+                val app = last?.let { component -> webFor(component, catalog) ?: catalog.firstOrNull { it.component == component } ?: xonosFor(component, catalog) }
                 if (app != null) openMedia(app, autoplay = CarSettings.autoplay.value, auto = true)
             }
         }
@@ -383,6 +393,13 @@ object CarServices {
         Xonos.isInside(last) -> catalog.firstOrNull { it.component.packageName == Xonos.APP_PACKAGE }
         else -> null
     }
+
+    /**
+     * A music service's web player for its own app used last, once that app is ticked to stay off the
+     * car's grid (see [WebMusic.replacing]): the drive opens the one the driver keeps in the car.
+     */
+    private fun webFor(last: ComponentName, catalog: List<MediaApp>): MediaApp? =
+        WebMusic.replacing(last.packageName)?.let { service -> catalog.firstOrNull { WebMusic.serviceFor(it.component) === service } }
 
     /**
      * The Xonos app took Xonos's place for the drive (see [InsideOrApp]): if Xonos inside myCar was
@@ -483,6 +500,9 @@ object CarServices {
         closedMedia = null
         // A call waiting to be confirmed belongs to this drive, not to the car's next arrival.
         CallPrompt.pending.value = null
+        // A toast or the voice help up as the drive ended came back at the start of the next one.
+        CarToasts.clearAll()
+        VoiceHelp.hide()
         media.forgetLosses()
         clearSectionCache()
         navStopped = false

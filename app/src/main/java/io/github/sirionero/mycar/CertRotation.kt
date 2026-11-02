@@ -101,6 +101,14 @@ object CertRotation {
         return next
     }
 
+    /**
+     * Whether [identity] is the certificate a car accepted last: a hang-up while it's checked is then
+     * likelier the cable or the car's Wi-Fi than a refusal (as [CertRotationPolicy] reads it too).
+     */
+    fun acceptedBefore(context: Context, identity: CertProvider.Identity): Boolean =
+        identity.kind == CertProvider.Kind.DOWNLOADED &&
+            CertCatalog.idOf(identity.certificate)?.let { it == read(context).accepted } == true
+
     /** The driver dismissed the notice. */
     fun dismiss(context: Context) = setNotice(context, Notice(CertRotationPolicy.Notice.NONE))
 

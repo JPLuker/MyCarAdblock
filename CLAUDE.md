@@ -286,6 +286,22 @@ Tutti i token in un solo posto, `car/design/`:
   diventa l'app musicale solo se non ne suona già un'altra. Il pannello di un'app esiste solo
   mentre la Home è visibile: un'app aperta a tutto schermo usa lo stesso collegamento.
   Anteprima: `--es sidePane <pacchetto>`, cartelle `split-plancia/`, `split-xonos/`.
+  **Dimensione del lettore** (0.6.8, richiesta dell'utente; chiave `car_player_size`, "Size of the player
+  beside the map" in auto e sul telefono): Piccola (com'era), Media 1,1, Grande 1,2. Il lato accanto alla
+  mappa ha la densità moltiplicata per quel valore e prende `MAP_SHARE`(3,1)/dimensione − 1 parti di mappa
+  (`CarHomeScreen`); solo per la musica (lettore, testo): un'app con template o Plancia resta com'è.
+  Anteprima `--es playerSize 1.1|1.2`, cartelle `split-medium/`, `split-large/`, `split-large-800x480/`.
+  Una scelta nuova per "Accanto alla mappa" riapre la colonna chiusa con la X (`showSidePane`); la X del
+  testo riporta il lettore (`showSideControls`).
+- **App nascoste** (0.6.8, richiesta dell'utente: "nascondere app dal menu"; `car/HiddenApps.kt`, chiave
+  `car_hidden_apps`): nel menu di un'app (tenerla premuta, griglia o dock) "Hide from the app grid" /
+  "Show on the app grid"; tornano da Impostazioni dell'auto > "Hidden apps" (con Show) o dal telefono
+  (Schermo dell'auto > "Apps on the car's app grid", elenco a spunte, `ui/CarGridSettings.kt`). Gli id
+  sono quelli delle icone fissate (`componentId`) e valgono anche per il gemello Plancia/Xonos
+  (`hiddenAsShown`). Settings non si nasconde (`canHide`). Escono solo dalla griglia: fissata nel dock
+  un'app resta lì, la voce la apre ancora; spostare un'app salva l'ordine intero, così una nascosta tiene
+  il suo posto. Anteprima: tocchi "x,y,long" (900 ms), `--es hideApps`, `--ez hiddenApps true`, cartelle
+  `grid-hide/`, `hidden-apps/`, `hidden-apps-none/`.
 - **Pagine accanto alla mappa** (`HomePager.kt`, `HomePages.kt`, `HomeWidgets.kt`, chiave
   `car_home_pages`): la Home è una fila di pagine; quella della mappa (mappa + musica o app scelta,
   invariata) e quelle del guidatore ai suoi lati, ognuna in un **formato** (`PageLayout`, disegni e
@@ -469,6 +485,14 @@ Tutti i token in un solo posto, `car/design/`:
   WebView può essere rifiutato (YouTube Music senza account); Apple Music, Amazon Music, TIDAL e Qobuz
   vogliono un abbonamento; restrizioni per paese; i popup (`window.open`) non hanno una gestione loro.
   Non provato: con un account, l'audio verso l'auto, gli appunti sul telefono vero, in auto.
+  0.6.8, "Nascondi l'app %s del telefono" (richiesta dell'utente: "così non ci saranno due Spotify"): ogni
+  servizio ha `appPackage` (Spotify `com.spotify.music`, …); con il servizio acceso e l'app installata, una
+  spunta nella sua sezione (chiave `web_music_hide_app`, nessuna di predefinito). Spuntata, l'app del
+  telefono non c'è nella griglia né negli elenchi "Accanto alla mappa" (`WebMusic.replacing`,
+  `rememberReplacedByWeb`), e le sue icone fissate, la scelta accanto alla mappa e l'ultima musica passano
+  al servizio web (`pinShown` → `withWebMusicInside`, `CarServices.webFor`); se a inizio viaggio suona
+  l'app del telefono, va in pausa e suona il servizio web. Dopo l'accesso sul telefono, tornati sul lettore
+  del servizio (accesso su un altro sito), la barra ha "Done".
   0.6.7: l'accesso a Spotify sul telefono era nero (vedi "WebView dentro Compose"); Incolla chiudeva la
   tastiera perché la schermata trasparente degli appunti toglie il fuoco alla pagina dell'auto e il campo
   mandava `focusout`: ora il campo lasciato si dice dopo 250 ms e solo se nessun campo è attivo
@@ -639,7 +663,11 @@ Tutti i token in un solo posto, `car/design/`:
   righe di novità) e un traduttore per lingua. Anteprima in CI: scatti `lang-<lingua>` (Home con la
   musica, griglia, impostazioni dell'auto a 1920x720; `lang-<lingua>-800x480`; sul telefono setup,
   Home, impostazioni, aiuto e introduzione in `phone/`, aperti con `--es screen <nome>` della build
-  debug), con la lingua messa da `cmd locale set-app-locales`.
+  debug), con la lingua messa da `cmd locale set-app-locales`. Da Android 13 Android dà la lingua
+  scelta per l'app alle sue activity, non al contesto della `Presentation` sul display dell'auto (gli
+  scatti della 0.6.8 lo hanno mostrato: telefono tradotto, auto in inglese): `AppLanguage.localized` e
+  `resources` confrontano la lingua delle risorse con quella voluta (`Locale.getDefault()` da Android 13,
+  la scelta salvata prima) e, se diverse, la mettono loro.
 - **L'assistente in 9 lingue** (0.6.0): segue la lingua di myCar (`VoiceLanguages.phone()` legge
   `Locale.getDefault()`, che Android 13 mette alla lingua scelta per l'app e MyCarApplication su
   Android 12). Frasari nuovi, scritti e provati sul banco JVM (`AssistantLanguage` + frasari +
@@ -1062,6 +1090,63 @@ Tutti i token in un solo posto, `car/design/`:
   "in rete" (`NET_CAPABILITY_NOT_SUSPENDED`: una galleria passava Plancia e Xonos alle app), Plancia con
   20 s all'avvio come Xonos, video coperto in marcia anche senza fix GPS (`CarMotion.movingForVideo`,
   l'ultima velocità vale fino a un fix nuovo, al massimo 5 minuti). Non provato in un'auto vera.
+- **Setaccio 6** (0.6.8, branch `feature/hide-apps`; richiesta dell'utente: "cerca nuovi bug sulla
+  connessione, sulla user experience"): due cacce in parallelo (collegamento: senza fili, cavo e sessione,
+  audio; esperienza d'uso: schermo dell'auto, telefono, messaggi di collegamento), ogni punto verificato da
+  uno scettico e nel codice, poi una revisione indipendente delle correzioni. Auto: durante una chiamata gli
+  schermi (non la mappa) e la scheda dei messaggi stanno sotto la barra della chiamata (`callTop` in
+  `CarUi`, misurata); squillo che chiude assistente e lettura dei messaggi; una scelta nuova per "Accanto
+  alla mappa" riapre la colonna (`showSidePane`); la X del testo riporta il lettore; il tasto Indietro
+  dell'auto risponde alle schede sopra tutto (`car/CardBack.kt`: slot propri, non il `backInterceptor` di
+  HomePager); tastiera della pagina web in vista; Novità che non si chiude spegnendo l'interruttore;
+  linguette del Telefono e X dell'assistente a 56 dp. Telefono: la scheda della lingua della voce conta
+  anche il modello che ascolta; la voce torna nella prima configurazione (`VoiceStep`); "Done" dopo
+  l'accesso a un servizio musicale; Xonos spento chiude anche l'app Xonos; Android 12 senza posizione
+  precisa lo dice. Collegamento: "l'auto non si è collegata via Bluetooth" solo per avvii mai arrivati a
+  una sessione (`drove`); niente scheda rossa prima di una ripartenza (`stop(say = false)`); notifica del
+  viaggio che segue `SessionStatus`; wake lock breve nell'ascolto dopo il viaggio (10 s se l'auto chiama
+  il telefono, 3 minuti se no) e a ogni ripartenza; "Usa myCar in auto" spento ferma un avvio
+  (`stopUnlessDriving`); rete dell'auto rilasciata dopo l'ultimo TCP fallito (`endJoin`); avvio automatico
+  fermato se l'auto se ne va per 30 s (`carGone`/`carHere`); niente myCar sopra una chiamata; col cavo,
+  dopo 45 s "cosa fare" (`SessionStatus.stillConnecting`); immagine che non si crea dopo tre tentativi →
+  sessione chiusa con il motivo; densità 0 → 160 anche per le app; Start e CodecConfig solo con lo schermo
+  nostro; riavvii dell'encoder contati in 10 minuti; avvisi e aiuto della voce azzerati fra viaggi;
+  messaggi giusti per Plancia col ponte, VPN, chiusura durante l'avvio (`certAcceptedBefore`), senza fili.
+  Audio: indicazioni che seguono la strada dell'auto (`followRouteForDirections`) e tacciono in chiamata;
+  avviso "la musica non arriva" anche mentre la domanda aspetta (dopo 5 s) e nel lettore a tutto schermo;
+  Automatico che aspetta la fine di una chiamata (al massimo 5 minuti); Cinema in pausa sul LOSS
+  dell'auto (`CinemaNow`) e che parte dopo una chiamata (focus ritardato). **Lasciati**: i puntini delle
+  pagine a 56 dp (con la decisione sulla striscia sopra i contenuti), il ripiego del cavo sul senza fili.
+  Non provato in un'auto vera.
+- **Setaccio 7** (0.6.8, stesso branch; richiesta dell'utente: "controlla anche l'assistente, l'autoplay
+  delle app tipo Spotify, le notifiche che non interrompano i servizi, la mappa (Vela) non funziona più
+  benissimo"): tre cacce (assistente, musica web, mappa dal lato di myCar), ogni punto verificato da uno
+  scettico. **Mappa**: la colonna della musica si chiude solo dopo 6 s senza musica (`MUSIC_HOLD_MS` in
+  `CarHome`, si disegna l'ultimo brano attivo): ogni cambio di larghezza è una superficie nuova per l'app della
+  mappa (due passaggi, Vela ridisegnava); area visibile che parte dal bordo vero della scheda della lista
+  (`MAP_PANE_MIN_EDGE` = 244 dp, `visibleAreaFor(…, minPanePx)`); scheda della svolta al massimo il 60%
+  della mappa. Non è dimostrato che fosse questa la causa di "Vela non va benissimo": va provato in auto.
+  **Musica web**: aprire un servizio (griglia, dock, voce: `launchEntry`) fa `openMedia(autoplay = true)`,
+  Autoplay o no; un Play che ha aspettato la pagina (`patient`) si riprova fino a 45 s dall'avvio della
+  pagina (`BOOT_MS`), e dopo una risposta "page" che non suona si rimanda dopo 4 s (`PLAY_CHECK_MS`), finché
+  è la musica dell'auto e non c'è stato un altro tasto (`acts`); mai un secondo clic sul tasto play/pausa
+  della barra. Schermo dell'auto rifatto (encoder nuovo) → `WebMusicPlayer.resumeAfterRebuild`, svuotato
+  dalla condivisione dello schermo; pagina caduta (renderer) → riparte se suonava, una volta al minuto.
+  Spotify Connect: l'orologio della barra che avanza senza niente che suona qui (`remote` nello script) conta
+  come musica altrove: il Play non clicca, l'auto lo dice una volta (`car_web_music_elsewhere`). Notifiche:
+  i popup sono muti, il focus transitorio di voce e assistente lo riprende il WebView da solo (smentiti dagli
+  scettici i due punti contrari). **Assistente**: motore di sintesi rifatto al viaggio dopo se non parte o
+  smette di parlare (`ttsFailed`, come `DirectionsVoice`); niente ascolto né risposta vocale durante lo
+  squillo; un solo `VoiceFocus` dalla domanda alla risposta (in `CarUi`, try/finally); tasto voce in
+  condivisione schermo → `PhoneMirror.requestStop()`; riconoscimento del telefono con la musica in pausa
+  (`systemFocus`); `stopVoice` chiude tutte le frasi in corso; niente bip per un ascolto annullato durante il
+  caricamento del modello. Revisione indipendente delle correzioni: con la barra di Spotify appena comparsa
+  la pagina risponde "wait" finché l'orologio non è letto due volte (`clockSeen`), così il Play non mette in
+  pausa Spotify che suona altrove; i tentativi si fermano se cambia la musica dell'auto o arriva un altro
+  tasto; la fine di una frase dice se il motore l'ha rifiutata (`refused`, anche dal canale delle
+  indicazioni) e il motore si segna da rifare solo se il testo non era troppo lungo; il brano tenuto
+  durante l'attesa della colonna solo per la stessa app e solo durante l'attesa (`holding`). Non provato
+  con un account Spotify vero né in auto con Vela.
 - **Prima connessione** (`ui/SetupScreen.kt`, `setup/`): una lista sola, "Set up myCar", al primo
   avvio (al posto di `CertSetupScreen` + le pagine di `SetupGuideScreen`, ancora nel codice finché
   la nuova non è provata sul telefono) e ogni volta che si torna con "Take me back to the initial
@@ -1161,9 +1246,8 @@ Tutti i token in un solo posto, `car/design/`:
   propria (`CarNotifications`, guardare il mittente dell'ultima riga); Assist che continua in Home
   Assistant dopo che myCar ha smesso di aspettare (`unsubscribe_events`); "chiudi il garage" mentre Home
   Assistant si ricollega; il token di Home Assistant confrontato per host e non per origine
-  (`PlanciaWeb`); avvio col cavo fermo su "Connecting" senza dire cosa fare; immagine che non si crea
-  dopo tre tentativi senza dirlo; cavo staccato a viaggio in corso che non passa da solo al senza fili;
-  Cinema che continua quando l'auto passa alla radio (LOSS) e non parte col focus negato.
+  (`PlanciaWeb`); cavo staccato a viaggio in corso che non passa da solo al senza fili (fattibile con
+  guardie, ma è un comportamento nuovo: da proporre all'utente).
 - Scatti `lang-*` per controllare le lingue.
 - Fatto nella 0.6.0: impostazioni del telefono in gruppi (`SettingsPage` in `ui/SettingsScreen.kt`;
   dalla 0.6.6, sotto la scheda dell'anteprima: Generali, Schermo dell'auto, Musica, Connessione, Voce,

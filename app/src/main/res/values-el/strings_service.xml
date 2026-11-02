@@ -25,12 +25,16 @@
     <string name="connection_picture_refused_detail">Το αυτοκίνητο δεν άνοιξε την οθόνη του στο myCar (κωδικός %1$s).</string>
     <string name="connection_no_picture">Καμία εικόνα για το αυτοκίνητο</string>
     <string name="connection_no_picture_detail">Ο κωδικοποιητής βίντεο του τηλεφώνου δεν ξεκίνησε (%1$s). Το myCar έκλεισε τη σύνδεση: συνδεθείτε ξανά.</string>
+    <string name="connection_stage_stuck_cable">Αναμονή ακόμη για το αυτοκίνητο. Αν η οθόνη του ρωτά κάτι ή δείχνει το Android Auto, απαντήστε ή πατήστε το· αλλιώς αποσυνδέστε το καλώδιο και συνδέστε το ξανά.</string>
+    <string name="connection_ui_failed_detail">Το τηλέφωνο δεν μπόρεσε να σχεδιάσει την οθόνη του αυτοκινήτου (%1$s). Το myCar έκλεισε τη σύνδεση: συνδεθείτε ξανά.</string>
     <string name="connection_picture_stopped">Η εικόνα του αυτοκινήτου σταμάτησε</string>
     <string name="connection_picture_stopped_detail">Ο κωδικοποιητής βίντεο του τηλεφώνου αποτυγχάνει συνεχώς (%1$s). Το myCar έκλεισε τη σύνδεση: συνδεθείτε ξανά.</string>
     <string name="connection_no_answer">Το αυτοκίνητο δεν απάντησε</string>
     <string name="connection_no_answer_detail">Η σύνδεση άνοιξε, αλλά το αυτοκίνητο δεν έστειλε τίποτα. Αν το Android ρωτήσει ποια εφαρμογή να ανοίξει για το αυτοκίνητο, επιλέξτε το myCar.</string>
+    <string name="connection_no_answer_wireless_detail">Η σύνδεση μέσω του Wi-Fi του αυτοκινήτου άνοιξε, αλλά το αυτοκίνητο δεν έστειλε τίποτα. Συνδεθείτε ξανά· αν συμβαίνει συνέχεια, σβήστε και ανάψτε ξανά το αυτοκίνητο.</string>
     <string name="connection_hung_up_setup">Το αυτοκίνητο έκλεισε τη σύνδεση κατά τη ρύθμιση</string>
     <string name="connection_hung_up_setup_detail">Το αυτοκίνητο τερμάτισε τη σύνδεση ενώ την ασφάλιζε. Συνήθως αυτό σημαίνει ότι απέρριψε το πιστοποιητικό.</string>
+    <string name="connection_hung_up_setup_link_detail">Η σύνδεση έκλεισε την ώρα που προστατευόταν, πιθανότατα λόγω του καλωδίου ή του Wi-Fi του αυτοκινήτου και όχι λόγω του πιστοποιητικού. Συνδεθείτε ξανά.</string>
     <string name="connection_hung_up_after_cert">Το αυτοκίνητο έκλεισε τη σύνδεση μετά το πιστοποιητικό</string>
     <string name="connection_hung_up_after_cert_detail">Το αυτοκίνητο δέχτηκε το πιστοποιητικό, αλλά τερμάτισε τη σύνδεση πριν ολοκληρωθεί η ρύθμιση.</string>
 
@@ -50,7 +54,7 @@
     <string name="wireless_link_wifi_off">Το Wi-Fi του τηλεφώνου είναι απενεργοποιημένο</string>
     <string name="wireless_link_wifi_off_detail">Ενεργοποιήστε το Wi-Fi του τηλεφώνου: η ασύρματη σύνδεση με το αυτοκίνητο περνά από το Wi-Fi του αυτοκινήτου.</string>
     <string name="wireless_link_vpn">Ένα VPN εμποδίζει το αυτοκίνητο</string>
-    <string name="wireless_link_vpn_detail">Το myCar συνδέθηκε στο δίκτυο του %1$s, αλλά ένα VPN σε αυτό το τηλέφωνο (για παράδειγμα το Tailscale) δεν το αφήνει να φτάσει στο αυτοκίνητο. Συνδεθείτε με το καλώδιο, απενεργοποιήστε το VPN ή αφήστε το myCar έξω από αυτό στις ρυθμίσεις του – τότε το Plancia και το Xonos μέσα στο myCar δεν μπορούν να χρησιμοποιήσουν τις διευθύνσεις του VPN, όπως τα ονόματα του Tailscale.</string>
+    <string name="wireless_link_vpn_detail">Το myCar συνδέθηκε στο δίκτυο του %1$s, αλλά ένα VPN σε αυτό το τηλέφωνο (για παράδειγμα το Tailscale) δεν το αφήνει να φτάσει στο αυτοκίνητο. Συνδεθείτε με το καλώδιο, απενεργοποιήστε το VPN ή αφήστε το myCar έξω από αυτό στις ρυθμίσεις του: τότε το Plancia και το Xonos μέσα στο myCar φτάνουν στις διευθύνσεις του Tailscale μέσω των εφαρμογών Plancia και Xonos, αν υπάρχουν στο τηλέφωνο.</string>
     <string name="wireless_link_no_connection">Συνδέθηκε στο Wi-Fi του αυτοκινήτου, αλλά χωρίς σύνδεση</string>
     <string name="wireless_link_no_connection_detail">Το myCar συνδέθηκε στο δίκτυο του %1$s, αλλά δεν μπόρεσε να φτάσει στο Android Auto στη διεύθυνση %2$s.</string>
     <string name="wireless_link_local_network_detail">Το Android κρατά το myCar έξω από τα τοπικά δίκτυα, και το Wi-Fi του αυτοκινήτου είναι ένα από αυτά: στο τηλέφωνο, δώστε στο myCar την άδεια Συσκευές σε κοντινή απόσταση και συνδεθείτε ξανά.</string>

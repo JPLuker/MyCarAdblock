@@ -68,6 +68,7 @@ object CarAudioRoute {
     fun onCarDisconnected() = main.post {
         projecting = false
         sawCall = false
+        callWaits = 0
         main.removeCallbacksAndMessages(settling)
         stopWatching()
         CarSettings.forgetCarLink()
@@ -80,22 +81,49 @@ object CarAudioRoute {
 
     private fun decide() {
         main.removeCallbacksAndMessages(settling)
+        sawCall = false
+        callWaits = 0
         if (bluetoothMusic()) {
             useBluetooth()
             return
         }
         log.i("no Bluetooth music connection to the car yet - giving it ${SETTLE_MS / 1000}s")
-        main.postDelayed({
-            if (!projecting || CarSettings.audioRoute.value != AudioRoute.AUTO) return@postDelayed
-            if (bluetoothMusic()) {
-                useBluetooth()
-            } else {
-                log.i("route: through myCar - the car takes no music from the phone over Bluetooth")
-                SessionReport.audioRoute("auto: through myCar (no Bluetooth music connection to the car)")
-                CarSettings.useCarLink(true)
-            }
-        }, settling, SETTLE_MS)
+        main.postDelayed({ settle() }, settling, SETTLE_MS)
     }
+
+    /**
+     * Automatic's choice for the drive, a moment after the picture. A drive started during a call
+     * waits for it to end: some cars give the phone's Bluetooth music back only then, and through
+     * myCar was picked for the whole drive (Android's question asked mid-call). At most
+     * [MAX_CALL_WAITS] waits: an app can leave the phone "in communication" for good.
+     */
+    private fun settle() {
+        if (!projecting || CarSettings.audioRoute.value != AudioRoute.AUTO) return
+        if (bluetoothMusic()) {
+            sawCall = false
+            useBluetooth()
+            return
+        }
+        if (inCall() && callWaits++ < MAX_CALL_WAITS) {
+            if (!sawCall) log.i("no Bluetooth music connection during a call - deciding once the call ends")
+            sawCall = true
+            main.postDelayed({ settle() }, settling, SETTLE_MS)
+            return
+        }
+        // The call just ended: the car is given a moment to bring its Bluetooth music back.
+        if (sawCall) {
+            sawCall = false
+            main.postDelayed({ settle() }, settling, SETTLE_MS)
+            return
+        }
+        log.i("route: through myCar - the car takes no music from the phone over Bluetooth")
+        SessionReport.audioRoute("auto: through myCar (no Bluetooth music connection to the car)")
+        CarSettings.useCarLink(true)
+    }
+
+    /** Waits for a call at the start of a drive, [SETTLE_MS] each: five minutes. */
+    private var callWaits = 0
+    private const val MAX_CALL_WAITS = 60
 
     private fun useBluetooth() {
         log.i("route: Bluetooth - the car takes the phone's music over it")

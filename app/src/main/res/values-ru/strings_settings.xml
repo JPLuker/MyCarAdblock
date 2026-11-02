@@ -233,6 +233,7 @@
 
     <string name="voice_model_language_title">Голос: %1$s</string>
     <string name="voice_model_language_ready">myCar настроен на %1$s язык, поэтому и помощник в автомобиле переходит на %1$s язык: он слушает и отвечает с помощью %2$s.</string>
+    <string name="voice_model_language_phone">myCar настроен на %1$s язык, поэтому и помощник в автомобиле переходит на %1$s язык: он слушает и отвечает с помощью распознавания речи телефона.</string>
     <string name="voice_model_language_ready_try">myCar настроен на %1$s язык, поэтому и помощник в автомобиле переходит на %1$s язык: он слушает и отвечает с помощью %2$s. Попробуйте: «%3$s».</string>
     <string name="voice_model_language_missing">myCar настроен на %1$s язык. С моделью %2$s (%3$d МБ) помощник в автомобиле тоже перейдёт на %1$s язык, а пока он понимает только английский.</string>
     <string name="voice_model_language_tts">Отвечает он голосом синтеза речи телефона (%1$s язык). Если звучит неправильно, выберите или скачайте этот голос в настройках синтеза речи Android.</string>
@@ -305,6 +306,15 @@
     <string name="settings_car_pages_header">Ваши страницы по обе стороны от карты на главном экране автомобиля. Измените их здесь или в автомобиле карандашом рядом с точками.</string>
     <string name="settings_car_pages_ready_text">Ваши страницы заменятся готовыми: погода и расписание слева от карты, а справа — Plancia рядом с браузером, если Plancia есть в myCar или на телефоне.</string>
     <string name="settings_car_fit_offline">Подключитесь к автомобилю, чтобы подогнать его экран: автомобиль сразу показывает каждое изменение.</string>
+    <string name="settings_grid_apps">Приложения в сетке автомобиля</string>
+    <string name="settings_grid_apps_all">Показаны все</string>
+    <plurals name="settings_grid_apps_hidden">
+        <item quantity="one">Скрыто: %d</item>
+        <item quantity="few">Скрыто: %d</item>
+        <item quantity="many">Скрыто: %d</item>
+        <item quantity="other">Скрыто: %d</item>
+    </plurals>
+    <string name="settings_grid_apps_note">Снимите отметку с приложения, чтобы его не было в сетке приложений автомобиля. В автомобиле: удерживайте приложение и выберите «Скрыть из сетки приложений». Приложение, закреплённое в доке, остаётся там.</string>
     <string name="theme_title">Тема</string>
     <string name="theme_footer">Как myCar выглядит на телефоне. У экрана автомобиля своя тема — в настройках автомобиля.</string>
     <string name="theme_phone">Как в телефоне</string>
@@ -324,6 +334,8 @@
     <string name="music_sign_in_title">%1$s: вход</string>
     <string name="music_sign_out">Выйти</string>
     <string name="music_sign_out_detail">Из этого сервиса в myCar, на телефоне и в автомобиле</string>
+    <string name="music_hide_app">Скрыть приложение %1$s на телефоне</string>
+    <string name="music_hide_app_detail">В сетке приложений автомобиля остаётся только %1$s внутри myCar: приложение %1$s на этом телефоне не показывается, чтобы не было двух одинаковых.</string>
     <string name="music_sign_out_title">Выйти из %1$s?</string>
     <string name="music_sign_out_text">myCar забудет вход в %1$s и то, что сохранили его страницы. Ваш аккаунт останется как есть.</string>
     <string name="music_add">Добавить сервис</string>

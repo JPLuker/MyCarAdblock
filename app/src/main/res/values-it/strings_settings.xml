@@ -229,6 +229,7 @@
 
     <string name="voice_model_language_title">Voce: %1$s</string>
     <string name="voice_model_language_ready">myCar è in %1$s, quindi l\'assistente dell\'auto ascolta e risponde in %1$s, con %2$s.</string>
+    <string name="voice_model_language_phone">myCar è in %1$s, quindi l\'assistente dell\'auto ascolta e risponde in %1$s, con il riconoscimento vocale del telefono.</string>
     <string name="voice_model_language_ready_try">myCar è in %1$s, quindi l\'assistente dell\'auto ascolta e risponde in %1$s, con %2$s. Prova a dire «%3$s».</string>
     <string name="voice_model_language_missing">myCar è in %1$s. Con %2$s (%3$d MB) l\'assistente dell\'auto ascolta e risponde in %1$s; fino ad allora capisce solo l\'inglese.</string>
     <string name="voice_model_language_tts">Risponde con la voce della sintesi vocale del telefono in %1$s. Se non suona bene, scegli o scarica quella voce nelle impostazioni di sintesi vocale di Android.</string>
@@ -301,6 +302,13 @@
     <string name="settings_car_pages_header">Le tue pagine ai lati della mappa, sulla Home dell\'auto. Cambiale qui, o in auto con la matita accanto ai puntini.</string>
     <string name="settings_car_pages_ready_text">Le tue pagine lasciano il posto a quelle pronte: meteo e agenda a sinistra della mappa e, a destra, Plancia accanto al browser, se Plancia è configurata o installata.</string>
     <string name="settings_car_fit_offline">Collegati all\'auto per adattarne lo schermo: l\'auto mostra ogni modifica mentre la fai.</string>
+    <string name="settings_grid_apps">App nella griglia dell\'auto</string>
+    <string name="settings_grid_apps_all">Tutte visibili</string>
+    <plurals name="settings_grid_apps_hidden">
+        <item quantity="one">%d nascosta</item>
+        <item quantity="other">%d nascoste</item>
+    </plurals>
+    <string name="settings_grid_apps_note">Togli la spunta a un\'app per tenerla fuori dalla griglia delle app dell\'auto. In auto: tieni premuta un\'app e scegli «Nascondi dalla griglia delle app». Un\'app fissata nel dock resta lì.</string>
     <string name="theme_title">Tema</string>
     <string name="theme_footer">L\'aspetto di myCar sul telefono. Lo schermo dell\'auto ha il suo, nelle impostazioni dell\'auto.</string>
     <string name="theme_phone">Come il telefono</string>
@@ -320,6 +328,8 @@
     <string name="music_sign_in_title">%1$s: accedi</string>
     <string name="music_sign_out">Esci</string>
     <string name="music_sign_out_detail">Da questo servizio in myCar, sul telefono e in auto</string>
+    <string name="music_hide_app">Nascondi l\'app %1$s del telefono</string>
+    <string name="music_hide_app_detail">Nella griglia delle app dell\'auto resta solo %1$s dentro myCar: l\'app %1$s di questo telefono non compare, così non ce ne sono due.</string>
     <string name="music_sign_out_title">Uscire da %1$s?</string>
     <string name="music_sign_out_text">myCar dimentica l\'accesso a %1$s e quello che le sue pagine hanno salvato. Il tuo account resta com\'è.</string>
     <string name="music_add">Aggiungi un servizio</string>
