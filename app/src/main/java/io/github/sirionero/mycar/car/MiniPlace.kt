@@ -26,22 +26,21 @@ internal data class MiniPlace(val x: Float, val y: Float) {
         /**
          * Where it starts until the driver moves it, in an area [areaW] x [areaH] where it is [ownW] x
          * [ownH] (dp; the area is the map inside [MINI_EDGE] and above [MINI_DOTS_STRIP]). The bottom
-         * right ([CORNER]) where the map leaves that clear; on a small map (an 800x480 screen at a large
-         * size) the corner is beside the trip's time card or under the map's buttons (TemplateChrome),
-         * so it starts above the one and to the left of the other.
+         * right ([CORNER]) where the map leaves that clear. On a small map (an 800x480 screen at a large
+         * size) the corner can be under the map's buttons (top right) or beside the trip's time card
+         * (bottom left; see TemplateChrome): it moves left of the buttons, but never over the card a map
+         * shows at its left (a list of places, a search), which hides it whole - and above the trip's time.
          */
         fun start(areaW: Float, areaH: Float, ownW: Float, ownH: Float): MiniPlace {
             val roomW = areaW - ownW
             val roomH = areaH - ownH
             var x = roomW
             var y = roomH
-            // Beside the trip's time card (bottom left): above it.
-            if (x < TRIP_CARD_WIDTH) y = roomH - TRIP_CARD_RISE
-            // Under the map's buttons (top right): to their left, which may take it over the trip's time.
             if (y < BUTTONS_REACH) {
-                x = roomW - BUTTONS_STEP
-                if (x < TRIP_CARD_WIDTH) y = minOf(y, roomH - TRIP_CARD_RISE)
+                val besideCard = maxOf((areaW + 2 * MINI_EDGE) * PANE_FRACTION, PANE_MIN_EDGE) - MINI_EDGE + GAP
+                x = maxOf(roomW - BUTTONS_STEP, besideCard).coerceAtMost(roomW)
             }
+            if (x < TRIP_CARD_WIDTH) y = minOf(y, roomH - TRIP_CARD_RISE)
             if (x == roomW && y == roomH) return CORNER
             return MiniPlace(
                 if (roomW > 0) (x / roomW).coerceIn(0f, 1f) else 1f,
@@ -76,6 +75,11 @@ private const val TRIP_CARD_RISE = 40f
 private const val BUTTONS_REACH = 302f
 /** How far left of the area's right edge the mini player ends to clear those buttons (their width, and 8 dp). */
 private const val BUTTONS_STEP = 62f
+/** The card at a map's left (MapPaneLayout) ends at this fraction of the map's width, or at least at [PANE_MIN_EDGE] (MAP_PANE_MIN_EDGE). */
+private const val PANE_FRACTION = 0.42f
+private const val PANE_MIN_EDGE = 244f
+/** The room left between the mini player and the map's cards. */
+private const val GAP = 8f
 
 /**
  * Whether the mini player shows: music on (through the column's short wait too) over a map that has

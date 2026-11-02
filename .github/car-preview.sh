@@ -132,7 +132,7 @@ EXTRA="--ez demoSong true --es playerSize 1.4" shoot lyrics-side-extra-800x480 8
 # song brings the column back, the column's X the mini player, where it was let go; a slow tap (0.9 s, not
 # moved) on its cover still opens the full player. Then at 800x480, light, where an earlier drive left it,
 # off; and at 800x480 with the car's screen at Large and Extra large (--es carScale), where the map is
-# small: it starts left of the map's buttons and above the trip's time.
+# small: it starts clear of Vela's card of places as far as it goes, under its buttons, over the trip's time.
 EXTRA="--ez demoSong true" shoot mini 1920 720 240 "$WAIT;1866,54;$WAIT;1536,582,drag,936,174;1254,174;72,279;1866,54;$WAIT;936,174,long"
 EXTRA="--ez demoSong true" shoot mini-800x480 800 480 160 "$WAIT;764,36;$WAIT;544,388,drag,460,60"
 EXTRA="--ez demoSong true --es carScale 1.25" shoot mini-large-800x480 800 480 160 "$WAIT;755,45;$WAIT;$WAIT"
