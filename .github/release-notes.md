@@ -2,7 +2,7 @@ myCar 0.7.0-alpha: the release that gathers the whole 0.6 series, and the steadi
 
 ## The crash
 - **myCar closed and the drive ended** after a tap in Plancia's page (Home Assistant), on a page beside the map, followed by a turn back to the map or a tap on the app grid. It happened in 0.6.7 and 0.6.9, three times in the drivers' logs. The cause was in the library that draws the car's screen: the tap gave Plancia's page the focus, and when the page left the screen with the focus still inside, the focus moving on measured the pages again halfway through the removal. The next frame then placed a piece no longer on screen, and the app stopped. Now the page keeps its place for one more frame and gives the focus up first. The same goes for Plancia beside the map (a swipe to another page, the app grid, Close, the song in the dock), for pages changed on the phone while the car shows Home, and for the browser in the pages when Home leaves the screen or a page is changed.
-- Reproduced in the emulator every time before the fix (Android 17 and 14, with the drivers' own touches and timings); the same sequence with the focus taken first never went down.
+- Reproduced in the emulator every time before the fix (Android 17 and 14, with the drivers' own touches and timings): myCar went down at the first round. With the fix, eight runs on Android 17 (the page in three parts left for the map, for the app grid and for changing it, Plancia beside the map, and the drivers' trips replayed) gave Plancia's page the focus 127 times in all, then took it away, and never went down.
 - If myCar ever closes by itself, the next start writes in the log why Android closed it: a crash with its whole trace, memory, not responding, Android 17's memory limit, said in plain words. Each release now carries R8's map, so a trace from a driver's log can be read.
 
 ## Voice
@@ -44,4 +44,4 @@ myCar 0.7.0-alpha: the release that gathers the whole 0.6 series, and the steadi
 
 The full list is in the README ("What's new in 0.7") and, release by release, in the app under Settings > About > What's new.
 
-Every change was checked in the code by a second, skeptical reader; the crash was reproduced and its fix tried in the emulator on Android 17. Every commit compiled and unit-tested in CI. Not tried in a real car.
+Every change was checked in the code by a second, skeptical reader, and the crash fix by an independent review that found the two places it first missed (beside the map, pages changed on the phone). Every commit compiled and unit-tested in CI. Not tried in a real car.
