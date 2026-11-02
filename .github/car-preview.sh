@@ -292,10 +292,10 @@ EXTRA="--es webMusic spotify" shoot music-grid 1920 720 240 "$WAIT;$WAIT;$GRID_B
 # The map's surfaces as a drive with music starts (CarServices.musicStarting): Vela, and Spotify's web
 # player as the drive's music (Autoplay on, as by default). The player's column is kept from the start,
 # so the map's first surface should already be the narrow one, and "Starting Spotify…" beside it; with
-# no account here no song comes, and 20 s in the map gets its whole width. The dock's map button 7 s in
-# brings Home back over the full player that the media key opened.
-installed $VELA && EXTRA="--es webMusic spotify" shoot map-start 1920 720 240 \
-    "$WAIT;$DOCK_MAP;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+# no account here no song comes, and 20 s in the map gets its whole width. No media key (--ez
+# webMusicKey false): pressed first, it opened Spotify as the driver's pick, not the drive's.
+installed $VELA && EXTRA="--es webMusic spotify --ez webMusicKey false" shoot map-start 1920 720 240 \
+    "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 if [ -d previews/map-start ]; then
     echo "--- the map's surfaces as a drive with music starts: the first should be the narrow one ---"
     grep -h "stage: surface\|host: lent\|media: \|preview: the car's player" \

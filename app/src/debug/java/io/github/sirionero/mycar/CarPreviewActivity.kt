@@ -165,7 +165,9 @@ class CarPreviewActivity : ComponentActivity() {
         io.github.sirionero.mycar.webmusic.WebMusic.only(webMusic?.id)
         if (webMusic != null) {
             CarSettings.setLastMedia(io.github.sirionero.mycar.webmusic.WebMusic.mediaApp(this, webMusic).component.flattenToString())
-            main.postDelayed({
+            // --ez webMusicKey false: no media key, so the drive's own start opens it as the car's music,
+            // as in a car (the key, if first, opens it as the driver's pick: the map-start shot).
+            if (intent.getBooleanExtra("webMusicKey", true)) main.postDelayed({
                 io.github.sirionero.mycar.car.CarKeys.onKey(io.github.sirionero.mycar.car.CarKeys.KEYCODE_MEDIA, down = true, longPress = false)
             }, 3_000)
             // --es webMusicSearch "lofi": later, "play lofi" as the voice assistant asks the car's
