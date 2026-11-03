@@ -392,6 +392,7 @@ object CarServices {
             autoplayAsks = media.askMark()
         } else if (media.askedSince(autoplayAsks)) {
             autoplayPending = false
+            if (_musicStarting.value) expectMusic(false)
             io.github.sirionero.mycar.MyCarLog.i("media: Autoplay left alone - the music was asked for something meanwhile")
             return
         }
@@ -401,6 +402,7 @@ object CarServices {
         val now = android.os.SystemClock.elapsedRealtime()
         if (autoplayBluetoothSince != 0L && now - autoplayBluetoothSince > AUTOPLAY_BLUETOOTH_MS) {
             autoplayPending = false
+            if (_musicStarting.value) expectMusic(false)
             io.github.sirionero.mycar.MyCarLog.i("media: Autoplay given up - no way out for the music but the phone's speaker for ${AUTOPLAY_BLUETOOTH_MS / 1000} s")
             return
         }
@@ -421,11 +423,24 @@ object CarServices {
                 io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the sound to have a way to the car")
                 return
             }
-            if (autoplayBluetoothSince == 0L) autoplayBluetoothSince = now
+            if (autoplayBluetoothSince == 0L) {
+                autoplayBluetoothSince = now
+                // The column kept for the music ("Starting …") lasts as long as this wait may: run out at
+                // 20 s, the map widened and narrowed again once the music came - two new surfaces.
+                if (_musicStarting.value) {
+                    musicWait.removeCallbacks(musicWaitOver)
+                    musicWait.postDelayed(musicWaitOver, AUTOPLAY_BLUETOOTH_MS)
+                }
+            }
             io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the car's Bluetooth music (or a cable), not to play on the phone's speaker")
             return
         }
         autoplayPending = false
+        // After a wait for the Bluetooth, the song has its own 20 s from the Play to say itself.
+        if (autoplayBluetoothSince != 0L && _musicStarting.value) {
+            musicWait.removeCallbacks(musicWaitOver)
+            musicWait.postDelayed(musicWaitOver, MUSIC_START_MS)
+        }
         if (!media.now.value.playing) media.togglePlay()
     }
 
