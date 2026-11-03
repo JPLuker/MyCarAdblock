@@ -1010,7 +1010,8 @@ phone_lang() {
         sleep 1.5; adb exec-out screencap -p > "$d/intro-page-$i.png"
     done
 }
-LANGS="it es de fr pt el ru zh-CN"
+# it-XP, en-XP: pirate speak (AppLanguage.PIRATE), Italian and English.
+LANGS="it es de fr pt el ru zh-CN it-XP en-XP"
 for lang in $LANGS; do
     BEFORE="adb shell cmd locale set-app-locales $PKG --locales $lang" EXTRA="--ez demoSong true" \
         shoot "lang-$lang" 1920 720 240 "$WAIT;$GRID_BUTTON;$(at settings);$WAIT"
