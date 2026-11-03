@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_support_title">Поддержать плавание</string>
+    <string name="settings_support_footer">myCar бесплатный, без рекламы и слежки: вольный корабль под своим флагом. Ваша поддержка держит его на плаву.</string>
+    <string name="settings_usage_notes_title">Отчёты о плаваниях</string>
+    <string name="settings_updates_title">Новые паруса</string>
+
+    <string name="settings_about_title">Наш флаг</string>
+    <string name="settings_about_whats_new">Свежая добыча</string>
+    <string name="settings_about_replay_intro">Снова развернуть обзор версии %1$s</string>
+    <string name="settings_about_replay_intro_detail">Свежая добыча этого выпуска — за несколько касаний</string>
+    <string name="settings_about_setup">Снаряжение корабля</string>
+    <string name="settings_about_setup_detail">Что уже погружено и чего не хватает. Ничего не пойдёт за борт.</string>
+
+    <string name="settings_connection_title">Абордаж</string>
+    <string name="settings_use_mycar">Использовать myCar на борту</string>
+    <string name="settings_use_mycar_on">myCar отвечает, когда вы берёте корабль на абордаж</string>
+    <string name="settings_use_mycar_off">Выкл.: абордаж может перехватить Android Auto</string>
+    <string name="settings_wireless_auto">Абордаж без кабеля автоматически</string>
+    <string name="settings_wireless_auto_on">Корабль, который вы уже брали на абордаж без кабеля, снова подключается, когда его заводят. Android спросит один раз.</string>
+    <string name="settings_wireless_auto_cars">Снова сам берёт на абордаж %1$s, когда его заводят. Для другого корабля Android спросит один раз, после плавания без кабеля.</string>
+    <string name="settings_wireless_auto_off">Выкл.: каждый раз нажимайте «Абордаж без кабеля»</string>
+
+    <string name="settings_help_title">Помощь и снасти</string>
+    <string name="settings_help_connect">Как взять на абордаж</string>
+    <string name="settings_help_connect_detail">Какие автомобили подходят и что ещё нужно снарядить</string>
+    <string name="settings_help_preview">Подзорная труба</string>
+    <string name="settings_help_preview_detail">Бортовой экран на вашем телефоне</string>
+    <string name="settings_preview_busy">Доступна, когда корабль не подключён</string>
+    <string name="settings_help_logs">Судовой журнал</string>
+    <string name="settings_help_logs_detail">О чём myCar и корабль толкуют друг с другом</string>
+
+    <string name="settings_audio_title">Звук на борту</string>
+    <string name="settings_audio_footer_ask">Звонки в любом случае идут через Bluetooth. Выполните один раз команду из раздела «Как взять на абордаж», и myCar перестанет просить разрешение на трансляцию звука.</string>
+    <string name="settings_audio_auto">Автоматически (выбор капитана)</string>
+    <string name="settings_audio_auto_detail">Bluetooth, если корабль принимает так песни с телефона, иначе через myCar</string>
+    <string name="settings_audio_bluetooth_detail">Без вопроса в каждой поездке, и голос навигатора звучит на борту. Некоторые корабли принимают по нему только звонки</string>
+
+    <string name="settings_apps_recommended">Выбор капитана</string>
+
+    <string name="settings_plancia_footer">Ваши панели Home Assistant на борту, готовые сразу, как только вы их открываете: во флоте, на одной из палуб рядом с картой или сбоку от карты. Токен создаётся в Home Assistant: ваш профиль, «Безопасность», «Долгосрочные токены доступа».</string>
+    <string name="settings_plancia_asking">Окликаем Plancia…</string>
+    <string name="settings_plancia_remove_text">myCar забудет адреса и токен Plancia. Приложение Plancia, если оно есть на телефоне, вернётся на корабль.</string>
+    <string name="settings_plancia_removed">Plancia больше нет в myCar: на корабле снова приложение Plancia, если оно есть на телефоне.</string>
+    <string name="settings_ask_ha">Спрашивать Home Assistant на борту</string>
+    <string name="settings_ask_ha_detail">То, что корабельный попугай myCar не может сделать сам, передаётся голосовому ассистенту, настроенному в Home Assistant (там: Настройки &gt; Голосовые ассистенты): Claude, Gemini, ChatGPT, модели у вас дома или собственному ассистенту Home Assistant, который ещё и управляет домом. Когда телефон заблокирован, он отвечает вместо попугая телефона. В ваш Home Assistant уходят только эти слова, в виде текста.</string>
+
+    <string name="settings_xonos_footer">Ваша медиатека Music Assistant среди музыкальных приложений на борту. Если звук на борту идёт через myCar, песни поступают прямо на борт, и Android не просит разрешить трансляцию звука, пока вы их слушаете.</string>
+    <string name="settings_xonos_asking">Окликаем Xonos…</string>
+    <string name="settings_xonos_app_no_account">В Xonos пока нет учётной записи, которой можно поделиться: сначала поднимитесь на борт в Xonos или здесь, ниже.</string>
+    <string name="settings_xonos_signed_in">Вы на борту. Чтобы сменить учётную запись, поднимитесь на борт снова.</string>
+    <string name="settings_xonos_signed_in_as">Вы на борту как %1$s. Чтобы сменить учётную запись, поднимитесь на борт снова.</string>
+    <string name="settings_xonos_signing_in">Поднимаемся на борт…</string>
+    <string name="settings_xonos_sign_in">На борт</string>
+    <string name="settings_xonos_remove_text">myCar забудет адрес и данные для входа, а чтобы снова подняться на борт, понадобится пароль. Приложение Xonos, если оно есть на телефоне, вернётся на корабль.</string>
+    <string name="settings_xonos_removed">Xonos в myCar отключён: на корабле снова приложение Xonos, если оно есть на телефоне.</string>
+
+    <string name="settings_cinema_footer">Видеосайты в виде плиток на борту, каждый открывается в браузере, созданном для видео. Защищённое видео (Netflix, DAZN, Prime Video, Disney+ и подобные), скорее всего, останется на борту чёрным: Android скрывает его от экрана, превращённого в видеопоток, — а бортовой экран именно такой.</string>
+    <string name="settings_cinema_reset_title">Вернуть предложенные сайты на борт?</string>
+    <string name="settings_cinema_reset_text_own">В Cinema снова будут только эти сайты: %1$s. Ваши собственные сайты пойдут за борт: %2$s.</string>
+    <string name="settings_cinema_remove_title">Затопить %1$s?</string>
+    <string name="settings_cinema_remove_site_text">Сайт пойдёт ко дну и пропадёт из Cinema. Чтобы вернуть его, адрес придётся ввести заново.</string>
+    <string name="settings_cinema_remove">Затопить %1$s</string>
+    <string name="settings_cinema_protected">защищённое видео: на борту, скорее всего, чёрный экран</string>
+    <string name="settings_cinema_videos_allowed">Они показываются на борту, в разделе «На этом телефоне»</string>
+    <string name="settings_cinema_tv_footer">Списки IPTV в формате M3U от вашего провайдера, общедоступные или с домашнего ТВ-сервера: каждый становится в Cinema плиткой со своими каналами. Они воспроизводятся встроенным плеером телефона; защищённые (DRM) и multicast-каналы остаются за бортом.</string>
+    <string name="settings_cinema_tv_remove_text">Его адрес и каналы myCar выбросит за борт. Чтобы вернуть его, адрес придётся ввести заново.</string>
+
+    <string name="settings_phone_typing_close">Закрыть бортовую клавиатуру</string>
+    <string name="settings_phone_typing_label">Ввод для бортового экрана</string>
+    <string name="settings_phone_typing_search">Поиск на бортовом экране</string>
+
+    <string name="settings_audio_choice_title">Передавать звук на борт по Bluetooth?</string>
+    <string name="settings_audio_choice_text">Android считает песни, которые передаёт myCar, трансляцией экрана, поэтому спрашивает в каждой поездке. По Bluetooth он не спрашивает никогда, если ваш корабль так воспроизводит песни с телефона. Это можно изменить позже в такелаже.</string>
+
+    <string name="about_give_once">Разовый взнос в казну</string>
+    <string name="about_bitcoin_title">В казну через Bitcoin</string>
+    <string name="about_matrix_detail">Экипаж Gearslip — проекта, на котором основан myCar</string>
+    <string name="about_upstream">С верфи Gearslip</string>
+
+    <string name="voice_model_live_title">Попугай: текст на лету</string>
+    <string name="voice_model_live_about">Корабельный попугай превращает речь в текст на этом телефоне, и ничего из сказанного его не покидает — кроме того, что myCar не может сделать сам: если настроен Home Assistant, это уходит в ваш Home Assistant в виде текста. Нужны две модели, вместе около %1$d МБ, скачиваются один раз. Эта записывает слова, пока вы говорите, на английском; на другом языке она распознаёт речь, только когда вы замолчите.</string>
+    <string name="voice_model_final_title">Попугай: итоговый текст</string>
+    <string name="voice_model_delete_title">Затопить %1$s?</string>
+    <string name="voice_model_delete_in_use">С телефона будет удалено %1$d МБ. Эта модель используется: попугай на борту не сможет слушать, пока её не скачают снова.</string>
+    <string name="voice_model_canary_detail">Выбор капитана. Быстрая и хорошо распознаёт имена и места. Английский, испанский, немецкий и французский. NVIDIA NeMo, CC BY 4.0</string>
+
+    <string name="voice_model_language_title">Попугай: %1$s</string>
+    <string name="voice_model_language_ready">myCar настроен на %1$s язык, поэтому и попугай на борту переходит на %1$s язык: он слушает и отвечает с помощью %2$s.</string>
+    <string name="voice_model_language_phone">myCar настроен на %1$s язык, поэтому и попугай на борту переходит на %1$s язык: он слушает и отвечает с помощью распознавания речи телефона.</string>
+    <string name="voice_model_language_ready_try">myCar настроен на %1$s язык, поэтому и попугай на борту переходит на %1$s язык: он слушает и отвечает с помощью %2$s. Попробуйте: «%3$s».</string>
+    <string name="voice_model_language_missing">myCar настроен на %1$s язык. С моделью %2$s (%3$d МБ) попугай на борту тоже перейдёт на %1$s язык, а пока он понимает только английский.</string>
+
+    <string name="speech_download_channel">Загрузка попугая</string>
+
+    <string name="stats_intro">Если включить, myCar будет отправлять короткий отчёт при открытии и после каждого плавания. %1$s По отчётам видно, какие автомобили работают и где возникают сбои у остальных.</string>
+    <string name="stats_worked_title_year">myCar взял на абордаж ваш %2$s %1$s года</string>
+    <string name="stats_worked_title_named">myCar взял на абордаж ваш %1$s</string>
+    <string name="stats_worked_title_car">myCar взял на абордаж ваш корабль</string>
+    <string name="stats_worked_text">Поделиться этим, чтобы следующий капитан знал, что всё работает? Без имени, учётной записи и местоположения.</string>
+
+    <string name="settings_group_general">Кубрик</string>
+    <string name="settings_group_general_detail">Язык, окраска, новые паруса</string>
+    <string name="settings_group_connection_detail">Без проводов, звук на борту, сертификат</string>
+    <string name="settings_group_voice">Попугай</string>
+    <string name="settings_group_voice_detail">Корабельный попугай и речевые модели</string>
+    <string name="settings_group_plancia_detail">Home Assistant на борту</string>
+    <string name="settings_group_xonos_detail">Music Assistant на борту</string>
+    <string name="settings_group_help_detail">Как взять на абордаж, журналы</string>
+    <string name="settings_group_about_detail">Версия, лицензии, поддержать плавание</string>
+    <string name="settings_group_car">Бортовой экран</string>
+    <string name="settings_group_car_detail">Гавань, палубы, вид, горизонт, предупреждения</string>
+    <string name="settings_car_pages_header">Ваши палубы по обе стороны от карты, в гавани бортового экрана. Измените их здесь или на борту — карандашом рядом с точками.</string>
+    <string name="settings_car_pages_ready_text">Ваши палубы заменятся готовыми: погода и расписание слева от карты, а справа — Plancia рядом с браузером, если Plancia есть в myCar или на телефоне.</string>
+    <string name="settings_car_fit_offline">Возьмите корабль на абордаж, чтобы подогнать его экран: корабль сразу показывает каждое изменение.</string>
+    <string name="settings_grid_apps">Приложения во флоте</string>
+    <string name="settings_grid_apps_all">Все в строю</string>
+    <plurals name="settings_grid_apps_hidden">
+        <item quantity="one">Спрятано: %d</item>
+        <item quantity="few">Спрятано: %d</item>
+        <item quantity="many">Спрятано: %d</item>
+        <item quantity="other">Спрятано: %d</item>
+    </plurals>
+    <string name="settings_grid_apps_note">Снимите отметку с приложения, чтобы его не было во флоте. На борту: удерживайте приложение и выберите «Убрать из флота». Приложение, прибитое к мачте, остаётся там.</string>
+    <string name="theme_title">Окраска</string>
+    <string name="theme_footer">Как myCar выглядит на телефоне. У бортового экрана своя окраска — в бортовом такелаже.</string>
+    <string name="settings_audio_per_car">Когда корабль подключён, выбор сохраняется для этого корабля, и его меняет также кнопка звука в шарманке. Без подключённого корабля он действует для всех кораблей.</string>
+    <string name="settings_group_music">Песни</string>
+    <string name="settings_group_music_detail">Xonos, Spotify и другие песни на борту</string>
+    <string name="music_in_the_car">На борту</string>
+    <string name="music_xonos_on">Music Assistant на бортовом экране, как одно из его музыкальных приложений</string>
+    <string name="music_xonos_off">Выключено: Xonos нет на бортовом экране, как и приложения Xonos</string>
+    <string name="music_service_on">Во флоте; звучит через myCar</string>
+    <string name="music_service_off">Выключено: нет на бортовом экране</string>
+    <string name="music_sign_in">На борт с телефона</string>
+    <string name="music_sign_in_detail">С клавиатуры телефона: вход сохранится и на корабле</string>
+    <string name="music_sign_in_title">%1$s: на борт</string>
+    <string name="music_sign_out">Покинуть борт</string>
+    <string name="music_sign_out_detail">Из этого сервиса в myCar, на телефоне и на корабле</string>
+    <string name="music_hide_app">Спрятать приложение %1$s на телефоне</string>
+    <string name="music_hide_app_detail">Во флоте остаётся только %1$s внутри myCar: приложение %1$s на этом телефоне не показывается, чтобы не было двух одинаковых.</string>
+    <string name="music_sign_out_title">Покинуть борт %1$s?</string>
+    <string name="music_add_footer">Другие музыкальные сервисы, каждый со своим веб-плеером внутри myCar: их звук идёт на борт через myCar, как у Cinema.</string>
+    <string name="music_add_note">Каждый отмеченный появится здесь и во флоте.</string>
+</resources>
