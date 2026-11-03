@@ -1342,8 +1342,15 @@ Tutti i token in un solo posto, `car/design/`:
   (Theme.NoDisplay, fuori dai recenti, task suo, si chiude in onCreate e chiama `retry`, che aspetta anche l'esito di
   un avvio in corso) col telefono bloccato o lo schermo spento, una mappa per auto installata e il servizio non acceso
   (su Android 12-13 sempre); non durante una chiamata; sbloccato e acceso, myCar viene davanti e riprova in onResume.
-  Scatto `location-arrival`: auto finta associata dalla shell (`cmd companiondevice associate 0 <pkg> <mac>`), myCar
-  aperta e lasciata dietro, PIN e schermo spento per 15 s, poi `cmd companiondevice simulate-device-appeared <id>`. (2) Colonna della musica riservata dall'avvio
+  Auto arrivata durante una chiamata: a chiamata finita (controllo ogni 2 s, al massimo mezz'ora, `afterCall`) la
+  schermata per l'arrivo, anche col telefono in uso (`evenIfLit`: dopo una chiamata nessuno porta davanti myCar).
+  Scatto `location-arrival`: auto finta associata dalla shell (`cmd companiondevice associate 0 <pkg> <mac>`; su
+  Android 17 `list` stampa `Association{mId=…}`), myCar aperta, PIN e 15 s, poi `cmd companiondevice
+  simulate-device-appeared <id>`, in quattro situazioni (myCar ultima schermata o dietro la home; schermo spento o
+  blocco acceso), ognuna senza (prova di controllo: nella build debug il file `files/no-arrival-screen` salta la
+  schermata) e con. Verificato (0.7.1, API 37.0): senza, rifiutato in tre su quattro col messaggio del log del
+  guidatore (uid IMPORTANT_FOREGROUND o TOP_SLEEPING); con, sempre "running" (uid TOP, `getFgsAllowWiu_forCapabilities
+  =PROC_STATE_TOP`). Solo "dietro la home, schermo spento" passava anche senza: portare davanti myCar la rende TOP lì. (2) Colonna della musica riservata dall'avvio
   (`CarServices.musicStarting`, 20 s, "Starting <app>…") così la prima superficie della mappa è già quella
   stretta (scatto `map-start`: prima superficie 1195x720). (3) Area visibile ridetta a una superficie rifatta
   alla stessa misura; tocchi sulla superficie nel log. (4) Spotify su un altro dispositivo: solo con l'orologio
