@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_support_title">Στηρίξτε το πλήρωμα</string>
+    <string name="settings_support_footer">Το myCar είναι δωρεάν, χωρίς διαφημίσεις και χωρίς παρακολούθηση. Η στήριξή σας κρατά τα πανιά του φουσκωμένα.</string>
+    <string name="settings_usage_notes_title">Σημειώσεις πλεύσης</string>
+    <string name="settings_updates_title">Νέα πανιά</string>
+
+    <string name="settings_about_title">Σημαία</string>
+    <string name="settings_about_whats_new">Νέα λάφυρα</string>
+    <string name="settings_about_replay_intro">Ξαναδείτε την καθέλκυση της %1$s</string>
+    <string name="settings_about_replay_intro_detail">Τα λάφυρα αυτής της έκδοσης, με λίγα πατήματα</string>
+    <string name="settings_about_setup">Αρχικό ξάρτισμα</string>
+    <string name="settings_about_setup_detail">Τι έχει γίνει και τι μένει πριν σαλπάρετε. Τίποτα δεν πάει στη θάλασσα.</string>
+
+    <string name="settings_connection_title">Ρεσάλτο</string>
+    <string name="settings_use_mycar">Χρήση του myCar στο καράβι</string>
+    <string name="settings_use_mycar_on">Το myCar απαντά στο προσκλητήριο όταν κάνετε ρεσάλτο σε καράβι</string>
+    <string name="settings_use_mycar_off">Ανενεργό: το ρεσάλτο μπορεί να το κάνει στη θέση του το Android Auto</string>
+    <string name="settings_wireless_auto">Αυτόματο ασύρματο ρεσάλτο</string>
+    <string name="settings_wireless_auto_on">Ένα καράβι στο οποίο κάνατε ρεσάλτο χωρίς καλώδιο γαντζώνεται ξανά μόλις το ξεκινάτε. Το Android ρωτά μία φορά.</string>
+    <string name="settings_wireless_auto_cars">Γαντζώνεται ξανά μόνο του στο %1$s όταν το ξεκινάτε. Για άλλο καράβι, το Android ρωτά μία φορά, μετά από ένα ταξίδι χωρίς καλώδιο.</string>
+    <string name="settings_wireless_auto_off">Ανενεργό: πατάτε «Ρεσάλτο ασύρματα» κάθε φορά</string>
+
+    <string name="settings_help_title">Σωσίβια και εργαλεία</string>
+    <string name="settings_help_connect">Πώς να κάνετε ρεσάλτο</string>
+    <string name="settings_help_connect_detail">Ποια καράβια λειτουργούν και τι μένει να ξαρτιστεί</string>
+    <string name="settings_help_preview">Κιάλια του καραβιού</string>
+    <string name="settings_help_preview_detail">Δείτε την οθόνη του καραβιού στο τηλέφωνό σας</string>
+    <string name="settings_preview_busy">Διαθέσιμα όταν κανένα καράβι δεν είναι γαντζωμένο</string>
+    <string name="settings_help_logs">Ημερολόγιο πλοίου</string>
+    <string name="settings_help_logs_detail">Τι λένε μεταξύ τους το myCar και το καράβι</string>
+
+    <string name="settings_audio_title">Ήχος στο καράβι</string>
+    <string name="settings_audio_footer_ask">Οι κλήσεις περνούν πάντα από το Bluetooth. Εκτελέστε μία φορά την εντολή από το «Πώς να κάνετε ρεσάλτο» και το myCar σταματά να ζητά κοινή χρήση του ήχου.</string>
+    <string name="settings_audio_auto">Αυτόματα (Προτεινόμενη ρότα)</string>
+    <string name="settings_audio_auto_detail">Bluetooth όταν το καράβι παίρνει έτσι τους σκοπούς του τηλεφώνου, αλλιώς μέσω του myCar</string>
+    <string name="settings_audio_bluetooth_detail">Χωρίς ερώτηση σε κάθε ταξίδι, και η φωνή της εφαρμογής χαρτών σας φτάνει στο καράβι. Μερικά καράβια δέχονται από εκεί μόνο κλήσεις</string>
+    <string name="settings_audio_mycar_detail">Με το καλώδιο ή το Wi-Fi, όπως το Android Auto. Το Android ζητά κοινή χρήση του ήχου μία φορά σε κάθε ταξίδι</string>
+
+    <string name="settings_apps_title">Στόλος</string>
+    <string name="settings_apps_recommended">Προτάσεις του καπετάνιου</string>
+
+    <string name="settings_cert_footer">Οι αλλαγές ισχύουν από το επόμενο ρεσάλτο.</string>
+    <string name="settings_cert_show_details">Λεπτομέρειες στο φως</string>
+    <string name="settings_cert_hide_details">Λεπτομέρειες στο αμπάρι</string>
+    <string name="settings_cert_in_use_next">Το %1$s χρησιμοποιείται από το επόμενο ρεσάλτο.</string>
+
+    <string name="settings_test_trying">Βολιδοσκόπηση…</string>
+
+    <string name="settings_plancia_footer">Οι πίνακες ελέγχου του Home Assistant σας στο καράβι, έτοιμοι μόλις τους ανοίξετε: από τον στόλο, σε μια καμπίνα δίπλα σε αυτή του χάρτη ή στο πλαίσιο δίπλα στον χάρτη. Δημιουργήστε το διακριτικό στο Home Assistant: το προφίλ σας, Ασφάλεια, Διακριτικά πρόσβασης μακράς διαρκείας.</string>
+    <string name="settings_plancia_use_app">Μπαρκάρισμα με τον λογαριασμό της εφαρμογής Plancia</string>
+    <string name="settings_plancia_use_app_detail">Οι διευθύνσεις και το διακριτικό της, χωρίς κουπί στο πληκτρολόγιο</string>
+    <string name="settings_plancia_asking">Φωνάζουμε το Plancia…</string>
+    <string name="settings_plancia_app_no_account">Το Plancia δεν έχει ακόμη λογαριασμό για μοιρασιά: ρυθμίστε τον πρώτα στο Plancia ή γράψτε τον παρακάτω.</string>
+    <string name="settings_plancia_missing_remove">Προσθέστε μια διεύθυνση και ένα διακριτικό. Για να βγάλετε το Plancia από το myCar, πατήστε «Στη θάλασσα».</string>
+    <string name="settings_plancia_remove_title">Το Plancia στη θάλασσα, έξω από το myCar;</string>
+    <string name="settings_plancia_remove_text">Το myCar ξεχνά τις διευθύνσεις και το διακριτικό του. Η εφαρμογή Plancia, αν υπάρχει στο τηλέφωνο, επιστρέφει στο καράβι.</string>
+    <string name="settings_plancia_removed">Το Plancia πήγε στη θάλασσα: η εφαρμογή Plancia επιστρέφει στο καράβι, αν υπάρχει στο τηλέφωνο.</string>
+    <string name="settings_ask_ha">Ερωτήσεις στο Home Assistant από το καράβι</string>
+    <string name="settings_ask_ha_detail">Ό,τι δεν μπορεί να κάνει μόνος του ο παπαγάλος του myCar πηγαίνει στον φωνητικό βοηθό που έχει ρυθμιστεί στο Home Assistant (εκεί: Ρυθμίσεις &gt; Φωνητικοί βοηθοί): Claude, Gemini, ChatGPT, ένα μοντέλο στο σπίτι ή ο βοηθός του ίδιου του Home Assistant, που ελέγχει και το σπίτι. Με το τηλέφωνο κλειδωμένο, απαντά στη θέση του παπαγάλου του τηλεφώνου. Μόνο αυτές οι λέξεις πηγαίνουν στο Home Assistant σας, ως κείμενο.</string>
+
+    <string name="settings_xonos_footer">Η βιβλιοθήκη σας του Music Assistant ανάμεσα στις εφαρμογές μουσικής του καραβιού. Με τον ήχο του καραβιού μέσω του myCar, οι σκοποί του πηγαίνουν κατευθείαν στο καράβι και το Android δεν ζητά κοινή χρήση του ήχου όσο τους ακούτε.</string>
+    <string name="settings_xonos_use_app">Μπαρκάρισμα με τον λογαριασμό της εφαρμογής Xonos</string>
+    <string name="settings_xonos_use_app_detail">Οι διευθύνσεις και το μπαρκάρισμά της, χωρίς κουπί στο πληκτρολόγιο</string>
+    <string name="settings_xonos_asking">Φωνάζουμε το Xonos…</string>
+    <string name="settings_xonos_app_no_account">Το Xonos δεν έχει ακόμη λογαριασμό για μοιρασιά: κάντε μπαρκάρισμα πρώτα στο Xonos ή εδώ παρακάτω.</string>
+    <string name="settings_xonos_signed_in">Έχετε μπαρκάρει. Για να το αλλάξετε, μπαρκάρετε ξανά.</string>
+    <string name="settings_xonos_signed_in_as">Έχετε μπαρκάρει ως %1$s. Για να το αλλάξετε, μπαρκάρετε ξανά.</string>
+    <string name="settings_xonos_signing_in">Μπαρκάρουμε…</string>
+    <string name="settings_xonos_sign_in">Μπαρκάρισμα</string>
+    <string name="settings_xonos_remove_title">Το Xonos στη θάλασσα, έξω από το myCar;</string>
+    <string name="settings_xonos_remove_text">Το myCar ξεχνά τη διεύθυνση και το μπαρκάρισμά του, και για να μπαρκάρετε ξανά θα χρειαστεί ο κωδικός. Η εφαρμογή Xonos, αν υπάρχει στο τηλέφωνο, επιστρέφει στο καράβι.</string>
+    <string name="settings_xonos_removed">Το Xonos του myCar πήγε στη θάλασσα: η εφαρμογή Xonos επιστρέφει στο καράβι, αν υπάρχει στο τηλέφωνο.</string>
+    <string name="settings_xonos_test_ok">Music Assistant %1$s, το γραμμόφωνο παίζει ως %2$s</string>
+
+    <string name="settings_cinema_footer">Ιστότοποι βίντεο ως πλακίδια στο καράβι, ο καθένας σε ένα πρόγραμμα περιήγησης φτιαγμένο για βίντεο. Το προστατευμένο βίντεο (Netflix, DAZN, Prime Video, Disney+ και παρόμοια) πιθανότατα μένει μαύρο στο καράβι: το Android το κρύβει από μια οθόνη που γίνεται ροή βίντεο, όπως αυτή του καραβιού.</string>
+    <string name="settings_cinema_add_site">Επιβίβαση του ιστότοπου</string>
+    <string name="settings_cinema_reset">Η λίστα στην αρχική της ρότα</string>
+    <string name="settings_cinema_reset_title">Πίσω στις προτάσεις του καπετάνιου;</string>
+    <string name="settings_cinema_reset_text">Το Cinema βάζει ξανά πλώρη για τα %1$s.</string>
+    <string name="settings_cinema_reset_text_own">Το Cinema βάζει ξανά πλώρη για τα %1$s. Οι δικοί σας ιστότοποι πάνε στη θάλασσα: %2$s.</string>
+    <string name="settings_cinema_reset_confirm">Πίσω στη ρότα</string>
+    <string name="settings_cinema_remove_title">«%1$s» στη θάλασσα;</string>
+    <string name="settings_cinema_remove_site_text">Αποβιβάζεται από το Cinema. Για να ξαναεπιβιβαστεί, πρέπει να γράψετε ξανά τη διεύθυνσή του.</string>
+    <string name="settings_cinema_remove">«%1$s» στη θάλασσα</string>
+    <string name="settings_cinema_protected">προστατευμένο βίντεο, πιθανότατα μαύρο στο καράβι</string>
+    <string name="settings_cinema_videos_ask">Επιτρέψτε στο myCar να τα δείχνει στο καράβι, στο «Σε αυτό το τηλέφωνο»</string>
+    <string name="settings_cinema_videos_limited">Στο καράβι φαίνονται μόνο τα βίντεο που επιλέξατε για το myCar</string>
+    <string name="settings_cinema_videos_allowed">Φαίνονται στο καράβι, στο «Σε αυτό το τηλέφωνο»</string>
+    <string name="settings_cinema_more_sites">Ιστότοποι για επιβίβαση</string>
+    <string name="settings_cinema_tv_footer">Λίστες IPTV σε μορφή M3U, από τον πάροχό σας, μια δημόσια λίστα ή έναν διακομιστή TV στο σπίτι: η καθεμία είναι ένα πλακίδιο στο Cinema με τα κανάλια της. Παίζουν με το πρόγραμμα αναπαραγωγής του ίδιου του τηλεφώνου· τα προστατευμένα κανάλια (DRM) και τα multicast μένουν στη στεριά.</string>
+    <string name="settings_cinema_tv_remove_text">Η διεύθυνσή της και τα κανάλια της αποβιβάζονται από το myCar. Για να ξαναεπιβιβαστεί, πρέπει να γράψετε ξανά τη διεύθυνση.</string>
+    <string name="settings_cinema_tv_loading">φορτώνουμε…</string>
+    <string name="settings_cinema_tv_add">Επιβίβαση της λίστας</string>
+
+    <string name="settings_phone_typing_close">Κλείσιμο του πληκτρολογίου του καραβιού</string>
+    <string name="settings_phone_typing_label">Πληκτρολόγηση για την οθόνη του καραβιού</string>
+    <string name="settings_phone_typing_search">Ξετρύπωμα στην οθόνη του καραβιού</string>
+
+    <string name="settings_audio_choice_title">Ήχος στο καράβι μέσω Bluetooth;</string>
+    <string name="settings_audio_choice_text">Το Android θεωρεί τη μουσική που στέλνεται μέσω του myCar κοινή χρήση της οθόνης σας, οπότε ρωτά σε κάθε ταξίδι. Μέσω Bluetooth δεν ρωτά ποτέ, αν το καράβι σας παίζει έτσι τη μουσική του τηλεφώνου. Μπορείτε να αλλάξετε ρότα αργότερα, στα Ξάρτια.</string>
+    <string name="settings_audio_choice_command">Ή κρατήστε τη ρότα του myCar και σταματήστε την ερώτηση για πάντα: συνδέστε το τηλέφωνο σε έναν υπολογιστή με ενεργό τον εντοπισμό σφαλμάτων USB και εκτελέστε αυτό μία φορά.</string>
+    <string name="settings_mic_blocked_title">Ο ήχος στο καράβι χρειάζεται την άδεια μικροφώνου</string>
+
+    <string name="about_no_wallet">Ούτε ίχνος από εφαρμογή πορτοφολιού Bitcoin. Αντιγράψτε τη διεύθυνση.</string>
+    <string name="about_give_once">Ένα δουβλόνι για το πλήρωμα</string>
+    <string name="about_bitcoin_title">Στηρίξτε το πλήρωμα με Bitcoin</string>
+    <string name="about_matrix_detail">Το πλήρωμα του Gearslip, του ναυπηγείου από όπου σάλπαρε το myCar</string>
+    <string name="about_voice_credits">Συντελεστές του παπαγάλου</string>
+
+    <string name="voice_model_live_title">Παπαγάλος: ζωντανές λέξεις</string>
+    <string name="voice_model_live_about">Ο παπαγάλος μετατρέπει την ομιλία σε κείμενο σε αυτό το τηλέφωνο, και τίποτα από όσα λέτε δεν φεύγει από αυτό – εκτός, με ρυθμισμένο το Home Assistant, από ό,τι δεν μπορεί να κάνει μόνο του το myCar, που στέλνεται στο Home Assistant σας ως κείμενο. Χρειάζεται δύο μοντέλα, περίπου %1$d MB μαζί, που λαμβάνονται μία φορά. Αυτό γράφει τις λέξεις σας όσο μιλάτε, στα αγγλικά· σε άλλη γλώσσα ακούει μόνο όταν σταματάτε.</string>
+    <string name="voice_model_final_title">Παπαγάλος: τελικές λέξεις</string>
+    <string name="voice_model_final_about">Όταν σταματάτε να μιλάτε, αυτό το μοντέλο ξαναδιαβάζει ολόκληρη τη φράση, από την πλώρη ως την πρύμνη. Πιάνει ονόματα και τοποθεσίες που χάνει το ζωντανό μοντέλο.</string>
+    <string name="voice_model_delete_title">Βύθιση του %1$s;</string>
+    <string name="voice_model_delete_in_use">Τα %1$d MB του φεύγουν από το τηλέφωνο. Είναι αυτό που χρησιμοποιείται: ο παπαγάλος του καραβιού δεν μπορεί να ακούσει μέχρι να ληφθεί ξανά.</string>
+    <string name="voice_model_delete_again">Τα %1$d MB του φεύγουν από το τηλέφωνο. Μπορείτε να το ξαναφορτώσετε από εδώ.</string>
+    <string name="voice_model_downloaded">Φορτωμένο. %1$s</string>
+    <string name="voice_model_downloading">Φορτώνουμε, %1$d%%</string>
+    <string name="voice_model_download">Φόρτωμα</string>
+    <string name="voice_model_parakeet_small_detail">Πιο ελαφρύ σκαρί και πιο γρήγορο, χάνει περισσότερα ονόματα. NVIDIA NeMo, CC BY 4.0</string>
+    <string name="voice_model_canary_detail">Πρόταση του καπετάνιου. Γρήγορο σαν τον άνεμο, και ακούει καλά ονόματα και τοποθεσίες. Αγγλικά, ισπανικά, γερμανικά και γαλλικά. NVIDIA NeMo, CC BY 4.0</string>
+    <string name="voice_model_parakeet_large_detail">Ακούει καλύτερα τα ονόματα, αλλά είναι πιο αργό και με τριπλάσιο εκτόπισμα. NVIDIA NeMo, CC BY 4.0</string>
+    <string name="voice_model_parakeet_multi_detail">Ιταλικά, πορτογαλικά, ισπανικά, γαλλικά, γερμανικά, ελληνικά, ρωσικά και αγγλικά, και άλλες 17 ευρωπαϊκές γλώσσες. Ίδιο εκτόπισμα και ίδια αργή πλεύση με το Parakeet μεγάλο. NVIDIA NeMo, CC BY 4.0</string>
+
+    <string name="voice_model_language_title">Παπαγάλος: %1$s</string>
+    <string name="voice_model_language_ready">Το myCar είναι στα %1$s, οπότε ο παπαγάλος του καραβιού ακούει και απαντά στα %1$s, με το %2$s.</string>
+    <string name="voice_model_language_phone">Το myCar είναι στα %1$s, οπότε ο παπαγάλος του καραβιού ακούει και απαντά στα %1$s, με την αναγνώριση φωνής του τηλεφώνου.</string>
+    <string name="voice_model_language_ready_try">Το myCar είναι στα %1$s, οπότε ο παπαγάλος του καραβιού ακούει και απαντά στα %1$s, με το %2$s. Δοκιμάστε «%3$s».</string>
+    <string name="voice_model_language_missing">Το myCar είναι στα %1$s. Με το %2$s (%3$d MB) ο παπαγάλος του καραβιού ακούει και απαντά στα %1$s· μέχρι τότε καταλαβαίνει μόνο αγγλικά.</string>
+    <string name="voice_model_language_tts">Απαντά με τη φωνή μετατροπής κειμένου σε ομιλία του ίδιου του τηλεφώνου για τα %1$s. Αν κρώζει στραβά, επιλέξτε ή κατεβάστε αυτή τη φωνή στις ρυθμίσεις μετατροπής κειμένου σε ομιλία του Android.</string>
+    <string name="voice_model_language_download">Φόρτωμα του %1$s</string>
+
+    <string name="speech_download_channel">Φόρτωμα φωνής</string>
+    <string name="speech_download_title">Φορτώνουμε τη φωνή</string>
+
+    <string name="stats_intro">Αν το ενεργοποιήσετε, το myCar στέλνει μια σύντομη σημείωση όταν το ανοίγετε και μετά από κάθε διαδρομή. %1$s Οι σημειώσεις δείχνουν ποια αυτοκίνητα λειτουργούν και πού πέφτουν σε ξέρα τα υπόλοιπα.</string>
+    <string name="stats_send">Αποστολή σημειώσεων πλεύσης</string>
+    <string name="stats_show_note">Η σημείωση στο φως</string>
+    <string name="stats_hide_note">Η σημείωση στο αμπάρι</string>
+    <string name="stats_worked_title_year">Το myCar όργωσε τις θάλασσες με το %2$s σας του %1$s</string>
+    <string name="stats_worked_title_named">Το myCar όργωσε τις θάλασσες με το %1$s σας</string>
+    <string name="stats_worked_title_car">Το myCar όργωσε τις θάλασσες με το καράβι σας</string>
+    <string name="stats_worked_text">Να το μοιραστείτε, για να ξέρει ο επόμενος καπετάνιος ότι λειτουργεί; Χωρίς όνομα, λογαριασμό ή τοποθεσία.</string>
+    <string name="stats_worked_share">Μοιρασιά</string>
+
+    <string name="settings_group_general">Κατάστρωμα</string>
+    <string name="settings_group_general_detail">Γλώσσα, θέμα, νέα πανιά</string>
+    <string name="settings_group_connection_detail">Ασύρματα, ήχος καραβιού, πιστοποιητικό</string>
+    <string name="settings_group_voice">Παπαγάλος</string>
+    <string name="settings_group_voice_detail">Ο παπαγάλος και τα μοντέλα ομιλίας του</string>
+    <string name="settings_group_plancia_detail">Το Home Assistant στο καράβι</string>
+    <string name="settings_group_xonos_detail">Το Music Assistant στο καράβι</string>
+    <string name="settings_group_help_detail">Ρεσάλτο, ημερολόγιο πλοίου</string>
+    <string name="settings_group_about_detail">Έκδοση, άδειες, στήριξη του πληρώματος</string>
+    <string name="settings_group_car">Οθόνη καραβιού</string>
+    <string name="settings_group_car_detail">Λιμάνι, καμπίνες, εμφάνιση, ταπετσαρία, προειδοποιήσεις</string>
+    <string name="settings_car_pages_header">Οι καμπίνες σας δεξιά και αριστερά από τον χάρτη, στο Λιμάνι του καραβιού. Αλλάξτε τες εδώ ή στο καράβι, με το μολύβι δίπλα στις τελείες.</string>
+    <string name="settings_car_pages_ready_text">Οι καμπίνες σας πάνε στη θάλασσα και στη θέση τους μπαίνουν οι έτοιμες: ο καιρός και η ατζέντα αριστερά από τον χάρτη και, δεξιά του, το Plancia δίπλα στον περιηγητή, αν το Plancia έχει ρυθμιστεί ή εγκατασταθεί.</string>
+    <string name="settings_car_fit_offline">Κάντε ρεσάλτο στο καράβι για να προσαρμόσετε την οθόνη του: το καράβι δείχνει κάθε αλλαγή καθώς την κάνετε.</string>
+    <string name="settings_grid_apps">Εφαρμογές στον στόλο του καραβιού</string>
+    <string name="settings_grid_apps_all">Όλες στο φως</string>
+    <plurals name="settings_grid_apps_hidden">
+        <item quantity="one">%d λαθρεπιβάτης</item>
+        <item quantity="other">%d λαθρεπιβάτες</item>
+    </plurals>
+    <string name="settings_grid_apps_note">Καταργήστε την επιλογή μιας εφαρμογής για να μη φαίνεται στον στόλο του καραβιού. Στο καράβι: κρατήστε πατημένη μια εφαρμογή και επιλέξτε «Στο αμπάρι, εκτός στόλου». Μια εφαρμογή δεμένη στον μόλο μένει εκεί.</string>
+    <string name="theme_footer">Η εμφάνιση του myCar στο τηλέφωνο. Η οθόνη του καραβιού έχει τη δική της, στα Ξάρτια του καραβιού.</string>
+    <string name="theme_black">Μαύρο σαν πίσσα (AMOLED)</string>
+    <string name="settings_audio_per_car">Με γαντζωμένο καράβι, η επιλογή μένει για εκείνο το καράβι, και την αλλάζει και το κουμπί ήχου στο γραμμόφωνο. Χωρίς γαντζωμένο καράβι, ισχύει για όλα τα καράβια.</string>
+    <string name="settings_group_music">Γραμμόφωνο</string>
+    <string name="settings_group_music_detail">Xonos, Spotify και άλλοι σκοποί στο καράβι</string>
+    <string name="music_in_the_car">Στο καράβι</string>
+    <string name="music_xonos_on">Το Music Assistant στην οθόνη του καραβιού, ως μία από τις εφαρμογές μουσικής του</string>
+    <string name="music_xonos_off">Ανενεργό: το Xonos δεν εμφανίζεται στην οθόνη του καραβιού, ούτε η εφαρμογή Xonos</string>
+    <string name="music_service_on">Στον στόλο του καραβιού· παίζει μέσω του myCar</string>
+    <string name="music_service_off">Ανενεργό: δεν εμφανίζεται στην οθόνη του καραβιού</string>
+    <string name="music_sign_in">Μπαρκάρισμα από το τηλέφωνο</string>
+    <string name="music_sign_in_detail">Με το πληκτρολόγιο του τηλεφώνου: μένετε μπαρκαρισμένοι και στο καράβι</string>
+    <string name="music_sign_in_title">%1$s: μπαρκάρισμα</string>
+    <string name="music_sign_out">Ξεμπαρκάρισμα</string>
+    <string name="music_sign_out_detail">Από αυτή την υπηρεσία στο myCar, στο τηλέφωνο και στο καράβι</string>
+    <string name="music_hide_app">Στο αμπάρι η εφαρμογή %1$s του τηλεφώνου</string>
+    <string name="music_hide_app_detail">Στον στόλο του καραβιού μένει μόνο το %1$s μέσα στο myCar: η εφαρμογή %1$s αυτού του τηλεφώνου δεν εμφανίζεται, έτσι δεν υπάρχουν δύο.</string>
+    <string name="music_sign_out_title">Ξεμπαρκάρισμα από το %1$s;</string>
+    <string name="music_sign_out_text">Το myCar ξεχνά το μπαρκάρισμα στο %1$s και ό,τι κράτησαν οι σελίδες του. Ο λογαριασμός σας μένει ως έχει.</string>
+    <string name="music_add">Επιβίβαση υπηρεσίας</string>
+    <string name="music_add_footer">Άλλες υπηρεσίες μουσικής, η καθεμία με το δικό της διαδικτυακό γραμμόφωνο μέσα στο myCar: ο ήχος τους φτάνει στο καράβι μέσω του myCar, όπως του Cinema.</string>
+    <string name="music_add_note">Όποια επιλέξετε εμφανίζεται εδώ και στον στόλο του καραβιού.</string>
+    <string name="music_needs_google">Η Google μπορεί να μην επιτρέψει το μπαρκάρισμα μέσα σε εφαρμογή: τότε το YouTube Music παίζει χωρίς μπαρκάρισμα.</string>
+</resources>
