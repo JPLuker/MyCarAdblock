@@ -64,7 +64,7 @@
         <item quantity="other">Home Assistant %1$s，舱里有 %2$d 个实体</item>
     </plurals>
     <string name="settings_ask_ha">在船上询问 Home Assistant</string>
-    <string name="settings_ask_ha_detail">myCar 的随船鹦鹉自己做不到的事，会交给 Home Assistant 中设置的语音助手（在 Home Assistant 的“设置 &gt; 语音助手”中）：Claude、Gemini、ChatGPT、家中运行的模型，或 Home Assistant 自带的助手，它还能控制家里的设备。手机锁定时，由它代替手机助手回答。只有这些话会以文字形式发送到你的 Home Assistant。</string>
+    <string name="settings_ask_ha_detail">myCar 的随船鹦鹉自己做不到的事，会交给 Home Assistant 中设置的语音助手（在 Home Assistant 的“设置 &gt; 语音助手”中）：Claude、Gemini、ChatGPT、家中运行的模型，或 Home Assistant 自带的助手，它还能控制家里的设备。手机锁定时，由它代替手机的鹦鹉回答。只有这些话会以文字形式发送到你的 Home Assistant。</string>
 
     <string name="settings_xonos_footer">把你的 Music Assistant 音乐库搬上船，和船上的船歌应用排在一起。船上音频设为“通过 myCar”时，它的船歌直接传到船上，收听时 Android 也不会请求共享音频。</string>
     <string name="settings_xonos_use_app">征用 Xonos 应用的账户</string>
@@ -90,9 +90,9 @@
     <string name="settings_cinema_remove_site_text">它会被扔出 Cinema。如需捞回来，要重新输入它的地址。</string>
     <string name="settings_cinema_remove">把“%1$s”扔下船</string>
     <string name="settings_cinema_protected">受保护的视频，在船上可能是黑屏</string>
-    <string name="settings_cinema_videos_ask">允许 myCar 在船上的“本机视频”中显示它们</string>
+    <string name="settings_cinema_videos_ask">允许 myCar 在船上的“本机货舱视频”中显示它们</string>
     <string name="settings_cinema_videos_limited">船上只显示为 myCar 挑出的视频</string>
-    <string name="settings_cinema_videos_allowed">它们会显示在船上的“本机视频”中</string>
+    <string name="settings_cinema_videos_allowed">它们会显示在船上的“本机货舱视频”中</string>
     <string name="settings_cinema_tv_footer">M3U 格式的 IPTV 列表，可以来自你的服务商、公开列表或家中的电视服务器：每个列表都是 Cinema 中的一个图块，里面是它的频道。频道用手机自带的播放器播放；受保护的频道（DRM）和组播频道会被留在岸上。</string>
     <string name="settings_cinema_tv_remove_text">它的地址和频道会被扔下 myCar。如需捞回来，要重新输入地址。</string>
     <string name="settings_cinema_tv_loading">正在搬上船…</string>
@@ -179,7 +179,7 @@
     <string name="music_service_on">显示在船队中；通过 myCar 开唱</string>
     <string name="music_service_off">已关闭：不会出现在船上屏幕上</string>
     <string name="music_sign_in">在手机上入伙</string>
-    <string name="music_sign_in_detail">用手机键盘入伙：船上也会保持已入伙</string>
+    <string name="music_sign_in_detail">用手机键盘入伙：船上也会保持入伙状态</string>
     <string name="music_sign_in_title">%1$s：入伙</string>
     <string name="music_sign_out">退伙</string>
     <string name="music_sign_out_detail">在 myCar 中从此服务退伙，手机和船上都会退出</string>

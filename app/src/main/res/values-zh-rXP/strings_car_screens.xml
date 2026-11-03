@@ -15,7 +15,6 @@
     <string name="car_settings_car_audio_note">“通过 myCar”会像 Android Auto 一样，经 myCar 自己的连接（数据线或 WLAN）发送手机的声音。每次航程 Android 都会请求共享屏幕，少数应用会阻止这样做。蓝牙会像手机平时那样播放，Android 从不询问，但有些船通过蓝牙只接收通话。“自动”会在船能通过蓝牙播放手机船歌时使用蓝牙，否则使用 myCar 的连接。</string>
     <string name="car_settings_bluetooth_warning">蓝牙未连接时敲钟提醒</string>
     <string name="car_settings_location_warning">位置信息关闭时敲钟提醒</string>
-    <string name="car_settings_spoken_directions">语音播报航向</string>
     <string name="car_settings_spoken_directions_note">myCar 会通过船上扬声器播报每个转弯，播报时船歌音量会降低。如果你的海图应用自己的语音已经在船上播放，请关闭此项。</string>
     <string name="car_settings_system_speech">鹦鹉用手机的语音识别</string>
     <string name="car_settings_system_speech_note">鹦鹉改用手机自带的语音服务来识别语音，而不是 myCar 自己的。大多数手机上这是 Google 的服务，可能会把你的语音发送给 Google。GrapheneOS 没有这项服务，所以 myCar 会继续使用自己的。</string>

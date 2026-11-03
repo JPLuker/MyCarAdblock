@@ -108,11 +108,10 @@
     <string name="intro_location_body">手机锁屏放在口袋里时，海图也能获得你的位置：车辆一连接，myCar 就会获取位置。如果 Android 仍然拒绝，车辆会在停车时告诉你。</string>
     <string name="intro_phone_title">在手机上掌舵。</string>
     <string name="intro_phone_body">船上屏幕的所有选项也都在手机上：舵轮 > 船上屏幕。修改任何一项，船上立即同步，航行途中也一样。海图旁的甲板和从船队中藏起的应用也是如此。</string>
-    <string name="intro_graphene_title">舱门重新封好。</string>
     <string name="intro_apps_title">好船友。</string>
     <string name="intro_voice_title">告诉鹦鹉就行。</string>
     <string name="intro_voice_body">点按麦克风，或按下方向盘上的语音键，然后说话。手机会自己把语音转成文字，你说的话会留在手机上，除非你是在问自己的 Home Assistant。在船上说“%1$s”可查看完整列表。</string>
-    <string name="intro_voice_body_language">点按麦克风，或按下方向盘上的语音键，然后说话。手机会自己把语音转成文字，你说的话会留在手机上，除非你是在问自己的 Home Assistant。它会用 myCar 的语言（%1$s）听你说话并回答。在船上说“%2$s”可查看完整列表。</string>
+    <string name="intro_voice_body_language">点按麦克风，或按下方向盘上的语音键，然后说话。手机会自己把语音转成文字，你说的话会留在手机上，除非你是在问自己的 Home Assistant。它会用 myCar 的船上语言（%1$s）听你说话并回答。在船上说“%2$s”可查看完整列表。</string>
     <string name="intro_voice_downloading">正在搬上船，%1$d%%</string>
     <string name="intro_voice_failed">下载搁浅，点按重试</string>
 
