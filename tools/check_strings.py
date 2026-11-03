@@ -92,11 +92,11 @@ for lang in LANGS:
         need = NEEDED.get(lang, {"one", "other"})
         if not need <= set(forms):
             print(lang, name, "forms", sorted(forms), "need", sorted(need)); problems += 1
-# Pirate speak (AppLanguage.PIRATE): values-b+<language>+pirate, any part of the language's texts
+# Pirate speak (AppLanguage.PIRATE): values-<language>-rXP, any part of the language's texts
 # (the rest comes from the language's own folder), with the same placeholders and plural forms.
 pirates = 0
 for lang in ["en"] + LANGS:
-    folder = os.path.join(RES, f"values-b+{lang}+pirate")
+    folder = os.path.join(RES, f"values-{lang}-rXP")
     if not os.path.isdir(folder):
         continue
     for path in sorted(glob.glob(os.path.join(folder, "strings*.xml"))):

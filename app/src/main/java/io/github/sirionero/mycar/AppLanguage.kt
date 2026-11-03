@@ -43,24 +43,31 @@ enum class AppLanguage(
 
         /**
          * Pirate speak (the user's wish: every text in pirate terms, the emblem of free choice) is a way
-         * of speaking each language, not a language of its own: the BCP 47 variant "pirate", whose
-         * words are in res/values-b+<language>+pirate. A text not written there yet comes from the
-         * language's own folder, as Android falls back to it.
+         * of speaking each language, not a language of its own: the language with the private-use
+         * region XP, its words in res/values-<language>-rXP. A text not written there yet comes from the
+         * language's own folder, as Android falls back to it. Not a BCP 47 variant ("it-pirate"): aapt2
+         * can't build a folder with a variant and no region ("invalid locale 'it-'").
          */
-        const val PIRATE = "pirate"
+        const val PIRATE = "XP"
 
         /** Pirate speak is on (see [PIRATE]). */
         fun pirate(context: Context): Boolean {
             if (Build.VERSION.SDK_INT >= 33) {
                 val locales = context.getSystemService(LocaleManager::class.java)?.applicationLocales
-                return locales != null && !locales.isEmpty && locales[0].variant.equals(PIRATE, ignoreCase = true)
+                return locales != null && !locales.isEmpty && locales[0].country == PIRATE
             }
             return AppSettings.getString(context, KEY_PIRATE, "") == "on"
         }
 
         /** [language], spoken the pirate way if [pirate]. */
         fun localeFor(language: AppLanguage, pirate: Boolean): Locale =
-            if (!pirate) language.locale else Locale.Builder().setLocale(language.locale).setVariant(PIRATE).build()
+            if (!pirate) language.locale else Locale.Builder().setLanguage(language.locale.language).setRegion(PIRATE).build()
+
+        /**
+         * The phone's country, for what goes by it (units, how phone numbers are written, Portugal's or
+         * Brazil's Portuguese): the language's own region, but not pirate speak's, which is no country.
+         */
+        fun country(): String = Locale.getDefault().country.takeIf { it != PIRATE } ?: phoneLocale().country
 
         /** The one chosen in Settings; null for the phone's. */
         fun chosen(context: Context): AppLanguage? {
@@ -169,7 +176,7 @@ enum class AppLanguage(
          * asking the system, as [Words] does it for every text), before it the one chosen here.
          */
         private fun wanted(context: Context): Locale? {
-            // From Android 13 the default locale is the one Android gives myCar, pirate variant and all.
+            // From Android 13 the default locale is the one Android gives myCar, pirate speak and all.
             if (Build.VERSION.SDK_INT >= 33) return Locale.getDefault().takeIf { of(it) != null }
             val language = chosen(context) ?: if (pirate(context)) current(context) else return null
             return localeFor(language, pirate(context))
@@ -178,7 +185,7 @@ enum class AppLanguage(
         /** [context]'s words are already in [locale]: its language, and pirate speak or not. */
         private fun speaks(context: Context, locale: Locale): Boolean {
             val own = context.resources.configuration.locales[0] ?: return false
-            return own.language == locale.language && own.variant.equals(locale.variant, ignoreCase = true)
+            return own.language == locale.language && (own.country == PIRATE) == (locale.country == PIRATE)
         }
 
         private fun inLanguage(context: Context, locale: Locale): Context =

@@ -38,7 +38,6 @@ import io.github.sirionero.mycar.R
 import android.telephony.PhoneNumberUtils
 import io.github.sirionero.mycar.call.CallUiState
 import io.github.sirionero.mycar.call.Caller
-import java.util.Locale
 import io.github.sirionero.mycar.car.design.MyCarPalette
 import io.github.sirionero.mycar.call.CarCalls
 
@@ -121,7 +120,7 @@ private fun IncomingCall(s: CallUiState.Ringing, onAnswer: () -> Unit, onDecline
 
 /** Who's calling: the name, or the number as the phone writes it ("333 123 4567", not "3331234567"). */
 private fun Caller.shown(): String =
-    name ?: number.takeIf { it.isNotBlank() }?.let { PhoneNumberUtils.formatNumber(it, Locale.getDefault().country) ?: it } ?: label
+    name ?: number.takeIf { it.isNotBlank() }?.let { PhoneNumberUtils.formatNumber(it, io.github.sirionero.mycar.AppLanguage.country()) ?: it } ?: label
 
 @Composable
 private fun CallButton(icon: ImageVector, label: String, color: Color, enabled: Boolean, onClick: () -> Unit) {

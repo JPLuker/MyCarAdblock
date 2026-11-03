@@ -1,6 +1,5 @@
 package io.github.sirionero.mycar.car
 
-import java.util.Locale
 
 /**
  * The assistant in Portuguese (see [AssistantLanguage]), for Brazil and Portugal alike: it hears
@@ -177,7 +176,7 @@ internal object PortuguesePhrases : Phrasebook() {
     private fun at(time: String) = if (oneOClock(time)) "da ${time.removePrefix("0")}" else "das $time"
 
     /** Portugal's words or Brazil's, by the phone's country. */
-    private fun pt(portugal: String, brazil: String) = if (Locale.getDefault().country == "PT") portugal else brazil
+    private fun pt(portugal: String, brazil: String) = if (io.github.sirionero.mycar.AppLanguage.country() == "PT") portugal else brazil
 
     private val screen get() = pt("ecrã", "tela")
     private val contacts get() = pt("Contactos", "Contatos")
