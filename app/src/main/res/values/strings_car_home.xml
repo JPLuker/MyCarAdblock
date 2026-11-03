@@ -296,6 +296,8 @@
     <string name="car_wallpaper_graphite">Graphite</string>
     <string name="car_wallpaper_lava">Lava</string>
     <string name="car_wallpaper_polar">Polar</string>
+    <!-- myCar's own moving wallpaper: the waves and a pirate ship that rides out every storm. "Rebel" as a name -->
+    <string name="car_wallpaper_mycar">myCar · Rebel</string>
     <string name="car_wallpaper_waves">Waves</string>
     <string name="car_wallpaper_fireflies">Fireflies</string>
 
