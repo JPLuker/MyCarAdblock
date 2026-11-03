@@ -44,7 +44,7 @@ object AssistantCommands {
         playSearchCommand(context, navigator, heard)?.let { return it }
         // After "play X" ("play ETA" is a song), before the music's words: "when do I get to the
         // next exit" isn't "next". Not for a person: "call Eta".
-        if (ETA.containsMatchIn(heard) && CALL_TRIGGERS.none { heard.startsWith(it) }) return arrival()
+        if (WholePhrases.arrival(heard) && CALL_TRIGGERS.none { heard.startsWith(it) }) return arrival()
         mediaCommand(heard)?.let { return it }
         navCommand(navigator, heard)?.let { return it }
         infoCommand(heard)?.let { return it }
@@ -372,7 +372,8 @@ object AssistantCommands {
             BuiltInApps.Exit.open(navigator)
             "Back to the car's screen."
         }
-        "go home" in heard || heard == "home" || heard == "home screen" || "go to the home screen" in heard -> {
+        // Whole phrases: "turn on the heating when I go home" is for Home Assistant (WholePhrases).
+        WholePhrases.home(heard) -> {
             navigator.home()
             "Heading home."
         }
@@ -380,7 +381,7 @@ object AssistantCommands {
             navigator.apps()
             "Here are your apps."
         }
-        "settings" in heard -> {
+        WholePhrases.settings(heard) -> {
             navigator.settings()
             "Opening settings."
         }
@@ -395,11 +396,11 @@ object AssistantCommands {
         else -> null
     }
 
+    // Whole phrases: "what time is sunset", "how hot is the living room" are for Home Assistant (WholePhrases).
     private fun infoCommand(heard: String): String? = when {
-        "what time" in heard || "what's the time" in heard || heard == "time" || "the time" in heard ->
+        WholePhrases.time(heard) ->
             "It's ${DateFormat.getTimeInstance(DateFormat.SHORT).format(Date())}."
-        "weather" in heard || "going to rain" in heard || "gonna rain" in heard || "how hot" in heard ||
-            "how cold" in heard || "temperature outside" in heard -> {
+        WholePhrases.weather(heard) -> {
             val data = (Weather.state.value as? WeatherState.Ready)?.data
             if (data != null) "${data.temp}${data.tempUnit} and ${Weather.describe(data.code)} in ${data.place}."
             else "I don't have the weather yet."
@@ -570,12 +571,6 @@ object AssistantCommands {
     private val ANOTHER = Regex("^(?:(?:play me|play|put on|listen to) )?(?:something else|another (?:song|track|one)|a different (?:song|track))$")
 
     private val PLAY_TRIGGERS = listOf("play me ", "play ", "put on ", "listen to ", "i want to hear ", "shuffle ")
-
-    /** "When do I arrive", "what time will we get there", "how much longer", "ETA". */
-    private val ETA = Regex(
-        "\\b(?:eta|arrival time|time of arrival|how much longer|how long (?:until|till|to|left|is left|before)" +
-            "|(?:when|what time) (?:do|will|are|am) (?:i|we)(?: going to)? (?:arrive|get there|be there|get to|reach))\\b",
-    )
 
     /** "Read my messages", "play my new texts", "read me the last message". */
     private val READ_MESSAGES = Regex("^(?:(?:read|check)(?: me)?(?: my| the)?|play(?: me)? my)((?: new| last| latest| unread)?) (?:messages?|texts?)$")
