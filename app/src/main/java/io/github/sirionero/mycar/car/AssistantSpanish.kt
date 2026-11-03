@@ -110,10 +110,18 @@ internal object SpanishPhrases : Phrasebook() {
         Rule(
             "(?:siguiente|la siguiente|próxima|proxima|siguiente canción|siguiente cancion|próxima canción|proxima cancion|salta|" +
                 "sáltala|saltala|pasa|cambia de canción|cambia de cancion|otra canción|otra cancion|otra|pon otra|pon otra canción|" +
-                "pon otra cancion|pon otra cosa|otra cosa)",
+                "pon otra cancion|pon otra cosa|otra cosa|" +
+                // "Ve a la siguiente canción", "pasa a la próxima": the next song, before "ve…" is taken for a place.
+                "(?:(?:ve|vete|ir|vamos|pasa|salta|cambia|pon|ponme|reproduce|toca) )?(?:(?:a la|al|a|la|el) )?" +
+                "(?:(?:siguiente|próxima|proxima|próximo|proximo)(?: (?:canción|cancion|pista|tema))?|(?:canción|cancion|pista|tema) siguiente))",
             "next",
         ),
-        Rule("(?:anterior|la anterior|canción anterior|cancion anterior|la de antes|vuelve a la anterior)", "previous"),
+        Rule(
+            "(?:anterior|la anterior|canción anterior|cancion anterior|la de antes|vuelve a la anterior|" +
+                "(?:(?:ve|vete|ir|vamos|vuelve|volver|regresa|pasa|salta|pon|ponme|reproduce|toca) )?(?:(?:a la|al|a|la|el) )?" +
+                "(?:(?:canción|cancion|pista|tema) )?anterior)",
+            "previous",
+        ),
         Rule(
             "(?:repite|repítela|repitela|pon otra vez|vuelve a poner)(?: esta| la)?(?: canción| cancion)?(?: otra vez| de nuevo| desde el principio)?",
             "play it again",

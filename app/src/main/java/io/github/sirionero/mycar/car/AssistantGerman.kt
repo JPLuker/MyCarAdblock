@@ -97,10 +97,21 @@ internal object GermanPhrases : Phrasebook() {
         Rule("(?:weiter|fortsetzen|weiterspielen|spiel weiter|musik an|musik|play|abspielen|wiedergabe)", "continue"),
         Rule(
             "(?:nächster|naechster|nächstes|naechstes|nächste|naechste|nächster titel|nächstes lied|nächster song|überspringen|" +
-                "ueberspringen|skip|anderes lied|ein anderes lied|was anderes|etwas anderes)",
+                "ueberspringen|skip|anderes lied|ein anderes lied|was anderes|etwas anderes|" +
+                // "Geh zum nächsten Lied": the next song, before "geh…" is taken for a place.
+                "(?:(?:geh|gehe|wechsel|wechsle|spring|springe|spiel|spiele|weiter) )?(?:(?:zum|zur|zu dem|auf den|auf das|das|den|der|die) )?" +
+                "(?:nächsten|naechsten|nächste|naechste|nächster|naechster|nächstes|naechstes)(?: (?:lied|titel|song|track|stück|stueck))?)",
             "next",
         ),
-        Rule("(?:vorheriger|vorheriges|vorherige|vorheriger titel|vorheriges lied|zurück zum letzten lied|letztes lied|das lied davor)", "previous"),
+        Rule(
+            "(?:vorheriger|vorheriges|vorherige|vorheriger titel|vorheriges lied|zurück zum letzten lied|letztes lied|das lied davor|" +
+                "(?:(?:geh|gehe|wechsel|wechsle|spring|springe|spiel|spiele) )?(?:zurück |zurueck )?" +
+                "(?:(?:zum|zur|zu dem|auf den|auf das|das|den|der|die) )?" +
+                "(?:(?:vorherigen|vorherige|vorheriger|vorheriges)(?: (?:lied|titel|song|track|stück|stueck))?|" +
+                "(?:letzten|letzte|letzter|letztes) (?:lied|titel|song|track|stück|stueck))|" +
+                "(?:(?:geh|gehe|spring|springe) )?(?:ein lied|einen titel|einen song) (?:zurück|zurueck))",
+            "previous",
+        ),
         Rule("(?:nochmal|noch mal|wiederholen|wiederhole)(?: das lied| den titel| diesen song)?(?: von vorne)?", "play it again"),
         Rule(
             "(?:was läuft|was laeuft|was läuft gerade|was ist das für ein lied|was für ein lied ist das|welches lied ist das|" +

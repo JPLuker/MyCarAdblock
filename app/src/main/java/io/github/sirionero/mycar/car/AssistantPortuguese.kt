@@ -135,10 +135,19 @@ internal object PortuguesePhrases : Phrasebook() {
         ),
         Rule(
             "(?:próxima|proxima|próximo|proximo|próxima música|proxima musica|próxima faixa|seguinte|pula|pule|pular|passa|passe|" +
-                "avança|avance|outra|outra música|outra musica|toca outra|toque outra|muda de música|muda a música)",
+                "avança|avance|outra|outra música|outra musica|toca outra|toque outra|muda de música|muda a música|" +
+                // "Vai para a próxima música", "passa pra próxima": the next song, before "vai…" is taken for a place.
+                "(?:(?:vá|va|vai|vamos|ir|passa|passe|pula|pule|pular|avança|avance|toca|toque|coloca|coloque|põe|poe|ponha|bota|bote) )?" +
+                "(?:(?:para a|para o|pra|pro|para|à|ao|a|o) )?" +
+                "(?:(?:próxima|proxima|próximo|proximo)(?: (?:música|musica|faixa|canção|cancao))?|(?:música|musica|faixa|canção|cancao) seguinte|seguinte))",
             "next",
         ),
-        Rule("(?:anterior|música anterior|musica anterior|faixa anterior|volta uma música|volte uma música|a de antes)", "previous"),
+        Rule(
+            "(?:anterior|música anterior|musica anterior|faixa anterior|volta uma música|volte uma música|a de antes|" +
+                "(?:(?:vá|va|vai|vamos|ir|volta|volte|voltar|passa|passe|toca|toque|coloca|coloque|põe|poe|ponha|bota|bote) )?" +
+                "(?:(?:para a|para o|pra|pro|para|à|ao|a|o) )?(?:(?:música|musica|faixa|canção|cancao) )?anterior)",
+            "previous",
+        ),
         Rule(
             "(?:repete|repita|repetir|toca de novo|toque de novo|toca outra vez|toque outra vez)(?: essa| esta| a)?(?: música| musica| faixa)?" +
                 "(?: do começo| do comeco| do início| do inicio)?",
