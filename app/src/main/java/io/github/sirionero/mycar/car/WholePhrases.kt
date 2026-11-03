@@ -34,7 +34,7 @@ internal object WholePhrases {
     fun settings(heard: String) = SETTINGS.matches(heard)
 
     private val TIME = Regex(
-        "(?:what(?:'s|s| is)? (?:the )?(?:current )?time(?: is it)?|(?:tell me|give me|do you know|you know|say|check) (?:the )?(?:current )?time" +
+        "(?:what(?:'s|s| is)? (?:the )?(?:current )?time(?: is it)?|(?:tell me|give me|do you know|you know|say|check|do you have|have you got) (?:the )?(?:current )?time" +
             "|(?:tell me|do you know|you know) what time it is|(?:the )?(?:current )?time|time check)",
     )
 
@@ -48,10 +48,10 @@ internal object WholePhrases {
             "|(?:when|what time) (?:do|will|are|am) (?:i|we)(?: going to)? (?:arrive|get there|be there|get to|reach))\\b",
     )
 
-    /** "How long until" and the like: by itself, or until "we get there", "we arrive", "arrival", "go". */
+    /** "How long until" and the like: by itself, or until "we get there", "we arrive", "arrival", "go", "my destination", "home". */
     private val HOW_LONG = Regex(
         "\\bhow long (?:until|till|to|before)" +
-            "(?: (?:i|we) (?:get|arrive|reach|are)\\b.*| (?:i'm|we're) there| go| arrival| (?:the )?destination)?$",
+            "(?: (?:i|we) (?:get|arrive|reach|are)\\b.*| (?:i'm|we're) (?:there|home)| go| arrival| (?:my |the )?destination| home)?$",
     )
 
     private val HOME = setOf(
@@ -60,6 +60,6 @@ internal object WholePhrases {
     )
 
     private val SETTINGS = Regex(
-        "(?:(?:open|go to|show|show me|bring up|pull up|switch to) )?(?:the |my )?(?:(?:mycar|mycar's|car|app) )?settings(?: screen| page| menu)?",
+        "(?:(?:open|go to|show|show me|bring up|pull up|switch to|change) )?(?:the |my )?(?:(?:mycar|mycar's|car|app) )?settings(?: screen| page| menu)?",
     )
 }

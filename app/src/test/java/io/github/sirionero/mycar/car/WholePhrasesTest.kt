@@ -38,7 +38,7 @@ class WholePhrasesTest {
         "time",
         "what time is it", "what's the time", "what is the time", "whats the time", "what time", "time", "the time",
         "tell me the time", "do you know the time", "do you know what time it is", "tell me what time it is",
-        "what's the current time", "current time", "check the time",
+        "what's the current time", "current time", "check the time", "do you have the time", "have you got the time",
     )
 
     @Test fun theWeather() = only(
@@ -53,6 +53,8 @@ class WholePhrasesTest {
         "when do i arrive", "when will we get there", "what time do we arrive", "when do we get to the hotel", "eta", "what's my eta",
         "arrival time", "how much longer", "how long left", "how long is left", "how long until we get there", "how long till we arrive",
         "how long before we get home", "how long until we're there", "how long to go", "how long until arrival", "how long until",
+        "how long to my destination", "how long until the destination", "how long until home", "how long to home",
+        "how long until we're home",
     )
 
     @Test fun home() = only("home", "go home", "home", "home screen", "go to the home screen", "back to the home screen")
@@ -60,7 +62,7 @@ class WholePhrasesTest {
     @Test fun settings() = only(
         "settings",
         "settings", "open settings", "go to settings", "open the settings", "show me the settings", "open my car settings",
-        "open mycar settings", "car settings", "settings menu",
+        "open mycar settings", "car settings", "settings menu", "change settings", "change the settings",
     )
 
     /** For Home Assistant: they only have a word of myCar's in them. */
