@@ -151,13 +151,20 @@ fun CarUi() {
     // holds the car's screen up for a moment.
     val homeComplete = io.github.sirionero.mycar.home.HomeAssistant.config.collectAsState().value.isComplete
     val planciaApp = io.github.sirionero.mycar.home.HomeAssistant.appTakesOver.collectAsState().value
-    val homeSetUp = homeComplete && !planciaApp
+    // Plancia's page goes (the app takes its place, the account is removed, light turns to dark) a
+    // frame after a tap's focus has left it: taken out with the focus in it, Compose crashed (see
+    // LeaveWithoutFocus.kt). Without a focus in the car's screen, at once as before.
+    val carView = LocalView.current
+    val planciaWanted = afterFocusLeaves(Pair(homeComplete && !planciaApp, dark), holds = true) { carView.dropInteropFocus() }
+    val homeSetUp = planciaWanted.first
     var settled by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         delay(PLANCIA_AFTER_MS)
         settled = true
     }
-    val plancia = remember(homeSetUp && settled, dark) { if (homeSetUp && settled) PlanciaWeb(carContext, dark) else null }
+    val plancia = remember(homeSetUp && settled, planciaWanted.second) {
+        if (homeSetUp && settled) PlanciaWeb(carContext, planciaWanted.second) else null
+    }
     DisposableEffect(plancia) { onDispose { plancia?.destroy() } }
     // The music services' web players: a page for each one opened this drive, kept until it ends,
     // made only when wanted (see WebMusicPage).
