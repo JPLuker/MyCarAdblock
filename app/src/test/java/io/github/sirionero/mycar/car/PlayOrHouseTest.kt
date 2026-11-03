@@ -11,6 +11,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -102,6 +103,17 @@ class PlayOrHouseTest {
         check(PlayAsked.PAUSE, EN, "Put on pause.")
         // Another app's name is not the music playing: the house's player, for Home Assistant.
         assertEquals(PlayAsked.HOUSE, playAsked("in pausa spotify", "Metrolist"))
+    }
+
+    @Test fun aSharedWordByItselfMayBeASong() {
+        for (q in listOf("la luce", "le luci", "la tv", "the lights", "the light", "la luz", "la lumière", "a luz", "das licht", "la sveglia")) {
+            assertEquals(q, PlayAsked.HOUSE, playAsked(q))
+            assertTrue(q, mayBeASong(q))
+        }
+        for (q in listOf("il riscaldamento", "la sveglia alle 7", "la luce al 50%", "the heating", "il riscaldamento a 21 gradi",
+            "la tv su rai 1", "luce", "the lights on", "in pausa la tv")) {
+            assertFalse(q, mayBeASong(q))
+        }
     }
 
     @Test fun plainQueries() {

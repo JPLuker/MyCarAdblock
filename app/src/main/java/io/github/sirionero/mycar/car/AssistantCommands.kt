@@ -200,6 +200,18 @@ object AssistantCommands {
         return t to nearby
     }
 
+    /** Before the name of the app to play on: "on Metrolist", and the phrasebooks' own ("su", "en", "sur"…). */
+    private val APP_SEPARATORS = listOf(" on ", " in ", " from ", " with ", " using ")
+
+    /** "… su Spotify", "… on YouTube Music": [query] ends with the name of a music app on the phone. */
+    private suspend fun endsWithMusicApp(context: Context, query: String): Boolean {
+        val apps = withContext(Dispatchers.IO) { io.github.sirionero.mycar.media.MediaCatalog.installed(context) }
+        return (APP_SEPARATORS + AssistantLanguage.appWords()).any { sep ->
+            val at = query.lastIndexOf(sep)
+            at > 0 && bestMatch(apps, query.substring(at + sep.length)) { it.label } != null
+        }
+    }
+
     /**
      * "play X" with something after it: a song, artist, album or playlist, asked of the music app
      * that's open through its own search ([CarMedia.search]). A bare "play", or "play music",
@@ -214,13 +226,16 @@ object AssistantCommands {
         // la musica" is the pause; "metti il riscaldamento a 21 gradi" the house, on to Home Assistant.
         when (playAsked(query, CarServices.mediaApp.value?.label)) {
             PlayAsked.PAUSE -> return mediaCommand("pause")
-            PlayAsked.HOUSE -> return null
+            // Not when a music app is named at the end ("metti la luce su Spotify": a song), nor for a
+            // word songs share with the house said by itself ("metti la luce") when Home Assistant
+            // isn't there to hear it: a song then, as before 0.7.
+            PlayAsked.HOUSE -> if (!endsWithMusicApp(context, query) && (AssistantBrain.ready || !mayBeASong(query))) return null
             PlayAsked.MUSIC -> Unit
         }
         val media = CarServices.media
 
         // "play Daft Punk on Metrolist": switch to that app first, if it's one we know.
-        for (sep in listOf(" on ", " in ", " from ", " with ", " using ") + AssistantLanguage.appWords()) {
+        for (sep in APP_SEPARATORS + AssistantLanguage.appWords()) {
             val at = query.lastIndexOf(sep)
             if (at <= 0) continue
             // A service's web player inside myCar first: it bears the service's name, as its app

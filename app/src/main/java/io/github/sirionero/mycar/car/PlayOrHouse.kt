@@ -39,6 +39,19 @@ internal fun playAsked(query: String, appName: String? = null): PlayAsked {
     return if (after == null || after in SETTINGS) PlayAsked.HOUSE else PlayAsked.MUSIC
 }
 
+/**
+ * A [PlayAsked.HOUSE] only for a word songs share with the house said by itself after an article
+ * ("la luce", "the lights", "la tv"): a song when Home Assistant isn't there to hear it, as before 0.7,
+ * where "metti la luce" otherwise got "I don't know how to do that yet". Never the plain house
+ * ("il riscaldamento", "la sveglia alle 7"), which no song is.
+ */
+internal fun mayBeASong(query: String): Boolean {
+    val words = words(query)
+    if (words.size < 2 || words[0] !in ARTICLES) return false
+    val thing = words.drop(1)
+    return SHARED.any { it == thing }
+}
+
 /** Lower case, split at spaces, apostrophes ("l'aria") and hyphens ("lave-linge", "air-conditioning"). */
 private fun words(text: String): List<String> =
     text.lowercase().replace('’', '\'').split(Regex("[\\s'-]+")).filter { it.isNotEmpty() }
