@@ -75,8 +75,6 @@
 
     <string name="car_dashboard_title">Σήμερα στο πέλαγος</string>
     <string name="car_dashboard_weather_loading">Φορτώνουμε τον καιρό…</string>
-    <string name="car_dashboard_coming_up">Στον ορίζοντα</string>
-    <string name="car_dashboard_allow_calendar">Επιτρέψτε στο myCar το ημερολόγιο στο τηλέφωνο για να βλέπετε τι έρχεται στον ορίζοντα.</string>
     <string name="car_dashboard_calendar_loading">Φορτώνουμε το ημερολόγιο…</string>
     <string name="car_dashboard_nothing_coming">Μπουνάτσα: τίποτα την επόμενη εβδομάδα.</string>
 

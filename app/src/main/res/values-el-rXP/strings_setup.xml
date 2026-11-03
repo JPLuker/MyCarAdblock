@@ -105,7 +105,7 @@
         <item quantity="other">%d σφάλματα βρέθηκαν και ρίχτηκαν στη θάλασσα από την 0.6</item>
     </plurals>
     <string name="intro_music_title">Σκοποί στο myCar.</string>
-    <string name="intro_music_body">Το Spotify και άλλες υπηρεσίες παίζουν μέσα στο myCar, από το δικό τους πρόγραμμα αναπαραγωγής ιστού. Κάντε μπαρκάρισμα μία φορά στο τηλέφωνο με τον δικό σας λογαριασμό, στα Ξάρτια &gt; Γραμμόφωνο. Εκεί στείλτε στο αμπάρι την εφαρμογή Spotify του τηλεφώνου: ένα Spotify στο καράβι, όχι δύο.</string>
+    <string name="intro_music_body">Το Spotify και άλλες υπηρεσίες παίζουν μέσα στο myCar, από το δικό τους διαδικτυακό γραμμόφωνο. Κάντε μπαρκάρισμα μία φορά στο τηλέφωνο με τον δικό σας λογαριασμό, στα Ξάρτια &gt; Γραμμόφωνο. Εκεί στείλτε στο αμπάρι την εφαρμογή Spotify του τηλεφώνου: ένα Spotify στο καράβι, όχι δύο.</string>
     <string name="intro_mini_title">Όλος ο χάρτης θησαυρού.</string>
     <string name="intro_mini_body">Κλείστε το γραμμόφωνο δίπλα στον χάρτη και ένα μικρό γραμμόφωνο πλέει από πάνω, με το εξώφυλλο και τα κουμπιά του: κρατήστε το πατημένο και σύρετέ το όπου θέλετε. Δίπλα στον χάρτη το γραμμόφωνο φτάνει πλέον έως το μέγεθος Πολύ μεγάλο.</string>
     <string name="intro_lyrics_title">Τραγουδάμε, πλήρωμα!</string>
@@ -122,7 +122,7 @@
     <string name="intro_voice_failed">Η λήψη εξόκειλε. Δοκιμάστε ξανά</string>
     <string name="intro_voice_download">Λήψη του παπαγάλου, %1$d MB</string>
 
-    <string name="activity_toast_music_pauses_sharing">Οι σκοποί του τηλεφώνου κάνουν μάινα όσο γίνεται κατοπτρισμός της οθόνης του</string>
+    <string name="activity_toast_music_pauses_sharing">Οι σκοποί του τηλεφώνου κάνουν παύση όσο γίνεται κατοπτρισμός της οθόνης του</string>
     <string name="activity_toast_open_for_music">Ανοίξτε το myCar στο τηλέφωνο για να στείλετε τους σκοπούς του στο καράβι</string>
     <string name="activity_toast_open_for_sharing">Ανοίξτε το myCar στο τηλέφωνο για τον κατοπτρισμό της οθόνης του στο καράβι</string>
     <string name="activity_status_taken_title">Άλλη εφαρμογή έκανε ρεσάλτο στο αυτοκίνητο</string>

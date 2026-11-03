@@ -56,8 +56,6 @@
     <string name="cinema_back_page">Όπισθεν μία σελίδα</string>
     <string name="cinema_back_10s">Όπισθεν 10 δευτερόλεπτα</string>
     <string name="cinema_forward_10s">Πρόσω 10 δευτερόλεπτα</string>
-    <string name="cinema_play">Βίρα</string>
-    <string name="cinema_pause">Μάινα</string>
     <string name="cinema_error_stopped_early">Προσάραξε πριν από το τέλος: ελέγξτε τη σύνδεση του τηλεφώνου.</string>
     <string name="cinema_error_channel_stopped">Το κανάλι έριξε άγκυρα.</string>
     <string name="cinema_error_unreachable">Δεν φτάσαμε ως εκείνες τις ακτές: ελέγξτε τη σύνδεση του τηλεφώνου.</string>

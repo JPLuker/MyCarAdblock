@@ -44,8 +44,6 @@
     <string name="car_clipboard_empty">Το πρόχειρο του τηλεφώνου δεν έχει κείμενο, καπετάνιε.</string>
 
     <string name="car_player_previous">Προηγούμενος σκοπός</string>
-    <string name="car_player_play">Βίρα</string>
-    <string name="car_player_pause">Μάινα</string>
     <string name="car_player_next">Επόμενος σκοπός</string>
     <string name="car_player_like">Στο σεντούκι</string>
     <string name="car_player_unlike">Έξω από το σεντούκι</string>
@@ -61,11 +59,11 @@
     <string name="car_media_connecting">Ρεσάλτο στο %1$s…</string>
     <string name="car_media_library_closed">Το %1$s κρατά τη βιβλιοθήκη του κλειδωμένη στο αμπάρι του.</string>
     <string name="car_media_needs_notification_access">Το myCar μπορεί πάντως να το κουμαντάρει, αν αποκτήσει πρόσβαση σε ειδοποιήσεις στο τηλέφωνο. Επιτρέψτε την στις Ρυθμίσεις > Ειδοποιήσεις > Πρόσβαση σε ειδοποιήσεις.</string>
-    <string name="car_media_library_closed_detail">Ξεκινήστε τους σκοπούς από την εφαρμογή στο τηλέφωνό σας. Βίρα, μάινα, παράλειψη και μετακίνηση λειτουργούν από εδώ.</string>
+    <string name="car_media_library_closed_detail">Ξεκινήστε τους σκοπούς από την εφαρμογή στο τηλέφωνό σας. Αναπαραγωγή, παύση, παράλειψη και μετακίνηση λειτουργούν από εδώ.</string>
     <string name="car_media_not_running">Το %1$s είναι αγκυροβολημένο: δεν εκτελείται.</string>
     <string name="car_media_not_running_detail">Το %1$s παίζει μέσω του γραμμοφώνου του myCar, αλλά μόνο όσο είναι ανοιχτό στο τηλέφωνο. Ανοίξτε το μία φορά και θα συνεχίσει να παίζει εδώ στο καράβι.</string>
     <string name="car_media_refused">Το %1$s δεν άφησε το myCar να το εξερευνήσει.</string>
-    <string name="car_media_refused_detail">Μερικές εφαρμογές πολυμέσων δέχονται μόνο το host της ίδιας της Google. Ανοίξτε την εφαρμογή στο τηλέφωνο και το myCar μπορεί πάντως να παίζει τους σκοπούς της, να κάνει μάινα και να τους προσπερνά.</string>
+    <string name="car_media_refused_detail">Μερικές εφαρμογές πολυμέσων δέχονται μόνο το host της ίδιας της Google. Ανοίξτε την εφαρμογή στο τηλέφωνο και το myCar μπορεί πάντως να παίζει τους σκοπούς της, να κάνει παύση και να τους προσπερνά.</string>
     <string name="car_media_keeps_closing">Το %1$s ναυαγεί συνεχώς στο τηλέφωνο.</string>
     <string name="car_media_keeps_closing_detail">Ναυάγησε δύο φορές μέσα σε ένα λεπτό, οπότε το myCar σταμάτησε να του ξανακάνει ρεσάλτο.</string>
     <string name="car_media_list_failed">Δεν ήταν δυνατή η φόρτωση αυτής της λίστας στο καράβι.</string>

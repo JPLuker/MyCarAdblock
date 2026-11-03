@@ -56,7 +56,6 @@
     <string name="settings_plancia_use_app_detail">Οι διευθύνσεις και το διακριτικό της, χωρίς κουπί στο πληκτρολόγιο</string>
     <string name="settings_plancia_asking">Φωνάζουμε το Plancia…</string>
     <string name="settings_plancia_app_no_account">Το Plancia δεν έχει ακόμη λογαριασμό για μοιρασιά: ρυθμίστε τον πρώτα στο Plancia ή γράψτε τον παρακάτω.</string>
-    <string name="settings_plancia_missing_remove">Προσθέστε μια διεύθυνση και ένα διακριτικό. Για να βγάλετε το Plancia από το myCar, πατήστε «Στη θάλασσα».</string>
     <string name="settings_plancia_remove_title">Το Plancia στη θάλασσα, έξω από το myCar;</string>
     <string name="settings_plancia_remove_text">Το myCar ξεχνά τις διευθύνσεις και το διακριτικό του. Η εφαρμογή Plancia, αν υπάρχει στο τηλέφωνο, επιστρέφει στο καράβι.</string>
     <string name="settings_plancia_removed">Το Plancia πήγε στη θάλασσα: η εφαρμογή Plancia επιστρέφει στο καράβι, αν υπάρχει στο τηλέφωνο.</string>
