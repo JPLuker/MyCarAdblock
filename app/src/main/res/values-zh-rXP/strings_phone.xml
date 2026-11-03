@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_whats_new_in">%1$s 版新战利品</string>
+    <string name="home_how_to_connect_subtitle">哪些船能出海，以及还需要设置什么</string>
+    <string name="home_disconnect">解缆离船</string>
+    <string name="home_disconnect_title">要解缆离开汽车吗？</string>
+    <string name="home_disconnect_text">myCar 会立即离开船上屏幕。如果使用数据线，拔下后重新插上即可重新登船。</string>
+    <string name="home_bluetooth_missing_calls_music">通话和船歌通过蓝牙播放，但你的手机没有连接到汽车。请在这里或从汽车的蓝牙菜单中连接。</string>
+    <string name="home_voice_downloading">正在把语音搬上船，%1$d%%</string>
+
+    <string name="wireless_button_connect">无线登船</string>
+    <string name="wireless_button_denied">myCar 需要蓝牙和附近 WLAN 的访问权限才能无线登船。</string>
+    <string name="wireless_button_switched_off">myCar 已关闭，船上无法使用它（“舵轮”中的“在船上使用 myCar”）。</string>
+    <string name="wireless_button_which_car">哪艘船？</string>
+    <string name="wireless_button_bluetooth_off">蓝牙已关闭。请开启蓝牙，然后再次点按“无线登船”。</string>
+    <string name="wireless_button_not_paired">你的手机还没有与任何设备配对。请先与船配对。</string>
+    <string name="wireless_button_not_listed">名册上没有你的船？请先将它与手机配对。</string>
+
+    <string name="help_title">如何登船</string>
+    <string name="help_which_cars">哪些船能出海</string>
+    <string name="help_which_cars_text">大多数汽车都可以使用。大约从 2020 年起，有些汽车采用了更新的安全标准，会拒绝 myCar 的证书，myCar 无法登上这些汽车。</string>
+    <string name="help_see_full_list">查看完整名册</string>
+    <string name="help_in_the_car">在船上</string>
+    <string name="help_sound_through_mycar">通过 myCar 把声音送上船</string>
+    <string name="help_step_connect">插上数据线，或无线登船。</string>
+    <string name="help_step_connect_detail">船连上后，myCar 会自动打开。如需无线登船，请先将手机与船配对，然后在母港点按“无线登船”。</string>
+    <string name="help_step_audio_prompt">不再每趟航程都询问音频。</string>
+    <string name="help_step_audio_prompt_detail">在手机上开启 USB 调试，连接到电脑，然后运行一次这条命令。如果跳过，每次起航时都要点按“开始”。</string>
+    <string name="help_step_notifications_detail">共享音频时，Android 会隐藏通知的内容。同时运行这条命令后，myCar 只会在船歌传到车上时解除隐藏。</string>
+
+    <string name="cert_notice_switched_text">myCar 从现在起使用 %1$s。请重新连接汽车：重新插上数据线，或无线登船。</string>
+    <string name="cert_notice_switched_next_text">myCar 从现在起使用下一个证书。请重新连接汽车：重新插上数据线，或无线登船。</string>
+    <string name="cert_notice_own_refused_text">如要改用公开证书，请在“舵轮”的“证书”中移除你的证书。</string>
+
+    <string name="cert_role_recommended">船长推荐</string>
+
+    <string name="cert_setup_continue">继续航行</string>
+
+    <string name="update_title">换新帆</string>
+    <string name="update_out">myCar %1$s 已扬帆起航</string>
+    <string name="update_downloading">正在搬上船… %1$d%%</string>
+    <string name="update_unplug_first">请先解缆离开汽车再安装。安装时 myCar 会关闭。</string>
+    <string name="update_downloaded">已搬上船。Android 会在安装前询问你。</string>
+    <string name="update_download_now">立即搬上船。Android 会在安装前询问你。</string>
+    <string name="update_update">换帆</string>
+    <string name="update_download">搬上船</string>
+    <string name="update_status_daily">myCar 每天看一次有没有新帆</string>
+    <string name="update_status_checking">正在看看有没有新帆…</string>
+    <string name="update_status_latest">你正驾着最新版本航行</string>
+    <string name="update_status_available">版本 %1$s 已扬帆起航</string>
+    <string name="update_status_ready">版本 %1$s 已在舱里，可以安装</string>
+    <string name="update_check_automatically">自动瞭望新帆</string>
+    <string name="update_notification_text">点按即可换帆。</string>
+    <string name="update_car_notification_text">在 myCar 应用中或从 GitHub 换帆</string>
+    <string name="update_error_no_space">手机的货舱空间不足，无法换帆。请释放一些空间后重试。</string>
+    <string name="update_error_stopped">搬上船中断了。请检查网络连接，然后重试。</string>
+    <string name="update_error_not_sent">GitHub 没有送来新帆（代码 %1$d）。请稍后重试。</string>
+    <string name="update_error_stopped_early">搬上船提前中断了。请重试。</string>
+    <string name="update_error_damaged">搬上船的文件已损坏。请重试。</string>
+    <string name="update_splash_updated_to">已换帆至</string>
+    <string name="update_splash_tap">点按任意位置继续航行</string>
+
+    <string name="whatsnew_title">新战利品</string>
+
+    <string name="recommended_title">船长推荐</string>
+    <string name="recommended_intro">这些免费应用可以在 myCar 的船上屏幕上运行。每个按钮都会打开该应用在 GitHub 上的页面。</string>
+    <string name="recommended_section_maps">海图</string>
+    <string name="recommended_section_music">船歌</string>
+    <string name="recommended_about_organic_maps">离线海图和航线规划。</string>
+    <string name="recommended_about_vela">逐向导航，船上没有 Google。</string>
+    <string name="recommended_about_youtube_music">一款 YouTube Music 船歌匣。</string>
+    <string name="recommended_about_antennapod">播客，章节等功能满满一船。</string>
+
+    <string name="logs_title">航海日志</string>
+    <string name="logs_clear">扔下船</string>
+    <string name="logs_empty">航海日志还是空的。航程进行时，每一行都会实时记在这里。</string>
+    <string name="logs_share_subject">myCar 航海日志</string>
+    <string name="logs_share_chooser">分享航海日志</string>
+    <string name="logs_earlier_title">更早的航海日志</string>
+    <string name="logs_earlier_empty">还没有更早的航海日志。myCar 每次起航都会新开一本。</string>
+    <string name="logs_crashed">已触礁</string>
+
+    <string name="preview_title">千里镜预览</string>
+    <string name="preview_size">%1$dx%2$d @ %3$ddpi · 触摸会发送到船上界面</string>
+    <string name="preview_car_screen">船上屏幕</string>
+    <string name="preview_waiting">正在等待画面驶来…</string>
+    <string name="preview_leave">退出千里镜预览</string>
+
+    <string name="donate_title">很高兴这趟航程一帆风顺</string>
+    <string name="donate_text">myCar 免费，没有广告，也不跟踪你。如果它助你顺利起航，你的支持能让这艘船继续航行。</string>
+    <string name="donate_bitcoin">用比特币支持航行</string>
+    <string name="audio_not_reaching_title">船歌没有传到船上</string>
+    <string name="audio_not_reaching_text">Android 关于通过 myCar 传送声音的请求被拒绝了，所以车上没有船歌。</string>
+</resources>

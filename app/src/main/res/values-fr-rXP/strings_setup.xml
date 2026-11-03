@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setup_title">Gréer myCar</string>
+    <string name="setup_subtitle_first_run">Quelques appuis avant votre première traversée.</string>
+    <string name="setup_subtitle_return">Ce qu’il reste à faire. Rien de ce que vous avez gréé ne change.</string>
+    <string name="setup_unofficial">myCar n’est pas officiel : gréez-le à l’arrêt, puis gardez les yeux sur la route.</string>
+    <string name="setup_section_connect">Pour monter à bord</string>
+    <string name="setup_section_drive">Pour la traversée</string>
+    <string name="setup_status_done">Paré</string>
+
+    <string name="setup_cert_some_ready">%1$d sur %2$d obtenus. %3$s est paré ; vous pourrez obtenir les autres plus tard dans la Timonerie.</string>
+    <string name="setup_cert_ready_own">Paré : votre propre certificat.</string>
+    <plurals name="setup_cert_ready_spares">
+        <item quantity="one">Paré : %1$s. De secours : %2$s.</item>
+        <item quantity="other">Paré : %1$s. De secours : %2$s.</item>
+    </plurals>
+    <string name="setup_cert_ready_one">Paré : %1$s.</string>
+    <string name="setup_cert_ready">Paré.</string>
+
+    <string name="setup_mycar_on_title">Activez myCar pour le navire</string>
+    <string name="setup_mycar_on_body">Il est désactivé dans la Timonerie, donc le navire ne peut pas le joindre.</string>
+
+    <string name="setup_aa_title">Larguez Android Auto</string>
+    <string name="setup_aa_off">Android Auto reste à quai.</string>
+    <string name="setup_aa_body">Android Auto est activé, et il peut faire main basse sur la connexion de la voiture avant myCar. Sur l’écran qui s’ouvre, appuyez sur Désactiver, puis sur OK, puis revenez ici.</string>
+    <string name="setup_aa_keep_body">Alors gardez-le, capitaine. Quand vous branchez le téléphone, Android demande quelle app ouvrir : choisissez myCar et appuyez sur Toujours. Si Android Auto s’ouvre tout seul, c’est qu’il est réglé pour toujours s’ouvrir : dans ses infos sur l’appli, appuyez sur Ouvrir par défaut, puis sur Effacer les préférences par défaut.</string>
+
+    <string name="setup_drive_title">Appels, carte et chants</string>
+    <string name="setup_drive_body">Votre voiture affiche qui appelle et vos appels récents, et peut appeler vos contacts. La carte sait où vous êtes, et vos chants peuvent arriver dans la voiture sans Bluetooth. Android demande plusieurs fois : appuyez sur Autoriser à chaque fois. myCar ne fait que lire, et n’écoute que quand vous appuyez sur le micro.</string>
+
+    <string name="setup_more_later">Tout ceci peut aussi attendre la prochaine marée.</string>
+    <string name="setup_calendar_body">L’écran de bord affiche votre prochain événement. myCar ne fait que lire votre agenda.</string>
+    <string name="setup_audio_title">Son à bord</string>
+    <string name="setup_audio_body">Comment les chants arrivent à bord. Les appels passent par le Bluetooth dans tous les cas.</string>
+    <string name="setup_usage_title">Aider les autres capitaines</string>
+
+    <plurals name="setup_bar_steps_left">
+        <item quantity="one">Encore %1$d étape avant votre première traversée.</item>
+        <item quantity="other">Encore %1$d étapes avant votre première traversée.</item>
+    </plurals>
+    <string name="setup_bar_ready_to_connect">Tout est paré pour monter à bord.</string>
+    <string name="setup_bar_allow_drive">Autoriser appels, carte et chants</string>
+    <string name="setup_bar_ready">Tout est paré. Branchez le téléphone au navire ; si Android demande, choisissez myCar et appuyez sur Toujours.</string>
+    <string name="setup_bar_finish_later">Gréer plus tard</string>
+
+    <plurals name="setup_card_steps_left">
+        <item quantity="one">Encore %1$d étape avant votre première traversée : %2$s.</item>
+        <item quantity="other">Encore %1$d étapes avant votre première traversée : %2$s.</item>
+    </plurals>
+    <plurals name="setup_card_extras_left">
+        <item quantity="one">Tout est paré pour monter à bord. Encore %1$d étape facultative.</item>
+        <item quantity="other">Tout est paré pour monter à bord. Encore %1$d étapes facultatives.</item>
+    </plurals>
+    <string name="setup_card_all_done">Tout est paré.</string>
+    <string name="setup_card_title">Premier gréement</string>
+    <string name="setup_card_footer">Rien n’est sabordé ni réinitialisé. Vous ne verrez que ce qui reste, avec ce qui est paré coché.</string>
+    <string name="setup_card_back">Revenir au premier gréement</string>
+    <string name="setup_left_title">Finir de gréer</string>
+    <string name="setup_left_body">À faire avant votre première traversée : %1$s.</string>
+    <string name="setup_left_continue">Continuer à gréer</string>
+
+    <string name="setup_guide_optional">AU CHOIX</string>
+    <string name="setup_guide_usage_title">Aidez les autres capitaines.</string>
+    <string name="setup_guide_mic_body">myCar s’en sert pour envoyer vos chants à la voiture et pour vous entendre quand vous demandez quelque chose ou répondez à un message. Ce que vous dites reste sur le téléphone.</string>
+    <string name="setup_guide_location_body">La carte de la voiture et les recherches à proximité en ont besoin. Sans elle, le Nid-de-pie n’affiche pas de carte.</string>
+    <string name="setup_guide_aa_title">Larguez Android Auto.</string>
+    <string name="setup_guide_aa_body">Android Auto est toujours installé, et il dispute à myCar la connexion USB de la voiture. Sur l’écran qui s’ouvre, désactivez-le, ou jetez-le par-dessus bord en le désinstallant.</string>
+    <string name="setup_guide_choose_body">Si votre téléphone demande quelle app ouvrir quand vous le branchez au navire, choisissez myCar et appuyez sur Toujours.</string>
+    <string name="setup_guide_audio_title">Son à bord.</string>
+    <string name="setup_guide_audio_body">Choisissez comment les chants arrivent à bord. Les appels passent par le Bluetooth dans tous les cas.</string>
+    <string name="setup_guide_voice_title">Perroquet.</string>
+    <string name="setup_guide_voice_body">Demandez un itinéraire, des chants ou un appel au perroquet, de vive voix. Votre téléphone transforme lui-même la parole en texte, et rien de ce que vous dites n’en sort. Il faut %1$d Mo, téléchargés une seule fois. Utilisez le Wi-Fi si possible.</string>
+    <string name="setup_guide_voice_download">Télécharger le perroquet</string>
+    <string name="setup_guide_voice_progress">Téléchargement, %1$d %%. Vous pouvez aller de l’avant : il se poursuit.</string>
+    <string name="setup_guide_voice_ready">Le perroquet est paré.</string>
+    <string name="setup_guide_voice_failed">Le téléchargement n’a pas abouti. Appuyez sur Télécharger le perroquet pour réessayer.</string>
+
+    <string name="setup_audio_recommended">Cap conseillé</string>
+    <string name="setup_audio_automatic_body">Par le Bluetooth si votre navire reçoit ainsi les chants du téléphone, sinon via myCar.</string>
+    <string name="setup_audio_bluetooth_body">Pas de demande à chaque traversée, et la voix de votre app de navigation arrive à bord. Certains navires n’acceptent que les appels par ce biais.</string>
+    <string name="setup_audio_through_mycar_body">Par le câble ou le Wi-Fi, comme Android Auto. Android demande de partager l’audio une fois par traversée.</string>
+
+    <string name="intro_start">Appareiller</string>
+    <string name="intro_welcome_to">Bienvenue à bord de</string>
+    <string name="intro_course">Notre cap, c’est nous qui le choisissons : ni roi ni maître !</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d bug harponné et corrigé depuis la 0.6</item>
+        <item quantity="other">%d bugs harponnés et corrigés depuis la 0.6</item>
+    </plurals>
+    <string name="intro_music_title">Chants à bord.</string>
+    <string name="intro_music_body">Spotify et d’autres services chantent dans myCar, avec leur propre lecteur web. Enrôlez-vous une fois sur le téléphone avec votre propre compte, dans Timonerie > Chants. Planquez-y l’app Spotify du téléphone : un seul Spotify à bord, pas deux.</string>
+    <string name="intro_mini_title">Carte déployée.</string>
+    <string name="intro_mini_body">Fermez le phono à côté de la carte et un mini-phono flotte par-dessus, avec la pochette et ses boutons : maintenez-le appuyé puis faites-le glisser où bon vous semble. À côté de la carte, le phono va maintenant jusqu’au gabarit Très grand.</string>
+    <string name="intro_lyrics_title">Tous en chœur !</string>
+    <string name="intro_lyrics_body">Les couplets sont repêchés bien plus souvent, et chaque résultat est vérifié, pour que les couplets d’un autre chant n’apparaissent jamais. Les chants instrumentaux le disent.</string>
+    <string name="intro_location_title">Dans la cale.</string>
+    <string name="intro_location_body">La carte a votre position même avec le téléphone verrouillé dans la poche : myCar la prend dès que la voiture est en vue. Si Android la refuse quand même, la voiture vous le dit, seulement à l’arrêt.</string>
+    <string name="intro_phone_title">La barre au téléphone.</string>
+    <string name="intro_phone_body">Tous les réglages de l’écran de bord sont aussi sur le téléphone, dans Timonerie > Écran de bord : changez-en un et le navire suit aussitôt, même en pleine traversée. De même pour les ponts à côté de la carte et les apps planquées hors de la flotte.</string>
+    <string name="intro_apps_title">Bel équipage.</string>
+    <string name="intro_voice_title">Ordonnez.</string>
+    <string name="intro_voice_body">Appuyez sur le micro, ou sur le bouton de commande vocale du volant, et parlez au perroquet. Votre téléphone transforme lui-même la parole en texte, et ce que vous dites y reste, sauf ce que vous demandez à votre propre Home Assistant. Dites « %1$s » à bord pour la liste complète.</string>
+    <string name="intro_voice_body_language">Appuyez sur le micro, ou sur le bouton de commande vocale du volant, et parlez au perroquet. Votre téléphone transforme lui-même la parole en texte, et ce que vous dites y reste, sauf ce que vous demandez à votre propre Home Assistant. Le perroquet écoute et répond en %1$s, la langue de myCar. Dites « %2$s » à bord pour la liste complète.</string>
+    <string name="intro_voice_download">Télécharger le perroquet, %1$d Mo</string>
+
+    <string name="activity_toast_music_pauses_sharing">Les chants du téléphone font trêve pendant le partage de son écran</string>
+    <string name="activity_toast_open_for_music">Ouvrez myCar sur le téléphone pour envoyer ses chants à bord</string>
+    <string name="activity_toast_open_for_sharing">Ouvrez myCar sur le téléphone pour partager son écran à bord</string>
+</resources>

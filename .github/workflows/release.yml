@@ -40,11 +40,19 @@ jobs:
           apk=build/myCar-release.apk
           test -f "$apk" || { echo "no APK at $apk"; ls -R build | head -50; exit 1; }
           echo "path=$apk" >> "$GITHUB_OUTPUT"
+          # R8's map from the release's short names back to myCar's, so a crash in a driver's log
+          # (its stack has the release's names) can be read. The updater takes only the .apk.
+          map=$(find build -path '*mapping/release/mapping.txt' | head -1)
+          test -n "$map" || { echo "no R8 mapping"; exit 1; }
+          cp "$map" "build/myCar-${GITHUB_REF_NAME}-mapping.txt"
+          echo "mapping=build/myCar-${GITHUB_REF_NAME}-mapping.txt" >> "$GITHUB_OUTPUT"
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ steps.apk.outputs.path }}
+          files: |
+            ${{ steps.apk.outputs.path }}
+            ${{ steps.apk.outputs.mapping }}
           # The hand-written notes go first; GitHub adds the full changelog link under them.
           body_path: .github/release-notes.md
           generate_release_notes: true

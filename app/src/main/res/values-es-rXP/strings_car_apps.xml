@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialer_tab_recents">Bitácora</string>
+    <string name="dialer_tab_contacts">Tripulación</string>
+    <string name="dialer_loading_contacts">Cargando la tripulación…</string>
+    <string name="dialer_no_contacts">No hay nadie en la tripulación con número de teléfono.</string>
+    <string name="dialer_no_match">Nadie de la tripulación coincide con «%1$s».</string>
+    <string name="dialer_search_contacts">Buscar en la tripulación</string>
+
+    <string name="recents_loading">Cargando la bitácora de llamadas…</string>
+    <string name="recents_empty">Ninguna llamada en la bitácora.</string>
+
+    <string name="message_dismiss">Por la borda</string>
+    <string name="message_stop">Alto</string>
+    <string name="message_listening">El loro escucha</string>
+    <string name="message_sending_to">Rumbo a %1$s</string>
+
+    <string name="message_screen_title">Botellas</string>
+    <string name="message_empty">Ni una botella a la vista. Los mensajes nuevos de %1$s aparecen aquí cuando llegan al teléfono.</string>
+    <string name="message_quick_replies_hide">Arriar respuestas rápidas</string>
+
+    <string name="message_test_channel">Botellas de prueba</string>
+    <string name="message_test_late">Llego diez minutos tarde, ¿me guardas un sitio a bordo?</string>
+    <string name="message_test_tonight">¿Sigues subiendo a bordo esta noche?</string>
+    <string name="message_test_milk">¿Puedes comprar leche de vuelta a puerto?</string>
+    <string name="message_test_parked">Llámame cuando hayas echado el ancla.</string>
+
+    <string name="notifications_title">Señales</string>
+    <string name="notifications_clear_all">Hundir todo</string>
+    <string name="notifications_clear_confirm">Hundirlas todas</string>
+    <string name="notifications_empty">Mar en calma por ahora. Las notificaciones nuevas del teléfono aparecerán aquí.</string>
+
+    <string name="assistant_needs_model">Por ahora el loro solo entiende inglés: para las órdenes en %1$s, descarga %2$s en los aparejos de myCar en el teléfono.</string>
+    <string name="assistant_mic">Loro</string>
+    <string name="assistant_phone_inline">el loro del teléfono</string>
+    <string name="assistant_listening_on_phone">El loro escucha en el teléfono</string>
+    <string name="assistant_picker_title">Loro de a bordo</string>
+    <string name="assistant_choice_phone">Loro del teléfono</string>
+    <string name="assistant_picker_footer">El loro del teléfono se activa como al deslizar hacia arriba desde una esquina inferior de la pantalla del teléfono. Otro loro escucha y responde en el teléfono, y su voz solo llega a bordo por Bluetooth; con el teléfono bloqueado, se inicia cuando se desbloquea el teléfono, o bien, con Home Assistant configurado en myCar, myCar escucha en su lugar y responde Home Assistant. El de myCar funciona sin conexión, con bloqueo o sin él, y se muestra al timón; con Home Assistant configurado, lo que no sabe hacer por sí mismo va al asistente de voz de Home Assistant.</string>
+
+    <string name="bluetooth_hide">Arriar</string>
+
+    <string name="cinema_continue">Avante: %1$s</string>
+    <string name="cinema_on_this_phone">Tesoro del teléfono</string>
+    <string name="cinema_empty">Nada a bordo todavía: añade sitios de vídeo y listas de TV en los aparejos de myCar en el teléfono, en Cinema.</string>
+    <string name="cinema_forward_10s">Avante 10 segundos</string>
+    <string name="cinema_play">Que suene</string>
+    <string name="cinema_pause">Alto</string>
+    <string name="cinema_videos_none_picked">No hay vídeos elegidos para myCar. En el teléfono, en los aparejos de myCar, en Cinema, elige cuáles puede ver.</string>
+    <string name="cinema_videos_none">Ni un vídeo a bordo de este teléfono.</string>
+    <string name="cinema_tv_too_big">La lista no cabe a bordo (más de %1$d MB).</string>
+
+    <string name="plancia_set_up_title">Apareja Plancia en el teléfono</string>
+    <string name="plancia_set_up_text">En myCar, en el teléfono: Aparejos y luego Plancia; la dirección de tu Home Assistant y un token.</string>
+</resources>

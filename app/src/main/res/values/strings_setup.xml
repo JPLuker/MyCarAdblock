@@ -210,34 +210,37 @@
     <string name="intro_start">Start</string>
     <!-- Small, above the release number in huge type (e.g. 0.6) -->
     <string name="intro_welcome_to">Welcome to</string>
-    <!-- A small tag under the release number; "alpha" is the release's stage -->
-    <string name="intro_welcome_tag">alpha · the big one</string>
-    <!-- Intro of 0.6, the language page: a list of the languages to tap follows it. Page titles are short, in very big type -->
-    <string name="intro_language_title">Your language.</string>
-    <string name="intro_language_body">myCar now speaks English, Italian, Spanish, German, French, Portuguese, Greek, Russian and Chinese: on the phone, on the car\'s screen and in the voice assistant. It follows the phone; pick another one here, or later in Settings > Language.</string>
-    <!-- Page titles are short, in very big type -->
-    <string name="intro_wireless_title">Wireless.</string>
-    <string name="intro_wireless_body">If your car does wireless Android Auto, pair once and leave the cable at home.</string>
-    <!-- The car's rotary knob -->
-    <string name="intro_knobs_title">Knobs work.</string>
-    <string name="intro_knobs_body">Turn, push, done. No touchscreen? myCar doesn\'t need one anymore.</string>
+    <!-- A small tag under the release number (0.7), on one line; "alpha" is the release's stage. "Smooth sailing": steady and complete, said with the ship sailing in above it - an idiom of your language about sailing is welcome -->
+    <string name="intro_welcome_tag">alpha · smooth sailing</string>
+    <!-- Under the release number, once the ship is in and its flag is up: the motto, by a compass whose needle settles. Said by the whole crew; an idiom of your language about setting a course or a route is welcome -->
+    <string name="intro_course">We chart our own course.</string>
+    <!-- Under the motto: how many bugs were found and fixed from 0.6 to this release -->
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d bug found and fixed since 0.6</item>
+        <item quantity="other">%d bugs found and fixed since 0.6</item>
+    </plurals>
+    <!-- Intro of 0.7: one page for each big change since 0.6. Page titles are short, in very big type: about ten letters fit on a line, so no long words (a no-break space keeps "built in" together). The music page: the services' names drift past under it -->
+    <string name="intro_music_title">Music, built in.</string>
+    <!-- "Settings > Music": the section in the phone's settings -->
+    <string name="intro_music_body">Spotify and other services play inside myCar, from their own web player. Sign in once on the phone with your own account, in Settings > Music. Hide the phone\'s Spotify app there: one Spotify in the car, not two.</string>
+    <!-- The mini player floats over the map once the player beside the map is closed. "Extra large": the biggest size of the player beside the map, as the car's settings name it -->
+    <string name="intro_mini_title">The whole map.</string>
+    <string name="intro_mini_body">Close the player beside the map and a mini player floats over it, with the cover and its buttons: hold it, then drag it anywhere. Beside the map, the player now goes up to Extra large.</string>
+    <!-- Song lyrics, shown by the car's player -->
+    <string name="intro_lyrics_title">Sing along.</string>
+    <string name="intro_lyrics_body">Song lyrics are found far more often, and every result is checked, so another song\'s words never show up. Instrumental tracks say so.</string>
+    <!-- The map app gets the phone's position even with the phone locked in a pocket -->
+    <string name="intro_location_title">In your pocket.</string>
+    <string name="intro_location_body">The map gets your position even with the phone locked in your pocket: myCar takes it as the car arrives. If Android still refuses, the car tells you, only when you\'re stopped.</string>
+    <!-- The car's settings on the phone. "Settings > Car screen": the section in the phone's settings -->
+    <string name="intro_phone_title">From the phone.</string>
+    <string name="intro_phone_body">Every setting of the car\'s screen is on the phone too, in Settings > Car screen: change one and the car follows at once, even mid-drive. So are the pages beside the map and the apps hidden from the car\'s grid.</string>
     <string name="intro_graphene_title">Protections back on.</string>
     <!-- "exploit protection compatibility mode": the name of a GrapheneOS setting -->
     <string name="intro_graphene_body">On GrapheneOS, myCar no longer needs exploit protection compatibility mode. If you turned it on for myCar, turn it off to get full protection back.</string>
     <string name="intro_graphene_open_settings">Open app settings</string>
-    <!-- Title over recommended apps, in the intro and the guide -->
+    <!-- Title over recommended apps, in the guide -->
     <string name="intro_apps_title">Good company.</string>
-    <string name="intro_apps_body">Free, open-source apps that work well in the car. The first in each row works best. Tap one to see it on GitHub.</string>
-    <!-- Kinds of app, shown in capitals over their row -->
-    <string name="intro_apps_maps">Maps</string>
-    <string name="intro_apps_music">Music</string>
-    <string name="intro_apps_podcasts">Podcasts</string>
-    <string name="intro_theme_title">Your buttons.</string>
-    <string name="intro_theme_body">Pick how the car\'s buttons look. Change it any time in the car\'s settings.</string>
-    <!-- A sample of the car's controls in the chosen style: two icon buttons (read aloud) and a wide button -->
-    <string name="intro_theme_search">Search</string>
-    <string name="intro_theme_play">Play</string>
-    <string name="intro_theme_navigate">Navigate</string>
     <string name="intro_voice_title">Just say it.</string>
     <!-- %1$s: the word that opens the assistant's help, in the assistant's language (e.g. help) -->
     <string name="intro_voice_body">Tap the mic, or press the talk button on your wheel, and speak. Your phone turns speech into text by itself, and what you say stays on it, unless you ask your own Home Assistant. Say \"%1$s\" in the car for the full list.</string>

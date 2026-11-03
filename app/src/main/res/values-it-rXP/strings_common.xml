@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_done">A posto</string>
+    <string name="common_back">Indietro tutta</string>
+    <string name="common_delete">Affonda</string>
+    <string name="common_add">Imbarca</string>
+    <string name="common_skip">Tira dritto</string>
+    <string name="common_next">Avanti tutta</string>
+    <string name="common_yes">Senz\'altro</string>
+    <string name="common_no">Giammai</string>
+    <string name="common_loading">Carico a bordo…</string>
+    <string name="common_settings">Timone</string>
+</resources>

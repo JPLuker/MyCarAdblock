@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setup_title">myCar seeklar machen</string>
+    <string name="setup_subtitle_first_run">Ein paar Fingertipps, bevor du zu deinem ersten Törn ausläufst.</string>
+    <string name="setup_subtitle_return">Was an Deck noch zu tun ist. Was du schon klargemacht hast, bleibt, wie es ist.</string>
+    <string name="setup_unofficial">myCar ist inoffiziell: Mach es im Stand seeklar und achte dann auf die Straße.</string>
+    <string name="setup_section_connect">Zum Entern</string>
+    <string name="setup_section_drive">Für deinen Törn</string>
+    <string name="setup_status_done">Klar</string>
+
+    <string name="setup_cert_body">Autos sprechen nur mit Telefonen, die ein Zertifikat haben, dem sie vertrauen. myCar hat keins an Bord: Es lädt öffentliche Zertifikate von Open-Source-Projekten auf GitHub herunter (je etwa 10 KB). Lehnt dein Auto eins ab, probiert myCar das nächste.</string>
+    <string name="setup_cert_wrong_file">Eine heruntergeladene Datei war nicht das erwartete Zertifikat, deshalb hat myCar sie nicht an Bord genommen. Versuche es später erneut.</string>
+    <string name="setup_cert_some_ready">%1$d von %2$d geladen. %3$s ist bereit; die anderen kannst du später in der Takelage laden.</string>
+
+    <string name="setup_mycar_on_title">myCar fürs Schiff einschalten</string>
+    <string name="setup_mycar_on_body">Es ist in der Takelage ausgeschaltet, deshalb kann das Schiff es nicht erreichen.</string>
+
+    <string name="setup_aa_kept">Du wählst myCar, wenn du das Telefon ans Schiff anschließt.</string>
+    <string name="setup_aa_body">Android Auto ist an und kann die Verbindung des Schiffs kapern, bevor myCar sie bekommt. Tippe auf dem Bildschirm, der sich gleich öffnet, auf „Deaktivieren“, dann auf „OK“, und komm dann hierher zurück.</string>
+    <string name="setup_aa_no_disable">Kein „Deaktivieren“ in Sicht?</string>
+    <string name="setup_aa_keep_body">Dann lass es an Bord. Wenn du das Telefon anschließt, fragt Android, welche App sich öffnen soll: Wähle myCar und tippe auf „Immer“. Reißt Android Auto trotzdem von selbst das Ruder an sich, ist es so eingestellt, dass es sich immer öffnet: Tippe in seiner App-Info auf „Standardmäßig öffnen“, dann auf „Standardeinstellungen löschen“.</string>
+    <string name="setup_aa_keep">Android Auto an Bord lassen</string>
+
+    <string name="setup_drive_title">Anrufe, Karte und Shantys</string>
+    <string name="setup_drive_skipped">Übersprungen. Tippe auf „Zulassen“, wenn du klar zum Auslaufen bist.</string>
+    <string name="setup_drive_body">Dein Auto zeigt, wer anruft, und deine letzten Anrufe und kann deine Kontakte anrufen; die Karte weiß, wo du bist; und Musik kommt auch ohne Bluetooth an Bord. Android fragt ein paar Mal: Tippe jedes Mal auf „Zulassen“. myCar liest nur und hört nur zu, wenn du auf das Mikrofon tippst.</string>
+
+    <string name="setup_more_later">Alles hier geht auch noch, wenn du schon in See gestochen bist.</string>
+    <string name="setup_messages_title">Flaschenpost</string>
+    <string name="setup_messages_body">Das Auto zeigt deine Flaschenposten, liest sie vor und lässt dich antworten. Schalte myCar auf der Seite ein, die sich gleich öffnet. Wenn Android sagt, dass es eine eingeschränkte Einstellung ist: Öffne die App-Info von myCar, tippe auf ⋮, dann auf „Eingeschränkte Einstellungen zulassen“, und versuche es erneut.</string>
+    <string name="setup_calendar_body">Der Bordbildschirm zeigt deinen nächsten Termin. myCar liest deinen Kalender nur.</string>
+    <string name="setup_notifications_body">Damit kann myCar zeigen, dass es mit dem Auto verbunden ist, mit „Stopp“, solange es den Ton des Telefons an Bord schickt, und dir sagen, wenn ein Update da ist.</string>
+    <string name="setup_screening_button">Klarmachen</string>
+    <string name="setup_audio_title">Ton an Bord</string>
+    <string name="setup_audio_body">Wie die Shantys an Bord kommen. Anrufe laufen in jedem Fall über Bluetooth.</string>
+    <string name="setup_usage_title">Anderen Käpt\'ns helfen</string>
+
+    <plurals name="setup_bar_steps_left">
+        <item quantity="one">Noch %1$d Schritt bis zu deinem ersten Törn.</item>
+        <item quantity="other">Noch %1$d Schritte bis zu deinem ersten Törn.</item>
+    </plurals>
+    <string name="setup_bar_ready_to_connect">Du bist klar zum Entern.</string>
+    <string name="setup_bar_allow_drive">Anrufe, Karte und Shantys zulassen</string>
+    <string name="setup_bar_ready">Du bist seeklar. Schließ das Telefon ans Schiff an; wenn Android fragt, wähle myCar und tippe auf „Immer“.</string>
+    <string name="setup_bar_finish_later">Später klarmachen</string>
+
+    <plurals name="setup_card_steps_left">
+        <item quantity="one">Noch %1$d Schritt bis zu deinem ersten Törn: %2$s.</item>
+        <item quantity="other">Noch %1$d Schritte bis zu deinem ersten Törn: %2$s.</item>
+    </plurals>
+    <plurals name="setup_card_extras_left">
+        <item quantity="one">Klar zum Entern. Noch %1$d Extra offen.</item>
+        <item quantity="other">Klar zum Entern. Noch %1$d Extras offen.</item>
+    </plurals>
+    <string name="setup_card_all_done">Alles ist seeklar.</string>
+    <string name="setup_card_title">Seeklar machen</string>
+    <string name="setup_card_footer">Nichts wird versenkt oder zurückgesetzt. Du siehst nur, was noch fehlt, und Erledigtes ist abgehakt.</string>
+    <string name="setup_card_back">Zurück zum Seeklarmachen</string>
+    <string name="setup_left_title">Klar Schiff machen</string>
+    <string name="setup_left_body">Noch offen vor deinem ersten Törn: %1$s.</string>
+    <string name="setup_left_continue">Weiter seeklar machen</string>
+
+    <string name="setup_guide_optional">FREIE WAHL</string>
+    <string name="setup_guide_usage_title">Anderen Käpt\'ns helfen.</string>
+    <string name="setup_guide_mic_body">myCar braucht es, um deine Musik an Bord zu senden und dich zu hören, wenn du um etwas bittest oder auf eine Nachricht antwortest. Was du sagst, bleibt auf dem Telefon.</string>
+    <string name="setup_guide_location_body">Die Karte im Auto und die Suche in der Nähe brauchen ihn. Ohne ihn zeigt der Ausguck keine Karte.</string>
+    <string name="setup_guide_notifications_body">Solange myCar an Bord ist, zeigt es eine Benachrichtigung mit einer Taste zum Beenden. Ohne diese Erlaubnis blendet Android sie aus.</string>
+    <string name="setup_guide_messages_title">Flaschenpost.</string>
+    <string name="setup_guide_messages_body">Das Auto zeigt deine Flaschenposten, liest sie vor und lässt dich antworten. Schalte myCar in der Liste ein, die sich gleich öffnet.</string>
+    <string name="setup_guide_aa_body">Android Auto ist noch installiert und liefert sich mit myCar ein Gefecht um die USB-Verbindung des Schiffs. Deaktiviere oder deinstalliere es auf dem Bildschirm, der sich gleich öffnet.</string>
+    <string name="setup_guide_choose_title">Kurs auf myCar.</string>
+    <string name="setup_guide_choose_body">Wenn dein Telefon beim Anschließen ans Schiff fragt, welche App sich öffnen soll, wähle myCar und tippe auf „Immer“.</string>
+    <string name="setup_guide_audio_title">Ton an Bord.</string>
+    <string name="setup_guide_audio_body">Wähle, wie die Shantys an Bord kommen. Anrufe laufen in jedem Fall über Bluetooth.</string>
+    <string name="setup_guide_voice_title">Papagei.</string>
+    <string name="setup_guide_voice_body">Frag den Papagei nach dem Weg, nach Shantys oder nach einem Anruf. Dein Telefon wandelt Sprache selbst in Text um, und nichts, was du sagst, verlässt es. Dafür braucht es %1$d MB, die einmal heruntergeladen werden. Nutze möglichst WLAN.</string>
+    <string name="setup_guide_voice_download">Sprachmodelle verladen</string>
+    <string name="setup_guide_voice_progress">Wird verladen, %1$d %%. Du kannst weitersegeln, der Download läuft weiter.</string>
+    <string name="setup_guide_voice_ready">Der Papagei ist bereit.</string>
+    <string name="setup_guide_voice_failed">Der Download ist nicht fertig geworden. Tippe auf „Sprachmodelle verladen“, um es erneut zu versuchen.</string>
+
+    <string name="setup_audio_recommended">Käpt\'ns Tipp</string>
+    <string name="setup_audio_automatic_body">Über Bluetooth, wenn dein Auto die Shantys des Telefons so annimmt, sonst über myCar.</string>
+    <string name="setup_audio_bluetooth_body">Keine Frage bei jedem Törn, und die Stimme deiner Karten-App ist an Bord zu hören. Manche Autos nehmen darüber nur Anrufe an.</string>
+    <string name="setup_audio_through_mycar_body">Per Kabel oder WLAN, wie bei Android Auto. Android fragt bei jedem Törn einmal nach der Audiofreigabe.</string>
+
+    <string name="intro_start">Leinen los</string>
+    <string name="intro_welcome_to">Ahoi, willkommen bei</string>
+    <string name="intro_welcome_tag">alpha · unter vollen Segeln</string>
+    <string name="intro_course">Unseren Kurs bestimmen wir selbst – und zum Teufel mit jeder Bevormundung!</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d Fehler seit 0.6 aufgespürt und über Bord geworfen</item>
+        <item quantity="other">%d Fehler seit 0.6 aufgespürt und über Bord geworfen</item>
+    </plurals>
+    <string name="intro_music_title">Shantys an Bord.</string>
+    <string name="intro_music_body">Spotify und andere Dienste spielen in myCar, über ihren eigenen Web-Player. Heuer einmal auf dem Telefon mit deinem eigenen Konto an, unter Takelage > Shantys. Verstau dort die App „Spotify“ des Telefons: ein Spotify an Bord, nicht zwei.</string>
+    <string name="intro_mini_body">Schließ die Drehorgel neben der Karte, und eine Mini-Drehorgel schwebt darüber, mit Cover und Tasten: Halte sie gedrückt und zieh sie, wohin du willst. Neben der Karte gibt es die Drehorgel jetzt bis Sehr groß.</string>
+    <string name="intro_lyrics_title">Sing den Shanty mit.</string>
+    <string name="intro_lyrics_body">Strophen werden viel öfter gefunden, und jeder Fund wird geprüft, sodass nie die Strophen eines anderen Shantys erscheinen. Instrumentale Shantys sagen es.</string>
+    <string name="intro_location_title">Im Seesack.</string>
+    <string name="intro_location_body">Die Karte bekommt deinen Standort auch bei gesperrtem Telefon in der Tasche: myCar holt ihn, sobald das Schiff in Sicht kommt. Verweigert Android ihn trotzdem, sagt es dir das Schiff, nur im Stand.</string>
+    <string name="intro_phone_title">Ruder am Telefon.</string>
+    <string name="intro_phone_body">Alle Einstellungen des Bordbildschirms gibt es auch auf dem Telefon, unter Takelage > Bordbildschirm: Änderst du eine, folgt das Schiff sofort, auch mitten im Törn. Ebenso die Decks neben der Karte und die in der Flotte verstauten Apps.</string>
+    <string name="intro_graphene_title">Schutz wieder an Bord.</string>
+    <string name="intro_apps_title">Gute Mitsegler.</string>
+    <string name="intro_voice_title">Sag\'s dem Papagei.</string>
+    <string name="intro_voice_body">Tippe auf das Mikrofon oder drück die Sprechtaste am Steuerrad und sprich. Dein Telefon wandelt Sprache selbst in Text um, und was du sagst, bleibt darauf, außer dem, was du dein eigenes Home Assistant fragst. Sag an Bord „%1$s“ für die ganze Liste.</string>
+    <string name="intro_voice_body_language">Tippe auf das Mikrofon oder drück die Sprechtaste am Steuerrad und sprich. Dein Telefon wandelt Sprache selbst in Text um, und was du sagst, bleibt darauf, außer dem, was du dein eigenes Home Assistant fragst. Der Papagei versteht und spricht %1$s, die Mundart von myCar. Sag an Bord „%2$s“ für die ganze Liste.</string>
+    <string name="intro_voice_downloading">Wird verladen, %1$d %%</string>
+    <string name="intro_voice_failed">Download gekentert. Erneut versuchen</string>
+    <string name="intro_voice_download">Sprachmodelle verladen, %1$d MB</string>
+
+    <string name="activity_toast_music_pauses_sharing">Die Musik des Telefons hat Flaute, solange sein Bildschirm geteilt wird</string>
+    <string name="activity_toast_open_for_music">Öffne myCar auf dem Telefon, um seine Musik an Bord zu senden</string>
+    <string name="activity_status_taken_title">Eine andere App hat das Auto gekapert</string>
+    <string name="activity_status_taken_detail">Eine andere App hat die Verbindung des Autos gekapert, bevor myCar es konnte. Wenn Android fragt, welche App sich für das Auto öffnen soll, wähle myCar.</string>
+</resources>

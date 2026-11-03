@@ -44,7 +44,7 @@ object AssistantCommands {
         playSearchCommand(context, navigator, heard)?.let { return it }
         // After "play X" ("play ETA" is a song), before the music's words: "when do I get to the
         // next exit" isn't "next". Not for a person: "call Eta".
-        if (ETA.containsMatchIn(heard) && CALL_TRIGGERS.none { heard.startsWith(it) }) return arrival()
+        if (WholePhrases.arrival(heard) && CALL_TRIGGERS.none { heard.startsWith(it) }) return arrival()
         mediaCommand(heard)?.let { return it }
         navCommand(navigator, heard)?.let { return it }
         infoCommand(heard)?.let { return it }
@@ -140,6 +140,8 @@ object AssistantCommands {
         }
         var destination = after(text, NAVIGATE_TRIGGERS) ?: return null
         if (destination.isBlank()) return "Where to?"
+        // "Go to the next song", "go to the previous track": the music's own buttons, not a place.
+        if (text.startsWith("go to ") && TRANSPORT.matches(destination)) return null
 
         val entries = allEntries(context)
         // "go to Spotify" means the app, and "go to settings" the screen; "go to Target" is a place.
@@ -208,6 +210,13 @@ object AssistantCommands {
         query = query.removePrefix("some ").trim()
         // "Play the next song", "play it again": the music's own buttons, not a search.
         if (query.isEmpty() || query in RESUME_WORDS || TRANSPORT.matches(query)) return null
+        // A phrasebook's "metti", "pon", "mets", "põe" or "put on" that wasn't for a song: "metti in pausa
+        // la musica" is the pause; "metti il riscaldamento a 21 gradi" the house, on to Home Assistant.
+        when (playAsked(query, CarServices.mediaApp.value?.label)) {
+            PlayAsked.PAUSE -> return mediaCommand("pause")
+            PlayAsked.HOUSE -> return null
+            PlayAsked.MUSIC -> Unit
+        }
         val media = CarServices.media
 
         // "play Daft Punk on Metrolist": switch to that app first, if it's one we know.
@@ -309,26 +318,30 @@ object AssistantCommands {
         if (CALL_TRIGGERS.any { heard.startsWith(it) }) return null
         val media = CarServices.media
         val none = CarServices.noMusicApp()
+        // Its buttons only for the music's own words (and its app's name): "when is my next appointment"
+        // isn't "next", nor "pause the TV" a pause of the car's music - they go on, to Home Assistant at the end.
+        val forMusic = musicCommandOnly(heard, CarServices.mediaApp.value?.label)
         return when {
-            ("pause" in heard && "unpause" !in heard) || heard.startsWith("stop") || heard == "quiet" || heard == "shut up" -> {
+            forMusic && (("pause" in heard && "unpause" !in heard) || heard.startsWith("stop") || heard == "quiet" || heard == "shut up") -> {
                 media.pause()
-                VoiceFocus.afterRelease { media.pause() }
+                // Not if something was asked of the music meanwhile: "pause", then at once "resume".
+                VoiceFocus.afterRelease(media.pauseLater())
                 "Paused."
             }
             // Before "play" below: "play the next song", "play something else", "play it again".
-            "next" in heard || "skip" in heard || heard.startsWith("change the song") || ANOTHER.matches(heard) -> {
+            forMusic && ("next" in heard || "skip" in heard || heard.startsWith("change the song") || ANOTHER.matches(heard)) -> {
                 if (none) return "Nothing's playing."
                 media.next()
                 "Skipping."
             }
-            "previous" in heard || "last song" in heard || "last track" in heard || "last one" in heard || "back song" in heard ||
-                "go back a song" in heard || AGAIN.matches(heard) || "replay" in heard -> {
+            forMusic && ("previous" in heard || "last song" in heard || "last track" in heard || "last one" in heard || "back song" in heard ||
+                "go back a song" in heard || AGAIN.matches(heard) || "replay" in heard) -> {
                 if (none) return "Nothing's playing."
                 media.previous()
                 "Playing the previous track."
             }
-            "resume" in heard || "unpause" in heard || heard in RESUME_PHRASES ||
-                (heard.startsWith("play") && "playing" !in heard) -> {
+            forMusic && ("resume" in heard || "unpause" in heard || heard in RESUME_PHRASES ||
+                (heard.startsWith("play") && "playing" !in heard)) -> {
                 // No music app open (the first drive, one closed from its menu): the one played
                 // last, playing - as the car's ▶ key does. It used to say "Playing." to silence.
                 if (none) {
@@ -338,7 +351,7 @@ object AssistantCommands {
                         "Open a music app first, then ask again."
                     }
                 }
-                if (!media.now.value.playing) media.togglePlay()
+                media.resume()
                 "Playing."
             }
             ("what" in heard && "playing" in heard) || "what song" in heard || "who sings" in heard ||
@@ -361,7 +374,8 @@ object AssistantCommands {
             BuiltInApps.Exit.open(navigator)
             "Back to the car's screen."
         }
-        "go home" in heard || heard == "home" || heard == "home screen" || "go to the home screen" in heard -> {
+        // Whole phrases: "turn on the heating when I go home" is for Home Assistant (WholePhrases).
+        WholePhrases.home(heard) -> {
             navigator.home()
             "Heading home."
         }
@@ -369,7 +383,7 @@ object AssistantCommands {
             navigator.apps()
             "Here are your apps."
         }
-        "settings" in heard -> {
+        WholePhrases.settings(heard) -> {
             navigator.settings()
             "Opening settings."
         }
@@ -384,11 +398,11 @@ object AssistantCommands {
         else -> null
     }
 
+    // Whole phrases: "what time is sunset", "how hot is the living room" are for Home Assistant (WholePhrases).
     private fun infoCommand(heard: String): String? = when {
-        "what time" in heard || "what's the time" in heard || heard == "time" || "the time" in heard ->
+        WholePhrases.time(heard) ->
             "It's ${DateFormat.getTimeInstance(DateFormat.SHORT).format(Date())}."
-        "weather" in heard || "going to rain" in heard || "gonna rain" in heard || "how hot" in heard ||
-            "how cold" in heard || "temperature outside" in heard -> {
+        WholePhrases.weather(heard) -> {
             val data = (Weather.state.value as? WeatherState.Ready)?.data
             if (data != null) "${data.temp}${data.tempUnit} and ${Weather.describe(data.code)} in ${data.place}."
             else "I don't have the weather yet."
@@ -559,12 +573,6 @@ object AssistantCommands {
     private val ANOTHER = Regex("^(?:(?:play me|play|put on|listen to) )?(?:something else|another (?:song|track|one)|a different (?:song|track))$")
 
     private val PLAY_TRIGGERS = listOf("play me ", "play ", "put on ", "listen to ", "i want to hear ", "shuffle ")
-
-    /** "When do I arrive", "what time will we get there", "how much longer", "ETA". */
-    private val ETA = Regex(
-        "\\b(?:eta|arrival time|time of arrival|how much longer|how long (?:until|till|to|left|is left|before)" +
-            "|(?:when|what time) (?:do|will|are|am) (?:i|we)(?: going to)? (?:arrive|get there|be there|get to|reach))\\b",
-    )
 
     /** "Read my messages", "play my new texts", "read me the last message". */
     private val READ_MESSAGES = Regex("^(?:(?:read|check)(?: me)?(?: my| the)?|play(?: me)? my)((?: new| last| latest| unread)?) (?:messages?|texts?)$")

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="session_idle_detail">Branchez le téléphone au port USB du navire, ou montez à bord sans fil. myCar s’ouvre tout seul quand le navire répond.</string>
+    <string name="session_connected_detail">myCar est sur l’écran de bord.</string>
+    <string name="session_disconnected_detail">Le navire n’est plus connecté.</string>
+
+    <string name="connection_stage_talking">Pourparlers avec le navire</string>
+
+    <string name="wireless_link_bt_talking">Bluetooth : pourparlers avec %1$s</string>
+    <string name="wireless_link_bt_waiting">En attente de %1$s. Si rien ne se passe, déconnectez le téléphone dans le menu Bluetooth de bord, puis reconnectez-le</string>
+
+    <string name="bridge_unknown">elle ne connaît pas la passerelle de ce myCar. Mettez à jour l’app %1$s.</string>
+
+    <string name="channel_session">Connecté au navire</string>
+    <string name="channel_audio">Son à bord</string>
+    <string name="session_notification_title">myCar est connecté au navire</string>
+    <string name="audio_notification_title">Lecture à bord</string>
+    <string name="audio_notification_text">myCar envoie le son du téléphone à bord.</string>
+    <string name="mirror_notification_title">Partage d’écran à bord</string>
+    <string name="mirror_notification_text">L’écran de bord affiche ce téléphone.</string>
+</resources>

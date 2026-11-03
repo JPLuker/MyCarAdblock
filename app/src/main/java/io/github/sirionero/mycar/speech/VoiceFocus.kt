@@ -58,6 +58,7 @@ object VoiceFocus {
             main.removeCallbacks(releaseNow)
             if (request != null) return@post
             val manager = app.getSystemService(AudioManager::class.java) ?: return@post
+            var made: AudioFocusRequest? = null
             val r = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
                 .setAudioAttributes(
                     AudioAttributes.Builder()
@@ -65,8 +66,17 @@ object VoiceFocus {
                         .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                         .build(),
                 )
-                .setOnAudioFocusChangeListener { }
+                // Lost for good (an app, or myCar's own web player, took the focus to play): forgotten,
+                // so the next answer or listening asks again and pauses the music once more. Before,
+                // the lost request was kept and nothing asked again until the release.
+                .setOnAudioFocusChangeListener({ change ->
+                    if (change == AudioManager.AUDIOFOCUS_LOSS && made != null && request === made) {
+                        request = null
+                        MyCarLog.i("voice: audio focus taken by the music, asked again next time")
+                    }
+                }, main)
                 .build()
+            made = r
             val granted = manager.requestAudioFocus(r) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
             MyCarLog.i("voice: audio focus ${if (granted) "granted, music paused" else "refused"}")
             if (granted) {

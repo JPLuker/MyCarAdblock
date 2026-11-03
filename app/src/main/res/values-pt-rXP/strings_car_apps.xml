@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialer_tab_contacts">Tripulação</string>
+    <string name="dialer_loading_contacts">Carregando a tripulação…</string>
+    <string name="dialer_no_contacts">Nenhum tripulante com número de telefone encontrado.</string>
+    <string name="dialer_no_match">Nenhum tripulante corresponde a “%1$s”.</string>
+    <string name="dialer_search_contacts">Buscar na tripulação</string>
+    <string name="dialer_favourite">No baú</string>
+
+    <string name="message_listening">O papagaio escuta</string>
+
+    <string name="message_screen_title">Correio</string>
+    <string name="message_empty">Nada recente no correio de bordo. As novas mensagens de %1$s aparecem aqui assim que atracam no telefone.</string>
+    <string name="message_quick_replies_hide">Recolher respostas rápidas</string>
+
+    <string name="message_test_late">Vou me atrasar dez minutos, guarda um lugar a bordo para mim?</string>
+    <string name="message_test_tonight">Você ainda sobe a bordo hoje à noite?</string>
+    <string name="message_test_milk">Pode comprar leite no caminho de volta ao ancoradouro?</string>
+    <string name="message_test_parked">Me liga quando lançar âncora.</string>
+
+    <string name="notifications_title">Sinais</string>
+    <string name="notifications_clear_all">Tudo ao mar</string>
+    <string name="notifications_clear_confirm">Todos ao mar</string>
+    <string name="notifications_empty">Nenhum sinal à vista ainda. As novas notificações do telefone vão aparecer aqui.</string>
+
+    <string name="assistant_needs_model">Por enquanto o papagaio só entende inglês: para comandos em %1$s, baixe %2$s no Leme do myCar no telefone.</string>
+    <string name="assistant_mic">Papagaio</string>
+    <string name="assistant_phone_inline">o papagaio do telefone</string>
+    <string name="assistant_start_failed">Não foi possível iniciar %1$s. O papagaio do myCar escuta no lugar dele.</string>
+    <string name="assistant_listening_on_phone">Escutando no telefone</string>
+    <string name="assistant_app_listening_on_phone">%1$s está escutando no telefone</string>
+    <string name="assistant_picker_title">Papagaio de bordo</string>
+    <string name="assistant_choice_phone">Papagaio do telefone</string>
+    <string name="assistant_picker_footer">O papagaio do telefone desperta como com o gesto de deslizar para cima a partir de um canto inferior da tela do telefone. Outro papagaio escuta e responde no telefone, e a voz dele só chega a bordo pelo Bluetooth; com o telefone bloqueado, ele começa quando o telefone é desbloqueado – ou, com o Home Assistant configurado no myCar, o myCar escuta no lugar dele e o Home Assistant responde. O papagaio do próprio myCar funciona offline, com o telefone bloqueado ou não, e aparece na tela de bordo; com o Home Assistant configurado, o que ele não sabe fazer sozinho vai para o assistente de voz do Home Assistant.</string>
+
+    <string name="bluetooth_hide">Recolher</string>
+
+    <string name="cinema_continue">Avante: %1$s</string>
+    <string name="cinema_empty">Adicione sites de vídeo e listas de TV no Leme do myCar no telefone, em Cinema.</string>
+    <string name="cinema_pause">Calmaria</string>
+    <string name="cinema_videos_none_picked">Nenhum vídeo escolhido para o myCar. No telefone, no Leme do myCar em Cinema, escolha quais ele pode ver.</string>
+
+    <string name="plancia_set_up_title">Prepare o Plancia no telefone</string>
+    <string name="plancia_set_up_text">No myCar, no telefone: Leme e depois Plancia – o endereço do seu Home Assistant e um token.</string>
+    <string name="plancia_menu_opens">O Plancia ancora em</string>
+    <string name="plancia_note_open">À vista</string>
+    <string name="plancia_note_opens_first">Ancora primeiro</string>
+</resources>

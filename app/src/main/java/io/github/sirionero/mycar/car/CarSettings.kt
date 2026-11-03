@@ -120,6 +120,9 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
 
     fun openWhatsNew() { whatsNewOpenFlow.value = true }
 
+    /** At the end of a drive: opened by hand, the notes came back at the start of the next one, moving or not. Still unread. */
+    fun forgetOpenWhatsNew() { whatsNewOpenFlow.value = false }
+
     /** Closes the notes and marks [versionCode]'s as read. */
     fun closeWhatsNew(versionCode: Int) {
         whatsNewOpenFlow.value = false
@@ -133,7 +136,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
     fun imperial(): Boolean = when (unitsFlow.value) {
         Units.IMPERIAL -> true
         Units.METRIC -> false
-        Units.AUTO -> java.util.Locale.getDefault().country in setOf("US", "LR", "MM")
+        Units.AUTO -> io.github.sirionero.mycar.AppLanguage.country() in setOf("US", "LR", "MM")
     }
 
     fun setUnits(units: Units) {

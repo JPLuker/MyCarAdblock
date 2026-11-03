@@ -113,6 +113,18 @@ internal class PlanciaWeb(context: Context, dark: Boolean) {
         place()
     }
 
+    /**
+     * Takes away the focus a tap in the page gave it, before its part leaves the screen (see
+     * LeaveWithoutFocus.kt). Returns what had it, for the log, or null if nothing did.
+     */
+    fun dropFocus(): String? {
+        val w = web ?: return null
+        if (!w.hasFocus()) return null
+        w.clearFocus()
+        // Android may give it straight back (the knob's last place): then the log says so.
+        return if (w.hasFocus()) "Plancia's page, which took it back" else "Plancia's page"
+    }
+
     fun openMenu() {
         _menu.value = true
     }
@@ -162,6 +174,7 @@ internal class PlanciaWeb(context: Context, dark: Boolean) {
         val w = web ?: return
         val target = hosts.lastOrNull()
         if (w.parent === target) return
+        MyCarLog.i(if (target == null) "plancia: the page out of sight" else "plancia: the page in sight (${hosts.size} place(s))")
         (w.parent as? ViewGroup)?.removeView(w)
         target?.addView(w, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
     }

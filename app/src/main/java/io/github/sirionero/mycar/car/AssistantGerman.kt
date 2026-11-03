@@ -72,6 +72,12 @@ internal object GermanPhrases : Phrasebook() {
                 else -> "read my messages"
             }
         },
+        // A call, before the messages take it for a reply to "den verpassten Anruf".
+        Rule(
+            "(?:antworte|antworten|beantworte|beantworten)(?: auf)? (?:den )?(?:letzten )?(?:verpassten|entgangenen) anruf|" +
+                "(?:auf )?(?:den )?(?:letzten )?(?:verpassten|entgangenen) anruf (?:beantworten|antworten)",
+            "call back",
+        ),
         Rule("(?:antworte|antworten|schreib|schreibe|schicke eine nachricht an|sende eine nachricht an|nachricht an) (.+)") { m ->
             "reply to " + who(m.groupValues[1])
         },
@@ -93,14 +99,30 @@ internal object GermanPhrases : Phrasebook() {
         Rule("(?:ruf|rufe) (.+) (?:an|zurück|zurueck)") { m -> "call " + who(m.groupValues[1]) },
         Rule("(?:telefoniere mit|wähle|waehle) (.+)") { m -> "call " + who(m.groupValues[1]) },
         Rule("(.+) anrufen") { m -> "call " + who(m.groupValues[1]) },
-        Rule("(?:pause|pausieren|pausiere|musik (?:aus|stoppen|anhalten)|stopp|stop|halt|anhalten|ruhe|leise)", "pause"),
+        // "Hör auf" before "hör…" is taken for a song.
+        Rule(
+            "(?:pause|pausieren|pausiere|musik (?:aus|stoppen|anhalten)|stopp|stop|halt|anhalten|ruhe|leise|" +
+                "(?:hör|höre|hoer|hoere)(?: jetzt| mal)? auf(?: damit| mit der musik)?|aufhören|aufhoeren)",
+            "pause",
+        ),
         Rule("(?:weiter|fortsetzen|weiterspielen|spiel weiter|musik an|musik|play|abspielen|wiedergabe)", "continue"),
         Rule(
             "(?:nächster|naechster|nächstes|naechstes|nächste|naechste|nächster titel|nächstes lied|nächster song|überspringen|" +
-                "ueberspringen|skip|anderes lied|ein anderes lied|was anderes|etwas anderes)",
+                "ueberspringen|skip|anderes lied|ein anderes lied|was anderes|etwas anderes|" +
+                // "Geh zum nächsten Lied": the next song, before "geh…" is taken for a place.
+                "(?:(?:geh|gehe|wechsel|wechsle|spring|springe|spiel|spiele|weiter) )?(?:(?:zum|zur|zu dem|auf den|auf das|das|den|der|die) )?" +
+                "(?:nächsten|naechsten|nächste|naechste|nächster|naechster|nächstes|naechstes)(?: (?:lied|titel|song|track|stück|stueck))?)",
             "next",
         ),
-        Rule("(?:vorheriger|vorheriges|vorherige|vorheriger titel|vorheriges lied|zurück zum letzten lied|letztes lied|das lied davor)", "previous"),
+        Rule(
+            "(?:vorheriger|vorheriges|vorherige|vorheriger titel|vorheriges lied|zurück zum letzten lied|letztes lied|das lied davor|" +
+                "(?:(?:geh|gehe|wechsel|wechsle|spring|springe|spiel|spiele) )?(?:zurück |zurueck )?" +
+                "(?:(?:zum|zur|zu dem|auf den|auf das|das|den|der|die) )?" +
+                "(?:(?:vorherigen|vorherige|vorheriger|vorheriges)(?: (?:lied|titel|song|track|stück|stueck))?|" +
+                "(?:letzten|letzte|letzter|letztes) (?:lied|titel|song|track|stück|stueck))|" +
+                "(?:(?:geh|gehe|spring|springe) )?(?:ein lied|einen titel|einen song) (?:zurück|zurueck))",
+            "previous",
+        ),
         Rule("(?:nochmal|noch mal|wiederholen|wiederhole)(?: das lied| den titel| diesen song)?(?: von vorne)?", "play it again"),
         Rule(
             "(?:was läuft|was laeuft|was läuft gerade|was ist das für ein lied|was für ein lied ist das|welches lied ist das|" +

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="changelog_46">
+        <item>Fixed a crash that sank myCar and ended the voyage: it struck after a tap in Plancia\'s page, then a turn to the chart or the fleet, the Plancia app taking its place, or a change of paint.</item>
+        <item>Pirate speak: in Rigging &gt; Tongue, every text of myCar in pirate terms, in yer own tongue. We chart our own course and bow to no crown.</item>
+        <item>A fresh moving wallpaper, myCar · Rebel: the waves, and a pirate ship that rides out every storm, skull and crossbones flying high.</item>
+        <item>If myCar ever closes by itself, the next start writes in the ship\'s log why Android scuttled it (a crash, memory, not responding), so the hole can be patched.</item>
+        <item>The parrot\'s voice models come aboard one at a time, never once the voyage is over, and before the first command only with memory to spare in the hold.</item>
+        <item>Wee shanty box: on small screens it sets out clear of the chart\'s buttons, let go under them it drifts just clear, and the chart\'s faded buttons no longer steal taps meant for the chart.</item>
+        <item>Verses: every shanty starts from its first line, and a live version of another shanty no longer smuggles in its words.</item>
+        <item>Spotify and the other shanty services: \"play …\" waits up to 25 seconds for the page, and a Play still waiting doesn\'t start once you\'ve switched shanties.</item>
+        <item>Choosing the ship\'s radio stops a video or a radio playing in Cinema or the browser, and they don\'t start again by themselves. Autoplay strikes up the shanties only once the sound has a course to the ship.</item>
+        <item>Parrot: \"next\", \"pause\" or \"stop\" inside a longer question no longer change the shanty; \"don\'t send\" and \"cancel\" are heard while you answer a message; a pause right before another shanty command no longer cancels it.</item>
+        <item>Fresh plunder waits for a call to end, and during a call the decks beside the chart and their menu stay below the call\'s bar.</item>
+        <item>Changing myCar\'s tongue mid-voyage switches the helm at once; on Android 12 and 13, opening myCar mid-voyage gives the chart its position back.</item>
+    </string-array>
+</resources>

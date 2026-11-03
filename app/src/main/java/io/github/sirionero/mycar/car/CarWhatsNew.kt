@@ -58,8 +58,10 @@ fun CarWhatsNew() {
     val moving = !rememberVideoAllowed()
     val due = (afterUpdates || keepShown) && seen < release.versionCode && !moving
     if (!open && !due) return
-    // A ringing call first: the card and its scrim covered the call's Answer.
-    if (CarCalls.state.collectAsState().value is CallUiState.Ringing) return
+    // A ringing call first: the card and its scrim covered the call's Answer. Shown on its own, it waits
+    // for the end of a call under way too: over its bar, a touch on End call closed the card instead.
+    val call = CarCalls.state.collectAsState().value
+    if (call is CallUiState.Ringing || (call !is CallUiState.None && !open)) return
     val close = { CarSettings.closeWhatsNew(release.versionCode) }
     // The car's Back closes it, as the scrim does, instead of the screen under it.
     CardBackKey(CardBack::whatsNew) { close() }

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_support_title">支持这趟航行</string>
+    <string name="settings_support_footer">myCar 免费，没有广告，也不跟踪你。你的支持能让这艘船继续乘风破浪。</string>
+    <string name="settings_usage_notes_title">航行报告</string>
+    <string name="settings_updates_title">换新帆</string>
+
+    <string name="settings_about_title">船旗</string>
+    <string name="settings_about_whats_new">新战利品</string>
+    <string name="settings_about_replay_intro">重看 %1$s 版起航介绍</string>
+    <string name="settings_about_replay_intro_detail">点按几下，看看这个版本带回了哪些新战利品</string>
+    <string name="settings_about_setup">出海准备</string>
+    <string name="settings_about_setup_detail">查看哪些准备已妥当、哪些还没完成，不会删除任何内容。</string>
+
+    <string name="settings_connection_title">登船</string>
+    <string name="settings_use_mycar">在船上使用 myCar</string>
+    <string name="settings_use_mycar_on">连接汽车时由 myCar 应声掌舵</string>
+    <string name="settings_use_mycar_off">已关闭：可改由 Android Auto 掌舵，接管连接</string>
+    <string name="settings_wireless_auto">自动无线登船</string>
+    <string name="settings_wireless_auto_on">无线连接过的汽车一启动，myCar 就会自动重新登船。Android 只会询问一次。</string>
+    <string name="settings_wireless_auto_cars">%1$s 一启动，myCar 就会自动重新登船。换一辆车时，在一次无线航程之后，Android 会询问一次。</string>
+    <string name="settings_wireless_auto_off">已关闭：每次都要点按“无线登船”</string>
+
+    <string name="settings_help_title">帮助和船具</string>
+    <string name="settings_help_connect">如何登船</string>
+    <string name="settings_help_connect_detail">哪些汽车能用，以及出海前还需要设置什么</string>
+    <string name="settings_help_preview">千里镜预览</string>
+    <string name="settings_help_preview_detail">在手机上眺望船上屏幕</string>
+    <string name="settings_preview_busy">未登船时可用</string>
+    <string name="settings_help_logs">航海日志</string>
+    <string name="settings_help_logs_detail">myCar 和船之间正在互相喊些什么</string>
+
+    <string name="settings_audio_title">船上音频</string>
+    <string name="settings_audio_footer_ask">无论走哪条航线，通话都通过蓝牙。在“如何登船”中运行一次那条命令，myCar 就不会再请求共享音频。</string>
+    <string name="settings_audio_footer">无论走哪条航线，通话都通过蓝牙。</string>
+    <string name="settings_audio_auto">自动（船长推荐）</string>
+    <string name="settings_audio_auto_detail">汽车能用蓝牙接收手机的船歌时走蓝牙，否则走 myCar</string>
+    <string name="settings_audio_bluetooth_detail">每次航程无需确认，海图应用的语音也能传到船上。部分汽车通过蓝牙只接收通话</string>
+    <string name="settings_audio_mycar_detail">像 Android Auto 一样，通过数据线或 WLAN 运送。每次航程 Android 会请求一次共享音频</string>
+
+    <string name="settings_apps_recommended">船长推荐</string>
+
+    <string name="settings_cert_footer">更改将在下次登船时生效。</string>
+    <string name="settings_cert_hide_details">藏起详情</string>
+    <string name="settings_cert_in_use_next">从下次登船开始使用 %1$s。</string>
+    <string name="settings_cert_in_use">正在服役。</string>
+
+    <string name="settings_test_trying">正在试航…</string>
+    <string name="settings_test_away">出海</string>
+    <string name="settings_address_away">出海时的地址（可选）</string>
+    <string name="settings_save_and_test">存进舱并试航</string>
+
+    <string name="settings_plancia_footer">你的 Home Assistant 仪表盘，在船上一打开就能用：可以从船队中打开，放在海图旁的甲板上，或显示在海图旁的面板中。令牌在 Home Assistant 中创建：用户资料 &gt; 安全 &gt; 长期访问令牌。</string>
+    <string name="settings_plancia_use_app">征用 Plancia 应用的账户</string>
+    <string name="settings_plancia_use_app_detail">直接拿来它的地址和令牌，一个字都不用敲</string>
+    <string name="settings_plancia_asking">正在向 Plancia 喊话…</string>
+    <string name="settings_plancia_app_no_account">Plancia 舱里还没有可共享的账户：请先在 Plancia 中设好，或在下方输入。</string>
+    <string name="settings_plancia_missing">请添加地址和令牌，才好起航。</string>
+    <string name="settings_plancia_missing_remove">请添加地址和令牌，才好起航。如要把 Plancia 扔下 myCar，请点按“移除”。</string>
+    <string name="settings_plancia_remove_title">要把 Plancia 扔下 myCar 吗？</string>
+    <string name="settings_plancia_remove_text">myCar 会忘记它的地址和令牌。如果手机上装有 Plancia 应用，它会重新回到船上。</string>
+    <string name="settings_plancia_removed">Plancia 已关闭：如果手机上装有 Plancia 应用，它会重新回到船上。</string>
+    <plurals name="settings_plancia_test_ok">
+        <item quantity="other">Home Assistant %1$s，舱里有 %2$d 个实体</item>
+    </plurals>
+    <string name="settings_ask_ha">在船上询问 Home Assistant</string>
+    <string name="settings_ask_ha_detail">myCar 的随船鹦鹉自己做不到的事，会交给 Home Assistant 中设置的语音助手（在 Home Assistant 的“设置 &gt; 语音助手”中）：Claude、Gemini、ChatGPT、家中运行的模型，或 Home Assistant 自带的助手，它还能控制家里的设备。手机锁定时，由它代替手机的鹦鹉回答。只有这些话会以文字形式发送到你的 Home Assistant。</string>
+
+    <string name="settings_xonos_footer">把你的 Music Assistant 音乐库搬上船，和船上的船歌应用排在一起。船上音频设为“通过 myCar”时，它的船歌直接传到船上，收听时 Android 也不会请求共享音频。</string>
+    <string name="settings_xonos_use_app">征用 Xonos 应用的账户</string>
+    <string name="settings_xonos_use_app_detail">直接拿来它的地址和登录信息，一个字都不用敲</string>
+    <string name="settings_xonos_asking">正在向 Xonos 喊话…</string>
+    <string name="settings_xonos_app_no_account">Xonos 舱里还没有可共享的账户：请先在 Xonos 中登录，或在下方入伙。</string>
+    <string name="settings_xonos_signed_in">已入伙。重新入伙即可更改。</string>
+    <string name="settings_xonos_signed_in_as">已入伙：%1$s。重新入伙即可更改。</string>
+    <string name="settings_xonos_missing">请填写地址、用户名和密码，才好起航。</string>
+    <string name="settings_xonos_signing_in">正在入伙…</string>
+    <string name="settings_xonos_sign_in">入伙</string>
+    <string name="settings_xonos_remove_title">要把 Xonos 扔下 myCar 吗？</string>
+    <string name="settings_xonos_remove_text">myCar 会忘记它的地址和登录信息，重新入伙时需要输入密码。如果手机上装有 Xonos 应用，它会重新回到船上。</string>
+    <string name="settings_xonos_removed">myCar 中的 Xonos 已关闭：如果手机上装有 Xonos 应用，它会重新回到船上。</string>
+    <string name="settings_xonos_test_ok">Music Assistant %1$s，以 %2$s 的名号开唱</string>
+
+    <string name="settings_cinema_footer">视频网站会以图块的形式出现在船上，每个网站都在专为视频打造的浏览器中打开。受保护的视频（Netflix、DAZN、Prime Video、Disney+ 等）在船上很可能是黑屏：Android 会对被转成视频流的屏幕隐藏这些内容，而船上屏幕正是这样。</string>
+    <string name="settings_cinema_name">名号</string>
+    <string name="settings_cinema_reset_title">恢复为船长推荐的网站？</string>
+    <string name="settings_cinema_reset_text">Cinema 将调转船头，恢复为 %1$s。</string>
+    <string name="settings_cinema_reset_text_own">Cinema 将调转船头，恢复为 %1$s。你自己添加的网站会被扔下船：%2$s。</string>
+    <string name="settings_cinema_remove_title">要把“%1$s”扔下船吗？</string>
+    <string name="settings_cinema_remove_site_text">它会被扔出 Cinema。如需捞回来，要重新输入它的地址。</string>
+    <string name="settings_cinema_remove">把“%1$s”扔下船</string>
+    <string name="settings_cinema_protected">受保护的视频，在船上可能是黑屏</string>
+    <string name="settings_cinema_videos_ask">允许 myCar 在船上的“本机货舱视频”中显示它们</string>
+    <string name="settings_cinema_videos_limited">船上只显示为 myCar 挑出的视频</string>
+    <string name="settings_cinema_videos_allowed">它们会显示在船上的“本机货舱视频”中</string>
+    <string name="settings_cinema_tv_footer">M3U 格式的 IPTV 列表，可以来自你的服务商、公开列表或家中的电视服务器：每个列表都是 Cinema 中的一个图块，里面是它的频道。频道用手机自带的播放器播放；受保护的频道（DRM）和组播频道会被留在岸上。</string>
+    <string name="settings_cinema_tv_remove_text">它的地址和频道会被扔下 myCar。如需捞回来，要重新输入地址。</string>
+    <string name="settings_cinema_tv_loading">正在搬上船…</string>
+
+    <string name="settings_phone_typing_close">关闭船上键盘</string>
+    <string name="settings_phone_typing_label">输入到船上屏幕</string>
+    <string name="settings_phone_typing_search">在船上屏幕上搜寻</string>
+
+    <string name="settings_audio_choice_title">通过蓝牙播放船上音频？</string>
+    <string name="settings_audio_choice_text">Android 会把通过 myCar 送出的音乐当作共享屏幕，所以每次航程都会询问。如果你的汽车能通过蓝牙播放手机音乐，改走蓝牙就不会再询问。以后可以在“舵轮”中更改。</string>
+    <string name="settings_audio_choice_command">或者守住这条航线，彻底不再询问：在手机上开启 USB 调试，连接到电脑，然后运行一次这条命令。</string>
+    <string name="settings_audio_choice_bluetooth">改走蓝牙</string>
+    <string name="settings_mic_blocked_title">船上音频需要麦克风权限</string>
+
+    <string name="about_give_once_detail">多少金币都行，用银行卡支付</string>
+    <string name="about_bitcoin_title">用比特币资助航行</string>
+    <string name="about_matrix">Matrix 上的 Gearslip 船员聊天室</string>
+    <string name="about_matrix_detail">myCar 的母船 Gearslip 项目的社区</string>
+    <string name="about_upstream">源自母船 Gearslip</string>
+
+    <string name="voice_model_live_about">随船鹦鹉在这部手机上把语音转成文字，你说的话不会离开手机——除非设置了 Home Assistant，此时 myCar 自己做不到的事会以文字形式发送到你的 Home Assistant。它需要两个模型，共约 %1$d MB，只需下载一次。这个模型会在你说话时实时写出文字（英语）；用其他语言时，它要等你说完才会识别。</string>
+    <string name="voice_model_final_about">你说完后，这个模型会把整句话重新识别一遍，捞回实时模型漏掉的人名和地名。</string>
+    <string name="voice_model_none_detail">保留实时识别的结果。航速最快，但最不准确</string>
+    <string name="voice_model_delete_title">要凿沉 %1$s 吗？</string>
+    <string name="voice_model_delete_in_use">会腾出手机里 %1$d MB 的舱位。这是正在使用的模型：重新下载之前，船上的鹦鹉将无法听你说话。</string>
+    <string name="voice_model_delete_again">会腾出手机里 %1$d MB 的舱位。之后可以在这里重新下载。</string>
+    <string name="voice_model_downloaded">已下载进舱。%1$s</string>
+    <string name="voice_model_downloading">正在下载进舱，%1$d%%</string>
+    <string name="voice_model_parakeet_small_detail">船身更轻、航速更快，但更容易漏听名字。NVIDIA NeMo，CC BY 4.0</string>
+    <string name="voice_model_canary_detail">船长推荐。航速快，能准确听出人名和地名。支持英语、西班牙语、德语和法语。NVIDIA NeMo，CC BY 4.0</string>
+    <string name="voice_model_parakeet_large_detail">最能听准名字，但航速较慢，吨位是三倍。NVIDIA NeMo，CC BY 4.0</string>
+    <string name="voice_model_parakeet_multi_detail">意大利语、葡萄牙语、西班牙语、法语、德语、希腊语、俄语和英语，另有 17 种欧洲语言。吨位和 Parakeet 大型一样大，航速一样慢。NVIDIA NeMo，CC BY 4.0</string>
+
+    <string name="voice_model_language_ready">myCar 的船上语言是%1$s，所以船上的鹦鹉会用%1$s听你说话并回答，使用的模型是 %2$s。</string>
+    <string name="voice_model_language_phone">myCar 的船上语言是%1$s，所以船上的鹦鹉会用%1$s听你说话并回答，使用手机的语音识别。</string>
+    <string name="voice_model_language_ready_try">myCar 的船上语言是%1$s，所以船上的鹦鹉会用%1$s听你说话并回答，使用的模型是 %2$s。试着喊一声“%3$s”。</string>
+    <string name="voice_model_language_missing">myCar 的船上语言是%1$s。下载 %2$s（%3$d MB）后，船上的鹦鹉会用%1$s听你说话并回答；在此之前，它只听得懂英语。</string>
+    <string name="voice_model_language_tts">这只鹦鹉会用手机自带的%1$s语音（文字转语音）来回答。如果听起来不对，请在 Android 的文字转语音设置中选择或下载这种语音。</string>
+
+    <string name="speech_download_title">正在把语音下载进舱</string>
+    <string name="speech_download_not_stored">无法把模型存进舱</string>
+
+    <string name="stats_intro">开启后，myCar 会在你打开它时以及每次航程后发送一份简短的报告。%1$s这些报告能告诉我们哪些汽车可以使用，其他汽车又是在哪一步出了问题。</string>
+    <string name="stats_send">发送航行报告</string>
+    <string name="stats_share_drives">每次航程以及如何结束</string>
+    <string name="stats_hide_note">藏起报告</string>
+    <string name="stats_example">示例（不会发送）：一次航程会在“sessions”中添加这些内容</string>
+    <string name="stats_worked_title_year">啊哈！myCar 已在你的 %1$s 款 %2$s 上顺利起航</string>
+    <string name="stats_worked_title_named">啊哈！myCar 已在你的 %1$s 上顺利起航</string>
+    <string name="stats_worked_title_car">啊哈！myCar 已在你的船上顺利起航</string>
+    <string name="stats_worked_text">要分享出去，让下一位船长知道它能用吗？不含姓名、账户或位置信息。</string>
+
+    <string name="tailscale_bridged_title">通过 Tailscale：也搭 %1$s 应用的便船</string>
+    <string name="settings_group_general">船务</string>
+    <string name="settings_group_general_detail">船上语言、船漆、换新帆</string>
+    <string name="settings_group_connection_detail">无线、船上音频、证书</string>
+    <string name="settings_group_voice">鹦鹉</string>
+    <string name="settings_group_voice_detail">随船鹦鹉和语音模型</string>
+    <string name="settings_group_plancia_detail">船上的 Home Assistant</string>
+    <string name="settings_group_xonos_detail">船上的 Music Assistant</string>
+    <string name="settings_group_help_detail">如何登船、航海日志</string>
+    <string name="settings_group_about_detail">版本、许可、支持这趟航行</string>
+    <string name="settings_group_car">船上屏幕</string>
+    <string name="settings_group_car_detail">母港、甲板、外观、壁纸、提醒</string>
+    <string name="settings_car_pages_header">船上母港里海图两侧的甲板。可在这里改造，也可在船上用圆点旁的铅笔改造。</string>
+    <string name="settings_car_pages_ready_text">你的甲板将被现成的甲板替换：海图左侧是天气和日程；如果已设置或安装 Plancia，右侧是 Plancia 和浏览器。</string>
+    <string name="settings_car_fit_offline">连上汽车后即可适配它的屏幕：每次修改都会立即显示在船上屏幕上。</string>
+    <string name="settings_grid_apps">船队中的应用</string>
+    <string name="settings_grid_apps_all">全员在列</string>
+    <plurals name="settings_grid_apps_hidden">
+        <item quantity="other">已藏起 %d 个</item>
+    </plurals>
+    <string name="settings_grid_apps_note">取消勾选某个应用，它就不会出现在船队中。在船上：长按应用并选择“从船队中藏起”。钉上桅杆的应用会留在那里。</string>
+    <string name="theme_title">船漆</string>
+    <string name="theme_footer">myCar 在手机上的外观。船上屏幕有自己的外观，在船上的舵轮中。</string>
+    <string name="theme_phone">跟随手机风向</string>
+    <string name="theme_black">海盗旗黑 (AMOLED)</string>
+    <string name="settings_audio_per_car">连接汽车时，这个选择会为这辆车保留，船歌匣中的声音按钮也可以更改它。未连接汽车时，它适用于所有汽车。</string>
+    <string name="settings_group_music">船歌</string>
+    <string name="settings_group_music_detail">船上的 Xonos、Spotify 和更多船歌</string>
+    <string name="music_in_the_car">在船上</string>
+    <string name="music_xonos_on">Music Assistant 显示在船上屏幕上，作为其中一个船歌应用</string>
+    <string name="music_xonos_off">已关闭：Xonos 不会出现在船上屏幕上，Xonos 应用也不会</string>
+    <string name="music_service_on">显示在船队中；通过 myCar 开唱</string>
+    <string name="music_service_off">已关闭：不会出现在船上屏幕上</string>
+    <string name="music_sign_in">在手机上入伙</string>
+    <string name="music_sign_in_detail">用手机键盘入伙：船上也会保持入伙状态</string>
+    <string name="music_sign_in_title">%1$s：入伙</string>
+    <string name="music_sign_out">退伙</string>
+    <string name="music_sign_out_detail">在 myCar 中从此服务退伙，手机和船上都会退出</string>
+    <string name="music_hide_app">藏起手机上的 %1$s 应用</string>
+    <string name="music_hide_app_detail">船队中只保留 myCar 内的 %1$s：不会显示这部手机上的 %1$s 应用，这样就不会有两个。</string>
+    <string name="music_sign_out_title">要从 %1$s 退伙吗？</string>
+    <string name="music_sign_out_text">myCar 会把 %1$s 的登录信息以及其网页保存的内容统统扔下船。你的账号不受影响。</string>
+    <string name="music_add_footer">其他音乐服务，各自在 myCar 中使用自己的网页播放器：歌声会像 Cinema 一样经 myCar 传到船上。</string>
+    <string name="music_add_note">你勾选的服务会出现在这里，也会加入船队。</string>
+    <string name="music_needs_google">Google 可能不允许在应用内登录：这时 YouTube Music 会以未登录状态开唱。</string>
+    <string name="music_needs_apple">上船需要订阅 Apple Music。</string>
+    <string name="music_needs_amazon">上船需要 Amazon Prime 或 Amazon Music Unlimited。</string>
+    <string name="music_needs_tidal">上船需要订阅 TIDAL。</string>
+    <string name="music_needs_qobuz">上船需要订阅 Qobuz。</string>
+</resources>

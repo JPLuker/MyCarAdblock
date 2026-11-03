@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="xonos_cat_foryou">Per te, capitano</string>
+    <string name="xonos_cat_tracks">Ballate</string>
+    <string name="xonos_cat_favorites">Ballate nel forziere</string>
+    <string name="xonos_cat_browse">Esplora i servizi</string>
+    <string name="xonos_top_tracks">Ballate più ascoltate</string>
+    <string name="xonos_all_tracks">Tutte le ballate</string>
+    <string name="xonos_problem_bad_token">Token non accettato: arruolati di nuovo in myCar sul telefono</string>
+    <string name="xonos_problem_not_configured">Prepara Xonos a salpare in myCar sul telefono</string>
+
+    <plurals name="xonos_count_tracks">
+        <item quantity="one">%d ballata</item>
+        <item quantity="other">%d ballate</item>
+    </plurals>
+</resources>

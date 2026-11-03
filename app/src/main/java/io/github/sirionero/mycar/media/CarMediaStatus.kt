@@ -2,6 +2,7 @@ package io.github.sirionero.mycar.media
 
 import android.graphics.Bitmap
 import android.media.session.PlaybackState
+import io.github.sirionero.mycar.BuildConfig
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.Protobuf
 import io.github.sirionero.mycar.car.CarServices
@@ -97,7 +98,8 @@ class CarMediaStatus(
         now.art?.let { art -> artBytes(art)?.let { body += Protobuf.bytesField(4, it) } }
         if (now.durationMs > 0) body += Protobuf.varintField(6, now.durationMs / 1000)
         sendOnChannel(MSG_METADATA, body)
-        MyCarLog.i("media status: -> track \"${now.title}\" by ${now.artist.ifBlank { "?" }}")
+        // The song's name only in the debug build: the log is shared for help.
+        MyCarLog.i("media status: -> track" + if (BuildConfig.DEBUG) " \"${now.title}\" by ${now.artist.ifBlank { "?" }}" else "")
     }
 
     /** Album art as a small PNG: car screens show it at thumbnail size, and the link is shared with video. */

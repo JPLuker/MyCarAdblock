@@ -92,6 +92,46 @@ shoot() {
     adb logcat -d -b crash > "previews/$1/crash.txt" 2>&1
 }
 
+# alive <shot>: whether myCar still runs at the end of the shot (the shot leaves it running), and if
+# not how it ended: the crash buffer (a native crash's tombstone too), what the web engine, the
+# graphics and Android said about it, and Android's record of the process's exits. In alive.txt.
+alive() {
+    case " ${ONLY:-$1} " in *" $1 "*) ;; *) return ;; esac
+    [ -d "previews/$1" ] || return
+    adb get-state >/dev/null 2>&1 || return
+    local pid
+    pid=$(adb shell pidof "$PKG" | tr -d '\r')
+    {
+        echo "myCar's process at the end of the shot: ${pid:-none}"
+        echo "--- crash buffer ---"
+        adb logcat -d -b crash
+        echo "--- native crashes, the web engine, graphics, kills ---"
+        adb logcat -d -v time -b main,system | grep -E "DEBUG|Fatal signal|F libc|libc  |chromium|cr_|WebView|hwui|OpenGLRenderer|RenderThread|lowmemorykiller|Killing|has died|ActivityManager: Process" | tail -300
+        echo "--- Android's record of myCar's exits ---"
+        adb shell dumpsys activity exit-info "$PKG" | head -120
+        echo "--- myCar's memory at the end ---"
+        adb shell dumpsys meminfo "$PKG" | head -45
+        echo "--- Android's settings on apps' memory ---"
+        adb shell device_config list activity_manager | grep -iE "mem|limit|kill" | head -40
+    } > "previews/$1/alive.txt" 2>&1
+    echo "--- $1: myCar's process at the end: ${pid:-none (gone)} ---"
+    grep -m 30 -E "Fatal signal|\*\*\* \*\*\*|signal [0-9]+ \(|Abort message|#[0-9]{2} pc" "previews/$1/alive.txt" || true
+}
+
+# How myCar's last process ended, at the top of the next log (LastExit): a native crash on purpose
+# (--ei crashAfterMs, debug only: a SIGSEGV), then a shot that only starts and says how the one before
+# ended - the signal, the crashing thread's frames - as a drive's log would after a crash.
+EXTRA="--ei crashAfterMs 5000" shoot last-exit-crash 800 480 160 "$WAIT;$WAIT;$WAIT"
+alive last-exit-crash
+shoot last-exit 800 480 160 "$WAIT"
+case " ${ONLY:-last-exit} " in *" last-exit "*)
+    echo "--- last-exit: how the shot before ended, in myCar's log ---"
+    grep -h "last exit" previews/last-exit/log.txt 2>/dev/null | cut -c1-250 | head -50 || echo "last-exit: nothing" ;;
+esac
+
+# The hunt for "LayoutNode should be attached to an owner": scripted shots, only when named (crash-*).
+source .github/car-preview-crash.sh
+
 # Home, then the app grid (dock's foot), then the dashboard (the clock at its top).
 shoot 800x480 800 480 160 "48,436;48,44"
 shoot 1920x720 1920 720 240 "$GRID_BUTTON;72,66"
@@ -179,6 +219,28 @@ if [ -n "${HA_TOKEN:-}" ]; then
     EXTRA="$HA" shoot plancia-app 1920 720 240 "$WAIT;$WAIT;$GRID_BUTTON;$(at plancia);$WAIT;$WAIT;$WAIT;$PLANCIA_MENU;$WAIT"
     EXTRA="$HA" shoot plancia-page 1920 720 240 "$WAIT;$WAIT;$DOCK_MAP;1098,675;$WAIT;$WAIT;$WAIT"
     EXTRA="$HA --es sidePane mycar:plancia" shoot plancia-side 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+    # A page left of the map in three parts, as a driver had it (--es pageParts): Plancia in the half,
+    # the agenda and the weather in the quarters; the music beside the map. Its dot turns to it (the
+    # dock's map first, which brings the dots back over the map), then a swipe on the weather goes back
+    # to the map ("x,y,swipe,x2,y2"), eight times - the last four as soon as the page is there. The
+    # driver's report (0.6.9): myCar went away as the page went back to the map. alive.txt says whether
+    # myCar still runs at the end, and how it went if not.
+    swipes() {
+        local taps="$WAIT" i
+        for i in 1 2 3 4; do taps="$taps;$1;$2;$WAIT;$3;$WAIT"; done
+        for i in 1 2 3 4; do taps="$taps;$1;$2;$3"; done
+        echo "$taps;$WAIT;$WAIT"
+    }
+    SWIPE_PAGE="--es pageLayout half-quarters --es pageParts plancia,agenda,weather --ez demoSong true"
+    EXTRA="$HA $SWIPE_PAGE" shoot plancia-swipe 1920 720 240 "$(swipes "$DOCK_MAP" 966,675 1700,560,swipe,500,560)"
+    alive plancia-swipe
+    EXTRA="$HA $SWIPE_PAGE" shoot plancia-swipe-800x480 800 480 160 "$(swipes 48,116 404,450 720,380,swipe,220,380)"
+    alive plancia-swipe-800x480
+    # The same with Spotify's web player as the car's music, a second web page in myCar as in that drive
+    # (no account here: it loads, signed out, and nothing plays).
+    EXTRA="$HA --es pageLayout half-quarters --es pageParts plancia,agenda,weather --es webMusic spotify" \
+        shoot plancia-swipe-spotify 800 480 160 "$(swipes 48,116 404,450 720,380,swipe,220,380)"
+    alive plancia-swipe-spotify
     echo "--- Plancia inside myCar ---"
     grep -h "plancia:\|web:" previews/plancia-app/log.txt 2>/dev/null || echo "plancia-app: nothing in the log"
     # What isn't one of myCar's commands goes to Home Assistant's Assist (car/AssistantBrain), as if
@@ -461,6 +523,8 @@ if [ -s previews/browser-select/crash.txt ]; then head -20 previews/browser-sele
 grep -h "change " previews/browser-select/log.txt previews/browser-select/stream.txt 2>/dev/null | head -3 || true
 
 # The app grid over each kind of moving wallpaper: the same screen shot 2.5s apart, to compare.
+EXTRA="--es wallpaper mycar" shoot motion-mycar 1920 720 240 "$GRID_BUTTON;$WAIT;$WAIT"
+EXTRA="--es wallpaper mycar" shoot motion-mycar-800x480 800 480 160 "48,436;$WAIT;$WAIT"
 EXTRA="--es wallpaper waves" shoot motion-waves 1920 720 240 "$GRID_BUTTON;$WAIT;$WAIT"
 EXTRA="--es wallpaper fireflies" shoot motion-fireflies 1920 720 240 "$GRID_BUTTON;$WAIT;$WAIT"
 EXTRA="--es wallpaper lava" shoot motion-lava 1920 720 240 "$GRID_BUTTON;$WAIT;$WAIT"
@@ -893,6 +957,12 @@ setup_phone() {
     sleep 1.2; adb exec-out screencap -p > $d/09-intro-2.png
     sleep 1.2; adb exec-out screencap -p > $d/09-intro-3.png
     sleep 2; adb exec-out screencap -p > $d/09-intro-4.png
+    # Then the intro's other pages, Next by Next (its button, or the same spot when the screen can't
+    # be read): 09-intro-page-2 is the second page, up to the voice page (7) before Start.
+    for i in 2 3 4 5 6 7; do
+        tap_text "Next" || adb shell input tap $((W * 72 / 100)) $((H - 80))
+        sleep 2.5; adb exec-out screencap -p > $d/09-intro-page-$i.png
+    done
     # After a smaller update: the intro of this release seen, an older version noted, so the flag
     # runs up on its own page (UpdateSplash) before Home.
     adb shell am force-stop "$PKG"
@@ -924,13 +994,25 @@ phone_lang() {
     mkdir -p "$d"
     for s in setup home settings help intro; do
         adb shell am force-stop "$PKG"
+        # The intro from its first page: the language before left it on a later one.
+        [ "$s" = intro ] && adb shell run-as "$PKG" rm -f shared_prefs/intro.xml
         adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen "$s" >/dev/null
         sleep 4; adb exec-out screencap -p > "$d/$s-1.png"
-        adb shell input swipe 160 520 160 180 400; sleep 1.5; adb exec-out screencap -p > "$d/$s-2.png"
-        adb shell input swipe 160 520 160 180 400; sleep 1.5; adb exec-out screencap -p > "$d/$s-3.png"
+        # From above the fixed bar at the foot (setup's big button): started on it, the list didn't move.
+        adb shell input swipe 160 430 160 110 400; sleep 1.5; adb exec-out screencap -p > "$d/$s-2.png"
+        adb shell input swipe 160 430 160 110 400; sleep 1.5; adb exec-out screencap -p > "$d/$s-3.png"
+    done
+    # Each page of the intro in this language, where long words have the least room: Next is at the
+    # same spot in every language (its text isn't English here).
+    for i in 2 3 4 5 6 7; do
+        # On the button (570-621 at 640 high): at H-80 the tap fell between the dots and it.
+        adb shell input tap $((W * 72 / 100)) $((H - 45))
+        sleep 1.5; adb exec-out screencap -p > "$d/intro-page-$i.png"
     done
 }
-LANGS="it es de fr pt el ru zh-CN"
+# it-XP, en-XP: pirate speak (AppLanguage.PIRATE), Italian and English. en-GB: English that isn't en-US
+# must stay plain (values-en, copied at build time): without it Android picked the pirate folder.
+LANGS="it es de fr pt el ru zh-CN it-XP en-XP en-GB"
 for lang in $LANGS; do
     BEFORE="adb shell cmd locale set-app-locales $PKG --locales $lang" EXTRA="--ez demoSong true" \
         shoot "lang-$lang" 1920 720 240 "$WAIT;$GRID_BUTTON;$(at settings);$WAIT"

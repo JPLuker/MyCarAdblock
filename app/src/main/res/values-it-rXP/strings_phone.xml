@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_whats_new_in">Bottino della %1$s</string>
+    <string name="home_how_to_connect_subtitle">Quali navi funzionano e cosa manca per salpare</string>
+    <string name="home_disconnect">Sgancia</string>
+    <string name="home_disconnect_title">Sganciarsi dalla nave?</string>
+    <string name="home_disconnect_text">myCar lascia subito lo schermo di bordo. Col cavo, staccalo e riattaccalo per tornare a bordo.</string>
+    <string name="home_bluetooth_missing_calls">Le chiamate passano dal Bluetooth, ma il telefono non è collegato all\'auto. Collegalo da qui o dal menu Bluetooth di bordo.</string>
+    <string name="home_bluetooth_missing_calls_music">Chiamate e musica passano dal Bluetooth, ma il telefono non è collegato all\'auto. Collegalo da qui o dal menu Bluetooth di bordo.</string>
+    <string name="home_voice_downloading">Carico a bordo la voce, %1$d%%</string>
+
+    <string name="wireless_button_connect">Abborda senza fili</string>
+    <string name="wireless_button_denied">Per l\'abbordaggio senza fili myCar ha bisogno dell\'accesso a Bluetooth e Wi-Fi nelle vicinanze.</string>
+    <string name="wireless_button_switched_off">myCar è disattivata a bordo (Timone, «Usa myCar a bordo»).</string>
+    <string name="wireless_button_which_car">Quale nave?</string>
+    <string name="wireless_button_bluetooth_off">Il Bluetooth è disattivato. Attivalo, poi tocca di nuovo «Abborda senza fili».</string>
+    <string name="wireless_button_not_paired">Il telefono non è ancora accoppiato con niente. Prima accoppialo con la nave.</string>
+    <string name="wireless_button_not_listed">La nave non c\'è? Prima accoppiala con il telefono.</string>
+
+    <string name="help_title">Come abbordare</string>
+    <string name="help_which_cars">Quali navi funzionano</string>
+    <string name="help_which_cars_text">La maggior parte delle auto funziona. Dal 2020 circa, alcune auto hanno aggiunto standard di sicurezza più recenti che rifiutano il certificato di myCar, e con quelle auto myCar non può salpare.</string>
+    <string name="help_see_full_list">Srotola l\'elenco completo</string>
+    <string name="help_in_the_car">A bordo</string>
+    <string name="help_step_connect">Attacca il cavo, o abborda senza fili.</string>
+    <string name="help_step_connect_detail">myCar si apre da sola quando la nave si collega. Per il senza fili, prima accoppia il telefono con la nave, poi tocca «Abborda senza fili» in porto.</string>
+    <string name="help_step_screening">Respingi le chiamate sconosciute prima che squillino.</string>
+    <string name="help_set_up">Prepara</string>
+    <string name="help_step_audio_prompt">Niente più domanda per l\'audio a ogni traversata.</string>
+    <string name="help_step_audio_prompt_detail">Collega il telefono a un computer con il debug USB attivo ed esegui questo comando una volta. Se lo salti, tocchi Avvia ogni volta che salpi.</string>
+    <string name="help_step_notifications_detail">Android nasconde il testo delle notifiche mentre condivide l\'audio. Esegui anche questo comando, e myCar toglie quel limite solo mentre la musica va a bordo.</string>
+
+    <string name="cert_notice_switched_text">Da ora myCar usa %1$s. Ricollegati all\'auto: ricollega il cavo o abborda senza fili.</string>
+    <string name="cert_notice_switched_next_text">Da ora myCar usa il certificato successivo. Ricollegati all\'auto: ricollega il cavo o abborda senza fili.</string>
+    <string name="cert_notice_own_refused_text">Per usare invece quelli pubblici, togli il tuo nel Timone, in Certificato.</string>
+
+    <string name="cert_setup_continue">Avanti tutta</string>
+    <string name="cert_setup_skip">Tira dritto senza preparare il collegamento all\'auto</string>
+
+    <string name="update_title">Vele nuove</string>
+    <string name="update_out">Vele nuove in vista: myCar %1$s</string>
+    <string name="update_downloading">Carico a bordo… %1$d%%</string>
+    <string name="update_unplug_first">Sgancia il telefono dalla nave per installare. L\'installazione chiude myCar.</string>
+    <string name="update_downloaded">Caricato a bordo. Android chiede prima di installare.</string>
+    <string name="update_check_now">Scruta ora</string>
+    <string name="update_status_debug">Le build di debug scrutano solo quando tocchi «Scruta ora»</string>
+    <string name="update_status_daily">myCar scruta l\'orizzonte una volta al giorno</string>
+    <string name="update_status_checking">Scruto l\'orizzonte…</string>
+    <string name="update_status_latest">Hai l\'ultima versione, capitano</string>
+    <string name="update_status_available">In vista la versione %1$s</string>
+    <string name="update_status_ready">La versione %1$s è a bordo, pronta da installare</string>
+    <string name="update_check_automatically">Scruta in automatico</string>
+    <string name="update_notification_text">Tocca per issare le vele nuove.</string>
+    <string name="update_error_no_github">Impossibile approdare su GitHub. Controlla la connessione e riprova.</string>
+    <string name="update_error_no_space">Nella stiva del telefono non c\'è abbastanza spazio per l\'aggiornamento. Liberane un po\', poi riprova.</string>
+    <string name="update_error_stopped">Il download si è arenato. Controlla la connessione, poi riprova.</string>
+    <string name="update_error_not_sent">GitHub non ha mandato a bordo l\'aggiornamento (codice %1$d). Riprova più tardi.</string>
+    <string name="update_error_stopped_early">Il download si è arenato prima della fine. Riprova.</string>
+    <string name="update_error_damaged">Il download è arrivato avariato. Riprova.</string>
+    <string name="update_splash_updated_to">Issate le vele della</string>
+    <string name="update_splash_tap">Tocca ovunque e avanti tutta</string>
+    <string name="update_flag_description">Una bandiera pirata al vento: 100% locale. Difendiamo i nostri dati.</string>
+    <string name="update_ship_description">Una nave pirata che batte bandiera myCar: 100% locale. Difendiamo i nostri dati.</string>
+
+    <string name="whatsnew_title">Bottino</string>
+    <string name="whatsnew_this_version">%1$s (quella a bordo)</string>
+
+    <string name="recommended_title">Consigli del capitano</string>
+    <string name="recommended_intro">Queste app gratuite funzionano sullo schermo di bordo di myCar. Ogni tasto apre la pagina dell\'app su GitHub.</string>
+    <string name="recommended_section_music">Ballate</string>
+    <string name="recommended_about_organic_maps">Mappe e rotte offline.</string>
+    <string name="recommended_about_vela">Navigazione svolta per svolta, libera da Google.</string>
+    <string name="recommended_about_youtube_music">Un organetto per YouTube Music.</string>
+    <string name="recommended_about_antennapod">Podcast, capitoli e tutto il carico.</string>
+    <string name="recommended_installed">Già a bordo</string>
+
+    <string name="logs_title">Diario di bordo</string>
+    <string name="logs_share">Spartisci</string>
+    <string name="logs_jump_to_latest">Rotta sulle ultime righe</string>
+    <string name="logs_empty">Il diario di bordo è ancora vuoto. Le righe compaiono qui in tempo reale durante una traversata.</string>
+    <string name="logs_share_subject">Diario di bordo di myCar</string>
+    <string name="logs_share_chooser">Spartisci il diario di bordo</string>
+    <string name="logs_earlier_title">Diari di bordo precedenti</string>
+    <string name="logs_earlier_empty">Ancora nessun diario di bordo precedente. Ogni volta che myCar salpa, ne comincia uno nuovo.</string>
+    <string name="logs_crashed">Naufragio</string>
+
+    <string name="preview_title">Cannocchiale di bordo</string>
+    <string name="preview_size">%1$dx%2$d @ %3$ddpi - i tocchi vanno all\'interfaccia di bordo</string>
+    <string name="preview_car_screen">Schermo di bordo</string>
+    <string name="preview_waiting">In attesa di avvistare un fotogramma…</string>
+    <string name="preview_leave">Chiudi il cannocchiale di bordo</string>
+
+    <string name="donate_title">Felici che la traversata sia andata bene</string>
+    <string name="donate_text">myCar è gratuita, senza pubblicità e senza tracciamento. Se ti accompagna nelle tue traversate, il tuo sostegno le tiene il vento in poppa.</string>
+    <string name="audio_not_reaching_title">La musica non arriva a bordo</string>
+    <string name="audio_not_reaching_text">La domanda di Android per mandare il suono tramite myCar è stata rifiutata, quindi a bordo non arriva musica.</string>
+</resources>

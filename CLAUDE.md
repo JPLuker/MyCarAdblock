@@ -82,6 +82,24 @@ Rispondi sempre in **italiano**.
   scelte; parte con un'attesa: il primo tocco subito dopo l'avvio diventava una pressione lunga),
   `pages-layouts/` (matita, "Layout", elenco dei formati, "Half left"), `layout-<formato>/`
   e `layout-800x480/` (la pagina a sinistra della mappa in quel formato, `--es pageLayout <id>`); l'anteprima riparte ogni volta dalle pagine pronte (`HomePages.reset()`).
+  `--es pageParts plancia,agenda,weather` (con `pageLayout`) dice cosa mostra ogni parte; il tocco
+  `"x,y,swipe,x2,y2"` è uno scorrimento rapido (8 passi da 16 ms). Scatti `plancia-swipe/`,
+  `plancia-swipe-800x480/`, `plancia-swipe-spotify/`: pagina in tre parti (Plancia, agenda, meteo),
+  aperta dal puntino e lasciata scorrendo verso la mappa otto volte; `alive.txt` (funzione `alive`)
+  dice se myCar gira ancora a fine scatto e, se no, crash, tombstone, uscite registrate da Android,
+  memoria. Verificato (0.7, API 37.0 e 34): nessuna caduta. `last-exit-crash/` + `last-exit/`:
+  `--ei crashAfterMs` (solo debug) manda a myCar un SIGSEGV, lo scatto dopo scrive come è finito
+  (`LastExit`): verificato su Android 17, segnale, frame e righe dal tombstone.
+  Crash del LayoutNode (`.github/car-preview-crash.sh`, inclusa da `car-preview.sh`; scatti `crash-*`
+  solo se nominati in `shots`): `--es script` (solo debug, `PreviewScript.kt`) manda tocchi,
+  trascinamenti e fling coi tempi di un'auto (`tap`, `drag`, `fling`, `tapText`, `focus`, `key`,
+  `focusweb` / `unfocus` per il fuoco del WebView, `rep:n … end`, `snap`), e tiene gli ultimi
+  fotogrammi in `ring/`; `CrashProbe.kt` scrive i cambi di fuoco col loro stack, il nodo a metà
+  rimozione e quello che cade. `crash-webfocus` (fuoco al WebView di Plancia, poi alla mappa),
+  `crash-focus`, `crash-focus-grid`, `crash-webfocus-edit` (pagina in modifica), `crash-webfocus-grid`
+  provano la correzione; `crash-webfocus-cleared` era il controllo A/B; `crash-swipe-*`,
+  `crash-grid-*`, `crash-cinema`, `crash-plancia-*` rifanno i viaggi dei log. Home Assistant parte
+  anche per gli scatti `crash-`.
   Assistente: `assistant/` (Impostazioni al posto di un assistente-activity, `phone-screen.png`),
   `assistant-google/` (l'app Google dell'emulatore: schermo del telefono dopo il microfono e dopo lo
   scorrimento dall'angolo, `phone-mic.png` / `phone-swipe.png`), `assistant-mic/` +
@@ -184,7 +202,10 @@ Rispondi sempre in **italiano**.
   `res/values/strings_changelog.xml` (un `string-array` `changelog_<versionCode>` per versione, scritto
   anche nelle 8 cartelle `values-xx`, più la riga `Release(code, nome, R.array.changelog_<code>)` in
   `Changelog.kt`: schermata "Novità" sull'auto e sul telefono) e in `.github/release-notes.md` (testo
-  del rilascio, in inglese).
+  del rilascio, in inglese). Dalla 0.7.0 le novità si scrivono anche in **piratesco** (richiesta
+  dell'utente: col piratesco scelto, anche le descrizioni dei prossimi aggiornamenti sono pirata, più
+  colorite, ogni termine un emblema della libertà): lo stesso `changelog_<versionCode>` in ognuna delle
+  cartelle `values-<lingua>-rXP` (vedi "Il piratesco").
 - Il workflow **Release** parte dai tag `v*`, firma l'APK con i secret e lo allega al rilascio
   (non pre-release, così Obtainium lo trova).
 - Dalla sessione cloud di Claude il push dei tag è rifiutato (403): il rilascio lo crea l'utente su
@@ -208,9 +229,9 @@ Modulo unico `:app` (cartella `app/`), package `io.github.sirionero.mycar`. UI *
 | Package | Ruolo |
 |---|---|
 | radice | Protocollo AA: `MyCarRunner` (sessione, canali, video/audio), `SessionService` (servizio in primo piano del viaggio), `Tailnet` (Tailscale/VPN per i messaggi di Plancia e Xonos), `Framing`, `Protobuf`, `PhoneTls`, `ServiceDiscovery`, `CertProvider` / `CertDownloader`, `VideoSource` (encoder), `ScreenProjector` (VirtualDisplay + `Presentation` con Compose → encoder → auto), `MyCarActivity` (possiede la sessione USB/wireless), `PermissionActivity` (la domanda di Android sul telefono per un tocco sull'auto), `MyCarLog`, `AppLanguage` (la lingua di myCar) e `Words` (i suoi testi fuori dalle schermate), `MyCarApplication` |
-| `car/` | **UI mostrata sull'auto**: `CarUi` (root: tema, navigazione, overlay, transizioni), `CarDock` (dock a sinistra), `CarHomeScreen` (mappa + player), `HomePager` / `HomePages` / `HomeWidgets` (pagine della Home ai lati della mappa, widget meteo e agenda), `GlassPlayer` (player accanto alla mappa), `CarLauncher` (griglia app a pagine), `PhoneAssistants` (assistente vocale a scelta), `AssistantLanguage` + frasari (l'assistente nella lingua di myCar), `AssistantBrain` (quello che non è un comando va a Home Assistant), `WallpaperPicker`, `MediaScreen`, `PhoneDialerScreen` / `PhoneRecents` (Telefono: Recenti, contatti, tastierino), `QuickReplyTexts` (risposte rapide nella lingua di myCar), `CallOverlay`, `CarDashboardScreen`, `CarSettingsScreen`, `PlanciaApp` / `PlanciaWeb` / `PlanciaScripts` (Plancia integrata), `CinemaApp` / `CinemaShelves` / `CinemaPlayer` / `CinemaContinue` (Cinema in auto), `CarDriving` (stato di guida detto dall'auto, per il video), `CarWebContext` (il contesto di ogni WebView sullo schermo dell'auto), `WebSelect` (menu a tendina delle pagine), `AppLinks` (link alle app nelle pagine), `TemplateBack` / `BackCloses` (tasto Indietro dell'auto), `WebMusicApp` / `WebMusicPage` / `WebMusicScripts` (i lettori web dei servizi musicali), `CarClipboard` (appunti tra telefono e auto nella tastiera dell'auto), `CarNavigator` (stack schermate `CarScreen`), template Car App Library (`Template*`) |
+| `car/` | **UI mostrata sull'auto**: `CarUi` (root: tema, navigazione, overlay, transizioni), `CarDock` (dock a sinistra), `CarHomeScreen` (mappa + player), `HomePager` / `HomePages` / `HomeWidgets` (pagine della Home ai lati della mappa, widget meteo e agenda), `GlassPlayer` (player accanto alla mappa), `CarLauncher` (griglia app a pagine), `PhoneAssistants` (assistente vocale a scelta), `AssistantLanguage` + frasari (l'assistente nella lingua di myCar), `AssistantBrain` (quello che non è un comando va a Home Assistant), `ReplyWords` / `PlayOrHouse` / `WholePhrases` (regole pure dell'assistente: risposte nel conto alla rovescia, «metti» per la casa o per la musica, domande intere), `WallpaperPicker`, `MediaScreen`, `PhoneDialerScreen` / `PhoneRecents` (Telefono: Recenti, contatti, tastierino), `QuickReplyTexts` (risposte rapide nella lingua di myCar), `CallOverlay`, `CarDashboardScreen`, `CarSettingsScreen`, `PlanciaApp` / `PlanciaWeb` / `PlanciaScripts` (Plancia integrata), `CinemaApp` / `CinemaShelves` / `CinemaPlayer` / `CinemaContinue` (Cinema in auto), `CarDriving` (stato di guida detto dall'auto, per il video), `CarWebContext` (il contesto di ogni WebView sullo schermo dell'auto), `WebSelect` (menu a tendina delle pagine), `AppLinks` (link alle app nelle pagine), `TemplateBack` / `BackCloses` (tasto Indietro dell'auto), `WebMusicApp` / `WebMusicPage` / `WebMusicScripts` (i lettori web dei servizi musicali), `CarClipboard` (appunti tra telefono e auto nella tastiera dell'auto), `CarNavigator` (stack schermate `CarScreen`), template Car App Library (`Template*`) |
 | `car/theme/` | Design system attuale dei controlli: `GsTheme` / `ControlLook` (temi Flat/Tactile/Keycap), `GsControls` (`GsButton`, `GsIconButton`, `gsColors`), `GsSeekBar`, `GsSwitch` |
-| `ui/` | **UI sul telefono**: onboarding (`IntroScreen` col veliero `PirateShip`, `SetupScreen`; le vecchie `CertSetupScreen` / `SetupGuideScreen`), `UpdateSplash` (la bandiera dopo ogni aggiornamento), `HomeScreen`, `SettingsScreen`, `LanguageSettings` (la lingua), `IntroLanguage` (la pagina della lingua nell'introduzione), `CarScreenSettings` (le impostazioni dell'auto sul telefono, coi pezzi `Pick`/`PickRow`/`PickDialog`/`SwitchRow`), `CarPagesSettings` (le pagine accanto alla mappa dal telefono), `AssistantSettings` (l'assistente vocale, in Voce), `MusicSettings` (la sezione Musica: Xonos, Spotify e gli altri servizi), `PlanciaSettings` (account di Home Assistant per Plancia), `XonosSettings` (account di Music Assistant per Xonos, nella sezione Musica), `CinemaSettings` (siti di Cinema e "Video only when parked"), `MyCarTheme` (Material You), `AboutLinks` (link, donazioni, avvisi di licenza) |
+| `ui/` | **UI sul telefono**: onboarding (`IntroScreen` col veliero `PirateShip`, `SetupScreen`; le vecchie `CertSetupScreen` / `SetupGuideScreen`), `UpdateSplash` (la bandiera dopo ogni aggiornamento), `HomeScreen`, `SettingsScreen`, `LanguageSettings` (la lingua), `IntroBadges` (i distintivi animati delle pagine dell'introduzione della 0.7 e la fila dei servizi musicali), `CarScreenSettings` (le impostazioni dell'auto sul telefono, coi pezzi `Pick`/`PickRow`/`PickDialog`/`SwitchRow`), `CarPagesSettings` (le pagine accanto alla mappa dal telefono), `AssistantSettings` (l'assistente vocale, in Voce), `MusicSettings` (la sezione Musica: Xonos, Spotify e gli altri servizi), `PlanciaSettings` (account di Home Assistant per Plancia), `XonosSettings` (account di Music Assistant per Xonos, nella sezione Musica), `CinemaSettings` (siti di Cinema e "Video only when parked"), `MyCarTheme` (Material You), `AboutLinks` (link, donazioni, avvisi di licenza) |
 | `host/` | Host Car App Library per app di terze parti (`CarAppConnection`, `KnownApps`) |
 | `cinema/` | Cinema: `Cinema` (i siti, "solo a macchina ferma", `MORE` suggeriti), `SiteIcons` (l'icona che ogni sito dà di sé, scaricata e tenuta sul telefono), `PhoneVideos` (video del telefono), `TvLists` + `M3u` (liste IPTV), `ChannelLogos` |
 | `home/` | Home Assistant di Plancia integrata: `HomeAssistant` (account, collegamento per tutto il viaggio, plance, import dall'app Plancia), `HaClient` (WebSocket, OkHttp), `Panels` (plance e titoli), `Assist` + `AssistPlan` (le domande all'assistente vocale di Home Assistant) |
@@ -219,7 +240,7 @@ Modulo unico `:app` (cartella `app/`), package `io.github.sirionero.mycar`. UI *
 | `webmusic/` | Servizi musicali web dentro myCar: `WebMusic` (catalogo, interruttori), `WebMusicMediaService` (lettore Media3 per servizio), `WebMusicPlayer`, `WebPlayerState`, `WebMusicSignIn` (accesso sul telefono) |
 | `xonos/` | Xonos integrato: `Xonos` (account, connessione, libreria), `XonosAccount` (import dall'app Xonos), il motore di Xonos (`data/`, `sendspin/`, `playback/`: Music Assistant, Sendspin, lettore Media3 `PlaybackService`), `sendspin/CarLinkOutput` (uscita dritta verso l'auto) |
 | `call/` | Chiamate: `CarCalls` (stato da `TelephonyCallback` + numero dal broadcast `PHONE_STATE`; risponde/rifiuta/chiude con `TelecomManager`, serve `ANSWER_PHONE_CALLS`), `MyCarCallScreening` (filtro facoltativo: trattiene le chiamate da numeri fuori rubrica solo con l'auto collegata; ignora quelle in uscita) |
-| `media/`, `notify/`, `speech/`, `mirror/`, `wireless/`, `update/`, `stats/` | Media, notifiche, voce (sherpa-onnx), mirroring, AA wireless (`WirelessLink`; collegamento da solo: `WirelessAuto`, `CarPresenceService`), auto-aggiornamento da GitHub, statistiche d'uso opt-in |
+| `media/`, `notify/`, `speech/`, `mirror/`, `wireless/`, `update/`, `stats/` | Media (`MusicAsks`: conta ciò che si chiede alla musica, per la pausa rimandata dell'assistente), notifiche, voce (sherpa-onnx), mirroring, AA wireless (`WirelessLink`; collegamento da solo: `WirelessAuto`, `CarPresenceService`), auto-aggiornamento da GitHub, statistiche d'uso opt-in |
 
 Tema/colori/font:
 - UI dell'auto: `MyCarCarTheme` (in `car/design/MyCarDesign.kt`) alla radice di `CarUi`: colori
@@ -312,7 +333,9 @@ Tutti i token in un solo posto, `car/design/`:
   (`MINI_DOTS_STRIP` 60 dp); finché il guidatore non la sposta la partenza la calcola `MiniPlace.start`: in
   basso a destra sulle mappe grandi, sulle piccole (800x480 a Large/Extra large) a sinistra dei tasti della
   mappa ma mai sotto la scheda a sinistra (42% della mappa, almeno 244 dp); dove accanto alla scheda non ci sta
-  (800x480 a Extra large: 173 dp per 276) si disegna in scala (`MiniPlace.fitScale`, mai sotto 0,6). Scatti `mini-large-800x480`,
+  (800x480 a Extra large: 173 dp per 276) si disegna in scala (`MiniPlace.fitScale`, mai sotto 0,6). Lasciata
+  sotto la riga delle azioni dell'app o accanto ai tasti della mappa (che le stanno sopra: Pausa diventava
+  Search) si sposta appena fuori al rilascio (`MiniPlace.clearOfButtons`, 0.7.0). Scatti `mini-large-800x480`,
   `mini-xl-800x480` (`--es carScale`). Sta nello slot `overMap` di `CarAppStage`, fra la
   superficie e la chrome del template: schede e tasti dell'app restano sopra, la superficie non cambia, ogni
   tocco fuori dalla pillola va alla mappa. Gesto nostro sul passaggio Initial (`dragAfterHold`): tocco breve al
@@ -669,8 +692,8 @@ Tutti i token in un solo posto, `car/design/`:
 - **Lingue** (0.6.0, richiesta dell'utente: "tutta l'applicazione, non solo l'assistente", le lingue
   di Xonos): myCar in inglese, italiano, spagnolo, tedesco, francese, portoghese (brasiliano, come
   Xonos), greco, russo e cinese semplificato (`AppLanguage`): quella del telefono finché non se ne
-  sceglie una in Impostazioni > Lingua (`ui/LanguageSettings.kt`) o nella pagina "La tua lingua."
-  dell'introduzione della 0.6 (`ui/IntroLanguage.kt`). Da Android 13 la tiene Android
+  sceglie una in Impostazioni > Lingua (`ui/LanguageSettings.kt`; l'introduzione della 0.6 aveva anche
+  la pagina "La tua lingua.", tolta nella 0.7). Da Android 13 la tiene Android
   (`LocaleManager`, `res/xml/locales_config.xml`: si sceglie anche dalle impostazioni di Android per
   l'app) e vale per tutto il processo senza riavvii (MyCarActivity gestisce il cambio di `locale`); su
   Android 12 la applica myCar (`MyCarApplication` → `applyToProcess`, `wrap` nelle activity,
@@ -760,6 +783,83 @@ Tutti i token in un solo posto, `car/design/`:
   stesso telo, `drawCloth`) sull'albero maestro; mare a tre strati, scia, spruzzi, ombra, gabbiani,
   sole e luccichio; col tema scuro luna, stelle e mare cupo. Tutto nel solo disegno (orologio di 120 s
   su cui tornano tutti i periodi). Una nuova installazione non vede né l'una né l'altro.
+- **Introduzione della 0.7** (richiesta dell'utente: "un grande aggiornamento" col veliero, e l'intro che
+  presenta le novità dalla 0.6): parte da sola quando `versionName` diventa 0.7.x (`Intro.release`). Pagine
+  (`IntroStep`): WELCOME (veliero, etichetta "alpha · smooth sailing", in italiano "a gonfie vele": in ogni
+  lingua un modo di dire sul navigare), MUSIC ("Music, built in.": Spotify e gli altri servizi dal loro
+  lettore web, accesso col proprio account in Impostazioni > Musica, l'app Spotify del telefono da nascondere;
+  sotto scorre la fila dei servizi, `ServiceTicker`, dal catalogo di `WebMusic` più Xonos, senza Apple Music:
+  niente nome Apple sulle pagine di myCar), MINI_PLAYER (mini lettore e lettore fino a Molto grande), LYRICS,
+  LOCATION (posizione col telefono bloccato in tasca), CAR_ON_PHONE (impostazioni dell'auto, pagine e app
+  nascoste dal telefono), VOICE e GRAPHENE come prima. Tolte LANGUAGE, WIRELESS, KNOBS, THEME, APPS (non
+  dicono niente di nuovo a chi viene dalla 0.6) coi loro testi e `ui/IntroLanguage.kt`. Distintivi animati
+  nuovi in `ui/IntroBadges.kt` (nota che balla, mini lettore spostato sullo schermo, righe del testo che si
+  accendono, freccia con gli anelli, telefono con due interruttori), dentro il solito biscotto di
+  `BadgeStep`. Titoli di circa dieci lettere per riga (il carattere segue la larghezza): niente parole
+  lunghe. Il passo salvato vale solo per la sua release (`step_release`): una pagina lasciata a metà
+  dell'intro della 0.6 non fa saltare le prime della 0.7. Scatti: `setup-phone/09-intro-page-2…7` e, per
+  lingua, `lang-<lingua>/phone/intro-page-2…7`. Provato col banco Compose Desktop (sopra, "Build"): le
+  pagine nuove in inglese, greco, russo, tedesco, francese e cinese stanno anche a 320×640 dp.
+- **Il piratesco** (0.7.0, richiesta dell'utente: "un'ulteriore lingua, il piratesco, che funziona in
+  tutte le lingue e scrive ogni testo in termini pirateschi, l'emblema della libertà di scelta"): non una
+  lingua a sé ma un modo di parlare ciascuna delle 9, la lingua con la regione a uso privato **XP**
+  (`it-XP`, `en-XP`…, `AppLanguage.PIRATE`), testi in `res/values-<lingua>-rXP` (inglese `values-en-rXP`,
+  cinese `values-zh-rXP`). Un testo che manca lì viene dalla cartella della lingua: si può scrivere a
+  pezzi. Non la variante BCP 47 `it-pirate`: aapt2 non costruisce `values-b+it+pirate` ("configuration
+  has invalid locale 'it-'"). Impostazioni > Lingua > "Parla da pirata" (`language_pirate`,
+  `AppLanguage.choose(…, pirate)`); da Android 13 Android tiene `it-XP` come lingua di myCar, su
+  Android 12 la applica myCar (chiave `app_language_pirate`); col piratesco e la lingua del telefono si
+  fissa quella in cui è myCar. `AppLanguage.wanted` è un `Locale` (la regione conta per lo schermo
+  dell'auto e `Words`); ciò che va col paese (unità automatiche, formato dei numeri di telefono,
+  portoghese del Portogallo o del Brasile) prende `AppLanguage.country()`, il paese del telefono quando
+  la regione è XP. `tools/check_strings.py` controlla anche le cartelle `-rXP` (chiavi della lingua,
+  segnaposto, plurali). Testi scritti da agenti (glossario piratesco per lingua, poi un agente per gruppo
+  di file; glossari nella scratchpad della sessione): gergo pirata della lingua, ribelle e colorito ma
+  mai volgare (in auto ci sono bambini), stesso registro della lingua, etichette brevi, e i testi di
+  sicurezza (video in marcia, chiamate, permessi, errori) seri e chiari come prima. Nomi propri e di
+  marchi invariati. Le frasi dell'assistente (codice, non risorse) restano normali. Restano normali
+  anche `common_on`/`common_off` (stati degli interruttori), `common_remove`, `common_cancel` e `common_ok`
+  (confermano anche una chiamata, la rimozione o la password di un certificato): un testo pirata che li
+  nomina usa il loro testo normale. Un testo pirata uguale a quello normale non si tiene (copie vecchie
+  quando la lingua cambia). Dopo gli scrittori, un passaggio di coerenza per lingua allinea i nomi citati
+  fra virgolette (es. «Usa myCar a bordo» = `settings_use_mycar`) e i termini. Restano normali anche le
+  indicazioni di guida dette a voce (`directions_*`).
+  **`values-en`** (generata in build da `values/strings*.xml`, task `EnglishStrings` in
+  `app/build.gradle.kts`): senza, ogni inglese tranne en-US (en-GB, en-AU, «English» scelto in myCar)
+  prendeva `values-en-rXP`, perché Android preferisce una cartella con la lingua a quella senza e la
+  regione XP non conta (trovato da una revisione con una replica in C++ della scelta di AOSP; scatto
+  `lang-en-GB`). Da Android 13 Android tiene `it-XP`: le impostazioni leggono la scelta da
+  `AppLanguage.saved` (la lingua del telefono resta tale), e la voce riceve il paese del telefono, non
+  XP (`VoiceLanguages.speakingLocale`).
+- **Sfondo myCar «Ribelle»** (0.7.0, richiesta dell'utente: "il tema myCar, le onde, la barra del menu
+  con effetto glass, e tra le onde un veliero con la bandiera col teschio che sopravvive alle
+  intemperie: se va sotto un'onda poi rispunta fuori"): `Motion.Rebel` in `Wallpapers.kt`, disegno in
+  `car/design/RebelSea.kt` (le bande di Waves; la nave sulla seconda, in unità sue come il veliero
+  dell'intro ma più semplice; ogni 30 s un'onda grande con la schiuma la copre fin quasi alla bandiera,
+  poi la nave risale oltre la sua linea e si assesta). Id `mycar`, primo tra gli sfondi in movimento;
+  non è il predefinito (ogni fotogramma che cambia costa al video). Il dock resta di vetro sopra di lui
+  come con gli altri sfondi. Scatti `motion-mycar`, `motion-mycar-800x480`; provato col banco Compose
+  Desktop (`flagbench`, modo `rebel`).
+- **Il motto dell'intro della 0.7** (richiesta dell'utente: "un'animazione dopo l'arrivo della nave:
+  scegliamo noi le nostre rotte"): issata la bandiera, sul mare si disegna dalla prua una rotta a
+  puntini dorati fino a una stella (`PirateShip.drawCourse`, 3,25-4,55 s); sotto l'etichetta della 0.7
+  una bussola il cui ago gira e si ferma, e «Scegliamo noi le nostre rotte.» parola per parola
+  (`ui/IntroCourse.kt`, `WelcomeCourse`, `intro_course` nelle 9 lingue); sotto, il numero dei bug trovati
+  e corretti dalla release prima (`Intro.BUGS_FIXED`, plurale `intro_bugs_fixed`: 216 dalla 0.6.0 alla
+  0.7.0, contati commit per commit, nel dubbio come funzione nuova; elenco in `bugcount.tsv` nella
+  scratchpad di quella sessione). La pagina dà al testo lo spazio che serve e alla nave quello che resta
+  (su un telefono basso la nave è più piccola). Da aggiornare a ogni intro nuova.
+- **Seconda caccia della 0.7.0** (richiesta dell'utente: "controlla se trovi altri bug, in merito a crash
+  e assistente digitale"): sette cercatori (cuore dell'assistente, comandi, assistenti esterni, crash di
+  Compose, crash del processo, WebView, i log dei viaggi), unione, un verificatore scettico per ognuno:
+  13 bug veri su 14. Corretti: lo stesso crash di Plancia per altre strade (l'app Plancia che prende il
+  posto, account tolto, cambio di tema: `afterFocusLeaves` in CarUi e `rememberAllEntries`); «non
+  inviare» e «annulla» come risposta (`VoiceReply`); pausa rimandata che annullava il comando musicale
+  dopo; frasi della casa prese per musica; domande inglesi prese per comandi; «vai alla prossima
+  canzone» presa per navigazione; «hör auf»; «rispondi alla chiamata persa»; fuoco audio perso e mai
+  richiesto (`VoiceFocus`); assistente del telefono a schermo spento senza blocco (`AssistantUnlock`);
+  pipeline di Home Assistant con un modello ("*", `AssistPlan`); lunghezze enormi nel log dei messaggi
+  dell'auto (`Protobuf.describe`).
 - Condivisione schermo (`mirror/`): mentre il telefono è copiato in auto, `TouchRelayService`
   (accessibilità, già usato per i tocchi) aggiunge un pixel trasparente
   `TYPE_ACCESSIBILITY_OVERLAY` con `screenOrientation = LANDSCAPE` (fisso, non sensore) che gira il
@@ -848,6 +948,48 @@ Tutti i token in un solo posto, `car/design/`:
   non riparte né richiede: a fine condivisione la chiede `CarUi`. Accanto alla mappa l'app musicale
   prende il posto solo della scelta automatica del viaggio quando non si collega
   (`mediaAutoPicked`), mai di un'app scelta dal guidatore.
+- **Come è finito il processo di prima** (0.7, `LastExit.kt`): un crash nativo (motore web, grafica,
+  sherpa-onnx) o Android che chiude myCar non lasciano righe nel log: il file si ferma. All'avvio
+  (`MyCarActivity`, e l'anteprima) myCar scrive le uscite nuove da `ApplicationExitInfo` ("last exit:"
+  motivo, ora, pss/rss, descrizione), solo dei suoi processi e dei crash del motore web (le pagine web
+  chiuse con lei, "isolated not needed", coprivano il motivo vero); per un crash nativo il tombstone
+  (protobuf: segnale, abort, thread, 24 frame, ultime righe di avviso), per un ANR lo stack di main.
+  Android 17 ha un limite di memoria per app basato sulla RAM (Memory Limiter: motivo OTHER,
+  descrizione "MemoryLimiter:AnonSwap"): lo dice con una riga a sé. Nel log anche la pagina della Home
+  su cui si ferma ogni cambio ("home: page") e Plancia che entra o esce dalla vista. Nato dalle cadute
+  di 0.6.8/0.6.9 (Pixel 10 Pro, Android 17): log fermi senza eccezione e senza alcun tocco prima (la
+  seconda a 1 s dall'inizio del caricamento di Parakeet multilingual, 640 MB); lo scorrimento dalla
+  pagina in tre parti non cade in emulatore. Al primo avvio con `LastExit` (nessuna uscita già detta)
+  si scrivono le uscite degli ultimi due giorni, al massimo 5, dalla più vecchia. Il gestore dei crash
+  scrive la traccia intera (fino a 400 righe, con le cause), non le prime 12: nella release le righe
+  di Compose riempivano tutto. Il rilascio allega `myCar-v<versione>-mapping.txt` (la mappa di R8):
+  le tracce della release hanno nomi abbreviati (`r8-map-id-…`), e si leggono con `retrace` e quel file.
+- **Il crash della pagina in tre parti** (0.6.7-0.6.9, corretto in 0.7.0, `car/LeaveWithoutFocus.kt`):
+  `IllegalStateException: LayoutNode should be attached to an owner`, myCar chiusa e viaggio finito.
+  Un tocco nella pagina di Plancia, in una parte di una pagina della Home, dà il fuoco al WebView; se
+  poi la parte lascia lo schermo col fuoco dentro (alla mappa, alla griglia, in modifica:
+  `PlanciaPart(runs = false)` mette il segnaposto), `LayoutNode.removeAt` stacca la `Column` prima di
+  toglierla dalla lista, l'`AndroidView` toglie la sua view, Android passa il fuoco
+  (`rootViewRequestFocus`) e la ricerca del fuoco di Compose passa per il beyond-bounds del pager, che
+  rimisura subito (`remeasureSync`): il `Box` della parte è misurato col figlio ancora dentro, poi il
+  figlio esce dalla lista senza che il Box sia di nuovo da misurare, e al disegno dopo `Box.replace()`
+  posiziona un nodo staccato. Riprodotto in CI a ogni giro (API 37.0 e 34, scatti `crash-*`), mai col
+  fuoco tolto prima. Correzione: `leavesWithoutFocus(runs) { web.dropFocus() }` tiene la pagina un
+  fotogramma in più e in un effetto, fuori dall'applicazione dei cambi, le toglie il fuoco; la Home
+  toglie il fuoco alle view (`View.dropInteropFocus`, mai ai controlli di Compose) quando esce dallo
+  schermo e quando una pagina entra in modifica (il browser di una parte resta composto, ma la
+  modifica può toglierlo). Plancia accanto alla mappa (`CarHomeScreen`, `planciaShown`): pannello e
+  colonna restano un fotogramma dopo lo scorrimento, la griglia, Close o il brano nel dock (trovato
+  dalla revisione: lo stesso schema, non coperto). Le pagine cambiate dal telefono mentre la Home è in
+  vista arrivano un fotogramma dopo solo se una view dentro ha il fuoco (`afterFocusLeaves`). Ogni
+  nuova view focalizzabile (WebView) dentro le pagine del pager va tolta allo stesso modo. Plancia a
+  tutto schermo è fuori dal pager. Scatto `crash-webfocus-side`.
+- **Caricamento dei modelli della voce** (0.7.0, `SpeechEngine`): uno alla volta (al microfono il
+  finale dopo Kroko, non insieme), mai dopo la fine del viaggio (`generation`: `unload()` fa scadere i
+  caricamenti in attesa), e prima del primo comando (`warm`) il finale solo se resta memoria
+  abbondante (`roomForFinal`: libera meno 5/4 del modello sopra 4 volte la soglia di Android e 2 GB).
+  Ogni caricamento scrive la memoria libera e l'heap nativo. L'anteprima dell'auto sul telefono, senza
+  viaggio, non li carica.
 - **Motore da Gearslip** (0.5.18, branch `fix/engine`): delle 116 modifiche di Gearslip dopo il fork
   (0.3.01 → 0.3.31) si portano solo quelle che non possono cambiare come si collega un'auto che oggi va
   (richiesta dell'utente: "porta quello che ha senso, non cose che potrebbero rompere il nostro
@@ -1225,7 +1367,7 @@ Tutti i token in un solo posto, `car/design/`:
   Nelle schede i tasti stanno uno sotto l'altro: affiancati, su un telefono stretto il secondo
   diventava una colonna di lettere. Scatti in CI: `setup-phone` (installa senza permessi, scarica
   davvero i certificati, tocca i tasti per testo con uiautomator, scorre a piccoli passi; schermo
-  dell'emulatore 320×640; in fondo `09-intro-1…4`, il veliero dell'intro con le animazioni accese, e
+  dell'emulatore 320×640; in fondo `09-intro-1…4`, il veliero dell'intro con le animazioni accese, `09-intro-page-2…7` le sue pagine dopo, e
   `10-update-1…4`, la bandiera dopo un aggiornamento, con le preferenze scritte via `run-as`). Verificato (0.5.14): lista dal titolo, certificati scaricati e
   controllati, Android Auto tenuto, un "Allow" con sei domande di Android in fila, tutto spuntato,
   Home senza "Finish setting up", ritorno dalla Guida, e con i contatti tolti di nuovo "Allow".
@@ -1285,6 +1427,19 @@ Tutti i token in un solo posto, `car/design/`:
 - Auto-updater delle build GitHub: rilasci di `sirionero/mycar`; disattivato nella build F-Droid.
 
 ## Backlog
+
+- **Puntini delle pagine sopra le parti** (revisione degli scatti della 0.7.0): sulle pagine del guidatore
+  la pillola dei puntini e della matita sta sopra il fondo delle parti; a 800x480 copre la tessera in basso
+  di Plancia (un tocco va ai puntini). Da valutare: farla svanire anche lì come sulla mappa, o lasciarle
+  la sua striscia sotto le parti.
+
+- **Spotify Web e "Nascondi l'app del telefono" a inizio viaggio** (dalla caccia della 0.7.0, da provare
+  con un account Premium): myCar mette in pausa l'app Spotify del telefono e apre Spotify Web con
+  l'Autoplay; l'app in pausa resta il dispositivo attivo di Spotify Connect, quindi il Play della pagina
+  potrebbe farla ripartire sul telefono (altoparlante, o niente in auto) e poi dire "suona su un altro
+  dispositivo". Correzione pensata, solo nella pagina: un Play di myCar seguito entro 10 s da `remote`
+  manda una volta "pause" e un avviso suo ("scegli 'Questo browser web' nei dispositivi di Spotify",
+  9 lingue). Prima va visto succedere.
 
 - **Schermo dell'auto tutto nero** dopo un collegamento riuscito, a volte (segnalato dopo la 0.6.3):
   non trovato leggendo il codice. Escluso: il display virtuale di myCar non si spegne col telefono

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_ui_safety_unofficial">myCar es software no oficial, de bandera libre: ningún fabricante de coches lo ha hecho ni revisado, y puede fallar sin avisar.</string>
+    <string name="car_ui_safety_attention">No uses nunca esta pantalla mientras conduces. Elige el rumbo o la canción antes de salir y luego mantén la atención en la carretera.</string>
+    <string name="car_ui_app_wont_start">%1$s aún no funciona a bordo de myCar.</string>
+    <string name="car_ui_app_wont_start_unknown">Esta app aún no funciona a bordo de myCar.</string>
+    <string name="car_ui_app_wont_start_detail">No ha zarpado. Algunas apps solo funcionan bajo la bandera del Android Auto de Google.</string>
+    <string name="car_ui_search_ignored">%1$s no ha tocado ninguna tonada para «%2$s»</string>
+    <string name="car_ui_search_ignored_no_app">La app de música no ha tocado ninguna tonada para «%1$s»</string>
+    <string name="car_ui_link_opens_app">Este enlace pone rumbo a una app del teléfono</string>
+
+    <string name="car_dock_dashboard">Vigía</string>
+    <string name="car_dock_map">Carta</string>
+    <string name="car_dock_now_playing">Suena a bordo</string>
+    <string name="car_dock_assistant">Loro de a bordo</string>
+    <string name="car_dock_all_apps">Toda la flota</string>
+    <string name="car_dock_map_and_music">Carta y tonadas</string>
+
+    <string name="car_apps_vehicle_data">Datos del barco</string>
+    <string name="car_apps_exit">Desembarcar</string>
+    <string name="car_apps_partial">Solo funciona a medias a bordo de myCar</string>
+    <string name="car_apps_broken">No funciona a bordo de myCar</string>
+    <string name="car_apps_pin">Clavar al mástil</string>
+    <string name="car_apps_unpin">Desclavar del mástil</string>
+    <plurals name="car_apps_dock_full">
+        <item quantity="one">El mástil está lleno (%1$d clavada)</item>
+        <item quantity="other">El mástil está lleno (%1$d clavadas)</item>
+    </plurals>
+    <string name="car_apps_hide_from_grid">Mandar a la bodega</string>
+    <string name="car_apps_show_on_grid">Sacar de la bodega</string>
+    <string name="car_apps_hidden_toast">App en la bodega: %1$s. Para recuperarla: Aparejos, Bodega.</string>
+    <string name="car_web_music_elsewhere">%1$s está sonando en otro dispositivo, no a bordo</string>
+    <string name="car_mini_open_player">Abrir la gramola</string>
+    <string name="car_mini_hide">Arriar la minigramola</string>
+    <string name="car_mini_hidden_toast">Minigramola arriada durante esta travesía. La tonada del mástil abre la gramola.</string>
+    <string name="car_mini_hidden_toast_grid">Minigramola arriada durante esta travesía. El botón al pie del mástil recupera la gramola desde la flota.</string>
+
+    <string name="car_map_starting">%1$s leva anclas…</string>
+    <string name="car_map_starting_unknown">Desplegando la carta…</string>
+    <string name="car_map_failed_unknown">La app de mapas no ha zarpado.</string>
+    <string name="car_map_none_installed">No se ha avistado ninguna app de mapas.</string>
+    <string name="car_map_none_installed_detail">Instala una app de navegación compatible con Android Auto y zarpará aquí sola.</string>
+    <string name="car_map_stopped">Carta anclada.</string>
+    <string name="car_map_reopen">Volver a zarpar</string>
+    <string name="car_map_car_apps">Apps de a bordo</string>
+    <string name="car_map_choose">Elige una app de mapas para trazar el rumbo.</string>
+    <string name="car_home_hide_lyrics">Arriar los versos</string>
+    <string name="car_home_app_failed">%1$s no ha zarpado.</string>
+
+    <string name="car_side_close_player">Cerrar la gramola</string>
+    <string name="car_side_title">Junto a la carta</string>
+    <string name="car_side_music">Tonadas</string>
+    <string name="car_side_explained">«Tonadas» pone la gramola junto a la carta mientras suena algo. Una app se queda junto a la carta; ciérrala para esta travesía y el botón al pie del mástil la recupera desde la flota.</string>
+
+    <string name="car_pages_nothing_yet">Nada a la vista</string>
+    <string name="car_pages_app_missing">La app ha desertado del teléfono</string>
+    <string name="car_pages_tap_to_choose">Toca para elegir qué carga va aquí</string>
+    <string name="car_pages_app_gone">Esta app ha desertado del teléfono. Toca para elegir otra cosa.</string>
+    <string name="car_pages_dot_map">Carta</string>
+    <string name="car_pages_dot_page">Cubierta %1$d</string>
+    <string name="car_pages_change">Cambiar esta cubierta</string>
+    <string name="car_pages_add">Añadir una cubierta</string>
+    <string name="car_pages_delete">Hundir esta cubierta</string>
+    <string name="car_pages_delete_confirm">Hundir cubierta</string>
+    <string name="car_pages_one_app">Cada cubierta lleva una sola app de a bordo a la vez: %1$s ya está en esta.</string>
+    <string name="car_pages_layout_full">Cubierta entera</string>
+    <string name="car_pages_layout_map">Carta</string>
+    <string name="car_pages_layout_keeps">La carga de la cubierta se queda, en orden, mientras quepa en el nuevo diseño.</string>
+    <string name="car_pages_settings_title">Cubiertas junto a la carta</string>
+    <string name="car_pages_settings_explained">Desliza por Puerto, o toca los puntos de abajo, para ver tus cubiertas: el tiempo, la agenda, el navegador o una app de a bordo como Plancia, en una cubierta entera, en mitades, en cuartos o mezclados. El lápiz junto a los puntos cambia la cubierta que estás viendo.</string>
+    <string name="car_pages_replace">Sustituir mis cubiertas</string>
+    <string name="car_pages_ready_made">Cubiertas de serie</string>
+
+    <string name="car_dashboard_weather_loading">Oteando el tiempo…</string>
+    <string name="car_dashboard_coming_up">Próximas escalas</string>
+    <string name="car_dashboard_allow_calendar">Permite el calendario a myCar en el teléfono para ver lo que tienes por proa.</string>
+    <string name="car_dashboard_nothing_coming">Ninguna escala en la próxima semana.</string>
+
+    <string name="car_weather_loading">Oteando el tiempo…</string>
+    <string name="car_weather_waiting_fix">Esperando a fijar la posición.</string>
+    <string name="car_weather_allow_location">Permite la ubicación a myCar en el teléfono para otear el tiempo.</string>
+
+    <string name="car_template_car_app">App de a bordo</string>
+    <string name="car_template_waiting">esperando a que embarque</string>
+    <string name="car_template_finding_route">Trazando el rumbo…</string>
+    <string name="car_template_finding_routes">Trazando rumbos…</string>
+    <string name="car_template_nothing_playing">Aún no suena ninguna tonada.</string>
+    <string name="car_template_unsupported">%1$s aún no se puede mostrar a bordo</string>
+    <string name="car_template_start">Zarpar</string>
+
+    <string name="car_host_would_not_connect">la app no ha dejado que myCar la aborde</string>
+    <string name="car_host_needs_permission">Solo acepta la bandera del Android Auto de Google: su servicio requiere el permiso %1$s, que myCar no puede tener.</string>
+    <string name="car_host_only_android_auto">Solo acepta el host del propio Android Auto de Google: nada de piratas.</string>
+    <string name="car_host_location_notification">myCar está compartiendo la ubicación con el mapa de a bordo</string>
+    <string name="car_map_no_position_title">La carta no tiene tu ubicación</string>
+
+    <string name="car_wallpaper_title">Horizonte</string>
+    <string name="car_wallpaper_still">Fondeados</string>
+    <string name="car_wallpaper_moving">A toda vela</string>
+</resources>

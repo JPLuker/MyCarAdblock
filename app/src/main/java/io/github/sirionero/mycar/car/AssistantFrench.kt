@@ -85,6 +85,8 @@ internal object FrenchPhrases : Phrasebook() {
                 else -> "read my messages"
             }
         },
+        // A call, before the messages take it for a reply to "l'appel manqué".
+        Rule("(?:réponds|reponds|répond|repond|répondre|repondre) (?:(?:à|a) l'appel|au dernier appel) (?:manqué|manque)", "call back"),
         Rule(
             "(?:réponds|reponds|répond|repond|répondre|repondre|écris|ecris|écrire|ecrire|envoie un message|envoyer un message|envoie un sms|" +
                 "envoie un texto) (?:à|a) (.+)",
@@ -119,12 +121,17 @@ internal object FrenchPhrases : Phrasebook() {
         ),
         Rule(
             "(?:suivant|suivante|chanson suivante|morceau suivant|titre suivant|passe|passe à la suivante|passe a la suivante|" +
-                "zappe|saute|une autre|une autre chanson|mets autre chose|autre chose|change de chanson)",
+                "zappe|saute|une autre|une autre chanson|mets autre chose|autre chose|change de chanson|" +
+                // "Va à la chanson suivante", "passe au morceau suivant": the next song, before "va…" is taken for a place.
+                "(?:(?:va|aller|allons|on va|passe|passer|saute|mets|joue|lance) )?(?:(?:à la|a la|au|à|a|la|le) )?" +
+                "(?:(?:chanson|morceau|titre|piste) suivante?|suivante?|prochaine chanson|prochain morceau|prochain titre|prochaine piste))",
             "next",
         ),
         Rule(
             "(?:précédent|precedent|précédente|precedente|chanson précédente|chanson precedente|morceau précédent|titre précédent|" +
-                "la chanson d'avant|celle d'avant|reviens à la précédente)",
+                "la chanson d'avant|celle d'avant|reviens à la précédente|" +
+                "(?:(?:va|aller|allons|on va|passe|passer|reviens|revenir|retourne|retourner|retour|remets|mets|joue|rejoue) )?" +
+                "(?:(?:à la|a la|au|à|a|la|le) )?(?:(?:chanson|morceau|titre|piste) )?(?:précédente?|precedente?))",
             "previous",
         ),
         Rule(

@@ -218,6 +218,7 @@ class MyCarActivity : ComponentActivity(), Projection {
         MyCarLog.init(this)
         MyCarLog.installCrashHandler()
         MyCarLog.i("myCar ready")
+        LastExit.log(this)
         io.github.sirionero.mycar.wireless.WirelessLink.onConnected = { socket ->
             runOnUiThread { startWireless(socket) }
         }
@@ -329,6 +330,8 @@ class MyCarActivity : ComponentActivity(), Projection {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         CarEnvironment.setPhoneTheme(newConfig)
+        // A language chosen for myCar (here or in Android's settings) during a drive: the car's screen follows.
+        AppLanguage.recheck(this)
     }
 
     // Throttled inside Prefetch, so this only does work if the last run was a while ago.

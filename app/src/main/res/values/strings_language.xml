@@ -5,4 +5,7 @@
     <string name="language_phone">Phone\'s language (%1$s)</string>
     <string name="language_footer">myCar on the phone and on the car\'s screen, and its voice assistant, in this language.</string>
     <string name="language_close">Close</string>
+    <!-- A switch under the language: every text in pirate terms, in that language (the BCP 47 variant "pirate"). The name of the switch in your language, plain -->
+    <string name="language_pirate">Pirate speak</string>
+    <string name="language_pirate_detail">Every text of myCar in pirate terms, in the language above. We chart our own course, arrr.</string>
 </resources>

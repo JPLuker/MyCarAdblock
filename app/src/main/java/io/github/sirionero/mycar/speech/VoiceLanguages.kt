@@ -23,7 +23,14 @@ object VoiceLanguages {
         return if (SpeechModels.finalFor(context, phone) != null) phone else VoiceLanguage.EN
     }
 
-    /** The voice to answer in: the phone's own kind of [language] (Brazilian or European Portuguese). */
-    fun speakingLocale(language: VoiceLanguage): Locale =
-        Locale.getDefault().takeIf { it.language == language.code } ?: language.locale
+    /**
+     * The voice to answer in: the phone's own kind of [language] (Brazilian or European Portuguese).
+     * With pirate speak myCar's language has the private-use region XP, no country: the phone's country
+     * instead, or the recognizer and the voice got "pt-XP" and a Portuguese phone lost its voice.
+     */
+    fun speakingLocale(language: VoiceLanguage): Locale {
+        val default = Locale.getDefault().takeIf { it.language == language.code } ?: return language.locale
+        if (default.country != io.github.sirionero.mycar.AppLanguage.PIRATE) return default
+        return Locale.Builder().setLanguage(default.language).setRegion(io.github.sirionero.mycar.AppLanguage.country()).build()
+    }
 }

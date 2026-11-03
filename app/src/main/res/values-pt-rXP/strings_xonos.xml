@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="xonos_cat_tracks">Cantigas</string>
+    <string name="xonos_cat_favorites">Baú do tesouro</string>
+    <string name="xonos_all_tracks">Todas as cantigas</string>
+    <string name="xonos_problem_bad_token">Token não aceito: embarque de novo no myCar, no telefone</string>
+    <string name="xonos_problem_not_configured">Prepare o Xonos no myCar, no telefone</string>
+
+    <plurals name="xonos_count_tracks">
+        <item quantity="one">%d cantiga</item>
+        <item quantity="other">%d cantigas</item>
+    </plurals>
+</resources>

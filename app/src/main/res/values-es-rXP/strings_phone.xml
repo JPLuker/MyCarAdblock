@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_whats_new_in">Nuevo botín de la %1$s</string>
+    <string name="home_how_to_connect_subtitle">Qué barcos navegan y qué falta por aparejar</string>
+    <string name="home_disconnect">Soltar amarras</string>
+    <string name="home_disconnect_title">¿Soltar amarras?</string>
+    <string name="home_disconnect_text">myCar deja ahora el timón. Con cable, desenchúfalo y vuelve a enchufarlo para volver a bordo.</string>
+    <string name="home_bluetooth_missing_calls_music">Las llamadas y las tonadas suenan por Bluetooth, pero tu teléfono no está conectado al coche. Conéctalo aquí o desde el menú Bluetooth del coche.</string>
+    <string name="home_voice_downloading">Descargando el loro, %1$d%%</string>
+
+    <string name="wireless_button_connect">Abordar sin cable</string>
+    <string name="wireless_button_switched_off">myCar está desactivado para el barco (Aparejos, «Usar myCar a bordo»).</string>
+    <string name="wireless_button_which_car">¿Qué barco?</string>
+    <string name="wireless_button_bluetooth_off">El Bluetooth está desactivado. Actívalo y vuelve a tocar Abordar sin cable.</string>
+    <string name="wireless_button_not_paired">Tu teléfono aún no está vinculado con nada. Vincúlalo primero con el barco.</string>
+    <string name="wireless_button_not_listed">¿No aparece tu barco? Vincúlalo primero con tu teléfono.</string>
+
+    <string name="help_title">Cómo abordar</string>
+    <string name="help_in_the_car">A bordo</string>
+    <string name="help_step_connect">Conecta el cable o aborda sin cable.</string>
+    <string name="help_step_connect_detail">myCar se abre solo cuando el barco se conecta. Para abordar sin cable, vincula primero el teléfono con el barco y luego toca Abordar sin cable en Inicio.</string>
+    <string name="help_set_up">Aparejar</string>
+    <string name="help_step_audio_prompt">Evita la pregunta del audio en cada travesía.</string>
+    <string name="help_step_audio_prompt_detail">Conecta el teléfono a un ordenador con la depuración por USB activada y ejecuta esto una vez. Si no lo haces, tocarás Empezar cada vez que zarpes.</string>
+    <string name="help_step_notifications_detail">Android oculta lo que dicen las notificaciones mientras comparte el audio. Ejecuta también esto, y myCar lo quita solo mientras la música va a bordo.</string>
+
+    <string name="cert_setup_continue">Avante</string>
+    <string name="cert_notice_own_refused_text">Para usar los públicos, quita el tuyo en Aparejos, en Certificado.</string>
+
+    <string name="update_title">Astillero</string>
+    <string name="update_out">myCar %1$s ya ha zarpado</string>
+    <string name="update_unplug_first">Suelta amarras para instalar. La instalación cierra myCar.</string>
+    <string name="update_status_daily">myCar otea el horizonte una vez al día</string>
+    <string name="update_status_checking">Oteando el horizonte…</string>
+    <string name="update_status_latest">Ya navegas con la última versión</string>
+    <string name="update_status_available">Ya ha zarpado la versión %1$s</string>
+    <string name="update_splash_updated_to">Ya navega la</string>
+    <string name="update_splash_tap">Toca en cualquier sitio y ¡avante!</string>
+
+    <string name="whatsnew_title">Nuevo botín</string>
+
+    <string name="recommended_title">Elegidas del capitán</string>
+    <string name="recommended_intro">Estas apps gratuitas funcionan al timón de myCar. Cada botón abre la página de la app en GitHub.</string>
+    <string name="recommended_section_maps">Cartas náuticas</string>
+    <string name="recommended_section_music">Tonadas</string>
+    <string name="recommended_about_organic_maps">Cartas y rumbos sin conexión.</string>
+    <string name="recommended_about_vela">Navegación giro a giro, libre de Google.</string>
+    <string name="recommended_about_youtube_music">Una gramola de YouTube Music.</string>
+
+    <string name="logs_title">Diario de a bordo</string>
+    <string name="logs_clear">Hundir</string>
+    <string name="logs_empty">El diario aún está en blanco. Las líneas aparecen aquí en directo durante la travesía.</string>
+    <string name="logs_share_subject">Diario de a bordo de myCar</string>
+    <string name="logs_share_chooser">Compartir el diario</string>
+    <string name="logs_earlier_title">Diarios anteriores</string>
+    <string name="logs_earlier_empty">Aún no hay diarios anteriores. Cada vez que myCar zarpa, empieza uno nuevo.</string>
+    <string name="logs_crashed">Naufragio</string>
+
+    <string name="preview_title">Catalejo del timón</string>
+    <string name="preview_size">%1$dx%2$d @ %3$ddpi - los toques van al timón</string>
+    <string name="preview_car_screen">Timón</string>
+    <string name="preview_leave">Salir del catalejo del timón</string>
+
+    <string name="donate_title">Qué bien que la travesía haya llegado a buen puerto</string>
+    <string name="donate_text">myCar es gratis, sin anuncios y sin rastreo. Si te ayuda a hacerte a la mar, tu apoyo lo mantiene a flote.</string>
+    <string name="audio_not_reaching_title">Las tonadas no llegan al coche</string>
+</resources>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setup_title">Ξάρτισμα του myCar</string>
+    <string name="setup_subtitle_first_run">Λίγα πατήματα πριν από το παρθενικό σας ταξίδι.</string>
+    <string name="setup_subtitle_return">Τι μένει για το ξάρτισμα. Ό,τι έχετε ήδη ρυθμίσει δεν αλλάζει.</string>
+    <string name="setup_section_connect">Για το ρεσάλτο</string>
+    <string name="setup_section_drive">Για το ταξίδι σας</string>
+    <string name="setup_status_done">Δεμένο γερά</string>
+    <string name="setup_status_blocked">Υπό αποκλεισμό</string>
+
+    <string name="setup_cert_body">Τα αυτοκίνητα επικοινωνούν μόνο με τηλέφωνα που έχουν ένα πιστοποιητικό που εμπιστεύονται. Το myCar δεν έχει κανένα στο φορτίο του: κατεβάζει δημόσια πιστοποιητικά από έργα ανοιχτού κώδικα στο GitHub (περίπου 10 KB το καθένα). Αν το αυτοκίνητό σας απορρίψει ένα, το myCar δοκιμάζει το επόμενο.</string>
+    <string name="setup_cert_get">Φόρτωμα πιστοποιητικών</string>
+    <string name="setup_cert_getting">Φορτώνουμε πιστοποιητικά…</string>
+    <string name="setup_cert_wrong_file">Ένα αρχείο που λήφθηκε δεν ήταν το αναμενόμενο πιστοποιητικό, οπότε το myCar το άφησε στη στεριά. Δοκιμάστε ξανά αργότερα.</string>
+    <string name="setup_cert_some_ready">Φορτώθηκαν %1$d από %2$d. Το %3$s είναι έτοιμο· τα υπόλοιπα μπορείτε να τα κατεβάσετε αργότερα από τα Ξάρτια.</string>
+    <string name="setup_cert_ready_own">Έτοιμο για απόπλου: το δικό σας πιστοποιητικό.</string>
+    <plurals name="setup_cert_ready_spares">
+        <item quantity="one">Έτοιμο για απόπλου: %1$s. Εφεδρικό: %2$s.</item>
+        <item quantity="other">Έτοιμο για απόπλου: %1$s. Εφεδρικά: %2$s.</item>
+    </plurals>
+    <string name="setup_cert_ready_one">Έτοιμο για απόπλου: %1$s.</string>
+    <string name="setup_cert_ready">Έτοιμο για απόπλου.</string>
+
+    <string name="setup_mycar_on_title">Ενεργοποιήστε το myCar για το καράβι</string>
+    <string name="setup_mycar_on_body">Είναι απενεργοποιημένο στα Ξάρτια, οπότε το καράβι δεν μπορεί να το βρει.</string>
+
+    <string name="setup_aa_title">Αφοπλίστε το Android Auto</string>
+    <string name="setup_aa_off">Το Android Auto είναι αφοπλισμένο.</string>
+    <string name="setup_aa_kept">Θα επιλέγετε το myCar για το ταξίδι όταν συνδέετε το καλώδιο.</string>
+    <string name="setup_aa_body">Το Android Auto είναι ενεργό και μπορεί να αρπάξει τη σύνδεση του καραβιού πριν από το myCar. Στην οθόνη που ανοίγει, πατήστε «Απενεργοποίηση», μετά «OK» και επιστρέψτε εδώ.</string>
+    <string name="setup_aa_keep_body">Τότε κρατήστε το. Όταν συνδέετε το καλώδιο, το Android ρωτά ποια εφαρμογή να ανοίξει: επιλέξτε το myCar και πατήστε «Πάντα», και το πηδάλιο το παίρνει το myCar. Αν το Android Auto ανοίγει μόνο του, είχε οριστεί να ανοίγει πάντα: στις πληροφορίες εφαρμογής του, πατήστε «Άνοιγμα από προεπιλογή» και μετά «Διαγραφή προεπιλογών».</string>
+
+    <string name="setup_drive_title">Κλήσεις, χάρτης και σκοποί</string>
+    <string name="setup_drive_skipped">Παραλείφθηκε. Πατήστε «Να επιτρέπεται» όταν είστε έτοιμοι να σαλπάρετε.</string>
+    <string name="setup_drive_body">Το αυτοκίνητό σας δείχνει ποιος καλεί και τις πρόσφατες κλήσεις σας και μπορεί να καλεί τις επαφές σας, ο χάρτης ξέρει πού βρίσκεστε και οι σκοποί σας μπορούν να φτάσουν στο αυτοκίνητο χωρίς Bluetooth. Το Android ρωτά μερικές φορές: πατάτε «Να επιτρέπεται» κάθε φορά. Το myCar μόνο διαβάζει, και ακούει μόνο όταν πατάτε το μικρόφωνο.</string>
+
+    <string name="setup_more_show_more">Περισσότερα στο φως</string>
+    <string name="setup_more_show_less">Πίσω στο αμπάρι</string>
+    <string name="setup_more_later">Όλα αυτά λειτουργούν και σε άλλη βάρδια.</string>
+    <string name="setup_messages_title">Μπουκάλια</string>
+    <string name="setup_calendar_body">Η οθόνη του καραβιού δείχνει το επόμενο συμβάν σας. Το myCar μόνο διαβάζει το ημερολόγιό σας.</string>
+    <string name="setup_screening_button">Ξάρτισμα</string>
+    <string name="setup_audio_title">Ήχος στο καράβι</string>
+    <string name="setup_audio_body">Πώς φτάνουν οι σκοποί στο καράβι. Οι κλήσεις περνούν πάντα από το Bluetooth.</string>
+    <string name="setup_usage_title">Βοηθήστε άλλους καπετάνιους</string>
+
+    <plurals name="setup_bar_steps_left">
+        <item quantity="one">Απομένει %1$d βήμα πριν από το παρθενικό σας ταξίδι.</item>
+        <item quantity="other">Απομένουν %1$d βήματα πριν από το παρθενικό σας ταξίδι.</item>
+    </plurals>
+    <string name="setup_bar_ready_to_connect">Είστε έτοιμοι για ρεσάλτο.</string>
+    <string name="setup_bar_allow_drive">Να επιτρέπονται κλήσεις, χάρτης και σκοποί</string>
+    <string name="setup_bar_ready">Είστε έτοιμοι να σαλπάρετε. Συνδέστε το καλώδιο στο αυτοκίνητο· αν το Android ρωτήσει, επιλέξτε το myCar και πατήστε «Πάντα».</string>
+    <string name="setup_bar_finish_later">Ολοκλήρωση σε άλλη βάρδια</string>
+
+    <plurals name="setup_card_steps_left">
+        <item quantity="one">Απομένει %1$d βήμα πριν από το παρθενικό σας ταξίδι: %2$s.</item>
+        <item quantity="other">Απομένουν %1$d βήματα πριν από το παρθενικό σας ταξίδι: %2$s.</item>
+    </plurals>
+    <plurals name="setup_card_extras_left">
+        <item quantity="one">Έτοιμο για ρεσάλτο. Απομένει %1$d προαιρετικό.</item>
+        <item quantity="other">Έτοιμο για ρεσάλτο. Απομένουν %1$d προαιρετικά.</item>
+    </plurals>
+    <string name="setup_card_all_done">Όλα δεμένα γερά.</string>
+    <string name="setup_card_title">Αρχικό ξάρτισμα</string>
+    <string name="setup_card_footer">Τίποτα δεν βυθίζεται ούτε μηδενίζεται. Θα δείτε μόνο ό,τι απομένει, με σημειωμένα όσα είναι δεμένα γερά.</string>
+    <string name="setup_card_back">Επιστροφή στο αρχικό ξάρτισμα</string>
+    <string name="setup_left_title">Ολοκληρώστε το ξάρτισμα</string>
+    <string name="setup_left_body">Απομένουν πριν από το παρθενικό σας ταξίδι: %1$s.</string>
+    <string name="setup_left_continue">Συνέχεια του ξαρτίσματος</string>
+
+    <string name="setup_guide_optional">ΑΝ ΘΕΛΕΤΕ</string>
+    <string name="setup_guide_skip_for_now">Τραβάμε ίσια για τώρα</string>
+    <string name="setup_guide_usage_title">Βοηθήστε άλλους καπετάνιους.</string>
+    <string name="setup_guide_safety_body">Το myCar είναι ανεπίσημο. Δεν το έχει φτιάξει ούτε ελέγξει καμία αυτοκινητοβιομηχανία και μπορεί να αποτύχει χωρίς προειδοποίηση. Ρυθμίστε το πριν σαλπάρετε και μετά κρατήστε τα μάτια σας στον δρόμο.</string>
+    <string name="setup_guide_mic_body">Το myCar το χρησιμοποιεί για να στέλνει τους σκοπούς σας στο αυτοκίνητο και για να σας ακούει όταν ζητάτε κάτι ή απαντάτε σε ένα μήνυμα. Ό,τι λέτε μένει στο τηλέφωνο.</string>
+    <string name="setup_guide_location_body">Τη χρειάζονται ο χάρτης του αυτοκινήτου και οι αναζητήσεις κοντινών μερών. Χωρίς αυτήν, η Σκοπιά δεν δείχνει χάρτη.</string>
+    <string name="setup_guide_messages_title">Μπουκάλια.</string>
+    <string name="setup_guide_aa_title">Αφοπλίστε το Android Auto.</string>
+    <string name="setup_guide_aa_body">Το Android Auto είναι ακόμη εγκατεστημένο και, σαν αντίπαλο καράβι, παλεύει με το myCar για τη σύνδεση USB του αυτοκινήτου. Απενεργοποιήστε το ή απεγκαταστήστε το στην οθόνη που ανοίγει.</string>
+    <string name="setup_guide_choose_title">Επιλέξτε το myCar, καπετάνιε.</string>
+    <string name="setup_guide_choose_body">Αν το τηλέφωνό σας ρωτήσει ποια εφαρμογή να ανοίξει όταν το συνδέετε στο αυτοκίνητο, επιλέξτε το myCar και πατήστε «Πάντα»: το πηδάλιο το παίρνει το myCar.</string>
+    <string name="setup_guide_audio_title">Ήχος στο καράβι.</string>
+    <string name="setup_guide_audio_body">Επιλέξτε πώς φτάνουν οι σκοποί στο καράβι. Οι κλήσεις περνούν πάντα από το Bluetooth.</string>
+    <string name="setup_guide_voice_title">Παπαγάλος.</string>
+    <string name="setup_guide_voice_body">Ζητήστε οδηγίες, σκοπούς ή μια κλήση με τη φωνή. Το τηλέφωνό σας μετατρέπει μόνο του την ομιλία σε κείμενο, και τίποτα από όσα λέτε δεν φεύγει από αυτό. Χρειάζεται %1$d MB, που λαμβάνονται μία φορά. Χρησιμοποιήστε Wi-Fi αν μπορείτε.</string>
+    <string name="setup_guide_voice_download">Λήψη του παπαγάλου</string>
+    <string name="setup_guide_voice_progress">Φορτώνουμε, %1$d%%. Μπορείτε να συνεχίσετε την πλεύση· η λήψη συνεχίζεται.</string>
+    <string name="setup_guide_voice_ready">Ο παπαγάλος είναι έτοιμος.</string>
+    <string name="setup_guide_voice_failed">Η λήψη εξόκειλε πριν ολοκληρωθεί. Πατήστε «Λήψη του παπαγάλου» για να δοκιμάσετε ξανά.</string>
+    <string name="setup_guide_project_media_body">Εκτελέστε αυτό από έναν υπολογιστή με ενεργό τον εντοπισμό σφαλμάτων USB, και το Android εμπιστεύεται για πάντα στο myCar τον ήχο σας. Χωρίς αυτό, πατάτε «Έναρξη» μία φορά σε κάθε ταξίδι.</string>
+    <string name="setup_guide_secure_settings_body">Όσο ο ήχος πηγαίνει στο αυτοκίνητο, το Android κρύβει το περιεχόμενο των ειδοποιήσεων, σαν να κάνατε κοινή χρήση της οθόνης σας. Αυτό επιτρέπει στο myCar να τις δείχνει κατά το ταξίδι και να τις κρύβει ξανά μετά.</string>
+
+    <string name="setup_audio_recommended">Πρίμα επιλογή</string>
+    <string name="setup_audio_automatic_body">Μέσω Bluetooth όταν το καράβι σας παίρνει έτσι τους σκοπούς του τηλεφώνου, αλλιώς μέσω του myCar.</string>
+    <string name="setup_audio_bluetooth_body">Χωρίς ερώτηση σε κάθε ταξίδι, και η φωνή της εφαρμογής χαρτών σας φτάνει στο καράβι. Μερικά καράβια δέχονται από εκεί μόνο κλήσεις.</string>
+    <string name="setup_audio_through_mycar_body">Με το καλώδιο ή το Wi-Fi, όπως το Android Auto. Το Android ζητά κοινή χρήση του ήχου μία φορά σε κάθε ταξίδι.</string>
+
+    <string name="intro_start">Σαλπάρουμε</string>
+    <string name="intro_welcome_to">Αχόι, καλώς ήρθατε στην έκδοση</string>
+    <string name="intro_welcome_tag">alpha · πρίμα τα πανιά</string>
+    <string name="intro_course">Τη ρότα μας τη χαράζουμε εμείς, και στον διάολο οι διαταγές!</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d σφάλμα βρέθηκε και ρίχτηκε στη θάλασσα από την 0.6</item>
+        <item quantity="other">%d σφάλματα βρέθηκαν και ρίχτηκαν στη θάλασσα από την 0.6</item>
+    </plurals>
+    <string name="intro_music_title">Σκοποί στο myCar.</string>
+    <string name="intro_music_body">Το Spotify και άλλες υπηρεσίες παίζουν μέσα στο myCar, από το δικό τους διαδικτυακό γραμμόφωνο. Κάντε μπαρκάρισμα μία φορά στο τηλέφωνο με τον δικό σας λογαριασμό, στα Ξάρτια &gt; Γραμμόφωνο. Εκεί στείλτε στο αμπάρι την εφαρμογή Spotify του τηλεφώνου: ένα Spotify στο καράβι, όχι δύο.</string>
+    <string name="intro_mini_title">Όλος ο χάρτης θησαυρού.</string>
+    <string name="intro_mini_body">Κλείστε το γραμμόφωνο δίπλα στον χάρτη και ένα μικρό γραμμόφωνο πλέει από πάνω, με το εξώφυλλο και τα κουμπιά του: κρατήστε το πατημένο και σύρετέ το όπου θέλετε. Δίπλα στον χάρτη το γραμμόφωνο φτάνει πλέον έως το μέγεθος Πολύ μεγάλο.</string>
+    <string name="intro_lyrics_title">Τραγουδάμε, πλήρωμα!</string>
+    <string name="intro_lyrics_body">Τα λόγια των σκοπών βρίσκονται πολύ πιο συχνά, και κάθε αποτέλεσμα ελέγχεται, ώστε να μην εμφανίζονται ποτέ τα λόγια άλλου σκοπού. Οι ορχηστρικοί σκοποί το λένε.</string>
+    <string name="intro_location_title">Στην τσέπη, καπετάνιε.</string>
+    <string name="intro_phone_title">Πηδάλιο στο τηλέφωνο.</string>
+    <string name="intro_phone_body">Όλες οι ρυθμίσεις της οθόνης του καραβιού υπάρχουν και στο τηλέφωνο, στα Ξάρτια &gt; Οθόνη καραβιού: αλλάξτε μία και το καράβι ακολουθεί αμέσως, ακόμη και στη μέση του ταξιδιού. Το ίδιο και οι καμπίνες δίπλα στον χάρτη και οι εφαρμογές που στείλατε στο αμπάρι, εκτός στόλου.</string>
+    <string name="intro_graphene_title">Ξανά με πανοπλία.</string>
+    <string name="intro_apps_title">Καλό πλήρωμα.</string>
+    <string name="intro_voice_title">Πείτε το στον παπαγάλο.</string>
+    <string name="intro_voice_body">Πατήστε το μικρόφωνο ή το κουμπί ομιλίας στο τιμόνι σας και μιλήστε. Το τηλέφωνό σας μετατρέπει μόνο του την ομιλία σε κείμενο, και όσα λέτε μένουν σε αυτό, εκτός από όσα ρωτάτε το δικό σας Home Assistant. Πείτε «%1$s» στο καράβι για την πλήρη λίστα.</string>
+    <string name="intro_voice_body_language">Πατήστε το μικρόφωνο ή το κουμπί ομιλίας στο τιμόνι σας και μιλήστε. Το τηλέφωνό σας μετατρέπει μόνο του την ομιλία σε κείμενο, και όσα λέτε μένουν σε αυτό, εκτός από όσα ρωτάτε το δικό σας Home Assistant. Ακούει και απαντά στα %1$s, τη γλώσσα του myCar. Πείτε «%2$s» στο καράβι για την πλήρη λίστα.</string>
+    <string name="intro_voice_downloading">Φορτώνουμε, %1$d%%</string>
+    <string name="intro_voice_failed">Η λήψη εξόκειλε. Δοκιμάστε ξανά</string>
+    <string name="intro_voice_download">Λήψη του παπαγάλου, %1$d MB</string>
+
+    <string name="activity_toast_music_pauses_sharing">Οι σκοποί του τηλεφώνου κάνουν παύση όσο γίνεται κατοπτρισμός της οθόνης του</string>
+    <string name="activity_toast_open_for_music">Ανοίξτε το myCar στο τηλέφωνο για να στείλετε τους σκοπούς του στο καράβι</string>
+    <string name="activity_toast_open_for_sharing">Ανοίξτε το myCar στο τηλέφωνο για τον κατοπτρισμό της οθόνης του στο καράβι</string>
+    <string name="activity_status_taken_title">Άλλη εφαρμογή έκανε ρεσάλτο στο αυτοκίνητο</string>
+    <string name="activity_status_taken_detail">Μια άλλη εφαρμογή άρπαξε τη σύνδεση του αυτοκινήτου πριν από το myCar. Αν το Android ρωτήσει ποια εφαρμογή να ανοίξει για το αυτοκίνητο, επιλέξτε το myCar.</string>
+</resources>

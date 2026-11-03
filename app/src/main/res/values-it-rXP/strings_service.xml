@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="session_idle">Nessun abbordaggio</string>
+    <string name="session_idle_detail">Collega il telefono alla porta USB di bordo, o abborda senza fili. myCar si apre da sola quando la nave risponde.</string>
+    <string name="session_connecting">Abbordaggio in corso</string>
+    <string name="session_connected">Abbordato</string>
+    <string name="session_connected_detail">myCar è sullo schermo di bordo.</string>
+    <string name="session_disconnected">Sganciato</string>
+    <string name="session_disconnected_detail">La nave non è più collegata.</string>
+
+    <string name="connection_stage_talking">Parlo con la nave</string>
+    <string name="connection_stage_accepted">Certificato accettato: mi preparo a salpare</string>
+
+    <string name="wireless_link_bt_reaching">Bluetooth: faccio rotta su %1$s</string>
+    <string name="wireless_link_bt_waiting">Aspetto %1$s. Se non succede niente, scollega il telefono dal menu Bluetooth di bordo e ricollegalo</string>
+    <string name="wireless_link_wifi_joining">Wi-Fi: abbordo la rete di %1$s</string>
+    <string name="wireless_link_wifi_reaching">Wi-Fi: faccio rotta su %1$s</string>
+
+    <string name="channel_session">Abbordaggio della nave</string>
+    <string name="channel_audio">Audio a bordo</string>
+    <string name="session_notification_title">myCar ha abbordato la nave</string>
+    <string name="audio_notification_title">Audio verso la nave</string>
+    <string name="audio_notification_text">myCar manda l\'audio del telefono a bordo.</string>
+    <string name="mirror_notification_title">Schermo condiviso con la nave</string>
+    <string name="mirror_notification_text">Lo schermo di bordo mostra questo telefono.</string>
+</resources>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_support_title">Sostieni la traversata</string>
+    <string name="settings_support_footer">myCar è gratuita, senza pubblicità e senza tracciamento. Il tuo sostegno le gonfia le vele.</string>
+    <string name="settings_usage_notes_title">Note di bordo</string>
+    <string name="settings_updates_title">Vele nuove</string>
+
+    <string name="settings_about_title">Bandiera</string>
+    <string name="settings_about_whats_new">Bottino</string>
+    <string name="settings_about_replay_intro">Rivedi il varo della %1$s</string>
+    <string name="settings_about_replay_intro_detail">Il bottino di questa versione, in pochi tocchi</string>
+    <string name="settings_about_setup">Preparativi per salpare</string>
+    <string name="settings_about_setup_detail">Cosa è già a bordo e cosa manca. Niente finisce fuori bordo.</string>
+
+    <string name="settings_connection_title">Abbordaggio</string>
+    <string name="settings_use_mycar">Usa myCar a bordo</string>
+    <string name="settings_use_mycar_on">myCar risponde all\'appello quando colleghi il telefono a una nave</string>
+    <string name="settings_use_mycar_off">Spento: al suo posto può salire a bordo Android Auto</string>
+    <string name="settings_wireless_auto">Abbordaggio senza fili automatico</string>
+    <string name="settings_wireless_auto_on">Una nave già abbordata senza cavo si riaggancia da sola quando la avvii. Android lo chiede una volta.</string>
+    <string name="settings_wireless_auto_cars">Si riaggancia da solo a %1$s quando la avvii. Per un\'altra nave Android lo chiede una volta, dopo una traversata senza cavo.</string>
+    <string name="settings_wireless_auto_off">Spento: tocca «Abborda senza fili» ogni volta</string>
+
+    <string name="settings_help_title">Soccorso e attrezzi</string>
+    <string name="settings_help_connect">Come abbordare</string>
+    <string name="settings_help_connect_detail">Quali navi funzionano e cosa resta da preparare</string>
+    <string name="settings_help_preview">Cannocchiale di bordo</string>
+    <string name="settings_help_preview_detail">Guarda lo schermo di bordo dal telefono</string>
+    <string name="settings_preview_busy">Disponibile quando nessuna nave è abbordata</string>
+    <string name="settings_help_logs">Diario di bordo</string>
+    <string name="settings_help_logs_detail">Cosa si dicono myCar e la nave</string>
+
+    <string name="settings_audio_title">Audio a bordo</string>
+    <string name="settings_audio_footer_ask">Le chiamate passano comunque dal Bluetooth. Esegui una volta il comando che trovi in «Come abbordare», e myCar smette di chiedere di condividere l\'audio.</string>
+    <string name="settings_audio_auto">Automatico (rotta consigliata)</string>
+    <string name="settings_audio_auto_detail">Bluetooth se la nave riceve così le ballate del telefono, altrimenti tramite myCar</string>
+    <string name="settings_audio_bluetooth_detail">Nessuna domanda a ogni traversata, e la voce della tua app di navigazione arriva a bordo. Alcune navi lo usano solo per le chiamate</string>
+    <string name="settings_audio_mycar_detail">Col cavo o in Wi-Fi, come fa Android Auto. Android chiede di condividere l\'audio una volta a ogni traversata</string>
+
+    <string name="settings_apps_recommended">Consigli del capitano</string>
+
+    <string name="settings_cert_footer">Le modifiche valgono dal prossimo abbordaggio.</string>
+    <string name="settings_cert_show_details">Svela i dettagli</string>
+    <string name="settings_cert_hide_details">Dettagli sottocoperta</string>
+    <string name="settings_cert_in_use_next">%1$s si usa dal prossimo abbordaggio.</string>
+    <string name="settings_cert_downloaded">Imbarcato.</string>
+    <string name="settings_cert_not_downloaded">Non ancora a bordo: tocca per scaricarlo.</string>
+    <string name="settings_cert_import">Imbarca un mio file</string>
+    <string name="settings_cert_imported">Certificato imbarcato.</string>
+    <string name="settings_cert_import_button">Imbarca</string>
+
+    <string name="settings_test_trying">Sondo le acque…</string>
+    <string name="settings_test_at_home">Porto di casa</string>
+    <string name="settings_test_away">Al largo</string>
+    <string name="settings_address_away">Indirizzo quando sei al largo (facoltativo)</string>
+
+    <string name="settings_plancia_footer">Le tue plance di Home Assistant a bordo, pronte appena le apri: dalla flotta, in una pagina accanto a quella della mappa o nel pannello accanto alla mappa. Crea il token in Home Assistant: il tuo profilo, Sicurezza, Token di accesso a lunga vita.</string>
+    <string name="settings_plancia_use_app">Imbarca l\'account dell\'app Plancia</string>
+    <string name="settings_plancia_use_app_detail">I suoi indirizzi e il token passano a bordo, senza scrivere niente</string>
+    <string name="settings_plancia_asking">Plancia a rapporto…</string>
+    <string name="settings_plancia_app_no_account">Plancia non ha ancora un account da spartire: preparalo prima in Plancia, o scrivilo qui sotto.</string>
+    <string name="settings_plancia_address_home">Indirizzo del porto di casa</string>
+    <string name="settings_plancia_missing">Imbarca un indirizzo e un token.</string>
+    <string name="settings_plancia_missing_remove">Imbarca un indirizzo e un token. Per togliere Plancia da myCar, usa Togli.</string>
+    <string name="settings_plancia_remove_title">Gettare Plancia fuori bordo da myCar?</string>
+    <string name="settings_plancia_remove_text">myCar dimentica i suoi indirizzi e il token. L\'app Plancia, se è sul telefono, torna a bordo.</string>
+    <string name="settings_plancia_removed">Plancia è fuori bordo: l\'app Plancia torna a bordo, se è sul telefono.</string>
+    <string name="settings_ask_ha">Chiedi a Home Assistant a bordo</string>
+    <string name="settings_ask_ha_detail">Quello che il pappagallo di bordo non sa fare da solo va all\'assistente vocale configurato in Home Assistant (lì in Impostazioni &gt; Assistenti vocali): Claude, Gemini, ChatGPT, un modello che gira in casa o quello di Home Assistant, che comanda anche la casa. Col telefono bloccato risponde al posto del pappagallo del telefono. A Home Assistant vanno solo quelle parole, come testo.</string>
+
+    <string name="settings_xonos_footer">La tua libreria di Music Assistant tra le app musicali di bordo. Con l\'audio a bordo tramite myCar, le sue ballate vanno dritte alla nave, e Android non chiede di condividere l\'audio mentre le ascolti.</string>
+    <string name="settings_xonos_use_app">Imbarca l\'account dell\'app Xonos</string>
+    <string name="settings_xonos_use_app_detail">I suoi indirizzi e l\'accesso passano a bordo, senza scrivere niente</string>
+    <string name="settings_xonos_asking">Xonos a rapporto…</string>
+    <string name="settings_xonos_app_no_account">Xonos non ha ancora un account da spartire: arruolati prima in Xonos, o qui sotto.</string>
+    <string name="settings_xonos_signed_in">Arruolato. Per cambiare, arruolati di nuovo.</string>
+    <string name="settings_xonos_signed_in_as">Arruolato come %1$s. Per cambiare, arruolati di nuovo.</string>
+    <string name="settings_xonos_missing">Imbarca l\'indirizzo, il tuo nome utente e la tua password.</string>
+    <string name="settings_xonos_signing_in">Arruolamento in corso…</string>
+    <string name="settings_xonos_sign_in">Arruolati</string>
+    <string name="settings_xonos_remove_title">Gettare Xonos fuori bordo da myCar?</string>
+    <string name="settings_xonos_remove_text">myCar dimentica il suo indirizzo e l\'arruolamento, e per arruolarti di nuovo serve la password. L\'app Xonos, se è sul telefono, torna a bordo.</string>
+    <string name="settings_xonos_removed">Xonos di myCar è fuori bordo: l\'app Xonos torna a bordo, se è sul telefono.</string>
+
+    <string name="settings_cinema_footer">I siti di video come riquadri a bordo, ognuno aperto in un browser fatto per il video. Il video protetto (Netflix, DAZN, Prime Video, Disney+ e simili) molto probabilmente resta nero a bordo: Android lo nasconde a uno schermo trasformato in un flusso video, come quello di bordo.</string>
+    <string name="settings_cinema_add_site">Imbarca il sito</string>
+    <string name="settings_cinema_reset">Torna ai siti di partenza</string>
+    <string name="settings_cinema_reset_title">Tornare ai siti di partenza?</string>
+    <string name="settings_cinema_reset_text">Cinema torna ai siti di partenza: %1$s.</string>
+    <string name="settings_cinema_reset_text_own">Cinema torna ai siti di partenza: %1$s. I siti imbarcati da te vanno fuori bordo: %2$s.</string>
+    <string name="settings_cinema_reset_confirm">Rimetti in rotta</string>
+    <string name="settings_cinema_remove_title">Gettare %1$s fuori bordo?</string>
+    <string name="settings_cinema_remove_site_text">Sbarca da Cinema. Per riaverlo a bordo, va scritto di nuovo il suo indirizzo.</string>
+    <string name="settings_cinema_remove">Getta %1$s fuori bordo</string>
+    <string name="settings_cinema_protected">video protetto, probabilmente nero a bordo</string>
+    <string name="settings_cinema_videos_ask">Consenti a myCar di mostrarli a bordo, in «Su questo telefono»</string>
+    <string name="settings_cinema_videos_limited">A bordo si vedono solo i video scelti per myCar</string>
+    <string name="settings_cinema_videos_allowed">Si vedono a bordo, in «Su questo telefono»</string>
+    <string name="settings_cinema_more_sites">Altri siti da imbarcare</string>
+    <string name="settings_cinema_tv_footer">Liste IPTV in formato M3U, dal tuo fornitore, da una lista pubblica o da un server TV di casa: ognuna è un riquadro in Cinema con i suoi canali. Si guardano con il lettore del telefono; i canali protetti (DRM) e quelli multicast restano a terra.</string>
+    <string name="settings_cinema_tv_remove_text">Il suo indirizzo e i suoi canali sbarcano da myCar. Per riaverla a bordo, va scritto di nuovo l\'indirizzo.</string>
+    <string name="settings_cinema_tv_loading">carico a bordo…</string>
+    <string name="settings_cinema_tv_add">Imbarca la lista</string>
+
+    <string name="settings_phone_typing_close">Chiudi la tastiera di bordo</string>
+    <string name="settings_phone_typing_label">Scrivi per lo schermo di bordo</string>
+    <string name="settings_phone_typing_search">Scova sullo schermo di bordo</string>
+
+    <string name="settings_audio_choice_title">Usare il Bluetooth per l\'audio a bordo?</string>
+    <string name="settings_audio_choice_text">Android tratta la musica mandata tramite myCar come una condivisione dello schermo, quindi lo chiede a ogni traversata. Col Bluetooth non lo chiede mai, se la tua nave riceve così la musica del telefono. Puoi cambiare rotta dopo, dal Timone.</string>
+    <string name="settings_audio_choice_command">Oppure resta sulla rotta di myCar e togli la domanda per sempre: collega il telefono a un computer con il debug USB attivo ed esegui questo comando una volta.</string>
+    <string name="settings_mic_blocked_title">L\'audio a bordo ha bisogno del permesso del microfono</string>
+
+    <string name="about_no_wallet">Nessuna app di portafoglio Bitcoin in vista. Copia invece l\'indirizzo.</string>
+    <string name="about_give_once">Dona un doblone, una volta</string>
+    <string name="about_bitcoin_title">Sostieni la traversata con Bitcoin</string>
+    <string name="about_matrix_detail">La ciurma di Gearslip, il cantiere da cui è salpata myCar</string>
+
+    <string name="voice_model_live_title">Pappagallo: parole in diretta</string>
+    <string name="voice_model_live_about">Il pappagallo di bordo trasforma la voce in testo su questo telefono, e niente di quello che dici esce dal telefono, tranne, se hai configurato Home Assistant, quello che myCar non sa fare da sola, che va al tuo Home Assistant come testo. Servono due modelli, circa %1$d MB in tutto, scaricati una volta. Questo scrive le tue parole mentre parli, in inglese; in un\'altra lingua sente solo quando smetti di parlare.</string>
+    <string name="voice_model_final_title">Pappagallo: parole finali</string>
+    <string name="voice_model_final_about">Quando smetti di parlare, questo modello rilegge tutta la frase da prua a poppa. Coglie nomi e luoghi che il modello in diretta non capisce.</string>
+    <string name="voice_model_delete_title">Affondare %1$s?</string>
+    <string name="voice_model_delete_in_use">Si liberano %1$d MB sul telefono. È quello in uso: il pappagallo di bordo non può ascoltare finché non lo scarichi di nuovo.</string>
+    <string name="voice_model_delete_again">Si liberano %1$d MB sul telefono. Puoi riportarlo a bordo da qui.</string>
+    <string name="voice_model_downloaded">Imbarcato. %1$s</string>
+    <string name="voice_model_downloading">Carico a bordo, %1$d%%</string>
+    <string name="voice_model_download">Carica a bordo</string>
+    <string name="voice_model_parakeet_small_detail">Più leggero e veloce, ma più nomi finiscono fuori bordo. NVIDIA NeMo, CC BY 4.0</string>
+    <string name="voice_model_canary_detail">Consigliato. Veloce come il vento, e capisce bene nomi e luoghi. Inglese, spagnolo, tedesco e francese. NVIDIA NeMo, CC BY 4.0</string>
+    <string name="voice_model_parakeet_large_detail">Capisce meglio i nomi, ma è più lento e stazza il triplo. NVIDIA NeMo, CC BY 4.0</string>
+    <string name="voice_model_parakeet_multi_detail">Italiano, portoghese, spagnolo, francese, tedesco, greco, russo e inglese, e altre 17 lingue europee. Stessa stazza e stessa andatura di Parakeet grande. NVIDIA NeMo, CC BY 4.0</string>
+
+    <string name="voice_model_language_title">Pappagallo: %1$s</string>
+    <string name="voice_model_language_ready">myCar è in %1$s, quindi il pappagallo di bordo ascolta e risponde in %1$s, con %2$s.</string>
+    <string name="voice_model_language_phone">myCar è in %1$s, quindi il pappagallo di bordo ascolta e risponde in %1$s, con il riconoscimento vocale del telefono.</string>
+    <string name="voice_model_language_ready_try">myCar è in %1$s, quindi il pappagallo di bordo ascolta e risponde in %1$s, con %2$s. Prova a dire «%3$s».</string>
+    <string name="voice_model_language_missing">myCar è in %1$s. Con %2$s (%3$d MB) il pappagallo di bordo ascolta e risponde in %1$s; fino ad allora capisce solo l\'inglese.</string>
+    <string name="voice_model_language_tts">Risponde con la voce della sintesi vocale del telefono in %1$s. Se gracchia male, scegli o scarica quella voce nelle impostazioni di sintesi vocale di Android.</string>
+    <string name="voice_model_language_download">Carica a bordo %1$s</string>
+
+    <string name="speech_download_channel">Imbarco della voce</string>
+    <string name="speech_download_title">Imbarco della voce in corso</string>
+
+    <string name="stats_intro">Se lo attivi, myCar manda una breve nota quando la apri e dopo ogni viaggio. %1$s Le note mostrano quali auto funzionano e dove le altre si arenano.</string>
+    <string name="stats_send">Invia le note di bordo</string>
+    <string name="stats_show_note">Svela la nota</string>
+    <string name="stats_hide_note">Nota sottocoperta</string>
+    <string name="stats_worked_title_year">myCar ha solcato i mari con la tua %2$s del %1$s</string>
+    <string name="stats_worked_title_named">myCar ha solcato i mari con la tua %1$s</string>
+    <string name="stats_worked_title_car">myCar ha solcato i mari con la tua nave</string>
+    <string name="stats_worked_text">Lo spartisci, così chi ha la stessa nave sa che funziona? Niente nomi, account né posizione.</string>
+    <string name="stats_worked_share">Spartisci</string>
+
+    <string name="settings_group_general">In coperta</string>
+    <string name="settings_group_general_detail">Parlata, tema, vele nuove</string>
+    <string name="settings_group_connection_detail">Senza fili, audio a bordo, certificato</string>
+    <string name="settings_group_voice">Pappagallo</string>
+    <string name="settings_group_voice_detail">Pappagallo di bordo e modelli vocali</string>
+    <string name="settings_group_plancia_detail">Home Assistant a bordo</string>
+    <string name="settings_group_xonos_detail">Music Assistant a bordo</string>
+    <string name="settings_group_help_detail">Come abbordare, diario di bordo</string>
+    <string name="settings_group_about_detail">Versione, licenze, sostieni la traversata</string>
+    <string name="settings_group_car">Schermo di bordo</string>
+    <string name="settings_group_car_detail">Porto, pagine, aspetto, orizzonte, avvisi</string>
+    <string name="settings_car_pages_header">Le tue pagine ai lati della mappa, in porto sullo schermo di bordo. Cambiale qui, o a bordo con la matita accanto ai puntini.</string>
+    <string name="settings_car_pages_ready_text">Le tue pagine vanno fuori bordo e al loro posto tornano quelle pronte: meteo e agenda a sinistra della mappa e, a destra, Plancia accanto al browser, se Plancia è configurata o installata.</string>
+    <string name="settings_car_fit_offline">Abborda la nave per adattarne lo schermo: la nave mostra ogni modifica mentre la fai.</string>
+    <string name="settings_grid_apps">App nella flotta di bordo</string>
+    <string name="settings_grid_apps_all">Tutte in vista</string>
+    <plurals name="settings_grid_apps_hidden">
+        <item quantity="one">%d clandestina</item>
+        <item quantity="other">%d clandestine</item>
+    </plurals>
+    <string name="settings_grid_apps_note">Togli la spunta a un\'app per tenerla fuori dalla flotta di bordo. A bordo: tieni premuta un\'app e scegli «Manda sottocoperta dalla flotta». Un\'app ormeggiata al molo resta lì.</string>
+    <string name="theme_footer">L\'aspetto di myCar sul telefono. Lo schermo di bordo ha il suo, nel Timone di bordo.</string>
+    <string name="theme_black">Nero pece (AMOLED)</string>
+    <string name="settings_audio_per_car">Con una nave abbordata, la scelta resta per quella nave, e la cambia anche il tasto dell\'audio nell\'organetto. Senza nave abbordata, vale per tutte le navi.</string>
+    <string name="settings_group_music">Ballate</string>
+    <string name="settings_group_music_detail">Xonos, Spotify e altre ballate a bordo</string>
+    <string name="music_in_the_car">A bordo</string>
+    <string name="music_xonos_on">Music Assistant sullo schermo di bordo, come una delle sue app musicali</string>
+    <string name="music_xonos_off">Spento: Xonos non è sullo schermo di bordo, e nemmeno l\'app Xonos</string>
+    <string name="music_service_on">Nella flotta di bordo; suona tramite myCar</string>
+    <string name="music_service_off">Spento: non è sullo schermo di bordo</string>
+    <string name="music_sign_in">Arruolati sul telefono</string>
+    <string name="music_sign_in_detail">Con la tastiera del telefono: resti arruolato anche a bordo</string>
+    <string name="music_sign_in_title">%1$s: arruolati</string>
+    <string name="music_sign_out">Congedati</string>
+    <string name="music_sign_out_detail">Da questo servizio in myCar, sul telefono e a bordo</string>
+    <string name="music_hide_app">Manda sottocoperta l\'app %1$s del telefono</string>
+    <string name="music_hide_app_detail">Nella flotta di bordo resta solo %1$s dentro myCar: l\'app %1$s di questo telefono non compare, così a bordo non ce ne sono due.</string>
+    <string name="music_sign_out_title">Congedarti da %1$s?</string>
+    <string name="music_sign_out_text">myCar dimentica l\'arruolamento in %1$s e quello che le sue pagine hanno salvato. Il tuo account resta com\'è.</string>
+    <string name="music_add">Imbarca un servizio</string>
+    <string name="music_add_footer">Altri servizi musicali, ognuno con il suo lettore web dentro myCar: il loro audio arriva a bordo tramite myCar, come quello di Cinema.</string>
+    <string name="music_add_note">Ognuno che spunti compare qui e nella flotta di bordo.</string>
+    <string name="music_needs_google">Google potrebbe non farti arruolare dentro un\'app: allora YouTube Music suona senza arruolamento.</string>
+</resources>

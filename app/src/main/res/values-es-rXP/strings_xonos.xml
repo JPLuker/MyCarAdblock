@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="xonos_cat_recent">Bitácora de escucha</string>
+    <string name="xonos_cat_tracks">Tonadas</string>
+    <string name="xonos_cat_favorites">Tonadas favoritas</string>
+    <string name="xonos_all_tracks">Todas las tonadas</string>
+    <string name="xonos_problem_not_configured">Apareja Xonos en myCar, en el teléfono</string>
+
+    <plurals name="xonos_count_tracks">
+        <item quantity="one">%d tonada</item>
+        <item quantity="other">%d tonadas</item>
+    </plurals>
+</resources>

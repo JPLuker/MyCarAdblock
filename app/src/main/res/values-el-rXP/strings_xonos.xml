@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="xonos_cat_recent">Πρόσφατα στο γραμμόφωνο</string>
+    <string name="xonos_cat_foryou">Για τον καπετάνιο</string>
+    <string name="xonos_cat_tracks">Σκοποί</string>
+    <string name="xonos_cat_favorites">Σκοποί στο σεντούκι</string>
+    <string name="xonos_cat_browse">Εξερεύνηση των υπηρεσιών</string>
+    <string name="xonos_top_tracks">Οι πιο δημοφιλείς σκοποί</string>
+    <string name="xonos_all_tracks">Όλοι οι σκοποί</string>
+
+    <string name="xonos_problem_bad_token">Το διακριτικό δεν έγινε δεκτό: κάντε ξανά μπαρκάρισμα στο myCar στο τηλέφωνο</string>
+    <string name="xonos_problem_not_configured">Ξαρτίστε το Xonos στο myCar στο τηλέφωνο</string>
+
+    <plurals name="xonos_results">
+        <item quantity="one">%d λάφυρο</item>
+        <item quantity="other">%d λάφυρα</item>
+    </plurals>
+    <plurals name="xonos_count_tracks">
+        <item quantity="one">%d σκοπός</item>
+        <item quantity="other">%d σκοποί</item>
+    </plurals>
+</resources>

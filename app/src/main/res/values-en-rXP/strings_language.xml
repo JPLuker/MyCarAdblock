@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">Tongue</string>
+    <string name="language_phone">Phone\'s tongue (%1$s)</string>
+    <string name="language_footer">myCar on the phone and at the helm, and its ship\'s parrot, in this tongue.</string>
+    <string name="language_pirate_detail">Every text of myCar in pirate tongue, in the tongue above. We chart our own course and bow to no crown, arrr.</string>
+</resources>

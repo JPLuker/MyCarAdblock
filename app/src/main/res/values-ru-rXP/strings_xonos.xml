@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="xonos_cat_recent">Давеча звучало</string>
+    <string name="xonos_cat_foryou">Для капитана</string>
+    <string name="xonos_cat_tracks">Песни</string>
+    <string name="xonos_cat_favorites">Песни из сундука</string>
+    <string name="xonos_cat_browse">Разведка сервисов</string>
+    <string name="xonos_top_tracks">Популярные песни</string>
+    <string name="xonos_all_tracks">Все песни</string>
+
+    <string name="xonos_problem_not_configured">Снарядите Xonos в myCar на телефоне</string>
+
+    <plurals name="xonos_results">
+        <item quantity="one">%d находка</item>
+        <item quantity="few">%d находки</item>
+        <item quantity="many">%d находок</item>
+        <item quantity="other">%d находки</item>
+    </plurals>
+    <plurals name="xonos_count_tracks">
+        <item quantity="one">%d песня</item>
+        <item quantity="few">%d песни</item>
+        <item quantity="many">%d песен</item>
+        <item quantity="other">%d песни</item>
+    </plurals>
+</resources>

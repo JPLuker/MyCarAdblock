@@ -59,6 +59,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -86,6 +87,7 @@ import io.github.sirionero.mycar.car.theme.gsColors
 import io.github.sirionero.mycar.host.CarAppConnection
 import io.github.sirionero.mycar.host.TemplateApp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 /**
@@ -106,10 +108,16 @@ import kotlinx.coroutines.launch
 internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -> Unit) {
     val navigator = LocalCarNavigator.current
     val scope = rememberCoroutineScope()
-    val pages = rememberHomePages()
+    val view = LocalView.current
+    // Pages changed on the phone while Home shows: a frame late if a web page in them has the focus,
+    // taken first (see LeaveWithoutFocus.kt). Changes made here come while a page is being changed,
+    // with the focus already gone, so at once.
+    val pages = afterFocusLeaves(rememberHomePages(), holds = onHome) { view.dropInteropFocus() }
     val latest by rememberUpdatedState(pages)
     val mapIndex = pages.indexOfFirst { it.layout == PageLayout.MAP }.coerceAtLeast(0)
     val pager = rememberPagerState(initialPage = mapIndex) { pages.size }
+    // Under a call's banner: the driver's pages, the bar and the lists of their changing (not the map).
+    val callTop = LocalCallTop.current
     var editing by remember { mutableStateOf<Int?>(null) }
     var choosing by remember { mutableStateOf<Int?>(null) }
     // The list of layouts for the page being changed.
@@ -145,8 +153,27 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
         snapshotFlow { latest.getOrNull(pager.currentPage)?.layout == PageLayout.MAP }
             .collect { navigator.onMapPage = it }
     }
+    // In the log, the page each turn settles on: a drive's log then says where Home was when something went.
+    LaunchedEffect(pager) {
+        snapshotFlow { pager.settledPage }.drop(1).collect { index ->
+            val page = latest.getOrNull(index)
+            io.github.sirionero.mycar.MyCarLog.i("home: page ${index + 1} of ${latest.size}, ${page?.layout?.id}${page?.slots?.let { " $it" }.orEmpty()}")
+        }
+    }
     LaunchedEffect(onHome) {
         if (!onHome) {
+            editing = null
+            choosing = null
+            // The pages can change from another screen (the ready-made ones put back): one that goes
+            // with the focus in its browser would crash (see LeaveWithoutFocus.kt).
+            view.dropInteropFocus()?.let { io.github.sirionero.mycar.MyCarLog.i("focus: taken from $it as Home leaves the screen") }
+        }
+    }
+    // The page being changed taken away on the phone (or the ready-made pages put back): the changing
+    // ends with it. Left on, Home stayed unswipeable with its car apps as icons, and a page added on the
+    // phone (the same id again) opened for changing by itself.
+    LaunchedEffect(pages) {
+        if (editing != null && pages.none { it.id == editing }) {
             editing = null
             choosing = null
         }
@@ -157,6 +184,11 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
     // the list of what can go in it first, then the changing. Only on Home: another screen up may
     // want Back for itself (the browser, for its pages).
     val changing = onHome && editing != null
+    // A page being changed can lose a part, or go: none of its web pages keeps the focus meanwhile
+    // (see LeaveWithoutFocus.kt). Its parts are covered by their cards, nothing there is typed into.
+    LaunchedEffect(changing) {
+        if (changing) view.dropInteropFocus()?.let { io.github.sirionero.mycar.MyCarLog.i("focus: taken from $it as a page is changed") }
+    }
     val besideMap = onHome && pages.getOrNull(pager.currentPage)?.layout != PageLayout.MAP
     DisposableEffect(changing, besideMap) {
         if (!changing && !besideMap) return@DisposableEffect onDispose { }
@@ -202,6 +234,7 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
                         editing = page.id
                         choosing = slot
                     },
+                    modifier = Modifier.padding(top = callTop),
                 )
             }
         }
@@ -240,9 +273,9 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
                     follow = latest.firstOrNull { it.layout == PageLayout.MAP }?.id
                 },
                 onDone = { editing = null },
-                modifier = Modifier.align(Alignment.TopCenter).padding(MyCarSpace.S),
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = callTop).padding(MyCarSpace.S),
             )
-            if (choosingLayout) {
+            if (choosingLayout) Box(Modifier.fillMaxSize().padding(top = callTop)) {
                 LayoutChooser(
                     edited.layout,
                     onChoose = { layout ->
@@ -253,15 +286,17 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
                 )
             }
             choosing?.let { slot ->
-                ContentChooser(
-                    edited,
-                    slot,
-                    onChoose = { content ->
-                        HomePages.save(latest.withSlot(edited.id, slot, content))
-                        choosing = null
-                    },
-                    onClose = { choosing = null },
-                )
+                Box(Modifier.fillMaxSize().padding(top = callTop)) {
+                    ContentChooser(
+                        edited,
+                        slot,
+                        onChoose = { content ->
+                            HomePages.save(latest.withSlot(edited.id, slot, content))
+                            choosing = null
+                        },
+                        onClose = { choosing = null },
+                    )
+                }
             }
         }
     }
@@ -272,7 +307,7 @@ internal class WebTile(val onHold: () -> Unit, val keyboard: MutableState<(@Comp
 
 /** One of the driver's pages: its parts, and under them, the page's whole width, the browser's keyboard. */
 @Composable
-private fun DriverPage(page: HomePage, inView: Boolean, editing: Boolean, onEdit: () -> Unit, onChoose: (Int) -> Unit) {
+private fun DriverPage(page: HomePage, inView: Boolean, editing: Boolean, onEdit: () -> Unit, onChoose: (Int) -> Unit, modifier: Modifier = Modifier) {
     val entries = rememberAllEntries()
     val keyboard = remember { mutableStateOf<(@Composable () -> Unit)?>(null) }
     // A page runs one car app, in the first part that holds one; the list of choices keeps it so.
@@ -280,7 +315,7 @@ private fun DriverPage(page: HomePage, inView: Boolean, editing: Boolean, onEdit
     val part: @Composable (Int, Modifier) -> Unit = { slot, modifier ->
         PagePart(page.slots[slot], entries, inView, inView && slot == runner, editing, onEdit, { onChoose(slot) }, keyboard, modifier)
     }
-    Column(Modifier.fillMaxSize()) {
+    Column(modifier.fillMaxSize()) {
         Box(Modifier.weight(1f).fillMaxWidth()) {
             when (page.layout) {
                 PageLayout.HALVES -> Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(PageGap)) {

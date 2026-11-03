@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="changelog_46">
+        <item>Voie d’eau colmatée : un plantage qui fermait myCar et la connexion. Il survenait après un appui dans la page de Plancia puis un passage à la carte ou à la flotte, quand l’app Plancia prenait sa place ou au changement de couleurs.</item>
+        <item>Parler pirate : dans Timonerie &gt; Langue, chaque texte de myCar en langage de pirate, dans votre langue. Notre cap, c’est nous qui le choisissons : ni roi ni maître !</item>
+        <item>Un nouvel horizon animé, myCar · Rebelle : les vagues et un voilier qui brave chaque tempête avec son pavillon à tête de mort.</item>
+        <item>Si myCar se ferme tout seul, le démarrage suivant écrit dans le journal de bord pourquoi Android l’a fermé (un plantage, la mémoire, absence de réponse), pour pouvoir colmater la brèche.</item>
+        <item>Les modèles du perroquet se chargent un à la fois, jamais après la fin de la traversée, et avant la première commande seulement s’il reste de la mémoire.</item>
+        <item>Mini-phono : sur les petits écrans il apparaît à l’écart des boutons de la carte, lâché dessous il jette l’ancre juste à côté, et les boutons estompés de la carte ne prennent plus les appuis destinés à la carte.</item>
+        <item>Couplets : chaque chant commence par sa première ligne, et la version live d’un autre chant n’apporte plus ses couplets.</item>
+        <item>Spotify et les autres services de musique : « mets … » attend la page jusqu’à 25 secondes, et un Play encore en attente ne démarre pas si vous avez changé de chant entre-temps.</item>
+        <item>Choisir la radio de bord arrête une vidéo ou une radio dans Cinema ou le navigateur, et elles ne repartent pas toutes seules. Chants dès l’appareillage : ils ne partent que quand le son a un passage vers le navire.</item>
+        <item>Perroquet : « suivant », « pause » ou « stop » dans une question plus longue ne changent plus le chant ; « n’envoyez pas » et « annuler » sont entendus pendant que vous répondez à une missive ; une pause juste avant une autre commande de musique ne l’annule plus.</item>
+        <item>Le Nouveau butin attend la fin d’un appel, et pendant un appel les ponts à côté de la carte et leur menu restent sous la barre de l’appel.</item>
+        <item>Changer la langue de myCar en pleine traversée change aussitôt l’écran de bord ; sous Android 12 et 13, ouvrir myCar en pleine traversée rend sa position à la carte.</item>
+    </string-array>
+</resources>

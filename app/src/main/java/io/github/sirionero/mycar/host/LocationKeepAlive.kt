@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -93,6 +94,9 @@ class LocationKeepAlive : Service() {
         /** How often a start-up's hold checks whether that start-up is still going on. */
         private const val START_UP_CHECK_MS = 60_000L
 
+        /** How long after the drive's service went the drive's hold is weighed (see [releaseDrive]). */
+        private const val RELEASE_CHECK_MS = 1_000L
+
         /** Public flag value; the constant itself is hidden from the SDK. */
         const val BIND_INCLUDE_CAPABILITIES = 0x1000
 
@@ -130,15 +134,20 @@ class LocationKeepAlive : Service() {
             }
         }
 
-        /** A start-up's hold goes by itself if that start-up ends without a drive. */
+        /**
+         * A start-up's hold goes by itself if that start-up ends without a drive. The rule of
+         * [releaseDrive]: not kept for the listening after a drive, which lasts 10 minutes - with
+         * WirelessLink.busy alone the service and its notification stayed all that time after a drive
+         * whose car closed the session before its Bluetooth channel.
+         */
         private val startUpCheck = object : Runnable {
             override fun run() {
                 if (!driveHold || !startUpOnly) return
-                if (WirelessLink.busy || WirelessLink.startingOver || SessionService.held) {
+                if (startUpGoesOn()) {
                     main.postDelayed(this, START_UP_CHECK_MS)
                     return
                 }
-                MyCarLog.i("location keep-alive: the start-up ended without a drive - letting go")
+                MyCarLog.i("location keep-alive: no drive or start-up going on - letting go")
                 startUpOnly = false
                 driveHold = false
                 appContext?.let { release(it) }
@@ -233,22 +242,38 @@ class LocationKeepAlive : Service() {
                     main.postDelayed(startUpCheck, START_UP_CHECK_MS)
                     return@post
                 }
-                driveHold = false
-                startUpOnly = false
+                // Decided a moment later, not now: a start-up whose car's Wi-Fi or TCP failed gives the
+                // service back from WirelessLink's own thread and only then marks its start-over, and
+                // this ran in between - the hold went, and the start-over took it anew past Android's
+                // 10 s: refused, the map had no position for the drive. A drive over lets go 1 s later.
+                appContext = app
+                startUpOnly = true
                 main.removeCallbacks(startUpCheck)
-                release(app)
+                main.postDelayed(startUpCheck, RELEASE_CHECK_MS)
             }
         }
+
+        /** A wireless start-up still going (not the listening after a drive), about to start over, or the drive's service held. */
+        private fun startUpGoesOn(): Boolean =
+            (WirelessLink.busy && !WirelessLink.listeningQuietly) || WirelessLink.startingOver || SessionService.held
 
         /**
          * Tries again after a refusal, while something holds the service: myCar on screen, or its
          * accessibility service just switched on, makes Android let it start.
+         *
+         * On Android 12 and 13 a start from the background isn't refused: the service runs, with no
+         * location to lend, and nothing shows it. Started once more from here, Android gives the
+         * running service what it lends for the rest of the drive.
          */
         fun retry(context: Context, why: String = "myCar is on screen") {
             main.post {
                 if (holders > 0 && state == State.FAILED) {
                     MyCarLog.i("location keep-alive: $why, trying again")
                     begin(context.applicationContext)
+                } else if (holders > 0 && state == State.ON && Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    val app = context.applicationContext
+                    runCatching { app.startForegroundService(Intent(app, LocationKeepAlive::class.java)) }
+                        .onFailure { MyCarLog.w("location keep-alive: $why, but couldn't start it again - ${it.message}") }
                 }
             }
         }

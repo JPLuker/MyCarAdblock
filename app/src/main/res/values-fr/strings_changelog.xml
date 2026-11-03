@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 0.6.8-alpha -->
+    <!-- 0.7.0-alpha -->
+    <string-array name="changelog_46">
+        <item>Correction d’un plantage qui fermait myCar et la connexion : il survenait après un appui dans la page de Plancia puis un passage à la carte ou à la grille des apps, quand l’app Plancia prenait sa place ou au changement de thème.</item>
+        <item>Parler pirate : dans Paramètres &gt; Langue, chaque texte de myCar en langage de pirate, dans votre langue. Notre cap, c’est nous qui le choisissons.</item>
+        <item>Un nouveau fond animé, myCar · Rebelle : les vagues et un voilier qui traverse chaque tempête avec son pavillon à tête de mort.</item>
+        <item>Si myCar se ferme tout seul, le démarrage suivant écrit dans le journal pourquoi Android l’a fermé (un plantage, la mémoire, absence de réponse), pour pouvoir le corriger.</item>
+        <item>Les modèles vocaux se chargent un à la fois, jamais après la fin du trajet, et avant la première commande seulement s’il reste de la mémoire.</item>
+        <item>Mini-lecteur : sur les petits écrans il apparaît à l’écart des boutons de la carte, lâché dessous il se décale juste à côté, et les boutons estompés de la carte ne prennent plus les appuis destinés à la carte.</item>
+        <item>Paroles : chaque titre commence par sa première ligne, et la version live d’une autre chanson n’apporte plus ses paroles.</item>
+        <item>Spotify et les autres services de musique : « mets … » attend la page jusqu’à 25 secondes, et un Play encore en attente ne démarre pas si vous avez changé de musique entre-temps.</item>
+        <item>Choisir la radio de la voiture arrête une vidéo ou une radio dans Cinema ou le navigateur, et elles ne repartent pas toutes seules. La lecture automatique lance la musique seulement quand le son a un chemin vers la voiture.</item>
+        <item>Assistant : « suivant », « pause » ou « stop » dans une question plus longue ne changent plus le titre ; « n’envoyez pas » et « annuler » sont entendus pendant que vous répondez à un message ; une pause juste avant une autre commande de musique ne l’annule plus.</item>
+        <item>Les Nouveautés attendent la fin d’un appel, et pendant un appel les pages à côté de la carte et leur menu restent sous la barre de l’appel.</item>
+        <item>Changer la langue de myCar pendant un trajet change aussitôt l’écran de la voiture ; sous Android 12 et 13, ouvrir myCar pendant un trajet rend sa position à la carte.</item>
+    </string-array>
+    <!-- 0.6.9-alpha -->
     <string-array name="changelog_45">
         <item>Mini-lecteur sur la carte entière : quand vous fermez le lecteur à côté de la carte, un petit lecteur flotte sur la carte, avec la pochette, précédent, lecture ou pause et suivant. Maintenez-le appuyé puis faites-le glisser où vous voulez ; son X le masque pour le trajet (le titre dans le dock ramène le lecteur), et il se désactive dans les Paramètres.</item>
         <item>Paroles trouvées bien plus souvent : titres nettoyés de « Remastered », « feat. », « Live » et des noms qu’ajoutent radios et vidéos, et chaque résultat vérifié, pour que les paroles d’une autre chanson n’apparaissent jamais. Les morceaux instrumentaux le disent ; avec Xonos dans myCar, d’abord les paroles de Music Assistant.</item>

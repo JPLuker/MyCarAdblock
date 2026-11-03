@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialer_tab_contacts">Экипаж</string>
+    <string name="dialer_loading_contacts">Собираем экипаж…</string>
+    <string name="dialer_no_contacts">В экипаже нет никого с номером телефона.</string>
+    <string name="dialer_no_match">В экипаже нет никого по запросу «%1$s».</string>
+    <string name="dialer_favourite">В сундуке</string>
+
+    <string name="recents_empty">Тихие воды: недавних звонков нет.</string>
+
+    <plurals name="message_new_count">
+        <item quantity="one">%1$s · %2$d новая депеша</item>
+        <item quantity="few">%1$s · %2$d новых депеши</item>
+        <item quantity="many">%1$s · %2$d новых депеш</item>
+        <item quantity="other">%1$s · %2$d новых депеши</item>
+    </plurals>
+    <string name="message_listening">Слушаю, кэп</string>
+    <string name="message_sending_to">Шлём депешу: %1$s</string>
+    <string name="message_sent_to">Депеша ушла: %1$s</string>
+
+    <string name="message_screen_title">Депеши</string>
+    <string name="message_empty">Пока ни одной депеши. Новые депеши %1$s появятся здесь, как только причалят к телефону.</string>
+    <plurals name="message_earlier">
+        <item quantity="one">Старые депеши: %d</item>
+        <item quantity="few">Старые депеши: %d</item>
+        <item quantity="many">Старые депеши: %d</item>
+        <item quantity="other">Старые депеши: %d</item>
+    </plurals>
+    <string name="message_quick_replies_hide">Спрятать быстрые ответы</string>
+
+    <string name="message_test_channel">Тестовые депеши</string>
+    <string name="message_test_late">Опаздываю минут на десять, займёшь мне место в кают-компании?</string>
+    <string name="message_test_tonight">Ты сегодня вечером всё ещё поднимешься к нам на борт?</string>
+    <string name="message_test_milk">Купишь молока по пути в порт?</string>
+    <string name="message_test_parked">Позвони, когда бросишь якорь.</string>
+
+    <string name="notifications_title">Сигналы</string>
+    <string name="notifications_clear_all">Всё за борт</string>
+    <string name="notifications_clear_confirm">Да, всё за борт</string>
+    <string name="notifications_empty">Море спокойно: пока ни одного сигнала. Новые сигналы с телефона появятся здесь.</string>
+
+    <string name="assistant_needs_model">Попугай пока понимает только английский: чтобы давать команды на языке «%1$s», скачайте %2$s в такелаже myCar на телефоне.</string>
+    <string name="assistant_mic">Попугай</string>
+    <string name="assistant_phone_inline">попугай телефона</string>
+    <string name="assistant_start_failed">Не удалось запустить: %1$s. Вместо этого слушает myCar.</string>
+    <string name="assistant_picker_title">Корабельный попугай</string>
+    <string name="assistant_choice_phone">Попугай телефона</string>
+    <string name="assistant_picker_footer">Попугай телефона просыпается так же, как при свайпе вверх из нижнего угла экрана телефона. Другой попугай слушает и отвечает на телефоне, а его голос попадает на борт только по Bluetooth; если телефон заблокирован, он запустится после разблокировки — или, если в myCar настроен Home Assistant, вместо него слушает myCar, а отвечает Home Assistant. Собственный попугай myCar работает без интернета, на заблокированном телефоне тоже, и показывается на бортовом экране; если настроен Home Assistant, то, что он не может сделать сам, передаётся голосовому ассистенту Home Assistant.</string>
+
+    <string name="cinema_empty">Добавьте видеосайты и списки ТВ в такелаже myCar на телефоне, в разделе Cinema.</string>
+    <string name="cinema_protected">Видео под замком: скорее всего, чёрный экран</string>
+    <string name="cinema_error_stopped_early">Видео село на мель, не дойдя до конца: проверьте подключение телефона.</string>
+    <string name="cinema_error_channel_stopped">Канал сел на мель: трансляция прервалась.</string>
+    <string name="cinema_error_timeout">На наш оклик вовремя не ответили.</string>
+    <string name="cinema_error_player_died">Плеер телефона пошёл ко дну.</string>
+    <string name="cinema_videos_none_picked">Для myCar не выбрано ни одного видео. На телефоне, в такелаже myCar в разделе Cinema, выберите, какие видео ему можно видеть.</string>
+    <string name="cinema_videos_none">Тысяча чертей! На этом телефоне нет видео.</string>
+    <string name="cinema_tv_too_big">Список слишком большой для корабля (больше %1$d МБ).</string>
+    <string name="cinema_tv_no_answer">%1$s не отвечает на наш оклик.</string>
+    <string name="cinema_tv_failed">Список не поднялся на борт: %1$s</string>
+
+    <string name="plancia_set_up_title">Снарядите Plancia на телефоне</string>
+    <string name="plancia_set_up_text">В myCar на телефоне: «Такелаж», затем Plancia — адрес вашего Home Assistant и токен.</string>
+</resources>

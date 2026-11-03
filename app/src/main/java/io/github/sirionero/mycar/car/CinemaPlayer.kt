@@ -60,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import io.github.sirionero.mycar.BuildConfig
 import io.github.sirionero.mycar.LocalNetwork
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.R
@@ -81,6 +82,13 @@ internal data class CinemaMedia(
     /** Under this name it starts again where it was left; null to start from the top. */
     val resumeKey: String? = null,
 )
+
+/**
+ * The media as the log names it: its title (a video's file name on the phone can be personal) only
+ * in the debug build, as the songs' - the log is shared for help.
+ */
+private val CinemaMedia.logged: String
+    get() = if (BuildConfig.DEBUG) title else if (live) "a TV channel" else "a video"
 
 /**
  * A video or a TV channel, full screen, on Android's own player: no app or library of its own.
@@ -187,7 +195,7 @@ internal fun CinemaPlayer(media: CinemaMedia, onClose: () -> Unit) {
             Column(Modifier.fillMaxSize()) { CinemaBar(media.title, onBack = onClose, onClose = onClose) }
         }
     }
-    LaunchedEffect(Unit) { MyCarLog.i("cinema: playing ${if (media.live) "a TV channel" else "a video"}: ${media.title}") }
+    LaunchedEffect(Unit) { MyCarLog.i("cinema: playing ${if (media.live) "a TV channel" else "a video"}" + if (BuildConfig.DEBUG) ": ${media.title}" else "") }
 }
 
 /** Back 10 s, play or pause, forward 10 s, and the line with the times; for TV, play or pause and "Live". */
@@ -358,7 +366,7 @@ private class Playback(private val context: Context, private val media: CinemaMe
             player.setDataSource(context, media.uri, media.headers)
             player.prepareAsync()
         } catch (e: Exception) {
-            MyCarLog.w("cinema: ${media.title} didn't open - ${e.javaClass.simpleName}: ${e.message}")
+            MyCarLog.w("cinema: ${media.logged} didn't open - ${e.javaClass.simpleName}: ${e.message}")
             problem = Words.get(R.string.cinema_error_open, e.message ?: e.javaClass.simpleName)
         }
     }
@@ -528,7 +536,7 @@ private class Playback(private val context: Context, private val media: CinemaMe
     }
 
     private fun failed(what: Int, extra: Int) {
-        MyCarLog.w("cinema: ${media.title} didn't play - error $what/$extra")
+        MyCarLog.w("cinema: ${media.logged} didn't play - error $what/$extra")
         // Where it stopped (the last tick: in its error state the player can't be asked), for
         // "Try again" and for next time.
         leave()

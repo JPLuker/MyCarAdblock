@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_done">妥了</string>
+    <string name="common_save">存进舱</string>
+    <string name="common_delete">凿沉</string>
+    <string name="common_next">前进</string>
+    <string name="common_yes">好嘞</string>
+    <string name="common_no">不干</string>
+    <string name="common_loading">正在搬上船…</string>
+    <string name="common_settings">舵轮</string>
+</resources>

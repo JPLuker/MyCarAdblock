@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">船上语言</string>
+    <string name="language_footer">手机上和船上屏幕上的 myCar，以及它的随船鹦鹉，都说这种语言。</string>
+    <string name="language_pirate_detail">myCar 的每段文字都换成海盗的说法，用的是上面选的船上语言。航向我们自己定，绝不向任何王冠低头，啊哈！</string>
+</resources>

@@ -148,7 +148,7 @@ private class ContactNames(private val context: Context) {
 
 /** A number as the phone writes it: "333 123 4567", not "3331234567". */
 internal fun shownNumber(number: String): String =
-    runCatching { PhoneNumberUtils.formatNumber(number, Locale.getDefault().country) }.getOrNull() ?: number
+    runCatching { PhoneNumberUtils.formatNumber(number, io.github.sirionero.mycar.AppLanguage.country()) }.getOrNull() ?: number
 
 /**
  * The Phone's Recents tab: the latest calls, a missed one in red, a tap asks "Call …?" over the

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="changelog_46">
+        <item>Ein Absturz ist behoben, der myCar versenkte und den Törn beendete: Er kam nach einem Tippen in die Plancia-Seite und dem Wechsel zur Karte oder in die Flotte, wenn die Plancia-App ihren Platz einnahm, oder beim Wechsel des Anstrichs.</item>
+        <item>Piratensprache: unter Takelage &gt; Mundart jeder Text von myCar in Piratensprache, in deiner Sprache. Unseren Kurs bestimmen wir selbst – und zum Teufel mit jeder Bevormundung!</item>
+        <item>Ein neuer bewegter Horizont, myCar · Freibeuter: die Wellen und ein Piratensegler, der mit seiner Totenkopfflagge jedem Sturm trotzt.</item>
+        <item>Geht myCar einmal von selbst unter, schreibt der nächste Start ins Logbuch, warum Android myCar versenkt hat (Absturz, Speicher, keine Antwort), damit das Leck gestopft werden kann.</item>
+        <item>Die Sprachmodelle werden nacheinander verladen, nie nach dem Ende des Törns, und vor dem ersten Befehl an den Papagei nur, wenn reichlich Speicher frei ist.</item>
+        <item>Mini-Drehorgel: Auf kleinen Bildschirmen startet sie abseits der Kartentasten, unter ihnen losgelassen rückt sie knapp daneben, und die verblassten Tasten der Karte kapern keine Tipps mehr, die der Karte gelten.</item>
+        <item>Strophen: Jeder Shanty beginnt mit seiner ersten Zeile, und die Live-Version eines anderen Shantys bringt nicht mehr dessen Strophen.</item>
+        <item>Spotify und die anderen Musikdienste: „Spiele …“ wartet bis zu 25 Sekunden auf die Seite, und ein noch wartendes Play sticht nicht mehr in See, wenn du inzwischen andere Shantys gewählt hast.</item>
+        <item>Wählst du das Bordradio, stoppen ein Video oder ein Radio in Cinema oder im Browser und starten nicht von selbst wieder. Autoplay spielt die Shantys erst auf, wenn der Ton einen Weg an Bord hat.</item>
+        <item>Papagei: „weiter“, „Pause“ oder „Stopp“ in einer längeren Frage wechseln den Shanty nicht mehr; „nicht senden“ und „Abbrechen“ werden gehört, während du auf eine Flaschenpost antwortest; eine Pause direkt vor einem anderen Musikbefehl hebt ihn nicht mehr auf.</item>
+        <item>Neue Beute wartet das Ende eines Anrufs ab, und während eines Anrufs bleiben die Decks neben der Karte und ihr Menü unter der Anrufleiste.</item>
+        <item>Änderst du die Mundart von myCar mitten im Törn, ändert sich der Bordbildschirm sofort; unter Android 12 und 13 gibt das Öffnen von myCar mitten im Törn der Karte ihre Position zurück.</item>
+    </string-array>
+</resources>

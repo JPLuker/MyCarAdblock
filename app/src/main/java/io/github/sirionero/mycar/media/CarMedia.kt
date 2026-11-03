@@ -528,11 +528,13 @@ class CarMedia(private val context: Context) {
             path.addLast(entry.id to entry.title)
             open(entry.id)
         } else if (entry.playable) {
+            asks.asked()
             controller?.transportControls?.playFromMediaId(entry.id, null)
         }
     }
 
     fun playAll(entry: MediaEntry) {
+        asks.asked()
         controller?.transportControls?.playFromMediaId(entry.id, null)
     }
 
@@ -551,7 +553,11 @@ class CarMedia(private val context: Context) {
 
     // --- transport -----------------------------------------------------------------------
 
+    /** What the driver asked of the music, for a pause put off until later ([pauseLater]). */
+    private val asks = MusicAsks()
+
     fun togglePlay() {
+        asks.asked()
         val controls = controller?.transportControls ?: return
         if (_now.value.playing) controls.pause() else controls.play()
     }
@@ -561,12 +567,42 @@ class CarMedia(private val context: Context) {
      * as soon as the microphone let go. A real pause tells the app to stay stopped.
      */
     fun pause() = controller?.transportControls?.pause()
-    fun play() = controller?.transportControls?.play()
-    fun next() = controller?.transportControls?.skipToNext()
-    fun previous() = controller?.transportControls?.skipToPrevious()
+
+    /**
+     * The pause a spoken "pause" sends again once myCar gives the music its focus back
+     * (VoiceFocus.afterRelease, for Metrolist), dropped if the music was asked for anything since:
+     * "pause", then at once "resume", "next", "play X" or ▶, and the music stopped again a moment later.
+     */
+    fun pauseLater(): () -> Unit = asks.unlessAskedSince { pause() }
+
+    /** "Resume": plays if the app is stopped, and counts as asked even if it already plays, for [pauseLater]. */
+    fun resume() {
+        asks.asked()
+        if (!_now.value.playing) togglePlay()
+    }
+
+    fun play() {
+        asks.asked()
+        controller?.transportControls?.play()
+    }
+
+    fun next() {
+        asks.asked()
+        controller?.transportControls?.skipToNext()
+    }
+
+    fun previous() {
+        asks.asked()
+        controller?.transportControls?.skipToPrevious()
+    }
+
     fun seek(ms: Long) = controller?.transportControls?.seekTo(ms)
     fun custom(action: CustomAction) = controller?.transportControls?.sendCustomAction(action.id, action.extras)
-    fun playQueueItem(track: QueueTrack) = controller?.transportControls?.skipToQueueItem(track.queueId)
+
+    fun playQueueItem(track: QueueTrack) {
+        asks.asked()
+        controller?.transportControls?.skipToQueueItem(track.queueId)
+    }
 
     /**
      * Asks the app to find and play [query]: a song, artist, album or playlist. This goes through
@@ -711,6 +747,7 @@ class CarMedia(private val context: Context) {
     fun playBestMatch(query: String) {
         val q = query.trim()
         if (q.isEmpty()) return
+        asks.asked()
         if (!canSearchLibrary) {
             search(q)
             return
@@ -845,7 +882,12 @@ class CarMedia(private val context: Context) {
         const val SESSION_RETRIES_LAUNCHED = 16
         /** How long an app gets to start playing a search before myCar says it didn't. */
         const val SEARCH_WAIT_MS = 6_000L
-        const val WEB_SEARCH_WAIT_MS = 15_000L
+        /**
+         * A web player: its search's page loads, then up to 12 tries for its first Play, then the song
+         * starts - past 15 s on a slow network, and the car said "nothing played" as it began. Past
+         * the 20 s its page holds the car's Play for the search (WebMusicPage.SEARCH_HOLD_MS).
+         */
+        const val WEB_SEARCH_WAIT_MS = 25_000L
         const val SEARCH_NOTICE_MS = 6_000L
         /** How soon after an app went away to connect to it again. */
         const val RELINK_WAIT_MS = 1_000L

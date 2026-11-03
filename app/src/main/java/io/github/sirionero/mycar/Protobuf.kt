@@ -55,6 +55,8 @@ object Protobuf {
                 }
                 2 -> {
                     val (len, afterLen) = readVarint(data, pos) ?: return null
+                    // A length past the end, or so big it turns negative as an Int: not a message.
+                    if (len < 0 || len > data.size - afterLen) return null
                     pos = afterLen + len.toInt()
                 }
                 5 -> pos += 4
@@ -89,8 +91,10 @@ object Protobuf {
                 }
                 2 -> {
                     val (len, afterLen) = readVarint(data, pos) ?: break
+                    // Bytes that only look like a message (describe reads every field as one) can carry
+                    // a length that overflows an Int: copyOfRange then threw, in the middle of a drive.
+                    if (len < 0 || len > data.size - afterLen) break
                     val end = afterLen + len.toInt()
-                    if (end > data.size) break
                     val body = data.copyOfRange(afterLen, end)
                     pos = end
                     val text = body.toString(Charsets.UTF_8)

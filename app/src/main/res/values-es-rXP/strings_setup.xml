@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setup_title">Apareja myCar</string>
+    <string name="setup_subtitle_first_run">Unos toques antes de tu primera travesía.</string>
+    <string name="setup_subtitle_return">Lo que queda por aparejar. No cambia nada de lo que ya has aparejado.</string>
+    <string name="setup_unofficial">myCar no es oficial: aparéjalo con el coche aparcado y luego no apartes la vista de la carretera.</string>
+    <string name="setup_section_connect">Para abordar</string>
+    <string name="setup_section_drive">Para la travesía</string>
+    <string name="setup_status_done">Listo</string>
+
+    <string name="setup_cert_some_ready">Obtenidos %1$d de %2$d. %3$s está listo; puedes obtener los demás más tarde en Aparejos.</string>
+
+    <string name="setup_mycar_on_title">Activa myCar para el barco</string>
+    <string name="setup_mycar_on_body">Está desactivado en Aparejos, así que el barco no puede llegar a él.</string>
+
+    <string name="setup_aa_body">Android Auto está activado y puede abordar el barco antes que myCar. En la pantalla que se abre, toca Inhabilitar, luego Aceptar, y vuelve aquí.</string>
+
+    <string name="setup_drive_body">Tu coche muestra quién llama y tus llamadas recientes, y puede llamar a tus contactos; el mapa sabe dónde estás, y las tonadas pueden llegar al coche sin Bluetooth. Android pregunta varias veces: toca Permitir cada vez. myCar solo lee, y solo escucha cuando tocas el micrófono.</string>
+
+    <string name="setup_more_later">Todo lo de aquí también se puede aparejar más tarde.</string>
+    <string name="setup_calendar_body">El timón muestra tu próximo evento. myCar solo lee tu calendario.</string>
+    <string name="setup_notifications_body">Permite que myCar muestre que está conectado al coche, con Detener mientras envía el sonido del teléfono, y que te avise cuando zarpe una versión nueva.</string>
+    <string name="setup_screening_button">Aparejar</string>
+    <string name="setup_audio_title">Sonido a bordo</string>
+    <string name="setup_audio_body">Cómo llegan las tonadas a bordo. Las llamadas van por Bluetooth en cualquier caso.</string>
+    <string name="setup_usage_title">Ayuda a otros capitanes</string>
+
+    <plurals name="setup_bar_steps_left">
+        <item quantity="one">Falta %1$d paso para tu primera travesía.</item>
+        <item quantity="other">Faltan %1$d pasos para tu primera travesía.</item>
+    </plurals>
+    <string name="setup_bar_ready_to_connect">Ya puedes abordar.</string>
+    <string name="setup_bar_ready">Todo listo para zarpar. Conecta el teléfono al barco; si Android pregunta, elige myCar y toca Siempre.</string>
+    <string name="setup_bar_finish_later">Aparejar más tarde</string>
+
+    <plurals name="setup_card_steps_left">
+        <item quantity="one">Falta %1$d paso para tu primera travesía: %2$s.</item>
+        <item quantity="other">Faltan %1$d pasos para tu primera travesía: %2$s.</item>
+    </plurals>
+    <plurals name="setup_card_extras_left">
+        <item quantity="one">Listo para abordar. Queda %1$d paso opcional.</item>
+        <item quantity="other">Listo para abordar. Quedan %1$d pasos opcionales.</item>
+    </plurals>
+    <string name="setup_card_all_done">Todo está aparejado.</string>
+    <string name="setup_card_title">Aparejar el barco</string>
+    <string name="setup_card_footer">Nada se echa por la borda ni se restablece. Solo verás lo que falta, con lo hecho marcado.</string>
+    <string name="setup_card_back">Volver a aparejar el barco</string>
+    <string name="setup_left_title">Termina de aparejar</string>
+    <string name="setup_left_body">Pendiente antes de tu primera travesía: %1$s.</string>
+    <string name="setup_left_continue">Sigue aparejando</string>
+
+    <string name="setup_guide_usage_title">Ayuda a otros capitanes.</string>
+    <string name="setup_guide_safety_body">myCar no es oficial. Ningún fabricante de coches lo ha hecho ni revisado, y puede fallar sin avisar. Aparéjalo antes de salir y luego no apartes la vista de la carretera.</string>
+    <string name="setup_guide_mic_body">myCar lo usa para enviar tus tonadas al coche y para oírte cuando pides algo o respondes a un mensaje. Lo que dices se queda en el teléfono.</string>
+    <string name="setup_guide_location_body">El mapa del coche y las búsquedas cercanas la necesitan. Sin ella, la Vigía no muestra ningún mapa.</string>
+    <string name="setup_guide_aa_body">Android Auto sigue instalado y le disputa a myCar la conexión USB del barco. Inhabilítalo o desinstálalo en la pantalla que se abre.</string>
+    <string name="setup_guide_choose_body">Si tu teléfono pregunta qué app abrir cuando lo conectas al barco, elige myCar y toca Siempre.</string>
+    <string name="setup_guide_audio_title">Sonido a bordo.</string>
+    <string name="setup_guide_audio_body">Elige cómo llegan las tonadas a bordo. Las llamadas van por Bluetooth en cualquier caso.</string>
+    <string name="setup_guide_voice_title">Loro.</string>
+    <string name="setup_guide_voice_body">Pide indicaciones, tonadas o una llamada con la voz. Tu teléfono convierte la voz en texto por sí solo, y nada de lo que dices sale de él. El loro necesita %1$d MB, que se descargan una vez. Usa Wi-Fi si puedes.</string>
+    <string name="setup_guide_voice_download">Descargar el loro</string>
+    <string name="setup_guide_voice_progress">Descargando, %1$d%%. Puedes seguir navegando; la descarga continúa.</string>
+    <string name="setup_guide_voice_ready">El loro está listo.</string>
+    <string name="setup_guide_voice_failed">La descarga no ha terminado. Toca Descargar el loro para volver a intentarlo.</string>
+
+    <string name="setup_audio_automatic_body">Por Bluetooth cuando tu barco recibe así las tonadas del teléfono; si no, a través de myCar.</string>
+    <string name="setup_audio_bluetooth_body">Sin preguntas en cada travesía, y la voz de tu app de mapas llega a bordo. Algunos barcos solo admiten llamadas por Bluetooth.</string>
+    <string name="setup_audio_through_mycar_body">Por cable o Wi-Fi, como Android Auto. Android pide compartir el audio una vez en cada travesía.</string>
+
+    <string name="intro_start">Zarpar</string>
+    <string name="intro_welcome_to">Sube a bordo de la</string>
+    <string name="intro_welcome_tag">alfa · a toda vela</string>
+    <string name="intro_course">Nuestro rumbo lo elegimos nosotros, sin rey ni amo.</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d vía de agua hallada y tapada desde la 0.6</item>
+        <item quantity="other">%d vías de agua halladas y tapadas desde la 0.6</item>
+    </plurals>
+    <string name="intro_music_title">Tonadas a bordo.</string>
+    <string name="intro_music_body">Spotify y otros servicios suenan dentro de myCar, desde su propia gramola web. Inicia sesión una vez en el teléfono con tu propia cuenta, en Aparejos &gt; Tonadas. Allí arría la app Spotify del teléfono: un solo Spotify a bordo, no dos.</string>
+    <string name="intro_mini_title">Toda la carta.</string>
+    <string name="intro_mini_body">Cierra la gramola junto a la carta y una minigramola flota encima, con la portada y sus botones: mantenla pulsada y arrástrala adonde quieras. Junto a la carta, la gramola ahora llega hasta Muy grande.</string>
+    <string name="intro_lyrics_title">Canta los versos.</string>
+    <string name="intro_lyrics_body">Los versos se encuentran mucho más a menudo, y cada resultado se comprueba, para que nunca aparezcan los versos de otra tonada. Las pistas instrumentales lo indican.</string>
+    <string name="intro_location_title">En la faltriquera.</string>
+    <string name="intro_location_body">La carta tiene tu ubicación aunque el teléfono esté bloqueado en el bolsillo: myCar la toma cuando llega el coche. Si Android aun así la rechaza, el coche te lo dice, solo con el coche parado.</string>
+    <string name="intro_phone_body">Todos los aparejos del timón están también en el teléfono, en Aparejos &gt; Timón: cambia uno y el barco lo sigue al momento, también en plena travesía. Igual con las cubiertas junto a la carta y las apps mandadas a la bodega.</string>
+    <string name="intro_apps_title">Buena flota.</string>
+    <string name="intro_voice_title">Dilo al loro.</string>
+    <string name="intro_voice_body">Toca el micrófono, o pulsa el botón de voz del volante, y habla al loro. Tu teléfono convierte la voz en texto por sí solo, y lo que dices se queda en él, salvo lo que preguntes a tu propio Home Assistant. Di «%1$s» a bordo para ver la lista completa.</string>
+    <string name="intro_voice_body_language">Toca el micrófono, o pulsa el botón de voz del volante, y habla. Tu teléfono convierte la voz en texto por sí solo, y lo que dices se queda en él, salvo lo que preguntes a tu propio Home Assistant. El loro escucha y responde en %1$s, la lengua de myCar. Di «%2$s» a bordo para ver la lista completa.</string>
+    <string name="intro_voice_download">Descargar el loro, %1$d MB</string>
+
+    <string name="activity_toast_music_pauses_sharing">Las tonadas del teléfono se pausan mientras se comparte su pantalla</string>
+    <string name="activity_toast_open_for_music">Abre myCar en el teléfono para enviar sus tonadas al coche</string>
+    <string name="activity_status_taken_title">Otra app ha abordado el coche</string>
+</resources>

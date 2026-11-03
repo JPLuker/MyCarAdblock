@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_whats_new_in">Butin de la %1$s</string>
+    <string name="home_how_to_connect_subtitle">Les navires compatibles, et ce qu’il reste à gréer</string>
+    <string name="home_disconnect">Larguer</string>
+    <string name="home_disconnect_title">Larguer les amarres ?</string>
+    <string name="home_disconnect_text">myCar quitte l’écran de bord maintenant. Avec le câble, débranchez-le et rebranchez-le pour revenir à bord.</string>
+    <string name="home_bluetooth_missing_calls">Les appels passent par le Bluetooth, mais votre téléphone n’est pas connecté à la voiture. Connectez-le ici ou depuis le menu Bluetooth de bord.</string>
+    <string name="home_bluetooth_missing_calls_music">Les appels et les chants passent par le Bluetooth, mais votre téléphone n’est pas connecté à la voiture. Connectez-le ici ou depuis le menu Bluetooth de bord.</string>
+    <string name="home_voice_downloading">Téléchargement du perroquet, %1$d %%</string>
+
+    <string name="wireless_button_connect">Abordage sans fil</string>
+    <string name="wireless_button_switched_off">myCar est désactivé à bord (Timonerie, « Utiliser myCar à bord »).</string>
+    <string name="wireless_button_which_car">Quel navire ?</string>
+    <string name="wireless_button_bluetooth_off">Le Bluetooth est désactivé. Activez-le, puis appuyez à nouveau sur Abordage sans fil.</string>
+    <string name="wireless_button_not_paired">Votre téléphone n’est encore associé à rien. Associez-le d’abord au navire.</string>
+    <string name="wireless_button_not_listed">Navire absent de la liste ? Associez-le d’abord à votre téléphone.</string>
+
+    <string name="help_title">Comment monter à bord</string>
+    <string name="help_which_cars">Navires compatibles</string>
+    <string name="help_in_the_car">À bord</string>
+    <string name="help_step_connect">Branchez le câble, ou montez à bord sans fil.</string>
+    <string name="help_step_connect_detail">myCar s’ouvre tout seul quand le navire se connecte. Pour le sans-fil, associez d’abord le téléphone au navire, puis appuyez sur Abordage sans fil dans l’Accueil.</string>
+    <string name="help_step_screening">Repoussez les appels inconnus avant qu’ils sonnent.</string>
+    <string name="help_step_screening_detail">Choisissez myCar comme appli d’identification de l’appelant et de spam. Sans cela, l’écran de bord affiche quand même chaque appel, et vous pouvez y répondre ou le refuser.</string>
+    <string name="help_set_up">Gréer</string>
+    <string name="help_step_audio_prompt">Évitez la demande audio à chaque traversée.</string>
+    <string name="help_step_audio_prompt_detail">Branchez le téléphone à un ordinateur avec le débogage USB activé, et lancez ceci une fois. Sinon, vous appuyez sur Commencer chaque fois que vous appareillez.</string>
+    <string name="help_step_notifications">Gardez les notifications lisibles à bord.</string>
+    <string name="help_step_notifications_detail">Android masque le contenu des notifications pendant qu’il partage l’audio. Lancez aussi ceci, et myCar ne lève ce masquage que pendant que la musique passe à bord.</string>
+
+    <string name="cert_notice_own_refused_text">Pour utiliser les certificats publics à la place, retirez le vôtre dans la Timonerie, sous Certificat.</string>
+
+    <string name="cert_setup_continue">En avant</string>
+
+    <string name="update_title">Voiles neuves</string>
+    <string name="update_out">myCar %1$s a accosté</string>
+    <string name="update_unplug_first">Larguez les amarres pour installer. L’installation ferme myCar.</string>
+    <string name="update_status_daily">myCar guette les voiles neuves une fois par jour</string>
+    <string name="update_status_latest">Vous voguez sous la dernière version</string>
+    <string name="update_status_available">La version %1$s a accosté</string>
+    <string name="update_status_ready">La version %1$s est parée à être installée</string>
+    <string name="update_notification_text">Appuyez pour hisser les voiles neuves.</string>
+    <string name="update_car_notification_text">Hissez les voiles neuves dans l’app myCar ou depuis GitHub</string>
+    <string name="update_error_damaged">Le téléchargement est arrivé avarié. Réessayez.</string>
+    <string name="update_splash_updated_to">Cap sur la version</string>
+    <string name="update_splash_tap">Appuyez n’importe où pour reprendre le large</string>
+    <string name="update_flag_description">Un pavillon noir : 100 % local. Nos données sont à nous.</string>
+
+    <string name="whatsnew_title">Nouveau butin</string>
+    <string name="whatsnew_this_version">%1$s (celle à bord)</string>
+
+    <string name="recommended_title">Choix du capitaine</string>
+    <string name="recommended_intro">Ces apps libres comme le vent tournent sur l’écran de bord de myCar. Chaque bouton ouvre la page de l’app sur GitHub.</string>
+    <string name="recommended_section_music">Chants</string>
+    <string name="recommended_about_vela">Navigation pas à pas, sans Google à la barre.</string>
+    <string name="recommended_about_youtube_music">Un phono pour YouTube Music.</string>
+    <string name="recommended_installed">À bord</string>
+
+    <string name="logs_title">Journal de bord</string>
+    <string name="logs_earlier">Anciens</string>
+    <string name="logs_jump_to_latest">Cap sur le plus récent</string>
+    <string name="logs_empty">Rien dans le journal de bord pour l’instant. Les lignes apparaissent ici en direct pendant une traversée.</string>
+    <string name="logs_share_subject">Journal de bord myCar</string>
+    <string name="logs_share_chooser">Partager le journal de bord</string>
+    <string name="logs_earlier_title">Anciens journaux de bord</string>
+    <string name="logs_earlier_empty">Pas encore d’anciens journaux de bord. myCar en commence un nouveau à chaque démarrage.</string>
+    <string name="logs_crashed">Naufrage</string>
+
+    <string name="preview_title">Longue-vue de bord</string>
+    <string name="preview_size">%1$dx%2$d @ %3$ddpi – les appuis vont à l’interface de bord</string>
+    <string name="preview_car_screen">Écran de bord</string>
+    <string name="preview_waiting">On guette une image…</string>
+    <string name="preview_leave">Ranger la longue-vue</string>
+
+    <string name="donate_title">Cette traversée a tenu le cap, tant mieux</string>
+    <string name="donate_text">myCar est gratuit, sans publicité ni pistage. S’il vous sert pendant vos traversées, votre soutien le garde à flot.</string>
+    <string name="donate_bitcoin">Ravitailler en Bitcoin</string>
+    <string name="donate_card">Un ravitaillement par carte</string>
+    <string name="audio_not_reaching_title">Les chants n’arrivent pas à bord</string>
+    <string name="audio_not_reaching_text">La demande d’Android pour envoyer le son via myCar a été refusée : la musique n’arrive donc pas à bord.</string>
+</resources>

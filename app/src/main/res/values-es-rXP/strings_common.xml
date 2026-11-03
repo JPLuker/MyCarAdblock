@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_done">Listo</string>
+    <string name="common_save">Al cofre</string>
+    <string name="common_delete">Hundir</string>
+    <string name="common_next">Avante</string>
+    <string name="common_settings">Aparejos</string>
+</resources>

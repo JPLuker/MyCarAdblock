@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">Parlata</string>
+    <string name="language_phone">Parlata del telefono (%1$s)</string>
+    <string name="language_footer">myCar sul telefono e sullo schermo di bordo, e il suo pappagallo, in questa parlata.</string>
+    <string name="language_pirate_detail">Ogni testo di myCar in termini pirateschi, nella parlata qui sopra. Scegliamo noi le nostre rotte, e al diavolo le imposizioni! Arrr.</string>
+</resources>

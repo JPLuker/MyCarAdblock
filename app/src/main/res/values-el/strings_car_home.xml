@@ -47,6 +47,7 @@
     <string name="car_mini_open_player">Άνοιγμα του προγράμματος αναπαραγωγής</string>
     <string name="car_mini_hide">Απόκρυψη του μίνι προγράμματος αναπαραγωγής</string>
     <string name="car_mini_hidden_toast">Το μίνι πρόγραμμα αναπαραγωγής κρύφτηκε για αυτή τη διαδρομή. Το τραγούδι στο Dock ανοίγει το πρόγραμμα αναπαραγωγής.</string>
+    <string name="car_mini_hidden_toast_grid">Το μίνι πρόγραμμα αναπαραγωγής κρύφτηκε για αυτή τη διαδρομή. Το κουμπί στο κάτω μέρος του Dock επαναφέρει το πρόγραμμα αναπαραγωγής από το πλέγμα εφαρμογών.</string>
 
     <string name="car_map_starting">Εκκίνηση του %1$s…</string>
     <string name="car_map_starting_unknown">Εκκίνηση του χάρτη…</string>
@@ -199,6 +200,7 @@
     <string name="car_wallpaper_graphite">Γραφίτης</string>
     <string name="car_wallpaper_lava">Λάβα</string>
     <string name="car_wallpaper_polar">Πολικό</string>
+    <string name="car_wallpaper_mycar">myCar · Επαναστάτης</string>
     <string name="car_wallpaper_waves">Κύματα</string>
     <string name="car_wallpaper_fireflies">Πυγολαμπίδες</string>
 

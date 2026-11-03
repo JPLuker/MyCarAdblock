@@ -60,6 +60,7 @@ import io.github.sirionero.mycar.ScreenProjector
 import io.github.sirionero.mycar.SessionStatus
 import io.github.sirionero.mycar.TouchPoint
 import io.github.sirionero.mycar.car.CarEnvironment
+import io.github.sirionero.mycar.car.CarServices
 import io.github.sirionero.mycar.car.CarUi
 
 /**
@@ -127,9 +128,12 @@ fun CarPreviewScreen(onBack: () -> Unit) {
             }
         }, handler)
 
+        // Plays nothing by itself (see CarServices.phonePreview).
+        CarServices.phonePreview = true
         projector.start(reader.surface, width, height, density, name = "mycar-preview") { CarUi() }
 
         onDispose {
+            CarServices.phonePreview = false
             projector.stop()
             reader.close()
             bitmap = null

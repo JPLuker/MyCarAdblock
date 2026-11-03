@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_whats_new_in">Butim da %1$s</string>
+    <string name="home_how_to_connect_subtitle">Quais carros funcionam e o que falta preparar</string>
+    <string name="home_disconnect">Soltar amarras</string>
+    <string name="home_disconnect_title">Soltar amarras do navio?</string>
+    <string name="home_disconnect_text">O myCar deixa a tela de bordo agora. Com o cabo, desconecte e conecte de novo para voltar a bordo.</string>
+    <string name="home_voice_downloading">Baixando o papagaio, %1$d%%</string>
+
+    <string name="wireless_button_connect">Abordar sem fio</string>
+    <string name="wireless_button_switched_off">O myCar está desativado para o navio (Leme, “Usar o myCar a bordo”).</string>
+    <string name="wireless_button_which_car">Qual navio?</string>
+    <string name="wireless_button_bluetooth_off">O Bluetooth está desativado. Ative-o e toque em Abordar sem fio de novo.</string>
+    <string name="wireless_button_not_paired">Seu telefone ainda não está pareado com nada. Pareie-o com o navio primeiro.</string>
+    <string name="wireless_button_not_listed">O navio não aparece? Pareie-o com seu telefone primeiro.</string>
+
+    <string name="help_title">Como abordar</string>
+    <string name="help_in_the_car">A bordo</string>
+    <string name="help_step_connect">Aborde pelo cabo ou sem fio.</string>
+    <string name="help_step_connect_detail">O myCar abre sozinho quando o navio se conecta. Para usar sem fio, pareie primeiro o telefone com o navio e depois toque em Abordar sem fio no porto.</string>
+    <string name="help_set_up">Preparar</string>
+    <string name="help_step_audio_prompt">Jogue ao mar a pergunta de áudio a cada viagem.</string>
+
+    <string name="cert_notice_own_refused_text">Para usar os públicos, remova o seu no Leme, em Certificado.</string>
+    <string name="cert_setup_continue">Avante</string>
+
+    <string name="update_title">Velas novas</string>
+    <string name="update_out">Atracou o myCar %1$s</string>
+    <string name="update_unplug_first">Solte as amarras do navio para instalar. A instalação fecha o myCar.</string>
+    <string name="update_downloaded">Baixado e à espera no cais. O Android pergunta antes de instalar.</string>
+    <string name="update_status_daily">O myCar verifica uma vez por dia se há velas novas</string>
+    <string name="update_status_checking">Procurando velas novas…</string>
+    <string name="update_status_latest">Você navega com a versão mais recente</string>
+    <string name="update_status_available">Atracou a versão %1$s</string>
+    <string name="update_status_ready">A versão %1$s está no cais, pronta para instalar</string>
+    <string name="update_check_automatically">Procurar velas novas sozinho</string>
+    <string name="update_error_stopped">O download encalhou. Verifique a conexão e tente de novo.</string>
+    <string name="update_error_stopped_early">O download encalhou antes do fim. Tente de novo.</string>
+    <string name="update_error_damaged">O download chegou avariado. Tente de novo.</string>
+    <string name="update_splash_updated_to">Agora navega a</string>
+    <string name="update_splash_tap">Toque em qualquer lugar e avante!</string>
+    <string name="update_flag_description">Uma bandeira pirata ao vento: 100% local. Defendemos nossos dados.</string>
+    <string name="update_ship_description">Um navio pirata de velas cheias com a bandeira do myCar: 100% local. Defendemos nossos dados.</string>
+
+    <string name="whatsnew_title">Butim novo</string>
+
+    <string name="recommended_title">Escolhas do capitão</string>
+    <string name="recommended_intro">Estes apps gratuitos funcionam na tela de bordo do myCar. Cada botão abre a página do app no GitHub.</string>
+    <string name="recommended_section_music">Cantigas</string>
+    <string name="recommended_about_organic_maps">Mapas e rotas offline, até em alto-mar.</string>
+    <string name="recommended_about_vela">Navegação curva a curva, livre do Google.</string>
+    <string name="recommended_about_youtube_music">Uma vitrola do YouTube Music.</string>
+    <string name="recommended_about_antennapod">Podcasts, com capítulos e tudo, de proa a popa.</string>
+
+    <string name="logs_title">Diário de bordo</string>
+    <string name="logs_jump_to_latest">Rumo ao mais recente</string>
+    <string name="logs_empty">O diário de bordo ainda está em branco. As linhas aparecem aqui ao vivo enquanto uma sessão está em andamento.</string>
+    <string name="logs_share_subject">Diário de bordo do myCar</string>
+    <string name="logs_share_chooser">Compartilhar diário</string>
+    <string name="logs_earlier_title">Diários anteriores</string>
+    <string name="logs_earlier_empty">Nenhum diário anterior ainda. Cada vez que o myCar zarpa, ele começa um novo.</string>
+    <string name="logs_crashed">Naufragou</string>
+
+    <string name="preview_title">Luneta de bordo</string>
+    <string name="preview_size">%1$dx%2$d @ %3$ddpi – os toques vão para a interface de bordo</string>
+    <string name="preview_car_screen">Tela de bordo</string>
+    <string name="preview_leave">Baixar a luneta</string>
+
+    <string name="donate_title">Que bom que a travessia deu certo</string>
+    <string name="donate_text">O myCar é gratuito, sem anúncios e sem rastreamento. Se ele leva você mar afora, seu apoio mantém as velas içadas.</string>
+    <string name="audio_not_reaching_title">A música não está chegando a bordo</string>
+    <string name="audio_not_reaching_text">A pergunta do Android para enviar o som pelo myCar foi recusada, então não chega música a bordo.</string>
+</resources>

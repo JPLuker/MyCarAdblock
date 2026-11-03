@@ -346,7 +346,9 @@ private fun SizeChip(label: String, selected: Boolean, onClick: () -> Unit) {
 @Composable
 internal fun PlanciaPart(runs: Boolean, onHold: () -> Unit, modifier: Modifier) {
     val web = LocalPlanciaWeb.current
-    if (!runs) {
+    // The page stays a frame after its part goes out of view, so a tap's focus can leave it first
+    // (see LeaveWithoutFocus.kt).
+    if (!leavesWithoutFocus(runs) { web?.dropFocus() }) {
         AppPlaceholder("Plancia", null, modifier, onHold, builtInId = BuiltInApps.Plancia.id)
         return
     }

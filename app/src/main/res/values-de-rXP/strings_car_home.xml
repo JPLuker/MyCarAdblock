@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_ui_app_wont_start">%1$s segelt noch nicht mit myCar.</string>
+    <string name="car_ui_app_wont_start_unknown">Diese App segelt noch nicht mit myCar.</string>
+    <string name="car_ui_app_wont_start_detail">Die App ist nicht in See gestochen. Manche Apps segeln nur unter der Flagge von Googles Android Auto.</string>
+    <string name="car_ui_search_ignored">%1$s hat für „%2$s“ nichts aufgespielt</string>
+    <string name="car_ui_search_ignored_no_app">Die Musik-App hat für „%1$s“ nichts aufgespielt</string>
+    <string name="car_ui_link_opens_app">Dieser Link lotst dich zu einer App auf dem Telefon</string>
+
+    <string name="car_dock_dashboard">Ausguck</string>
+    <string name="car_dock_now_playing">Jetzt erklingt</string>
+    <string name="car_dock_assistant">Bordpapagei</string>
+    <string name="car_dock_all_apps">Ganze Flotte</string>
+    <string name="car_dock_map_and_music">Karte und Shantys</string>
+
+    <string name="car_apps_vehicle_data">Borddaten</string>
+    <string name="car_apps_exit">Landgang</string>
+    <string name="car_apps_browse_label">%1$s · Erkunden</string>
+    <string name="car_apps_browse">Erkunden</string>
+    <string name="car_apps_partial">Segelt nur teilweise mit myCar</string>
+    <string name="car_apps_broken">Segelt nicht mit myCar</string>
+    <string name="car_apps_pin">An den Mast nageln</string>
+    <string name="car_apps_unpin">Vom Mast lösen</string>
+    <plurals name="car_apps_dock_full">
+        <item quantity="one">Der Mast ist voll (%1$d angenagelt)</item>
+        <item quantity="other">Der Mast ist voll (%1$d angenagelt)</item>
+    </plurals>
+    <string name="car_apps_reset_order">Flottenordnung zurücksetzen</string>
+    <string name="car_apps_hide_from_grid">In der Flotte verstauen</string>
+    <string name="car_apps_show_on_grid">In der Flotte anzeigen</string>
+    <string name="car_apps_hidden_toast">Verstaut: %1$s. Du holst sie unter „Takelage“, „Blinde Passagiere“ zurück.</string>
+    <string name="car_web_music_elsewhere">%1$s spielt auf einem anderen Gerät, nicht an Bord</string>
+    <string name="car_mini_open_player">Drehorgel öffnen</string>
+    <string name="car_mini_hide">Mini-Drehorgel verstauen</string>
+    <string name="car_mini_hidden_toast">Mini-Drehorgel für diesen Törn verstaut. Der Shanty am Mast öffnet die Drehorgel.</string>
+    <string name="car_mini_hidden_toast_grid">Mini-Drehorgel für diesen Törn verstaut. Die Taste unten am Mast holt die Drehorgel aus der Flotte zurück.</string>
+
+    <string name="car_map_starting">%1$s setzt die Segel…</string>
+    <string name="car_map_starting_unknown">Die Schatzkarte wird entrollt…</string>
+    <string name="car_map_failed_unknown">Die Karten-App ist nicht in See gestochen.</string>
+    <string name="car_map_none_installed">Keine Karten-Apps gesichtet.</string>
+    <string name="car_map_none_installed_detail">Installiere eine Navi-App, die Android Auto unterstützt, dann setzt sie hier von selbst die Segel.</string>
+    <string name="car_map_stopped">Karte eingerollt.</string>
+    <string name="car_map_reopen">Wieder entrollen</string>
+    <string name="car_map_car_apps">Bord-Apps</string>
+    <string name="car_map_choose">Wähle eine Karten-App, Käpt\'n.</string>
+    <string name="car_home_hide_lyrics">Strophen verstauen</string>
+    <string name="car_home_app_failed">%1$s ist nicht in See gestochen.</string>
+
+    <string name="car_side_close_player">Drehorgel schließen</string>
+    <string name="car_side_music">Shantys</string>
+    <string name="car_side_explained">„Shantys“ zeigt die Drehorgel neben der Karte, solange etwas erklingt. Eine App bleibt neben der Karte; schließt du sie für den Törn, holt die Taste unten am Mast sie aus der Flotte zurück.</string>
+
+    <string name="car_pages_nothing_yet">Noch nix</string>
+    <string name="car_pages_nothing">Nix</string>
+    <string name="car_pages_tap_to_choose">Tippen, um zu wählen, was hier vor Anker geht</string>
+    <string name="car_pages_app_gone">Diese App ging über Bord: Sie ist nicht mehr auf dem Telefon. Tippe, um etwas anderes zu wählen.</string>
+    <string name="car_pages_dot_page">Deck %1$d</string>
+    <string name="car_pages_change">Dieses Deck umbauen</string>
+    <string name="car_pages_add">Deck anbauen</string>
+    <string name="car_pages_delete">Dieses Deck versenken</string>
+    <string name="car_pages_delete_confirm">Deck versenken</string>
+    <string name="car_pages_one_app">Ein Deck führt immer nur eine Bord-App aus: %1$s ist schon auf diesem.</string>
+    <string name="car_pages_layout">Decksplan</string>
+    <string name="car_pages_layout_now">Decksplan: %1$s</string>
+    <string name="car_pages_layout_full">Ganzes Deck</string>
+    <string name="car_pages_layout_keeps">Was das Deck zeigt, bleibt in derselben Reihenfolge, soweit der neue Decksplan Platz hat.</string>
+    <string name="car_pages_settings_title">Decks neben der Karte</string>
+    <string name="car_pages_settings_explained">Wische über den Heimathafen oder tippe auf die Punkte unten für deine Decks: das Wetter, die Termine, den Browser oder eine Bord-App wie Plancia, als ganzes Deck, in Hälften, Vierteln oder gemischt. Der Stift neben den Punkten baut das sichtbare Deck um.</string>
+    <string name="car_pages_replace">Meine Decks ersetzen</string>
+    <string name="car_pages_ready_made">Fertige Decks</string>
+
+    <string name="car_dashboard_weather_loading">Wetter wird gepeilt…</string>
+    <string name="car_dashboard_coming_up">In Sicht</string>
+    <string name="car_dashboard_allow_calendar">Erlaube myCar auf dem Telefon den Kalender, um zu sehen, was in Sicht ist.</string>
+    <string name="car_dashboard_calendar_loading">Kalender wird verladen…</string>
+    <string name="car_dashboard_nothing_coming">In den nächsten sieben Tagen nichts in Sicht.</string>
+
+    <string name="car_weather_loading">Das Wetter wird gepeilt…</string>
+    <string name="car_weather_waiting_fix">Warte auf die Peilung des Standorts.</string>
+    <string name="car_weather_unreachable">Der Wetterdienst ist außer Rufweite.</string>
+
+    <string name="car_template_car_app">Bord-App</string>
+    <string name="car_template_finding_route">Kurs wird abgesteckt…</string>
+    <string name="car_template_finding_routes">Kurse werden abgesteckt…</string>
+    <string name="car_template_end_route">Kurs beenden</string>
+    <string name="car_template_search">Absuchen</string>
+    <string name="car_template_clear">Versenken</string>
+    <string name="car_template_nothing_playing">Noch erklingt nichts.</string>
+    <string name="car_template_start">Lossegeln</string>
+
+    <string name="car_wallpaper_title">Horizont</string>
+    <string name="car_wallpaper_still">Windstill</string>
+    <string name="car_wallpaper_moving">Seegang</string>
+    <string name="car_wallpaper_mycar">myCar · Freibeuter</string>
+</resources>

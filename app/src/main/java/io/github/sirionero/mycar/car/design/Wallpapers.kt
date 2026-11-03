@@ -74,6 +74,9 @@ sealed interface Motion {
     /** Bands of colour, back to front, rolling across the lower screen like waves. */
     class Waves(val colors: List<Color>) : Motion
 
+    /** myCar's own, "Rebel": the waves, and a pirate ship among them that rides out every storm (RebelSea.kt). */
+    class Rebel(val colors: List<Color>) : Motion
+
     /** Soft lights rising through the picture, swaying and glowing brighter and dimmer. */
     class Lights(colors: List<Color>, count: Int) : Motion {
         internal val lights = List(count) { Light.make(it, colors) }
@@ -159,7 +162,15 @@ object Wallpapers {
                 Glow(Color(0xFF2E3442), 0.85f, 0.90f, 0.60f),
             ),
         ),
-        // The moving ones.
+        // The moving ones, myCar's own first.
+        Wallpaper(
+            "mycar", R.string.car_wallpaper_mycar, Color(0xFF020813),
+            listOf(
+                Glow(Color(0xFF1F6BFF), 0.80f, 0.05f, 0.55f, 0.7f),
+                Glow(Color(0xFF7C4DFF), 0.15f, 0.10f, 0.40f, 0.45f),
+            ),
+            Motion.Rebel(listOf(Color(0xFF2E3DD1), Color(0xFF1A73E8), Color(0xFF00B8D9), Color(0xFF00E0B0))),
+        ),
         Wallpaper(
             "lava", R.string.car_wallpaper_lava, Color(0xFF120309),
             listOf(
@@ -274,6 +285,7 @@ fun Modifier.wallpaperBackground(wallpaper: Wallpaper, dim: Float = 0f, wholeScr
                 }
                 when (motion) {
                     is Motion.Waves -> drawWaves(screen, motion, seconds, fade)
+                    is Motion.Rebel -> drawRebel(screen, motion, seconds, fade)
                     is Motion.Lights -> drawLights(screen, motion, seconds, fade)
                     else -> Unit
                 }

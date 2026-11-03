@@ -79,7 +79,7 @@ object CarAssistant {
      */
     internal fun syncLanguage() {
         val context = appContext ?: return
-        val language = VoiceLanguages.effective(context, CarSettings.systemSpeech.value)
+        val language = VoiceLanguages.effective(context, phoneListens(context))
         AssistantLanguage.language = language
         val engine = tts ?: return
         if (!ttsReady || voiceIn == language) return
@@ -140,9 +140,12 @@ object CarAssistant {
         syncLanguage()
         // A message being read or answered gives way: the driver asked for the assistant instead,
         // and the reply left waiting would keep the car's voice key for itself. A reply counting
-        // down goes now, as the wheel's voice key sends it: dropping it lost it without a word.
+        // down goes now, as the wheel's voice key sends it: dropping it lost it without a word. One
+        // still read back doesn't (as for a ringing call, CarUi): the driver hasn't heard it yet, and
+        // the microphone is what a driver who hears it come out wrong touches to say "cancel".
         if (VoiceReply.active) {
-            if (VoiceReply.state.value.phase == VoiceReply.Phase.CONFIRMING) VoiceReply.sendNow() else VoiceReply.cancel()
+            val reply = VoiceReply.state.value
+            if (reply.phase == VoiceReply.Phase.CONFIRMING && reply.until > 0L) VoiceReply.sendNow() else VoiceReply.cancel()
         }
         // The driver may have picked another assistant, which then takes the button instead.
         if (AssistantChoice.startOther(context)) return
@@ -343,13 +346,21 @@ object CarAssistant {
     }
 
     /**
+     * The phone's own speech recognition listens: chosen, and there is one on the phone. Chosen on a
+     * phone without any (GrapheneOS), myCar's models listen, as for the microphone (listenOnce):
+     * taken as the phone's, the assistant said "The speech model didn't load." at every press.
+     */
+    private fun phoneListens(context: Context): Boolean =
+        CarSettings.systemSpeech.value && SpeechRecognizer.isRecognitionAvailable(context)
+
+    /**
      * myCar is in a language its downloaded models don't hear: the assistant listens in English
      * (VoiceLanguages.effective), and Italian said to it came out as nonsense with no word why.
      * Said in myCar's own language, with the model to download.
      */
     private fun languageHint(context: Context): String {
         val phone = VoiceLanguages.phone()
-        if (phone == VoiceLanguage.EN || AssistantLanguage.language != VoiceLanguage.EN || CarSettings.systemSpeech.value) return ""
+        if (phone == VoiceLanguage.EN || AssistantLanguage.language != VoiceLanguage.EN || phoneListens(context)) return ""
         val model = SpeechModels.recommended(phone).last()
         MyCarLog.w("assistant: no model hears ${phone.code} - listening in English")
         return Words.get(
@@ -375,7 +386,7 @@ object CarAssistant {
             return
         }
         VoiceFocus.acquire(context)
-        speak(engine, text) { _, _ ->
+        val id = speak(engine, text) { _, _ ->
             VoiceFocus.release()
             // Always, stopped part way too: a turn that cut a message read out on the car's channel
             // for spoken prompts (DirectionsVoice) left the reply waiting for good. Whoever stopped
@@ -383,6 +394,23 @@ object CarAssistant {
             // act for the run they were made in.
             mainHandler.post(onDone)
         }
+        // The assistant's watchdog doesn't see a message read aloud (its phase stays idle): an engine
+        // that never says it finished (updated in the background mid-message) kept the music paused and
+        // the reply stuck on its card. Ended after as long as any voice takes to say it, as an answer is,
+        // and not while the engine still tells the words it says.
+        val limit = ((SPEAK_BASE_MS + text.length * SPEAK_PER_CHAR_MS) * slowness()).toLong().coerceAtMost(SPEAK_MAX_MS)
+        mainHandler.postDelayed(object : Runnable {
+            override fun run() {
+                if (!endings.containsKey(id)) return
+                if (SystemClock.uptimeMillis() - lastWordAt < STILL_TALKING_MS) {
+                    mainHandler.postDelayed(this, WATCH_MS)
+                    return
+                }
+                MyCarLog.w("assistant: a message read aloud never said it ended after ${limit / 1000} s - closing it")
+                tts?.stop()
+                end(id, stopped = true)
+            }
+        }, limit)
     }
 
     private var utterances = 0
@@ -467,10 +495,12 @@ object CarAssistant {
         onError: (String) -> Unit,
         cue: Boolean = true,
         onSpeaking: () -> Unit = {},
+        /** The phrase has ended and its words are being made out. */
+        onHeard: () -> Unit = {},
     ) {
         cancel()
         syncLanguage()
-        listenOnce(onPartial, onHeard = {}, onResult = onResult, onError = onError, cue = cue, onSpeaking = onSpeaking)
+        listenOnce(onPartial, onHeard = onHeard, onResult = onResult, onError = onError, cue = cue, onSpeaking = onSpeaking)
     }
 
     /**

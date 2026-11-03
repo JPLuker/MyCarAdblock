@@ -38,9 +38,9 @@ android {
         applicationId = "io.github.sirionero.mycar"
         minSdk = 31
         targetSdk = 37
-        versionCode = 45
+        versionCode = 46
         // -PmyCarVersionName=0.1.99-test makes a build that thinks it's older, to try the updater.
-        versionName = project.findProperty("myCarVersionName")?.toString() ?: "0.6.9-alpha"
+        versionName = project.findProperty("myCarVersionName")?.toString() ?: "0.7.0-alpha"
         manifestPlaceholders["appLabel"] = "myCar"
         // Where opted-in phones send their daily usage note: the stats-worker/ Worker's address,
         // set as myCarStatsUrl in gradle.properties. Left empty, nothing is ever sent.
@@ -122,6 +122,38 @@ tasks.register("renameApk") {
     }
 }
 tasks.matching { it.name.startsWith("assemble") }.configureEach { finalizedBy("renameApk") }
+
+/**
+ * English in values-en too, copied at build time from values/. Pirate speak puts English's pirate words
+ * in values-en-rXP, and Android prefers a folder with the language to the one without for every English
+ * but en-US (en-GB, en-AU, en-IN, plain "en"): without values-en, they got the pirate words with pirate
+ * speak off. With it, every English picks values-en and only en-XP the pirate folder.
+ */
+abstract class EnglishStrings : DefaultTask() {
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NAME_ONLY)
+    abstract val strings: ConfigurableFileCollection
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @TaskAction
+    fun copy() {
+        val folder = outputDir.get().asFile.resolve("values-en")
+        folder.deleteRecursively()
+        folder.mkdirs()
+        strings.files.forEach { it.copyTo(folder.resolve(it.name), overwrite = true) }
+    }
+}
+
+androidComponents {
+    onVariants { variant ->
+        val english = tasks.register<EnglishStrings>("${variant.name}EnglishStrings") {
+            strings.from(fileTree("src/main/res/values") { include("strings*.xml") })
+        }
+        variant.sources.res?.addGeneratedSourceDirectory(english, EnglishStrings::outputDir)
+    }
+}
 
 dependencies {
     // Only for the XML window theme (Theme.Material3.DynamicColors); every screen is Compose.

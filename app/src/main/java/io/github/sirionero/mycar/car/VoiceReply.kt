@@ -8,6 +8,7 @@ import androidx.car.app.navigation.model.NavigationTemplate
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.call.CallUiState
 import io.github.sirionero.mycar.call.CarCalls
+import io.github.sirionero.mycar.car.ReplyWords.Command
 import io.github.sirionero.mycar.notify.CarNotification
 import io.github.sirionero.mycar.notify.CarNotifications
 import kotlinx.coroutines.CoroutineScope
@@ -134,7 +135,7 @@ object VoiceReply {
                 },
                 onResult = { text ->
                     if (id != run) return@dictate
-                    if (isYes(text)) {
+                    if (ReplyWords.isYes(text)) {
                         _state.value = _state.value.copy(phase = Phase.ASKING, heard = "", until = 0L, span = 0L, held = 0f)
                         CarAssistant.say(AssistantLanguage.answer("Go ahead.")) { if (id == run) listen(id) }
                     } else {
@@ -150,17 +151,6 @@ object VoiceReply {
     private fun idleAfterRead(id: Int) {
         _state.value = _state.value.copy(phase = Phase.READ, heard = "")
         lingerThenIdle(id)
-    }
-
-    private fun isYes(text: String): Boolean {
-        if (says(text, NO_WORDS + AssistantLanguage.no())) return false
-        return says(text, YES_WORDS + AssistantLanguage.yes())
-    }
-
-    /** Whether [text] has one of [phrases] in it, as whole words ("va bene", "laisse tomber"). */
-    private fun says(text: String, phrases: Set<String>): Boolean {
-        val said = " " + words(text).joinToString(" ") + " "
-        return phrases.any { said.contains(" $it ") }
     }
 
     /**
@@ -201,7 +191,16 @@ object VoiceReply {
         _state.value = _state.value.copy(phase = Phase.LISTENING, heard = "")
         CarAssistant.dictate(
             onPartial = { text -> if (id == run) _state.value = _state.value.copy(heard = text) },
-            onResult = { text -> if (id == run) confirm(id, text) },
+            onResult = { text ->
+                if (id != run) return@dictate
+                // "Cancel" said in place of the reply ends it: taken as the reply, it was read back and sent to the chat.
+                if (ReplyWords.onlyCancel(text)) {
+                    close()
+                    CarAssistant.say(AssistantLanguage.answer("Not sent.")) {}
+                } else {
+                    confirm(id, text)
+                }
+            },
             onError = { message ->
                 if (id != run) return@dictate
                 _state.value = _state.value.copy(phase = Phase.ERROR, error = message)
@@ -226,8 +225,30 @@ object VoiceReply {
     private fun startCountdown(id: Int, ms: Long) {
         val sendAt = SystemClock.uptimeMillis() + ms
         _state.value = _state.value.copy(until = sendAt, span = ms, held = 0f)
+        extended = false
         main.removeCallbacksAndMessages(SEND_TOKEN)
-        main.postAtTime({ if (id == run) send() }, SEND_TOKEN, sendAt)
+        main.postAtTime({ if (id == run) countdownOver(id) }, SEND_TOKEN, sendAt)
+    }
+
+    /** A phrase is being heard in the countdown: begun (its first word, or its end), its words not made out yet. */
+    private var talking = false
+    /** The countdown has had its one wait for a phrase ([countdownOver]). */
+    private var extended = false
+
+    /**
+     * The countdown has run out: sent, unless a phrase is still being heard - a "cancel" said in its
+     * last seconds, ended by a second of quiet and then made out by the final model. Sent then, the
+     * phrase was thrown away and the reply went. That phrase gets once [LAST_PHRASE_MS] more (the bar
+     * stays empty): road noise or the radio hold the reply back no longer than that.
+     */
+    private fun countdownOver(id: Int) {
+        if (talking && !extended) {
+            extended = true
+            MyCarLog.i("voice reply: a phrase still being heard as the countdown ends - waiting for it")
+            main.postAtTime({ if (id == run) send() }, SEND_TOKEN, SystemClock.uptimeMillis() + LAST_PHRASE_MS)
+            return
+        }
+        send()
     }
 
     /**
@@ -235,12 +256,16 @@ object VoiceReply {
      * pauses: in a noisy car it held for road noise and the radio, and the reply never went.
      */
     private fun listenForCommand(id: Int) {
+        talking = false
         CarAssistant.dictate(
             onPartial = {},
             cue = false,
+            onSpeaking = { if (id == run) talking = true },
+            onHeard = { if (id == run) talking = true },
             onResult = { text ->
                 if (id != run) return@dictate
-                when (command(text)) {
+                talking = false
+                when (ReplyWords.command(text)) {
                     Command.CANCEL -> {
                         close()
                         CarAssistant.say(AssistantLanguage.answer("Not sent.")) {}
@@ -259,23 +284,12 @@ object VoiceReply {
             // Silence ends the recognizer before the countdown does: listen again until it sends.
             onError = {
                 if (id != run) return@dictate
+                talking = false
                 // A short gap, so a recognizer that fails at once can't spin.
                 main.postDelayed({ if (id == run) listenForCommand(id) }, RELISTEN_MS)
             },
         )
     }
-
-    private enum class Command { CANCEL, CHANGE, SEND }
-
-    private fun command(text: String): Command? = when {
-        says(text, CANCEL_WORDS + AssistantLanguage.cancel()) -> Command.CANCEL
-        says(text, CHANGE_WORDS + AssistantLanguage.change()) -> Command.CHANGE
-        says(text, SEND_WORDS + AssistantLanguage.send()) -> Command.SEND
-        else -> null
-    }
-
-    /** Letters of any language: "sì", "ändern" and "réponds" are words too. */
-    private fun words(text: String) = text.lowercase().split(Regex("[^\\p{L}']+")).filter { it.isNotEmpty() }
 
     /**
      * Ready-made replies for a tap instead of a voice reply, in the phone's language (see
@@ -409,11 +423,6 @@ object VoiceReply {
     }
 
     private const val MAX_READ = 3
-    private val YES_WORDS = setOf("yes", "yeah", "yep", "yup", "sure", "ok", "okay", "reply", "please")
-    private val NO_WORDS = setOf("no", "nope", "nah", "cancel", "don't", "stop")
-    private val CANCEL_WORDS = setOf("cancel", "stop", "don't", "no", "nope")
-    private val CHANGE_WORDS = setOf("change", "redo", "again", "edit", "wrong", "fix")
-    private val SEND_WORDS = setOf("send", "yes", "yeah", "ok", "okay", "go")
 
     private val SEND_TOKEN = Any()
     private const val ECHO_MS = 300L
@@ -421,4 +430,6 @@ object VoiceReply {
     private const val OFFER_MS = 6_500L
     private const val OFFER_GRACE_MS = 1_500L
     private const val RELISTEN_MS = 400L
+    /** How long a reply waits, once, for a phrase still being heard as its countdown ends. */
+    private const val LAST_PHRASE_MS = 2_000L
 }

@@ -194,6 +194,13 @@ object MyCarLog {
         return out.toString().trimEnd()
     }
 
+    /** Like [e], with the whole stack of the exception and of its causes. */
+    private fun fatal(message: String, t: Throwable) {
+        write("E", "$message: ${rootCause(t)}", "APP")
+        Log.e(TAG, message, t)
+        stackTrace(t, frames = 400).lines().forEach { write("E", "    $it", "APP") }
+    }
+
     @Volatile private var crashHandlerInstalled = false
 
     /**
@@ -208,7 +215,9 @@ object MyCarLog {
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             runCatching {
                 SessionReport.fail(SessionReport.Category.CRASH, "uncaught in thread ${thread.name}", throwable)
-                e("FATAL uncaught exception in thread ${thread.name}", throwable)
+                // Every frame: the top 12 of a crash inside Compose were all Compose's own, and
+                // which screen it came from was cut off.
+                fatal("FATAL uncaught exception in thread ${thread.name}", throwable)
                 SessionReport.print()
                 flush()
             }

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_whats_new_in">Fresh plunder in %1$s</string>
+    <string name="home_how_to_connect_subtitle">Which ships sail, and what\'s left to fit out</string>
+    <string name="home_disconnect">Cast off</string>
+    <string name="home_disconnect_title">Cast off from the car?</string>
+    <string name="home_disconnect_text">myCar leaves the helm now. With the cable, unplug it and plug it back in to come back aboard.</string>
+    <string name="home_bluetooth_missing_calls_music">Calls and shanties play over Bluetooth, but your phone isn\'t connected to the car. Connect it here or from the car\'s Bluetooth menu.</string>
+    <string name="home_voice_downloading">Hauling the voice aboard, %1$d%%</string>
+
+    <string name="wireless_button_connect">Board wirelessly</string>
+    <string name="wireless_button_denied">myCar needs Bluetooth and nearby Wi-Fi access to board wirelessly.</string>
+    <string name="wireless_button_switched_off">myCar is switched off aboard (Rigging, \"Use myCar aboard\").</string>
+    <string name="wireless_button_which_car">Which ship?</string>
+    <string name="wireless_button_bluetooth_off">Bluetooth is off. Turn it on, then tap Board wirelessly again.</string>
+    <string name="wireless_button_not_paired">Your phone isn\'t paired with anything yet. Pair it with the ship first.</string>
+    <string name="wireless_button_not_listed">Ship not on the roster? Pair it with your phone first.</string>
+
+    <string name="help_title">How to board</string>
+    <string name="help_which_cars">Which ships sail</string>
+    <string name="help_which_cars_text">Most cars work. Starting around 2020, some cars added newer security standards that reject myCar\'s certificate, and myCar can\'t come aboard those cars.</string>
+    <string name="help_see_full_list">See the full roster</string>
+    <string name="help_in_the_car">Aboard</string>
+    <string name="help_step_connect">Plug in, or board wirelessly.</string>
+    <string name="help_step_connect_detail">myCar opens by itself when the ship connects. For wireless, pair the phone with the ship first, then tap Board wirelessly on Home.</string>
+    <string name="help_step_screening">Repel unknown callers before they ring.</string>
+    <string name="help_set_up">Fit out</string>
+    <string name="help_step_audio_prompt">Stop the audio prompt each voyage.</string>
+    <string name="help_step_audio_prompt_detail">Connect the phone to a computer with USB debugging on, and run this once. Skip it and you tap Start each time you set sail.</string>
+    <string name="help_step_notifications_detail">Android hides what notifications say while it shares audio. Run this too, and myCar lifts that only while shanties go to the car.</string>
+
+    <string name="cert_notice_switched_text">myCar uses %1$s from now on. Connect to the car again: plug the cable back in, or board wirelessly.</string>
+    <string name="cert_notice_switched_next_text">myCar uses the next certificate from now on. Connect to the car again: plug the cable back in, or board wirelessly.</string>
+    <string name="cert_notice_own_refused_text">To use the public ones instead, remove yours in Rigging, under Certificate.</string>
+
+    <string name="cert_role_recommended">Captain\'s pick</string>
+
+    <string name="cert_setup_continue">Onward</string>
+
+    <string name="update_title">Refits</string>
+    <string name="update_out">myCar %1$s has set sail</string>
+    <string name="update_downloading">Hauling aboard… %1$d%%</string>
+    <string name="update_unplug_first">Cast off from the car to install. Installing closes myCar.</string>
+    <string name="update_downloaded">Hauled aboard. Android asks before it installs.</string>
+    <string name="update_download_now">Haul it aboard now. Android asks before it installs.</string>
+    <string name="update_update">Refit</string>
+    <string name="update_download">Haul aboard</string>
+    <string name="update_status_daily">myCar scans the horizon once a day</string>
+    <string name="update_status_checking">Scanning the horizon…</string>
+    <string name="update_status_latest">You\'re sailing the latest version</string>
+    <string name="update_status_available">Version %1$s has set sail</string>
+    <string name="update_status_ready">Version %1$s is in the hold, ready to install</string>
+    <string name="update_check_automatically">Keep a lookout</string>
+    <string name="update_notification_text">Tap to refit.</string>
+    <string name="update_car_notification_text">Refit in the myCar app or from GitHub</string>
+    <string name="update_error_no_space">Not enough room in the phone\'s hold for the refit. Free some, then try again.</string>
+    <string name="update_error_stopped">Hauling aboard stopped. Check the connection, then try again.</string>
+    <string name="update_error_not_sent">GitHub didn\'t send the refit (code %1$d). Try again later.</string>
+    <string name="update_error_stopped_early">Hauling aboard stopped early. Try again.</string>
+    <string name="update_error_damaged">The download came aboard damaged. Try again.</string>
+    <string name="update_splash_updated_to">Refitted to</string>
+    <string name="update_splash_tap">Tap anywhere to sail on</string>
+
+    <string name="whatsnew_title">Fresh plunder</string>
+    <string name="whatsnew_this_version">%1$s (the one aboard)</string>
+
+    <string name="recommended_title">Captain\'s picks</string>
+    <string name="recommended_intro">These free apps sail at myCar\'s helm. Each button opens the app\'s page on GitHub.</string>
+    <string name="recommended_section_maps">Charts</string>
+    <string name="recommended_section_music">Shanties</string>
+    <string name="recommended_about_organic_maps">Offline charts and courses.</string>
+    <string name="recommended_about_vela">Turn-by-turn navigation, no Google aboard.</string>
+    <string name="recommended_about_youtube_music">A YouTube Music shanty box.</string>
+    <string name="recommended_about_antennapod">Podcasts, chapters, the whole haul.</string>
+
+    <string name="logs_title">Ship\'s log</string>
+    <string name="logs_clear">Swab</string>
+    <string name="logs_jump_to_latest">Leap to latest</string>
+    <string name="logs_empty">Nothing in the log yet. Lines appear here live while a voyage is under way.</string>
+    <string name="logs_share_subject">myCar ship\'s log</string>
+    <string name="logs_share_chooser">Share the ship\'s log</string>
+    <string name="logs_earlier_title">Earlier ship\'s logs</string>
+    <string name="logs_earlier_empty">No earlier ship\'s logs yet. Each time myCar sets sail, it begins a new one.</string>
+    <string name="logs_crashed">Wrecked</string>
+
+    <string name="preview_title">Helm spyglass</string>
+    <string name="preview_size">%1$dx%2$d @ %3$ddpi - touches go to the helm</string>
+    <string name="preview_car_screen">Helm</string>
+    <string name="preview_waiting">Waiting for a frame on the horizon…</string>
+    <string name="preview_leave">Leave the helm spyglass</string>
+
+    <string name="donate_title">Glad that voyage sailed true</string>
+    <string name="donate_text">myCar is free, with no ads and no tracking. If it gets you under way, your backing keeps the ship afloat.</string>
+    <string name="donate_bitcoin">Back it with Bitcoin</string>
+    <string name="audio_not_reaching_title">Shanties aren\'t reaching the car</string>
+    <string name="audio_not_reaching_text">Android\'s question to send the sound through myCar was turned down, so the car gets no shanties.</string>
+</resources>

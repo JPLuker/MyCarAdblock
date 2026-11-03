@@ -109,6 +109,13 @@ object CarServices {
     private var autoplayPending = false
 
     /**
+     * The phone's preview of the car's screen is open (Settings, no car): its car UI picks the music
+     * as a drive would, but plays nothing by itself - with Autoplay on, opening the preview started
+     * the music on the phone's speaker - and pauses no app on the phone for a web player.
+     */
+    @Volatile var phonePreview = false
+
+    /**
      * Who holds the drive's services: the car session itself and each car UI composed (the car's,
      * and the phone's preview of it). They go only when the last lets go: a car UI torn down for
      * screen sharing, or the preview closed mid-drive, used to end them all - the map unhooked,
@@ -148,7 +155,7 @@ object CarServices {
         // The Plancia and Xonos apps in place of the ones inside myCar, if those can't connect.
         InsideOrApp.start(appContext)
         // Loaded ahead of the first command, so the first reply isn't slower than the rest - but not
-        // while the car's first picture is being made: up to some 700 MB of voice models read and set
+        // while the car's first picture is being made: hundreds of MB of voice models read and set
         // up took the phone's cores and storage at the very moment the car connected. Not at all when
         // the phone's own speech recognition does the listening.
         speechWarm.removeCallbacks(warmSpeech)
@@ -161,9 +168,13 @@ object CarServices {
     private val speechWarm = android.os.Handler(android.os.Looper.getMainLooper())
     private val warmSpeech = Runnable {
         val app = context ?: return@Runnable
+        // The phone's preview of the car's screen alone (Settings, no car): no voice models for it.
+        if (phonePreview && !io.github.sirionero.mycar.SessionService.running) return@Runnable
         io.github.sirionero.mycar.speech.SpeechEngine.warm(
             app,
-            io.github.sirionero.mycar.speech.VoiceLanguages.effective(app, CarSettings.systemSpeech.value),
+            io.github.sirionero.mycar.speech.VoiceLanguages.effective(
+                app, CarSettings.systemSpeech.value && android.speech.SpeechRecognizer.isRecognitionAvailable(app),
+            ),
         )
     }
 
@@ -347,9 +358,25 @@ object CarServices {
         autoplayPending = false
     }
 
-    /** Called once the media app is connected: starts playback if that was asked for. */
+    /**
+     * Called once the media app is connected, and again as the sound's way to the car changes:
+     * starts playback if that was asked for. The drive's own pick waits for its sound to have a way
+     * to the car ([autoplayWaits]): started at once, it played on the phone's speaker in the driver's
+     * pocket for as long as Automatic decided or Android's question waited for myCar on screen. What
+     * the driver opens plays at once.
+     */
     fun autoplayIfDue() {
         if (!autoplayPending) return
+        if (mediaAutoPicked && autoplayWaits(
+                deciding = io.github.sirionero.mycar.audio.CarAudioRoute.deciding.value,
+                throughMyCar = CarSettings.pipeAudio.value,
+                captureOn = CarAudio.capture.value == CarAudio.Capture.ON,
+                straightIn = _mediaApp.value?.component?.let(Xonos::isInside) == true && CarAudio.direct.value,
+            )
+        ) {
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the sound to have a way to the car")
+            return
+        }
         autoplayPending = false
         if (!media.now.value.playing) media.togglePlay()
     }
@@ -387,7 +414,7 @@ object CarServices {
             val playing = withContext(Dispatchers.IO) { currentlyPlaying(ctx, catalog) }
             // The phone's own app of a service whose web player takes its place in the car (its app
             // ticked to stay off the grid): the music goes on in that player instead, the app paused.
-            val web = playing?.let { webFor(it.component, catalog) }
+            val web = playing?.takeUnless { phonePreview }?.let { webFor(it.component, catalog) }
             if (web != null) {
                 pausePhoneMedia("its web player takes its place in the car")
                 openMedia(web, autoplay = true, auto = true)
@@ -396,7 +423,7 @@ object CarServices {
             } else {
                 val last = CarSettings.lastMedia.value?.let(ComponentName::unflattenFromString)
                 val app = last?.let { component -> webFor(component, catalog) ?: catalog.firstOrNull { it.component == component } ?: xonosFor(component, catalog) }
-                if (app != null) openMedia(app, autoplay = CarSettings.autoplay.value, auto = true)
+                if (app != null) openMedia(app, autoplay = CarSettings.autoplay.value && !phonePreview, auto = true)
             }
         }
         _mediaDecided.value = true
@@ -512,9 +539,11 @@ object CarServices {
         runCatching { media.disconnect() }
         runCatching { browse.disconnect() }
         // A reply the driver was confirming goes out, any other is dropped, as when the microphone
-        // is pressed: left as it was, its card came back at the next connection, stuck.
+        // is pressed: left as it was, its card came back at the next connection, stuck. Only once its
+        // countdown runs: still read back, the driver hadn't heard it yet.
         if (VoiceReply.active) {
-            if (VoiceReply.state.value.phase == VoiceReply.Phase.CONFIRMING) VoiceReply.sendNow() else VoiceReply.cancel()
+            val reply = VoiceReply.state.value
+            if (reply.phase == VoiceReply.Phase.CONFIRMING && reply.until > 0L) VoiceReply.sendNow() else VoiceReply.cancel()
         }
         CarAssistant.cancel()
         io.github.sirionero.mycar.home.HomeAssistant.release()
@@ -538,6 +567,7 @@ object CarServices {
         // A toast or the voice help up as the drive ended came back at the start of the next one.
         CarToasts.clearAll()
         VoiceHelp.hide()
+        CarSettings.forgetOpenWhatsNew()
         media.forgetLosses()
         clearSectionCache()
         navStopped = false

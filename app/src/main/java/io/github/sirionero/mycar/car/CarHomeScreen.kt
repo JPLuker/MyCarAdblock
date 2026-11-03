@@ -76,7 +76,7 @@ fun CarHome() {
     val now by CarServices.media.now.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { CarServices.autostart(frame) }
-    LaunchedEffect(phase) { if (phase == CarMedia.Phase.READY) CarServices.autoplayIfDue() }
+    AutoplayWhenReady(phase)
 
     val navigator = LocalCarNavigator.current
     val panel = navigator.sidePanel
@@ -111,10 +111,13 @@ fun CarHome() {
     val lastActive = remember(mediaApp) { arrayOf(now) }
     if (now.isActive) lastActive[0] = now
     val holding = sideApp == null && musicShown && !musicOn
-    val shownNow = if (holding && !now.isActive && lastActive[0].isActive) lastActive[0] else now
+    val shownNow = if (holding && !now.isActive && lastActive[0].isActive) lastActive[0].playingAs(now) else now
+    // The music beside the map (the player, the lyrics), not an app's own screen there.
+    val music = sideApp?.template == null && sideApp?.builtIn != BuiltInApps.Plancia
     // Lyrics that gave the column back for a song without any come back with the next song that has some,
-    // until the driver closes them (their X, the dock's song, the player's X).
-    if (navigator.lyricsWanted && panel == SidePanel.CONTROLS && shownNow.isActive) {
+    // until the driver closes them (their X, the dock's song, the player's X). Not looked up with an app
+    // beside the map, where they can't show (no searches in the background).
+    if (navigator.lyricsWanted && panel == SidePanel.CONTROLS && shownNow.isActive && music) {
         val context = LocalContext.current
         val inside = mediaApp?.component?.let(io.github.sirionero.mycar.xonos.Xonos::isInside) == true
         val song = remember(shownNow.trackTitle, shownNow.title, shownNow.trackArtist, shownNow.artist, shownNow.album, shownNow.durationMs, shownNow.mediaId, inside) { shownNow.lyricsSong(inside) }
@@ -137,20 +140,25 @@ fun CarHome() {
     val splitScreen = panel != SidePanel.NONE && (sideApp != null || musicShown || reserved)
     // The music beside the map at the size chosen for it (Small, Medium, Large): an app's own screen
     // there keeps its size.
-    val music = sideApp?.template == null && sideApp?.builtIn != BuiltInApps.Plancia
     val playerSize by CarSettings.playerSize.collectAsStateWithLifecycle()
     // The map alone with music on (the column closed with its X, the dock's song, or Close beside an
     // app): the mini player floats over it instead (see MapMiniPlayer); not while the map is panned.
     // Its song as the column would draw it: the last one during the column's hold, whatever is beside the map.
     val miniOn by MiniPlayerSetting.on.collectAsStateWithLifecycle()
     val panning by CarServices.nav.panMode.collectAsStateWithLifecycle()
-    val miniNow = if (musicShown && !musicOn && !now.isActive && lastActive[0].isActive) lastActive[0] else now
+    val miniNow = if (musicShown && !musicOn && !now.isActive && lastActive[0].isActive) lastActive[0].playingAs(now) else now
 
     // The map's page among the driver's own (see HomePager). No outer padding on any side, split
     // screen or not - only the gap between the two panes when the player is sharing the screen
     // with the map.
+    val planciaWeb = LocalPlanciaWeb.current
+    val planciaBeside = splitScreen && sideApp?.builtIn == BuiltInApps.Plancia
     HomePager(onHome) { inView ->
     androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
+    // Plancia's page beside the map stays a frame after it goes (out of view, Close, another choice),
+    // so a tap's focus can leave it first (see LeaveWithoutFocus.kt); the column with it.
+    val planciaShown = leavesWithoutFocus(planciaBeside && inView) { planciaWeb?.dropFocus() }
+    val split = splitScreen || planciaShown
     // As far as it fits: the map keeps room for an app's card over it, the column for its X over the glass.
     val sideScale = if (music) sideScaleFor(playerSize, maxWidth.value - 8f, maxHeight.value, MAP_PANE_MIN_EDGE.value + 24f) else 1f
     Row(
@@ -160,24 +168,25 @@ fun CarHome() {
         Box(
             Modifier
                 // The side a third of the screen, as it always was, times its size: the map takes the rest.
-                .weight(if (splitScreen) MAP_SHARE / sideScale - 1f else 1f)
+                .weight(if (split) MAP_SHARE / sideScale - 1f else 1f)
                 .fillMaxHeight(),
         ) {
-            MapPane(navStatus, frame, inView, mini = miniNow.takeIf { miniPlayerShows(miniOn, navigator.miniPlayerHidden, musicShown, splitScreen, inView, panning) })
+            MapPane(navStatus, frame, inView, mini = miniNow.takeIf { miniPlayerShows(miniOn, navigator.miniPlayerHidden, musicShown, split, inView, panning) })
         }
-        if (splitScreen) CompositionLocalProvider(LocalPlayerInView provides inView, LocalDensity provides LocalDensity.current.scaledBy(sideScale)) {
+        if (split) CompositionLocalProvider(LocalPlayerInView provides inView, LocalDensity provides LocalDensity.current.scaledBy(sideScale)) {
             val side = Modifier.weight(1f).fillMaxHeight()
             val sideTemplate = sideApp?.template
             val sideMedia = sideApp?.media
             when {
+                // Plancia inside myCar: its one page goes wherever it's on screen, so here too only in
+                // view (and a frame more, see planciaShown).
+                planciaShown -> PlanciaPane(side)
                 // Only while its page is in view on Home: an app opened full screen from the grid,
                 // or on another page, uses the same connection, and two stages on it would pull its
                 // surface back and forth.
                 sideTemplate != null ->
                     if (inView) SideAppPane(sideTemplate, frame, side) else AppPlaceholder(sideApp?.shownLabel.orEmpty(), sideApp?.icon, side)
-                // Plancia inside myCar: its one page goes wherever it's on screen, so here too only in view.
-                sideApp?.builtIn == BuiltInApps.Plancia ->
-                    if (inView) PlanciaPane(side) else AppPlaceholder("Plancia", null, side, builtInId = BuiltInApps.Plancia.id)
+                sideApp?.builtIn == BuiltInApps.Plancia -> AppPlaceholder("Plancia", null, side, builtInId = BuiltInApps.Plancia.id)
                 panel == SidePanel.LYRICS -> SideLyrics(shownNow, side)
                 sideMedia != null -> SideMediaPane(sideMedia, shownNow, side)
                 else -> GlassDockedPlayer(shownNow, side, startingApp = mediaApp?.label?.takeIf { reserved && !shownNow.isActive })
@@ -270,6 +279,21 @@ private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame
 
 /** How long the music's column waits, once nothing plays, before giving the map its width back. */
 private const val MUSIC_HOLD_MS = 6_000L
+
+/**
+ * The song held through the column's wait, with its play button as the app is now: an app that stops
+ * on pause (STATE_STOPPED) shows Play, which is what a touch does (togglePlay reads the app's own state);
+ * before, it went on saying Pause and a second touch started the music again. Still a song in play, so
+ * the column and the mini player keep drawing it.
+ */
+private fun NowPlaying.playingAs(live: NowPlaying): NowPlaying =
+    if (live.playing == playing) this else NowPlaying(
+        title = title, artist = artist, album = album, art = art, artUri = artUri,
+        state = if (live.playing) live.state else PlaybackState.STATE_PAUSED,
+        positionMs = positionMs, durationMs = durationMs, speed = speed, updatedAt = updatedAt, actions = actions,
+        custom = custom, error = error, activeQueueItemId = activeQueueItemId, heart = heart,
+        trackTitle = trackTitle, trackArtist = trackArtist, mediaId = mediaId,
+    )
 
 /** Everything drawn [scale] times bigger: the player beside the map at Medium or Large. */
 private fun Density.scaledBy(scale: Float): Density = if (scale == 1f) this else Density(density * scale, fontScale)

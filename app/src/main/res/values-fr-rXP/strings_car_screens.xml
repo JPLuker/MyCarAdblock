@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_settings_open_on_connect">Ouvrir à l’appareillage</string>
+    <string name="car_settings_open_home">Port</string>
+    <string name="car_settings_size">Gabarit</string>
+    <string name="car_settings_size_extra_small">Très petit</string>
+    <string name="car_settings_size_small">Petit</string>
+    <string name="car_settings_size_normal">Normal</string>
+    <string name="car_settings_size_large">Grand</string>
+    <string name="car_settings_size_extra_large">Très grand</string>
+    <string name="car_settings_size_medium">Moyen</string>
+    <string name="car_settings_player_size">Gabarit du phono à côté de la carte</string>
+    <string name="car_settings_mini_player">Mini-phono sur la carte entière</string>
+    <string name="car_settings_mini_player_detail">Quand le phono à côté de la carte est fermé, un petit phono flotte sur la carte comme une bouée. Maintenez-le appuyé, puis faites-le glisser pour le déplacer.</string>
+    <string name="car_settings_hidden_apps">Apps planquées</string>
+    <string name="car_settings_hidden_apps_none">Aucune. Pour planquer une app, maintenez-la appuyée dans la flotte et choisissez Planquer hors de la flotte.</string>
+    <string name="car_settings_hidden_apps_show">Dévoiler</string>
+    <string name="car_settings_app_theme">Couleurs de l’app</string>
+    <string name="car_settings_app_theme_phone">Au gré du téléphone</string>
+    <string name="car_settings_controls_theme">Allure des boutons</string>
+    <string name="car_settings_autoplay">Chants dès l’appareillage</string>
+    <string name="car_settings_car_audio">Son à bord</string>
+    <string name="car_settings_car_audio_note">« Via myCar » envoie le son du téléphone par la liaison de myCar, le câble ou le Wi-Fi, comme Android Auto. Android demande de partager votre écran à chaque traversée, et quelques apps le bloquent. « Bluetooth » joue comme le téléphone le ferait normalement, et Android ne demande jamais rien, mais certains navires n’acceptent que les appels par ce biais. « Automatique » utilise le Bluetooth quand le navire reçoit ainsi les chants du téléphone, et la liaison de myCar sinon.</string>
+    <string name="car_settings_spoken_directions_note">myCar annonce chaque changement de direction par les haut-parleurs de bord, et les chants baissent pendant qu’il parle. Désactivez cette option si la voix de votre app de navigation passe déjà à bord.</string>
+    <string name="car_settings_system_speech_note">Le perroquet de bord écoute via le service vocal du téléphone au lieu de celui de myCar. Sur la plupart des téléphones, c’est celui de Google, qui peut envoyer votre voix à Google. GrapheneOS n’en a pas, donc myCar continue d’utiliser le sien.</string>
+    <string name="car_settings_experimental">Eaux inexplorées</string>
+    <string name="car_settings_experimental_hide">Planquer</string>
+    <string name="car_settings_experimental_show">Dévoiler</string>
+    <string name="car_settings_vehicle_data_note">Ajoute une tuile Infos de bord : un relevé brut et en direct du canal des capteurs du système multimédia. Les noms des champs (vitesse, régime, carburant…) viennent d’autres projets de rétro-ingénierie et n’ont pas été vérifiés sur ce navire : prenez-les pour une supposition, pas pour un fait, tant que vous n’en avez pas vu un changer de vos propres yeux.</string>
+    <string name="car_settings_connection">Abordage</string>
+    <string name="car_settings_info_vehicle">Navire</string>
+    <string name="car_settings_unknown_vehicle">Navire inconnu</string>
+    <string name="car_settings_about">Pavillon</string>
+    <string name="car_settings_whats_new_after_updates">Butin après chaque mise à jour</string>
+    <string name="car_settings_whats_new_after_updates_note">Dévoiler la liste des changements une fois, la première fois que le navire se connecte après une mise à jour.</string>
+    <string name="car_settings_whats_new">Nouveau butin</string>
+    <string name="car_settings_web_page_default">DuckDuckGo (par défaut) : appuyez pour mettre le cap sur une autre page</string>
+    <string name="car_settings_web_page_note">Affichée par l’app Navigateur à sa prochaine ouverture, et par un navigateur sur vos ponts à la prochaine traversée.</string>
+    <string name="car_settings_save_for_vehicle">Enregistrer pour ce navire</string>
+    <string name="car_settings_no_vehicle_profile">Aucun profil de navire correspondant</string>
+
+    <string name="car_whatsnew_title">Butin de la %1$s</string>
+    <string name="car_whatsnew_show_after_updates">Dévoiler après chaque mise à jour</string>
+    <string name="car_whatsnew_got_it">Bien reçu</string>
+
+    <string name="car_keyboard_hide">Planquer le clavier</string>
+
+    <string name="car_player_previous">Chant précédent</string>
+    <string name="car_player_pause">Trêve</string>
+    <string name="car_player_next">Chant suivant</string>
+    <string name="car_player_like">Au trésor</string>
+    <string name="car_player_unlike">Hors du trésor</string>
+    <string name="car_player_shuffle_on">Voguer au gré du vent</string>
+    <string name="car_player_shuffle_off">Garder le cap</string>
+    <string name="car_player_repeat">Bis</string>
+    <string name="car_player_lyrics">Couplets</string>
+    <string name="car_player_close">Fermer le phono</string>
+
+    <string name="car_media_tab_now_playing">On chante</string>
+    <string name="car_media_tab_browse">Explorer</string>
+    <string name="car_media_nothing_playing">Silence à bord</string>
+    <string name="car_media_library_closed">%1$s garde sa bibliothèque pour lui, à fond de cale.</string>
+    <string name="car_media_needs_notification_access">myCar peut quand même le piloter une fois qu’il a l’accès aux notifications sur le téléphone. Autorisez-le dans Paramètres &gt; Notifications &gt; Accès aux notifications.</string>
+    <string name="car_media_library_closed_detail">Lancez les chants dans l’app sur votre téléphone. D’ici, vous pouvez lire, mettre en pause, passer un chant et avancer dans le chant.</string>
+    <string name="car_media_not_running">%1$s n’a pas levé l’ancre.</string>
+    <string name="car_media_not_running_detail">%1$s chante via le phono de myCar, mais seulement s’il est ouvert sur le téléphone. Ouvrez-le une fois et il continue de chanter ici, à bord.</string>
+    <string name="car_media_refused">%1$s n’a pas laissé myCar l’explorer.</string>
+    <string name="car_media_refused_detail">Certaines apps multimédias ne jurent que par l’hôte de Google. Ouvrez l’app sur le téléphone : myCar pourra quand même lancer la lecture, la mettre en pause et passer les chants.</string>
+    <string name="car_media_keeps_closing">%1$s chavire sans cesse sur le téléphone.</string>
+    <string name="car_media_list_empty">La cale est vide.</string>
+    <string name="car_media_queue_empty">Aucun chant à suivre.</string>
+    <string name="car_media_queue_empty_idle">Silence à bord : toutes les apps ne disent pas à myCar ce qui suit.</string>
+    <string name="car_media_queue_empty_playing">Seulement le chant en cours : toutes les apps ne disent pas à myCar ce qui suit.</string>
+    <string name="car_media_search_app">Fouiller %1$s</string>
+    <string name="car_media_search_hint">Saisissez un chant, un artiste, un album ou une playlist.</string>
+    <string name="car_media_search_no_list">%1$s ne peut pas lister de résultats. Appuyez sur Fouiller, et %1$s choisit le chant.</string>
+    <string name="car_media_search_unsupported">%1$s ne se laisse pas fouiller à bord.</string>
+    <string name="car_media_searching">Fouille de %1$s…</string>
+    <string name="car_media_search_nothing">Fouille vaine : %1$s n’a rien trouvé pour « %2$s ».</string>
+    <string name="car_media_search_ask">Demander à %1$s de le chanter</string>
+    <string name="car_media_search_running">Fouille de %1$s pour « %2$s »…</string>
+    <string name="car_media_search_ignored">%1$s n’a rien chanté pour « %2$s ».</string>
+
+    <string name="car_lyrics_looking">Fouille des couplets…</string>
+    <string name="car_lyrics_nothing_playing">Silence à bord.</string>
+    <string name="car_lyrics_none">Pas encore de couplets pour ce chant.</string>
+    <string name="car_lyrics_none_detail">Les couplets viennent de LRCLIB, une archive libre comme le vent, écrite par ses auditeurs : tous les chants n’y sont pas encore.</string>
+    <string name="car_lyrics_instrumental_detail">Pas de couplets à reprendre en chœur sur ce chant.</string>
+    <string name="car_lyrics_unreachable">Impossible d’obtenir les couplets.</string>
+    <string name="car_lyrics_unreachable_detail">Ils viennent de lrclib.net : vérifiez la connexion du téléphone.</string>
+
+    <string name="car_vehicle_title">Données de bord</string>
+    <string name="car_sensor_compass">Compas</string>
+
+    <string name="car_player_sound_now_mycar">Le son passe maintenant par myCar, pour ce navire</string>
+    <string name="car_player_sound_now_bluetooth">Le son passe maintenant par Bluetooth, pour ce navire</string>
+</resources>

@@ -58,13 +58,24 @@ class MiniPlaceTest {
         assertTrue(x + MINI_WIDTH <= w - MINI_EDGE + 0.5f)
     }
 
-    @Test fun startsAsFarFromAMapsCardAsItGoesAndAboveTheTripAtExtraLarge() {
-        // 800x480 at Extra large: 437x320, where nothing leaves room for it beside the card.
+    @Test fun startsLeftOfTheButtonsAndAboveTheTripAtExtraLarge() {
+        // 800x480 at Extra large: 437x320, where nothing leaves room for it between the card and the
+        // buttons, drawn smaller as there (fitScale).
         val (w, h) = 437.33f to 320f
-        val (x, y) = topLeft(startOn(w, h), w, h)
-        assertEquals(w - MINI_EDGE - MINI_WIDTH, x, 0.5f)
+        val areaW = w - 2 * MINI_EDGE
+        val areaH = h - MINI_EDGE - MINI_DOTS_STRIP
+        val fit = MiniPlace.fitScale(areaW)
+        val ownW = MINI_WIDTH * fit
+        val ownH = MINI_HEIGHT * fit
+        val place = MiniPlace.start(areaW, areaH, ownW, ownH)
+        val x = MINI_EDGE + place.x * (areaW - ownW)
+        val y = MINI_EDGE + place.y * (areaH - ownH)
+        // Left of the map's buttons (54 dp, 12 from the edge, 8 apart): under them its first touch only
+        // woke them, and its X sat under Vela's zoom out.
+        assertTrue("$x", x + ownW <= w - 12f - 54f - 8f + 0.5f)
+        assertTrue("$x", x >= MINI_EDGE)
         // Above the trip's time card (about 80 dp, 12 from the bottom) and the page dots.
-        assertTrue("$y", y + MINI_HEIGHT <= h - 12f - 80f)
+        assertTrue("$y", y + ownH <= h - 12f - 80f)
     }
 
     @Test fun startsLeftOfTheButtonsOnAShortWideMap() {
@@ -92,5 +103,45 @@ class MiniPlaceTest {
         assertEquals(173f / 276f, MiniPlace.fitScale(413f), 0.01f)
         // Never smaller than about its Normal size at Extra large.
         assertEquals(0.6f, MiniPlace.fitScale(300f), 0.001f)
+    }
+
+    /** [place] let go on a map [mapW] x [mapH] dp, kept clear of the map's buttons: its top-left corner there. */
+    private fun letGoAt(place: MiniPlace, mapW: Float, mapH: Float) = topLeft(
+        MiniPlace.clearOfButtons(place, mapW - 2 * MINI_EDGE, mapH - MINI_EDGE - MINI_DOTS_STRIP, MINI_WIDTH, MINI_HEIGHT),
+        mapW, mapH,
+    )
+
+    @Test fun letGoUnderTheAppsRowItMovesBelowIt() {
+        // 800x480 at Normal, dragged up to the top right as in the preview (0.79, 0.047): under Vela's Search.
+        val (x, y) = letGoAt(MiniPlace(0.79f, 0.047f), 704f, 480f)
+        // Below the row: 12 dp from the top, 54 dp buttons, 8 dp apart.
+        assertTrue("$y", y >= 12f + 54f + 8f - 0.5f)
+        // And clear of the map's buttons down the right (54 dp, 12 from the edge, 8 apart).
+        assertTrue("$x", x + MINI_WIDTH <= 704f - 12f - 54f - 8f + 0.5f)
+    }
+
+    @Test fun letGoInTheTopRightCornerItMovesLeftOfTheButtons() {
+        // 1920x720 at 240 dpi: room left of the buttons, right of the card.
+        val (x, y) = letGoAt(MiniPlace(1f, 0f), 1184f, 480f)
+        assertTrue("$x", x + MINI_WIDTH <= 1184f - 12f - 54f - 8f + 0.5f)
+        assertTrue("$x", x >= 0.42f * 1184f + 8f - 0.5f)
+        assertTrue("$y", y >= 12f + 54f + 8f - 0.5f)
+    }
+
+    @Test fun letGoElsewhereItStaysPut() {
+        assertEquals(MiniPlace.CORNER, MiniPlace.clearOfButtons(MiniPlace.CORNER, 680f, 408f, MINI_WIDTH, MINI_HEIGHT))
+        val middle = MiniPlace(0.5f, 0.8f)
+        assertEquals(middle, MiniPlace.clearOfButtons(middle, 680f, 408f, MINI_WIDTH, MINI_HEIGHT))
+        // Over the card at the left, low down: the driver's choice.
+        val left = MiniPlace(0f, 0.6f)
+        assertEquals(left, MiniPlace.clearOfButtons(left, 680f, 408f, MINI_WIDTH, MINI_HEIGHT))
+    }
+
+    @Test fun letGoOnATinyMapItStaysInside() {
+        // 800x480 at Extra large (437x320), no room anywhere: still a place inside the map.
+        val place = MiniPlace.clearOfButtons(MiniPlace(1f, 0f), 413f, 248f, MINI_WIDTH, MINI_HEIGHT)
+        assertTrue(place.x in 0f..1f && place.y in 0f..1f)
+        // No room for it at all: as it was.
+        assertEquals(MiniPlace(1f, 0f), MiniPlace.clearOfButtons(MiniPlace(1f, 0f), 200f, 50f, MINI_WIDTH, MINI_HEIGHT))
     }
 }

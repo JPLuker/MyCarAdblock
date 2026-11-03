@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -234,8 +235,12 @@ internal fun rememberAllEntries(): List<Entry> {
             (entries.any { it.media?.component?.let(Xonos::isInside) == true } != xonos || LauncherCache.xonosOn != xonosOn)
         if (entries == null || stale) withContext(Dispatchers.IO) { LauncherCache.load(context, force = stale) }
     }
-    return remember(installed, home.isComplete, planciaApp, webMusic) {
-        withPlancia(BuiltInApps.entries + installed.orEmpty(), home.isComplete && !planciaApp) + webMusic
+    // Plancia inside myCar giving way to the app, or set up or removed, a frame after a tap's focus has
+    // left its page, as its page goes with it (see CarUi and LeaveWithoutFocus.kt).
+    val view = LocalView.current
+    val planciaInside = afterFocusLeaves(home.isComplete && !planciaApp, holds = true) { view.dropInteropFocus() }
+    return remember(installed, planciaInside, webMusic) {
+        withPlancia(BuiltInApps.entries + installed.orEmpty(), planciaInside) + webMusic
     }
 }
 

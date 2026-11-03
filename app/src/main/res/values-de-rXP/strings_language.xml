@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">Mundart</string>
+    <string name="language_phone">Mundart des Telefons (%1$s)</string>
+    <string name="language_footer">myCar auf dem Telefon und auf dem Bordbildschirm sowie sein Bordpapagei in dieser Mundart.</string>
+    <string name="language_pirate_detail">Jeder Text von myCar in Piratensprache, in der Mundart oben. Unseren Kurs bestimmen wir selbst – und zum Teufel mit jeder Bevormundung, arrr!</string>
+</resources>

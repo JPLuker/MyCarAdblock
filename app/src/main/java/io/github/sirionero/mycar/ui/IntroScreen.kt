@@ -28,9 +28,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Icon
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -66,6 +66,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -83,17 +84,6 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.CompositionLocalProvider
-import io.github.sirionero.mycar.car.CarSettings
-import io.github.sirionero.mycar.car.theme.GsButton
-import io.github.sirionero.mycar.car.theme.GsIconButton
-import io.github.sirionero.mycar.car.theme.GsThemes
-import io.github.sirionero.mycar.car.theme.GsTone
-import io.github.sirionero.mycar.car.theme.LocalGsTheme
 import io.github.sirionero.mycar.car.AssistantLanguage
 import io.github.sirionero.mycar.speech.SpeechModels
 import io.github.sirionero.mycar.speech.VoiceLanguage
@@ -116,6 +106,13 @@ object Intro {
     private const val PREFS = "intro"
     private const val KEY_SEEN = "seen_release"
     private const val KEY_STEP = "step"
+    private const val KEY_STEP_RELEASE = "step_release"
+
+    /**
+     * Bugs found and fixed from the release before to this one (0.6.0 to 0.7.0), said on the welcome
+     * page: counted commit by commit, a doubtful one as a feature (the list is in the release notes).
+     */
+    const val BUGS_FIXED = 216
 
     /** "0.3" from "0.3.00-alpha": the intro belongs to a release, not to each patch. */
     val release: String = BuildConfig.VERSION_NAME.split('.').take(2).joinToString(".")
@@ -143,20 +140,30 @@ object Intro {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putString(KEY_SEEN, release)
             .remove(KEY_STEP)
+            .remove(KEY_STEP_RELEASE)
             .apply()
     }
 
     /** A replay from Settings starts at the first page. */
     fun replay(context: Context) {
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().remove(KEY_STEP).apply()
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().remove(KEY_STEP).remove(KEY_STEP_RELEASE).apply()
     }
 
-    /** The page the intro was on, so an app restart part-way through resumes there. */
-    internal fun savedStep(context: Context): String? =
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_STEP, null)
+    /**
+     * The page the intro was on, so an app restart part-way through resumes there. Only a page of
+     * this release's intro: one left half-way through an older intro (saved without its release
+     * before 0.7) would skip this one's first pages, so that starts at the top.
+     */
+    internal fun savedStep(context: Context): String? {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_STEP, null)?.takeIf { prefs.getString(KEY_STEP_RELEASE, null) == release }
+    }
 
     internal fun saveStep(context: Context, step: String) {
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY_STEP, step).apply()
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putString(KEY_STEP, step)
+            .putString(KEY_STEP_RELEASE, release)
+            .apply()
     }
 }
 
@@ -178,8 +185,12 @@ internal fun introColors(): IntroColors {
     )
 }
 
-/** In the order shown: what's new, what to pick, then housekeeping. */
-private enum class IntroStep { WELCOME, LANGUAGE, WIRELESS, KNOBS, VOICE, THEME, APPS, GRAPHENE }
+/**
+ * In the order shown: what's new since 0.6 (music inside myCar, the mini player, lyrics, the map's
+ * position, the car's settings on the phone), the voice download, then housekeeping. A name saved
+ * by an older intro that's gone from here just starts at the top (see [Intro.savedStep]).
+ */
+private enum class IntroStep { WELCOME, MUSIC, MINI_PLAYER, LYRICS, LOCATION, CAR_ON_PHONE, VOICE, GRAPHENE }
 
 private val Pop = CubicBezierEasing(0.3f, 1.6f, 0.5f, 1f)
 private val Rise = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)
@@ -217,15 +228,17 @@ fun IntroScreen(onDone: () -> Unit) {
         Box(Modifier.weight(1f).fillMaxWidth()) {
         when (step) {
             IntroStep.WELCOME -> Welcome(c, ::cq, ::cqSp, h)
-            IntroStep.LANGUAGE -> BadgeStep(c, ::cq, ::cqSp, c.primaryC, stringResource(R.string.intro_language_title),
-                stringResource(R.string.intro_language_body), step,
-                extra = { LanguagePicker(c, ::cq, ::cqSp, step) }) {
-                Icon(ImageVector.vectorResource(R.drawable.sym_language), contentDescription = null, tint = c.onPrimaryC, modifier = Modifier.fillMaxSize())
-            }
-            IntroStep.WIRELESS -> BadgeStep(c, ::cq, ::cqSp, c.secondaryC, stringResource(R.string.intro_wireless_title),
-                stringResource(R.string.intro_wireless_body), step) { WifiIcon(c.onSecondaryC) }
-            IntroStep.KNOBS -> BadgeStep(c, ::cq, ::cqSp, c.tertiaryC, stringResource(R.string.intro_knobs_title),
-                stringResource(R.string.intro_knobs_body), step) { DialIcon(c.onTertiaryC) }
+            IntroStep.MUSIC -> BadgeStep(c, ::cq, ::cqSp, c.tertiaryC, stringResource(R.string.intro_music_title),
+                stringResource(R.string.intro_music_body), step,
+                extra = { ServiceTicker(c, ::cq, ::cqSp, step) }) { DancingNoteIcon(c.onTertiaryC) }
+            IntroStep.MINI_PLAYER -> BadgeStep(c, ::cq, ::cqSp, c.secondaryC, stringResource(R.string.intro_mini_title),
+                stringResource(R.string.intro_mini_body), step) { MiniPlayerIcon(c.onSecondaryC, c.secondaryC) }
+            IntroStep.LYRICS -> BadgeStep(c, ::cq, ::cqSp, c.primaryC, stringResource(R.string.intro_lyrics_title),
+                stringResource(R.string.intro_lyrics_body), step) { LyricsIcon(c.onPrimaryC) }
+            IntroStep.LOCATION -> BadgeStep(c, ::cq, ::cqSp, c.tertiaryC, stringResource(R.string.intro_location_title),
+                stringResource(R.string.intro_location_body), step) { LocationIcon(c.onTertiaryC) }
+            IntroStep.CAR_ON_PHONE -> BadgeStep(c, ::cq, ::cqSp, c.secondaryC, stringResource(R.string.intro_phone_title),
+                stringResource(R.string.intro_phone_body), step) { PhoneSwitchesIcon(c.onSecondaryC, c.secondaryC) }
             IntroStep.VOICE -> VoiceStep(c, ::cq, ::cqSp, step)
             IntroStep.GRAPHENE -> BadgeStep(c, ::cq, ::cqSp, c.secondaryC, stringResource(R.string.intro_graphene_title),
                 stringResource(R.string.intro_graphene_body), step,
@@ -238,12 +251,6 @@ fun IntroScreen(onDone: () -> Unit) {
                 },
                 outlined = true,
             ) { ShieldIcon(c.onSecondaryC, c.secondaryC) }
-            IntroStep.APPS -> BadgeStep(c, ::cq, ::cqSp, c.secondaryC, stringResource(R.string.intro_apps_title),
-                stringResource(R.string.intro_apps_body), step,
-                extra = { AppPicks(c, ::cq, ::cqSp, step) }) { StarIcon(c.onSecondaryC) }
-            IntroStep.THEME -> BadgeStep(c, ::cq, ::cqSp, c.tertiaryC, stringResource(R.string.intro_theme_title),
-                stringResource(R.string.intro_theme_body), step,
-                extra = { ThemePicker(c, ::cq, ::cqSp, step) }) { ButtonsIcon(c.onTertiaryC) }
         }
         }
         // Above the three-button navigation bar, which covered Next and Start.
@@ -295,9 +302,17 @@ private fun Welcome(c: IntroColors, cq: (Float) -> Dp, cqSp: (Float) -> TextUnit
         // mast (see PirateShip), where the flag alone flew at the top before. As big as the phone
         // leaves room for above the welcome.
         val shipHeight = minOf(cq(74f), height * 0.5f)
-        PirateShip(key, c.onSurface, Modifier.align(Alignment.TopCenter).size(width = shipHeight / 0.74f, height = shipHeight))
+        // The words take the room they need at the foot; the ship what's left above them, up to its size:
+        // on a short phone it comes smaller instead of under the words.
+        Column(Modifier.fillMaxSize()) {
+        Box(Modifier.weight(1f).fillMaxWidth()) {
+            PirateShip(
+                key, c.onSurface,
+                Modifier.align(Alignment.TopCenter).heightIn(max = shipHeight).fillMaxHeight().aspectRatio(1f / 0.74f, matchHeightConstraintsFirst = true),
+            )
+        }
 
-        Column(Modifier.align(Alignment.BottomStart).padding(horizontal = cq(8f)).padding(bottom = height * 0.06f)) {
+        Column(Modifier.padding(horizontal = cq(8f)).padding(bottom = height * 0.06f)) {
             Text(stringResource(R.string.intro_welcome_to), color = c.onVariant, style = TextStyle(fontSize = cqSp(4.2f), fontWeight = FontWeight.SemiBold),
                 modifier = Modifier.up(entrance(key, 100), cq(7f)))
             Text(
@@ -311,6 +326,14 @@ private fun Welcome(c: IntroColors, cq: (Float) -> Dp, cqSp: (Float) -> TextUnit
                 modifier = Modifier.padding(top = cq(4f)).up(entrance(key, 700), cq(7f))
                     .clip(RoundedCornerShape(50)).background(c.tertiaryC).padding(horizontal = cq(4.4f), vertical = cq(2.2f)),
             )
+            // Once the ship is in: the motto by a compass, and the bugs fixed since the release before.
+            WelcomeCourse(
+                key, stringResource(R.string.intro_course),
+                Intro.BUGS_FIXED.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.intro_bugs_fixed, it, it) },
+                accent = c.primary, ink = c.onSurface, quiet = c.onVariant, cq = cq, cqSp = cqSp,
+                modifier = Modifier.padding(top = cq(4.5f)),
+            )
+        }
         }
 
         // Thrown from behind the version number, under the ship.
@@ -500,131 +523,6 @@ private fun CommandDrift(c: IntroColors, cq: (Float) -> Dp, cqSp: (Float) -> Tex
     }
 }
 
-/** Each kind of app with its picks, the first recommended most. */
-private val APP_PICKS = listOf(
-    R.string.intro_apps_maps to listOf(
-        "Organic Maps" to "https://github.com/organicmaps/organicmaps",
-        "Vela" to "https://github.com/PimpinPumpkin/Vela",
-    ),
-    R.string.intro_apps_music to listOf(
-        "ViVi Music" to "https://github.com/vivizzz007/vivi-music",
-        "Metrolist" to "https://github.com/MetrolistGroup/Metrolist",
-    ),
-    R.string.intro_apps_podcasts to listOf(
-        "AntennaPod" to "https://github.com/AntennaPod/AntennaPod",
-    ),
-)
-
-/** One row per kind, with a chip per app opening its GitHub page; the rows arrive one after another. */
-@Composable
-private fun AppPicks(c: IntroColors, cq: (Float) -> Dp, cqSp: (Float) -> TextUnit, key: IntroStep) {
-    val context = LocalContext.current
-    Column(Modifier.padding(top = cq(6f)), verticalArrangement = Arrangement.spacedBy(cq(2.6f))) {
-        APP_PICKS.forEachIndexed { i, (kind, apps) ->
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .up(entrance(key, 500 + i * 120, 700), cq(7f))
-                    .clip(RoundedCornerShape(cq(5f)))
-                    .background(c.secondaryC)
-                    .padding(horizontal = cq(4f), vertical = cq(3f)),
-            ) {
-                Text(stringResource(kind).uppercase(), color = c.onSecondaryC.copy(alpha = 0.7f),
-                    style = TextStyle(fontSize = cqSp(3.2f), fontWeight = FontWeight.Bold, letterSpacing = cqSp(0.3f)),
-                    modifier = Modifier.padding(start = cq(1f), bottom = cq(1.6f)))
-                Row(horizontalArrangement = Arrangement.spacedBy(cq(2f))) {
-                    apps.forEach { (name, url) ->
-                        Text(
-                            "$name ↗", color = c.onSecondaryC,
-                            style = TextStyle(fontSize = cqSp(4.4f), fontWeight = FontWeight.ExtraBold),
-                            maxLines = 1,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .border(BorderStroke(1.5.dp, c.onSecondaryC.copy(alpha = 0.35f)), RoundedCornerShape(50))
-                                .clickable {
-                                    runCatching {
-                                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                                    }
-                                }
-                                .padding(horizontal = cq(3.6f), vertical = cq(2f)),
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * The car's button styles side by side, each drawn in its own style, and a row of real car
- * controls below that redraws in whichever is picked. Picking saves it, so the car shows it too.
- */
-@Composable
-private fun ThemePicker(c: IntroColors, cq: (Float) -> Dp, cqSp: (Float) -> TextUnit, key: IntroStep) {
-    val chosenId by CarSettings.uiTheme.collectAsState()
-    val chosen = GsThemes.byId(chosenId)
-    // The default first.
-    val themes = listOf(GsThemes.default) + GsThemes.builtIn.filter { it != GsThemes.default }
-    Column(
-        Modifier.padding(top = cq(7f)).fillMaxWidth().up(entrance(key, 500, 700), cq(7f)),
-        verticalArrangement = Arrangement.spacedBy(cq(6f)),
-    ) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(cq(3f))) {
-            themes.forEach { theme ->
-                CompositionLocalProvider(LocalGsTheme provides theme) {
-                    GsButton(
-                        onClick = { CarSettings.setUiTheme(theme.id) },
-                        modifier = Modifier.weight(1f),
-                        tone = if (theme == chosen) GsTone.Primary else GsTone.Neutral,
-                        contentPadding = PaddingValues(horizontal = cq(1f), vertical = cq(3f)),
-                    ) {
-                        Text(
-                            if (theme == chosen) "✓ ${theme.shownName}" else theme.shownName,
-                            style = TextStyle(fontSize = cqSp(4.2f), fontWeight = FontWeight.Bold),
-                            maxLines = 1,
-                        )
-                    }
-                }
-            }
-        }
-        // What the car shows: the player's controls and a full-width action.
-        CompositionLocalProvider(LocalGsTheme provides chosen) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(cq(3f)),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                GsIconButton(Icons.Filled.Search, stringResource(R.string.intro_theme_search), onClick = {}, size = cq(15f), iconSize = cq(7f))
-                GsIconButton(Icons.Filled.PlayArrow, stringResource(R.string.intro_theme_play), onClick = {}, tone = GsTone.Primary, size = cq(15f), iconSize = cq(8f))
-                GsButton(
-                    onClick = {},
-                    modifier = Modifier.weight(1f).height(cq(15f)),
-                    tone = GsTone.Tonal,
-                ) { Text(stringResource(R.string.intro_theme_navigate), style = TextStyle(fontSize = cqSp(4.6f), fontWeight = FontWeight.Bold)) }
-            }
-        }
-    }
-}
-
-/** Three keys of a keypad, pressing one after another. */
-@Composable
-private fun ButtonsIcon(color: Color) {
-    val t by rememberInfiniteTransition(label = "keys").animateFloat(
-        0f, 3f, infiniteRepeatable(tween(2400, easing = LinearEasing)), label = "keys",
-    )
-    Canvas(Modifier.fillMaxSize()) {
-        inIconBox {
-            listOf(6f, 19f, 32f).forEachIndexed { i, x ->
-                // Each key dips for a moment while its turn comes round.
-                val dip = (1f - kotlin.math.abs(t - i - 0.5f) * 2f).coerceIn(0f, 1f) * 4f
-                drawRoundRect(color.copy(alpha = 0.45f), Offset(x, 16f + 4f), Size(10f, 16f),
-                    androidx.compose.ui.geometry.CornerRadius(3f))
-                drawRoundRect(color, Offset(x, 16f + dip), Size(10f, 16f), androidx.compose.ui.geometry.CornerRadius(3f))
-            }
-        }
-    }
-}
-
 /** Material's scalloped "cookie": a circle whose radius waves around its edge. */
 @Composable
 internal fun Cookie(color: Color, modifier: Modifier) {
@@ -646,7 +544,7 @@ internal fun Cookie(color: Color, modifier: Modifier) {
 }
 
 /** Draws in the mockup's 48-unit icon box. */
-private inline fun DrawScope.inIconBox(block: DrawScope.() -> Unit) {
+internal inline fun DrawScope.inIconBox(block: DrawScope.() -> Unit) {
     val s = size.minDimension / 48f
     scale(s, s, Offset.Zero) { block() }
 }
@@ -674,29 +572,6 @@ internal fun WifiIcon(color: Color) {
                     Offset(24f - r, cy - r), Size(2 * r, 2 * r), style = stroke)
             }
             drawCircle(color, 3.6f, Offset(24f, 41f))
-        }
-    }
-}
-
-@Composable
-private fun DialIcon(color: Color) {
-    val angle by rememberInfiniteTransition(label = "dial").animateFloat(
-        -70f, -70f,
-        infiniteRepeatable(keyframes {
-            durationMillis = 2600
-            -70f at 0 using CubicBezierEasing(0.5f, 0f, 0.3f, 1f)
-            70f at 1040
-            70f at 1430 using CubicBezierEasing(0.5f, 0f, 0.3f, 1f)
-            -70f at 2470
-        }),
-        label = "dial",
-    )
-    Canvas(Modifier.fillMaxSize()) {
-        inIconBox {
-            drawCircle(color, 19f, Offset(24f, 24f), style = Stroke(5f))
-            rotate(angle, Offset(24f, 24f)) {
-                drawRoundRect(color, Offset(21.5f, 7f), Size(5f, 13f), androidx.compose.ui.geometry.CornerRadius(2.5f))
-            }
         }
     }
 }

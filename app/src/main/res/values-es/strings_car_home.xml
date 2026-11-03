@@ -47,6 +47,7 @@
     <string name="car_mini_open_player">Abrir el reproductor</string>
     <string name="car_mini_hide">Ocultar el minirreproductor</string>
     <string name="car_mini_hidden_toast">Minirreproductor oculto durante este viaje. La canción del dock abre el reproductor.</string>
+    <string name="car_mini_hidden_toast_grid">Minirreproductor oculto durante este viaje. El botón al pie del dock recupera el reproductor desde la cuadrícula de apps.</string>
 
     <string name="car_map_starting">Iniciando %1$s…</string>
     <string name="car_map_starting_unknown">Iniciando el mapa…</string>
@@ -199,6 +200,7 @@
     <string name="car_wallpaper_graphite">Grafito</string>
     <string name="car_wallpaper_lava">Lava</string>
     <string name="car_wallpaper_polar">Polar</string>
+    <string name="car_wallpaper_mycar">myCar · Rebelde</string>
     <string name="car_wallpaper_waves">Olas</string>
     <string name="car_wallpaper_fireflies">Luciérnagas</string>
 

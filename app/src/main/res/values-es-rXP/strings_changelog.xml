@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="changelog_46">
+        <item>Tapada una vía de agua que cerraba myCar y cortaba la conexión: llegaba tras tocar la página de Plancia y pasar luego a la carta o a la flota, cuando la app Plancia ocupaba su lugar o al cambiar la pinta.</item>
+        <item>Habla pirata: en Aparejos &gt; Lengua, cada texto de myCar en jerga pirata, en tu lengua. Nuestro rumbo lo elegimos nosotros, sin rey ni amo. ¡Arrr!</item>
+        <item>Un nuevo horizonte en movimiento, myCar · Rebelde: las olas y un barco pirata que capea cada tormenta con su bandera de calavera.</item>
+        <item>Si myCar se cierra de repente, el siguiente inicio anota en el diario de a bordo por qué se cerró (un fallo, la memoria, sin respuesta), para poder corregirlo.</item>
+        <item>Los modelos de voz del loro se cargan de uno en uno, nunca después de acabar la travesía, y antes de la primera orden solo si sobra memoria.</item>
+        <item>Minigramola: en pantallas pequeñas aparece lejos de los botones de la carta, si la sueltas debajo de ellos se aparta lo justo, y los botones atenuados de la carta ya no se quedan con los toques destinados a la carta.</item>
+        <item>Versos: cada tonada empieza por su primera línea, y la versión en directo de otra tonada ya no trae sus versos.</item>
+        <item>Spotify y los demás servicios de música: «pon …» espera la página hasta 25 segundos, y un Play que seguía esperando no zarpa si mientras tanto has cambiado las tonadas.</item>
+        <item>Elegir la radio del barco detiene un vídeo o una radio en Cinema o en el navegador, y no vuelven a empezar solos. «Que suene al abordar» pone las tonadas solo cuando el sonido tiene rumbo hacia el barco.</item>
+        <item>Loro de a bordo: «siguiente», «pausa» o «para» dentro de una pregunta más larga ya no cambian la tonada; «no envíes» y «cancelar» se oyen mientras respondes un mensaje; una pausa justo antes de otra orden de música ya no la anula.</item>
+        <item>Nuevo botín espera a que acabe una llamada, y durante una llamada las cubiertas junto a la carta y su menú quedan debajo de la barra de la llamada.</item>
+        <item>Cambiar la lengua de myCar en plena travesía cambia al instante el timón; en Android 12 y 13, abrir myCar en plena travesía devuelve la posición a la carta.</item>
+    </string-array>
+</resources>

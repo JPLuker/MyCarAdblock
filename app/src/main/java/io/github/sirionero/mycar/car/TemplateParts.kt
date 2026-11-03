@@ -246,28 +246,30 @@ internal fun RightEdgeControls(
         animationSpec = androidx.compose.animation.core.tween(if (visible) 150 else 500),
         label = "mapControls",
     )
+    // Faded out, a touch on a button only wakes them; one on the room between them goes on to the map and
+    // to what lies over it there (the mini player, a card's rows). Over the whole column, it took those too.
+    val asleep = if (visible) Modifier else Modifier.pointerInput(Unit) {
+        awaitPointerEventScope {
+            while (true) {
+                awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
+            }
+        }
+    }
     Column(
         modifier
             .alpha(alpha)
-            .onFocusChanged { holdsFocus = it.hasFocus }
-            .let { base ->
-                if (visible) base else base.pointerInput(Unit) {
-                    awaitPointerEventScope {
-                        while (true) {
-                            awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
-                        }
-                    }
-                }
-            },
+            .onFocusChanged { holdsFocus = it.hasFocus },
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         if (actions.isNotEmpty()) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                actions.forEach { ActionButton(it) }
+            Row(asleep, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // On a narrow map (the player beside it at a large size) the button with words gives way,
+                // not the last one: squeezed in turn, the settings button ended up a sliver.
+                actions.forEach { ActionButton(it, modifier = if (it.title.text().isNotEmpty()) Modifier.weight(1f, fill = false) else Modifier) }
             }
         }
-        mapActions.forEach { ActionButton(it) }
+        mapActions.forEach { ActionButton(it, modifier = asleep) }
     }
 }
 
@@ -346,7 +348,7 @@ internal fun ActionButton(action: Action, large: Boolean = false, modifier: Modi
             ) {
                 if (hasGlyph) CarGlyph(action.icon, Modifier.size(24.dp), standardFor(action))
                 if (hasGlyph) Spacer(Modifier.width(8.dp))
-                Text(title, style = ChromeType.body, maxLines = 1)
+                Text(title, style = ChromeType.body, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialer_tab_contacts">Πλήρωμα</string>
+    <string name="dialer_loading_contacts">Φορτώνουμε το πλήρωμα…</string>
+    <string name="dialer_no_contacts">Κανείς από το πλήρωμα δεν έχει αριθμό τηλεφώνου.</string>
+    <string name="dialer_no_match">Κανείς από το πλήρωμα δεν ταιριάζει με «%1$s».</string>
+    <string name="dialer_search_contacts">Ξετρύπωμα στο πλήρωμα</string>
+    <string name="dialer_favourite">Στο σεντούκι</string>
+
+    <string name="recents_loading">Φορτώνουμε τις πρόσφατες κλήσεις…</string>
+    <string name="recents_empty">Ήσυχα νερά: καμία πρόσφατη κλήση.</string>
+
+    <plurals name="message_new_count">
+        <item quantity="one">%1$s · %2$d νέο μπουκάλι</item>
+        <item quantity="other">%1$s · %2$d νέα μπουκάλια</item>
+    </plurals>
+    <string name="message_listening">Αυτιά τσίτα</string>
+    <string name="message_sending_to">Το μπουκάλι φεύγει για %1$s</string>
+    <string name="message_sent_to">Το μπουκάλι σαλπάρισε για %1$s</string>
+    <string name="message_reply_failed">Η απάντηση ναυάγησε</string>
+
+    <string name="message_screen_title">Μπουκάλια</string>
+    <string name="message_empty">Κανένα πρόσφατο μπουκάλι. Τα νέα μπουκάλια του %1$s ξεβράζονται εδώ μόλις φτάνουν στο τηλέφωνο.</string>
+    <plurals name="message_earlier">
+        <item quantity="one">%d παλαιότερο μπουκάλι</item>
+        <item quantity="other">%d παλαιότερα μπουκάλια</item>
+    </plurals>
+    <string name="message_quick_replies_hide">Απαντήσεις στο αμπάρι</string>
+
+    <string name="message_test_channel">Δοκιμαστικά μπουκάλια</string>
+    <string name="message_test_late">Θα αργήσω δέκα λεπτά, μου κρατάς μια θέση στο κατάστρωμα;</string>
+    <string name="message_test_tonight">Θα ανέβεις τελικά στο καράβι απόψε;</string>
+    <string name="message_test_milk">Μπορείς να πάρεις γάλα στη ρότα για το λιμάνι;</string>
+    <string name="message_test_parked">Πάρε με τηλέφωνο όταν ρίξεις άγκυρα.</string>
+
+    <string name="notifications_title">Σινιάλα</string>
+    <string name="notifications_clear_all">Βύθιση όλων</string>
+    <string name="notifications_clear_confirm">Μάλιστα, βύθιση όλων</string>
+    <string name="notifications_empty">Μπουνάτσα: κανένα σινιάλο ακόμη. Οι νέες ειδοποιήσεις από το τηλέφωνο θα εμφανίζονται εδώ.</string>
+
+    <string name="assistant_needs_model">Προς το παρόν ο παπαγάλος καταλαβαίνει μόνο αγγλικά: για εντολές στα %1$s, κατεβάστε το %2$s από τα Ξάρτια του myCar στο τηλέφωνο.</string>
+    <string name="assistant_mic">Παπαγάλος</string>
+    <string name="assistant_phone_inline">ο παπαγάλος του τηλεφώνου</string>
+    <string name="assistant_start_failed">Δεν ξεκίνησε %1$s. Το myCar στήνει αυτί στη θέση του.</string>
+    <string name="assistant_listening_on_phone">Ο παπαγάλος ακούει στο τηλέφωνο</string>
+    <string name="assistant_app_listening_on_phone">Το %1$s στήνει αυτί στο τηλέφωνο</string>
+    <string name="assistant_picker_title">Παπαγάλος</string>
+    <string name="assistant_choice_phone">Παπαγάλος του τηλεφώνου</string>
+    <string name="assistant_picker_footer">Ο παπαγάλος του τηλεφώνου ξυπνά όπως με το σύρσιμο προς τα πάνω από μια κάτω γωνία της οθόνης του τηλεφώνου. Ένας άλλος παπαγάλος ακούει και απαντά στο τηλέφωνο, και η φωνή του φτάνει στο καράβι μόνο μέσω Bluetooth· με το τηλέφωνο κλειδωμένο, ξεκινά μόλις το ξεκλειδώσετε – ή, με ρυθμισμένο το Home Assistant στο myCar, ακούει το myCar στη θέση του και απαντά το Home Assistant. Ο παπαγάλος του ίδιου του myCar λειτουργεί χωρίς σύνδεση, με το τηλέφωνο κλειδωμένο ή όχι, και εμφανίζεται στην οθόνη του καραβιού· με ρυθμισμένο το Home Assistant, ό,τι δεν μπορεί να κάνει μόνος του πηγαίνει στον φωνητικό βοηθό του Home Assistant.</string>
+
+    <string name="bluetooth_hide">Στο αμπάρι</string>
+
+    <string name="cinema_continue">Ξανά στη ρότα: %1$s</string>
+    <string name="cinema_empty">Επιβιβάστε ιστότοπους βίντεο και λίστες TV στα Ξάρτια του myCar στο τηλέφωνο, στο Cinema.</string>
+    <string name="cinema_protected">Προστατευμένο βίντεο: μάλλον μαύρο σαν πίσσα</string>
+    <string name="cinema_back_page">Όπισθεν μία σελίδα</string>
+    <string name="cinema_back_10s">Όπισθεν 10 δευτερόλεπτα</string>
+    <string name="cinema_forward_10s">Πρόσω 10 δευτερόλεπτα</string>
+    <string name="cinema_error_stopped_early">Προσάραξε πριν από το τέλος: ελέγξτε τη σύνδεση του τηλεφώνου.</string>
+    <string name="cinema_error_channel_stopped">Το κανάλι έριξε άγκυρα.</string>
+    <string name="cinema_error_unreachable">Δεν φτάσαμε ως εκείνες τις ακτές: ελέγξτε τη σύνδεση του τηλεφώνου.</string>
+    <string name="cinema_error_timeout">Δεν απάντησε εγκαίρως στο κάλεσμά μας.</string>
+    <string name="cinema_error_player_died">Το πρόγραμμα αναπαραγωγής του τηλεφώνου ναυάγησε.</string>
+    <string name="cinema_videos_none_picked">Δεν έχουν επιλεγεί βίντεο για το myCar. Στο τηλέφωνο, στα Ξάρτια του myCar στο Cinema, επιλέξτε ποια μπορεί να βλέπει.</string>
+    <string name="cinema_videos_none">Άδειο αμπάρι: κανένα βίντεο σε αυτό το τηλέφωνο.</string>
+    <string name="cinema_find_channel">Ξετρύπωμα καναλιού</string>
+    <string name="cinema_reload_list">Νέο φόρτωμα της λίστας</string>
+    <string name="cinema_tv_old_channels">%1$s Εμφανίζονται τα κανάλια του προηγούμενου φορτώματος.</string>
+    <string name="cinema_tv_found">Κανάλια που ξετρυπώσαμε με «%1$s»: %2$d</string>
+    <string name="cinema_tv_no_channels">Ούτε ένα κανάλι σε αυτή τη λίστα, καπετάνιε.</string>
+    <string name="cinema_tv_refused">Ο διακομιστής της λίστας είπε «αρνητικό» (%1$d).</string>
+    <string name="cinema_tv_too_big">Η λίστα είναι πολύ μεγάλη για το καράβι (πάνω από %1$d MB).</string>
+    <string name="cinema_tv_unknown_host">Το %1$s δεν ξετρυπώθηκε πουθενά: ελέγξτε τη διεύθυνση ή τη σύνδεση του τηλεφώνου.</string>
+    <string name="cinema_tv_no_answer">Το %1$s δεν απάντησε στο κάλεσμά μας.</string>
+    <string name="cinema_tv_failed">Η λίστα δεν ανέβηκε στο καράβι: %1$s</string>
+
+    <string name="plancia_set_up_title">Ξαρτίστε το Plancia στο τηλέφωνο</string>
+    <string name="plancia_set_up_text">Στο myCar στο τηλέφωνο: Ξάρτια και μετά Plancia – η διεύθυνση του Home Assistant σας και ένα διακριτικό.</string>
+    <string name="plancia_connecting">Πλεύση προς το Home Assistant</string>
+    <string name="plancia_reload">Νέο φόρτωμα του πίνακα</string>
+
+</resources>

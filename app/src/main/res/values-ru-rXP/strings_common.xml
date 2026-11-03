@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_done">Добро</string>
+    <string name="common_delete">Затопить</string>
+    <string name="common_next">Вперёд</string>
+    <string name="common_settings">Такелаж</string>
+</resources>

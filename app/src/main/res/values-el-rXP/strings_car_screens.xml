@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_settings_open_on_connect">Άνοιγμα στο ρεσάλτο</string>
+    <string name="car_settings_open_home">Λιμάνι</string>
+    <string name="car_settings_size">Τονάζ</string>
+    <string name="car_settings_player_size">Τονάζ του γραμμοφώνου δίπλα στον χάρτη</string>
+    <string name="car_settings_mini_player">Μικρό γραμμόφωνο πάνω από όλο τον χάρτη</string>
+    <string name="car_settings_mini_player_detail">Όταν το γραμμόφωνο δίπλα στον χάρτη είναι κλειστό, ένα μικρό γραμμόφωνο επιπλέει πάνω από τον χάρτη. Κρατήστε το πατημένο και σύρετέ το για να το μετακινήσετε.</string>
+    <string name="car_settings_hidden_apps">Λαθρεπιβάτες</string>
+    <string name="car_settings_hidden_apps_none">Κανένας λαθρεπιβάτης στο καράβι. Για να κρύψετε μια εφαρμογή, κρατήστε την πατημένη στον στόλο και επιλέξτε «Στο αμπάρι, εκτός στόλου».</string>
+    <string name="car_settings_hidden_apps_show">Στο φως</string>
+    <string name="car_settings_app_theme">Θέμα του καραβιού</string>
+    <string name="car_settings_autoplay">Αυτόματη αναπαραγωγή στο ρεσάλτο</string>
+    <string name="car_settings_car_audio">Ήχος στο καράβι</string>
+    <string name="car_settings_car_audio_note">Το «Μέσω του myCar» στέλνει τον ήχο του τηλεφώνου από τη σύνδεση του ίδιου του myCar, το καλώδιο ή το Wi-Fi, όπως το Android Auto. Το Android ζητά κοινή χρήση της οθόνης σας σε κάθε ταξίδι, και λίγες εφαρμογές το εμποδίζουν. Το Bluetooth παίζει όπως θα έπαιζε κανονικά το τηλέφωνο και το Android δεν ρωτά ποτέ, αλλά μερικά καράβια δέχονται από εκεί μόνο κλήσεις. Το «Αυτόματα» χρησιμοποιεί το Bluetooth όταν το καράβι παίρνει έτσι τους σκοπούς του τηλεφώνου, και τη σύνδεση του myCar όταν δεν τους παίρνει.</string>
+    <string name="car_settings_spoken_directions">Η ρότα φωναχτά</string>
+    <string name="car_settings_spoken_directions_note">Το myCar διαβάζει δυνατά κάθε στροφή από τα ηχεία του καραβιού, και οι σκοποί χαμηλώνουν όσο μιλά. Απενεργοποιήστε το αν η φωνή της εφαρμογής χαρτών σας ακούγεται ήδη στο καράβι.</string>
+    <string name="car_settings_system_speech_note">Ο παπαγάλος ακούει μέσω της υπηρεσίας ομιλίας του ίδιου του τηλεφώνου αντί για αυτή του myCar. Στα περισσότερα τηλέφωνα είναι αυτή της Google, που μπορεί να στέλνει τη φωνή σας στη Google. Το GrapheneOS δεν έχει καμία, οπότε το myCar συνεχίζει με τη δική του.</string>
+    <string name="car_settings_experimental">Αχαρτογράφητα νερά</string>
+    <string name="car_settings_experimental_hide">Στο αμπάρι</string>
+    <string name="car_settings_experimental_show">Στο φως</string>
+    <string name="car_settings_vehicle_data_note">Προσθέτει το πλακίδιο «Όργανα»: μια ζωντανή, ακατέργαστη εικόνα του καναλιού αισθητήρων της μονάδας πολυμέσων. Οι ετικέτες των πεδίων (ταχύτητα, στροφές, καύσιμο…) προέρχονται από άλλα έργα αντίστροφης μηχανικής και δεν έχουν επαληθευτεί σε αυτό το καράβι – θεωρήστε τες εικασία, όχι γεγονός, μέχρι να δείτε με τα μάτια σας κάποια να αλλάζει.</string>
+    <string name="car_settings_connection">Ρεσάλτο</string>
+    <string name="car_settings_info_vehicle">Καράβι</string>
+    <string name="car_settings_unknown_vehicle">Άγνωστο καράβι</string>
+    <string name="car_settings_about">Σημαία</string>
+    <string name="car_settings_whats_new_after_updates">Νέα λάφυρα μετά από ενημερώσεις</string>
+    <string name="car_settings_whats_new_after_updates_note">Δείχνει τη λίστα με τα νέα λάφυρα μία φορά, την πρώτη φορά που γίνεται ρεσάλτο μετά από μια ενημέρωση.</string>
+    <string name="car_settings_whats_new">Νέα λάφυρα</string>
+    <string name="car_settings_web_page_default">DuckDuckGo (προεπιλογή) – πατήστε για να βάλετε πλώρη για άλλη σελίδα</string>
+    <string name="car_settings_web_page_note">Τη δείχνει η εφαρμογή Περιηγητής από την επόμενη φορά που θα ανοίξει, και ένας περιηγητής στις καμπίνες σας από το επόμενο ταξίδι.</string>
+    <string name="car_settings_screen_fit">Προσαρμογή οθόνης καραβιού</string>
+    <string name="car_settings_save_failed">Η αποθήκευση ναυάγησε</string>
+    <string name="car_settings_save_for_vehicle">Αποθήκευση για αυτό το καράβι</string>
+    <string name="car_settings_no_vehicle_profile">Κανένα προφίλ για αυτό το καράβι</string>
+
+    <string name="car_whatsnew_title">Νέα λάφυρα της %1$s</string>
+    <string name="car_whatsnew_show_after_updates">Στο φως μετά από ενημερώσεις</string>
+    <string name="car_whatsnew_got_it">Ελήφθη</string>
+
+    <string name="car_keyboard_hide">Πληκτρολόγιο στο αμπάρι</string>
+    <string name="car_clipboard_copied">Αντιγράφηκε στο τηλέφωνο, καπετάνιε.</string>
+    <string name="car_clipboard_nothing">Δεν υπάρχει τίποτα για αντιγραφή, καπετάνιε.</string>
+    <string name="car_clipboard_empty">Το πρόχειρο του τηλεφώνου δεν έχει κείμενο, καπετάνιε.</string>
+
+    <string name="car_player_previous">Προηγούμενος σκοπός</string>
+    <string name="car_player_next">Επόμενος σκοπός</string>
+    <string name="car_player_like">Στο σεντούκι</string>
+    <string name="car_player_unlike">Έξω από το σεντούκι</string>
+    <string name="car_player_shuffle_on">Ενεργοποίηση τυχαίας ρότας</string>
+    <string name="car_player_shuffle_off">Απενεργοποίηση τυχαίας ρότας</string>
+    <string name="car_player_lyrics">Λόγια</string>
+    <string name="car_player_close">Κλείσιμο του γραμμοφώνου</string>
+
+    <string name="car_media_tab_now_playing">Στο γραμμόφωνο</string>
+    <string name="car_media_tab_browse">Εξερεύνηση</string>
+    <string name="car_media_tab_queue">Στον ορίζοντα</string>
+    <string name="car_media_nothing_playing">Σιωπή στο γραμμόφωνο</string>
+    <string name="car_media_connecting">Ρεσάλτο στο %1$s…</string>
+    <string name="car_media_library_closed">Το %1$s κρατά τη βιβλιοθήκη του κλειδωμένη στο αμπάρι του.</string>
+    <string name="car_media_needs_notification_access">Το myCar μπορεί πάντως να το κουμαντάρει, αν αποκτήσει πρόσβαση σε ειδοποιήσεις στο τηλέφωνο. Επιτρέψτε την στις Ρυθμίσεις > Ειδοποιήσεις > Πρόσβαση σε ειδοποιήσεις.</string>
+    <string name="car_media_library_closed_detail">Ξεκινήστε τους σκοπούς από την εφαρμογή στο τηλέφωνό σας. Αναπαραγωγή, παύση, παράλειψη και μετακίνηση λειτουργούν από εδώ.</string>
+    <string name="car_media_not_running">Το %1$s είναι αγκυροβολημένο: δεν εκτελείται.</string>
+    <string name="car_media_not_running_detail">Το %1$s παίζει μέσω του γραμμοφώνου του myCar, αλλά μόνο όσο είναι ανοιχτό στο τηλέφωνο. Ανοίξτε το μία φορά και θα συνεχίσει να παίζει εδώ στο καράβι.</string>
+    <string name="car_media_refused">Το %1$s δεν άφησε το myCar να το εξερευνήσει.</string>
+    <string name="car_media_refused_detail">Μερικές εφαρμογές πολυμέσων δέχονται μόνο το host της ίδιας της Google. Ανοίξτε την εφαρμογή στο τηλέφωνο και το myCar μπορεί πάντως να παίζει τους σκοπούς της, να κάνει παύση και να τους προσπερνά.</string>
+    <string name="car_media_keeps_closing">Το %1$s ναυαγεί συνεχώς στο τηλέφωνο.</string>
+    <string name="car_media_keeps_closing_detail">Ναυάγησε δύο φορές μέσα σε ένα λεπτό, οπότε το myCar σταμάτησε να του ξανακάνει ρεσάλτο.</string>
+    <string name="car_media_list_failed">Δεν ήταν δυνατή η φόρτωση αυτής της λίστας στο καράβι.</string>
+    <string name="car_media_list_empty">Εδώ δεν υπάρχει ούτε ένα φλουρί.</string>
+    <string name="car_media_queue_empty">Τίποτα στον ορίζοντα.</string>
+    <string name="car_media_queue_empty_idle">Σιωπή στο γραμμόφωνο – δεν λένε όλες οι εφαρμογές στο myCar τι έρχεται στον ορίζοντα.</string>
+    <string name="car_media_queue_empty_playing">Μόνο ό,τι παίζει ήδη – δεν λένε όλες οι εφαρμογές στο myCar τι έρχεται στον ορίζοντα.</string>
+    <string name="car_media_search_app">Ξετρύπωμα στο %1$s</string>
+    <string name="car_media_search_hint">Πληκτρολογήστε σκοπό, καλλιτέχνη, άλμπουμ ή λίστα αναπαραγωγής.</string>
+    <string name="car_media_search_no_list">Το %1$s δεν μπορεί να δείξει αποτελέσματα. Πατήστε το πλήκτρο αναζήτησης και το %1$s θα διαλέξει τον σκοπό.</string>
+    <string name="car_media_search_unsupported">Το %1$s δεν αφήνει ξετρύπωμα από το καράβι.</string>
+    <string name="car_media_searching">Ξετρύπωμα στο %1$s…</string>
+    <string name="car_media_search_nothing">Το %1$s δεν ξετρύπωσε τίποτα για «%2$s».</string>
+    <string name="car_media_search_running">Ξετρύπωμα για «%2$s» στο %1$s…</string>
+    <string name="car_media_search_ignored">Το %1$s δεν έπαιξε ούτε νότα για «%2$s».</string>
+
+    <string name="car_lyrics_looking">Ξετρυπώνουμε τα λόγια…</string>
+    <string name="car_lyrics_nothing_playing">Σιωπή στο γραμμόφωνο.</string>
+    <string name="car_lyrics_none">Δεν υπάρχουν ακόμη λόγια για αυτόν τον σκοπό.</string>
+    <string name="car_lyrics_none_detail">Τα λόγια έρχονται από το LRCLIB, ένα ελεύθερο αρχείο που γράφουν οι ακροατές: δεν υπάρχουν ακόμη όλοι οι σκοποί.</string>
+    <string name="car_lyrics_instrumental">Ορχηστρικός σκοπός</string>
+    <string name="car_lyrics_instrumental_detail">Αυτός ο σκοπός δεν έχει λόγια: σφυρίξτε τον ελεύθερα!</string>
+    <string name="car_lyrics_unreachable">Δεν ήταν δυνατή η πρόσβαση στα λόγια.</string>
+
+    <string name="car_vehicle_title">Όργανα του καραβιού</string>
+    <string name="car_vehicle_intro">Ακατέργαστο κανάλι αισθητήρων από τη συνδεδεμένη μονάδα πολυμέσων. Η σημασία των πεδίων είναι μια εκτίμηση – δείτε μια γραμμή να αλλάζει την ώρα που κάνετε την αντίστοιχη μανούβρα (φρένο, οδήγηση, φώτα) για να την επιβεβαιώσετε.</string>
+    <string name="car_sensor_numbered">Όργανο #%1$d</string>
+
+    <string name="car_web_select_title">Διαλέξτε εσείς</string>
+    <string name="car_player_sound_bluetooth">Ήχος μέσω Bluetooth. Πατήστε για να αλλάξει ρότα και να περνά από το myCar</string>
+    <string name="car_player_sound_mycar">Ήχος μέσω myCar. Πατήστε για να αλλάξει ρότα και να πηγαίνει μέσω Bluetooth</string>
+    <string name="car_player_sound_now_mycar">Ο ήχος περνά τώρα από το myCar, για αυτό το καράβι</string>
+    <string name="car_player_sound_now_bluetooth">Ο ήχος πηγαίνει τώρα μέσω Bluetooth, για αυτό το καράβι</string>
+</resources>

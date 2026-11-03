@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_ui_safety_attention">驾驶时切勿操作此屏幕。出发前设置好航线或歌曲，然后专注路况。</string>
+    <string name="car_ui_app_wont_start">%1$s 暂时还没法随 myCar 出航。</string>
+    <string name="car_ui_app_wont_start_unknown">此应用暂时还没法随 myCar 出航。</string>
+    <string name="car_ui_app_wont_start_detail">它没能离港。有些应用只在 Google 的 Android Auto 上航行。</string>
+    <string name="car_ui_search_ignored">%1$s 没为“%2$s”唱出一个音符</string>
+    <string name="car_ui_search_ignored_no_app">船歌应用没为“%1$s”唱出一个音符</string>
+    <string name="car_ui_link_opens_app">此链接会驶向手机上的一个应用</string>
+
+    <string name="car_dock_dashboard">瞭望台</string>
+    <string name="car_dock_map">海图</string>
+    <string name="car_dock_now_playing">正在高歌</string>
+    <string name="car_dock_assistant">随船鹦鹉</string>
+    <string name="car_dock_all_apps">整支船队</string>
+    <string name="car_dock_map_and_music">海图和船歌</string>
+
+    <string name="car_apps_exit">弃船</string>
+    <string name="car_apps_partial">只能部分随 myCar 出航</string>
+    <string name="car_apps_broken">无法随 myCar 出航</string>
+    <string name="car_apps_pin">钉上桅杆</string>
+    <string name="car_apps_unpin">从桅杆取下</string>
+    <plurals name="car_apps_dock_full">
+        <item quantity="other">桅杆已满（已钉上 %1$d 个）</item>
+    </plurals>
+    <string name="car_apps_move_left">移向左舷</string>
+    <string name="car_apps_move_right">移向右舷</string>
+    <string name="car_apps_reset_order">重置船队顺序</string>
+    <string name="car_apps_hide_from_grid">从船队中藏起</string>
+    <string name="car_apps_show_on_grid">在船队中显示</string>
+    <string name="car_apps_hidden_toast">已藏起：%1$s。可在“舵轮”&gt;“舱底的应用”中把它捞回来。</string>
+    <string name="car_web_music_elsewhere">%1$s 正在另一台设备上高歌，而不是在船上</string>
+    <string name="car_mini_open_player">打开船歌匣</string>
+    <string name="car_mini_hide">藏起小船歌匣</string>
+    <string name="car_mini_hidden_toast">本次航程已藏起小船歌匣。点按桅杆上的船歌可打开船歌匣。</string>
+    <string name="car_mini_hidden_toast_grid">本次航程已藏起小船歌匣。在船队中点按桅杆底部的按钮，即可让船歌匣回来。</string>
+
+    <string name="car_map_starting">%1$s 正在起锚…</string>
+    <string name="car_map_starting_unknown">正在展开海图…</string>
+    <string name="car_map_failed_unknown">海图应用没能起航。</string>
+    <string name="car_map_choose_another">选其他海图应用</string>
+    <string name="car_map_none_installed">船上没有海图应用。</string>
+    <string name="car_map_none_installed_detail">安装一个支持 Android Auto 的导航应用，它就会自己在这里扬帆起航。</string>
+    <string name="car_map_stopped">海图已收起。</string>
+    <string name="car_map_reopen">重新展开</string>
+    <string name="car_map_car_apps">船载应用</string>
+    <string name="car_map_choose">选一个海图应用。</string>
+    <string name="car_home_hide_lyrics">收起唱词</string>
+    <string name="car_home_app_failed">%1$s 没能起航。</string>
+
+    <string name="car_side_close_player">关闭船歌匣</string>
+    <string name="car_side_title">海图旁显示</string>
+    <string name="car_side_music">船歌</string>
+    <string name="car_side_explained">选“船歌”时，开唱期间船歌匣会显示在海图旁。选应用时，它会一直显示在海图旁；你可以在本次航程中关闭它，之后在船队中点按桅杆底部的按钮就能让它回来。</string>
+
+    <string name="car_pages_nothing_yet">甲板还空着</string>
+    <string name="car_pages_tap_to_choose">点按以选择这里要装载的内容</string>
+    <string name="car_pages_app_gone">此应用已落水：手机上已经没有它了。点按以选择其他内容。</string>
+    <string name="car_pages_dot_map">海图</string>
+    <string name="car_pages_dot_page">第 %1$d 层甲板</string>
+    <string name="car_pages_change">改造这层甲板</string>
+    <string name="car_pages_move_left">移向左舷</string>
+    <string name="car_pages_move_right">移向右舷</string>
+    <string name="car_pages_add">添一层甲板</string>
+    <string name="car_pages_delete">拆掉这层甲板</string>
+    <string name="car_pages_delete_confirm">确认拆掉</string>
+    <string name="car_pages_one_app">一层甲板一次只能运行一个船载应用：这层甲板上已有 %1$s。</string>
+    <string name="car_pages_layout">甲板布局</string>
+    <string name="car_pages_layout_now">甲板布局：%1$s</string>
+    <string name="car_pages_layout_full">整层甲板</string>
+    <string name="car_pages_layout_map">海图</string>
+    <string name="car_pages_layout_keeps">甲板上的内容会按原来的顺序保留，直到新布局放不下为止。</string>
+    <string name="car_pages_settings_title">海图旁的甲板</string>
+    <string name="car_pages_settings_explained">在母港上左右滑动，或点按底部的圆点，即可查看你的甲板：天气、日程、浏览器，或 Plancia 等船载应用，可整层、两半、四格或混合排列。圆点旁的铅笔可以改造眼前这层甲板。</string>
+    <string name="car_pages_replace">替换我的甲板</string>
+    <string name="car_pages_ready_made">现成的甲板</string>
+
+    <string name="car_dashboard_weather_loading">正在观察天色…</string>
+    <string name="car_dashboard_coming_up">即将驶来</string>
+    <string name="car_dashboard_allow_calendar">在手机上允许 myCar 访问日历，即可查看即将驶来的日程。</string>
+    <string name="car_dashboard_calendar_loading">正在展开日历…</string>
+    <string name="car_dashboard_nothing_coming">风平浪静：未来一周没有日程。</string>
+
+    <string name="car_weather_loading">正在观察天色…</string>
+    <string name="car_weather_waiting_fix">正在等待测定船位。</string>
+
+    <string name="car_template_car_app">船载应用</string>
+    <string name="car_template_waiting">正在等应用起锚</string>
+    <string name="car_template_finding_route">正在规划航线…</string>
+    <string name="car_template_finding_routes">正在规划多条航线…</string>
+    <string name="car_template_search">搜寻</string>
+    <string name="car_template_nothing_playing">暂未开唱。</string>
+    <string name="car_template_start">起航</string>
+
+    <string name="car_host_service_disconnected">应用的服务已解缆离船</string>
+    <string name="car_host_refused_bind">应用拒绝绑定——主机不得登船</string>
+    <string name="car_host_would_not_connect">应用不让 myCar 登船</string>
+    <string name="car_host_needs_permission">它只肯跟 Google 自己的 Android Auto 航行：它的服务需要 %1$s 权限，而 myCar 无法获得这项权限。</string>
+    <string name="car_host_only_android_auto">它只肯跟 Google 自己的 Android Auto 主机航行。</string>
+    <string name="car_host_not_allowed">它只让自己允许列表中的主机登船（Google 的 Android Auto 和少数其他主机），而 myCar 不在其中。</string>
+    <string name="car_host_no_answer">它没有回应 myCar 的呼喊。为较新版本 Android Auto 开发的应用只在 Google 的 Android Auto 上航行。</string>
+    <string name="car_host_rejected_at">它在 %1$s 步骤拒绝让 myCar 作为主机登船：%2$s</string>
+    <string name="car_host_location_notification">myCar 正在与车载海图共享位置信息</string>
+    <string name="car_map_no_position_title">海图上没有你的位置</string>
+
+    <string name="car_wallpaper_still">风平浪静</string>
+    <string name="car_wallpaper_moving">扬帆航行</string>
+    <string name="car_wallpaper_sunset">海上日落</string>
+    <string name="car_wallpaper_ocean">公海</string>
+    <string name="car_wallpaper_graphite">炮铜</string>
+</resources>

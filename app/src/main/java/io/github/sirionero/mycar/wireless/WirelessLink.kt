@@ -18,6 +18,7 @@ import android.os.Looper
 import android.os.PowerManager
 import android.os.SystemClock
 import android.provider.Settings
+import io.github.sirionero.mycar.BuildConfig
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.Protobuf
 import io.github.sirionero.mycar.R
@@ -186,10 +187,21 @@ object WirelessLink {
         runCatching { awake?.takeIf { it.isHeld }?.release() }
     }
 
-    private fun holdService(context: Context) {
+    /**
+     * Takes the drive's service for start-up [mine]; false if that start-up is over already. With
+     * [stop] under one lock: a stop as the channel opened or the Wi-Fi was asked for gave the service
+     * back, and the start-up then took it again, for good - the phone kept awake, "Connecting…" on
+     * Home, and every arrival of the car taken for a drive under way.
+     */
+    private fun holdService(context: Context, mine: Int): Boolean = synchronized(serviceLock) {
+        if (mine != startRun) return false
         ownsService = true
         io.github.sirionero.mycar.SessionService.start(context, wireless = true, holder = io.github.sirionero.mycar.SessionService.STARTUP)
+        true
     }
+
+    /** Guards [holdService] against [stop]. */
+    private val serviceLock = Any()
 
     /** A start-up that never got to a drive gives the drive's service back; a drive gives it back as it ends. */
     private fun giveBackService(context: Context) {
@@ -448,7 +460,8 @@ object WirelessLink {
      * Android Auto service no longer takes the car from Android Auto. A drive that's up stays.
      */
     fun stopUnlessDriving(context: Context) {
-        if (tcp != null || (!busy && network == null)) return
+        // A start-over waiting its 3 s is a start-up too: left alone it started again regardless.
+        if (tcp != null || (!busy && network == null && !startingOver)) return
         log.i("myCar turned off - the wireless start-up stops")
         stop(context)
     }
@@ -467,9 +480,12 @@ object WirelessLink {
      */
     fun stop(context: Context, say: Boolean = true) {
         tcpRun++
-        startRun++
+        // With the service: a start-up taking it right now either sees itself stopped or gives it back here.
+        synchronized(serviceLock) {
+            startRun++
+            giveBackService(context)
+        }
         againFor = null
-        giveBackService(context)
         sleepAgain()
         val starting = worker != null && SessionStatus.state.value.phase == SessionStatus.Phase.CONNECTING
         worker?.interrupt()
@@ -500,7 +516,8 @@ object WirelessLink {
     @SuppressLint("MissingPermission")
     private fun run(context: Context, device: BluetoothDevice, mine: Int, byItself: Boolean) {
         val name = name(device)
-        log.i("--- wireless start-up with $name (${device.address}) ---")
+        // The car's Bluetooth address only in the debug build: logs get shared, in public too.
+        log.i("--- wireless start-up with $name (${if (BuildConfig.DEBUG) device.address else "…" + device.address.takeLast(5)}) ---")
         if (!quiet) SessionStatus.connecting(R.string.wireless_link_bt_reaching, name)
         val listenMs = when {
             quiet -> AGAIN_LISTEN_MS
@@ -556,9 +573,14 @@ object WirelessLink {
         // The car's Wi-Fi is handed only to an app in front or with a foreground service. With the
         // phone in a pocket - connecting by itself, or after a stop - the screen isn't in front, and
         // the drive's service only came once the picture was up: the join was refused.
-        holdService(context)
+        if (!holdService(context, mine)) {
+            log.i("Bluetooth: stopped as the channel opened - closing it")
+            runCatching { socket.close() }
+            if (rfcomm === socket) rfcomm = null
+            return
+        }
         log.i("Bluetooth: channel open")
-        SessionStatus.connecting(R.string.wireless_link_bt_talking, name)
+        if (mine == startRun) SessionStatus.connecting(R.string.wireless_link_bt_talking, name)
         // A car whose Android Auto isn't ready yet can take the channel and say nothing: the start-up
         // stayed on "talking to the car" for good, holding the drive's service, and every arrival of
         // the car after it was taken for a drive under way. Closed, it starts over (channelEnded).
@@ -596,7 +618,9 @@ object WirelessLink {
                             Protobuf.varint(((6 shl 3) or 2).toLong()) + Protobuf.varint(ids.size.toLong()) + ids
                         send(output, MSG_VERSION_RESPONSE, reply)
                         log.i("-> VersionResponse")
-                        log.hex("   reply", reply)
+                        // With the phone's id (its serial, twice) only in the debug build: logs get shared.
+                        if (BuildConfig.DEBUG) log.hex("   reply", reply)
+                        else log.i("   reply: version ${Wire.varint(f, 1) ?: 1}.${Wire.varint(f, 2) ?: 0}, status $STATUS_SUCCESS (the phone's id left out)")
                     }
                     MSG_START_REQUEST -> {
                         val f = Wire.fields(body)
@@ -620,7 +644,15 @@ object WirelessLink {
                         val password = text(2)
                         val bssid = text(3)
                         val security = Wire.varint(f, 4) ?: -1
-                        log.i("<- InfoResponse: ssid=\"$ssid\" bssid=$bssid security=$security password=${if (password.isEmpty()) "none" else "(${password.length} chars)"}")
+                        // The car's Wi-Fi address (BSSID) only in the debug build: logs get shared, and it
+                        // places the car on maps of networks. Whether there's one is what setBssid needs.
+                        val shownBssid = when {
+                            BuildConfig.DEBUG -> bssid
+                            bssid.isEmpty() -> "none"
+                            bssid == "00:00:00:00:00:00" -> "zeros"
+                            else -> "(set)"
+                        }
+                        log.i("<- InfoResponse: ssid=\"$ssid\" bssid=$shownBssid security=$security password=${if (password.isEmpty()) "none" else "(${password.length} chars)"}")
                         // ZLink head units send the Wi-Fi details again once the stream is up. Asking
                         // Android for the network again releases the one carrying the stream, which
                         // aborts it a second in; a phone running Android Auto carries on. A car
@@ -794,7 +826,7 @@ object WirelessLink {
             runCatching { rfcomm?.close() }
             return
         }
-        SessionStatus.connecting(R.string.wireless_link_wifi_joining, name)
+        if (mine == startRun) SessionStatus.connecting(R.string.wireless_link_wifi_joining, name)
         val spec = WifiNetworkSpecifier.Builder().setSsid(ssid).apply {
             runCatching { MacAddress.fromString(bssid) }.getOrNull()
                 ?.takeIf { it != MacAddress.fromString("00:00:00:00:00:00") }
@@ -864,7 +896,7 @@ object WirelessLink {
         }
         // In the foreground for the request (see [run]): the service started with the channel, given
         // a moment to be up.
-        holdService(context)
+        if (!holdService(context, mine)) return
         val until = System.currentTimeMillis() + 3_000
         while (!io.github.sirionero.mycar.SessionService.running && System.currentTimeMillis() < until) {
             try {

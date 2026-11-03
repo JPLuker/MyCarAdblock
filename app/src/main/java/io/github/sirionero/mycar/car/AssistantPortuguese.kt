@@ -1,6 +1,5 @@
 package io.github.sirionero.mycar.car
 
-import java.util.Locale
 
 /**
  * The assistant in Portuguese (see [AssistantLanguage]), for Brazil and Portugal alike: it hears
@@ -102,6 +101,11 @@ internal object PortuguesePhrases : Phrasebook() {
                 else -> "read my messages"
             }
         },
+        // A call, before the messages take it for a reply to "chamada perdida".
+        Rule(
+            "(?:responda|responde|responder) (?:à|a) (?:última |ultima )?(?:chamada|ligação|ligacao) (?:perdida|não atendida|nao atendida)",
+            "call back",
+        ),
         Rule(
             "(?:responda|responde|responder|escreva|escreve|escrever|mande uma mensagem|manda uma mensagem|envie uma mensagem|" +
                 "envia uma mensagem) (?:para o|para a|para|pro|pra|ao|à|a) (.+)",
@@ -136,10 +140,19 @@ internal object PortuguesePhrases : Phrasebook() {
         ),
         Rule(
             "(?:próxima|proxima|próximo|proximo|próxima música|proxima musica|próxima faixa|seguinte|pula|pule|pular|passa|passe|" +
-                "avança|avance|outra|outra música|outra musica|toca outra|toque outra|muda de música|muda a música)",
+                "avança|avance|outra|outra música|outra musica|toca outra|toque outra|muda de música|muda a música|" +
+                // "Vai para a próxima música", "passa pra próxima": the next song, before "vai…" is taken for a place.
+                "(?:(?:vá|va|vai|vamos|ir|passa|passe|pula|pule|pular|avança|avance|toca|toque|coloca|coloque|põe|poe|ponha|bota|bote) )?" +
+                "(?:(?:para a|para o|pra|pro|para|à|ao|a|o) )?" +
+                "(?:(?:próxima|proxima|próximo|proximo)(?: (?:música|musica|faixa|canção|cancao))?|(?:música|musica|faixa|canção|cancao) seguinte|seguinte))",
             "next",
         ),
-        Rule("(?:anterior|música anterior|musica anterior|faixa anterior|volta uma música|volte uma música|a de antes)", "previous"),
+        Rule(
+            "(?:anterior|música anterior|musica anterior|faixa anterior|volta uma música|volte uma música|a de antes|" +
+                "(?:(?:vá|va|vai|vamos|ir|volta|volte|voltar|passa|passe|toca|toque|coloca|coloque|põe|poe|ponha|bota|bote) )?" +
+                "(?:(?:para a|para o|pra|pro|para|à|ao|a|o) )?(?:(?:música|musica|faixa|canção|cancao) )?anterior)",
+            "previous",
+        ),
         Rule(
             "(?:repete|repita|repetir|toca de novo|toque de novo|toca outra vez|toque outra vez)(?: essa| esta| a)?(?: música| musica| faixa)?" +
                 "(?: do começo| do comeco| do início| do inicio)?",
@@ -177,7 +190,7 @@ internal object PortuguesePhrases : Phrasebook() {
     private fun at(time: String) = if (oneOClock(time)) "da ${time.removePrefix("0")}" else "das $time"
 
     /** Portugal's words or Brazil's, by the phone's country. */
-    private fun pt(portugal: String, brazil: String) = if (Locale.getDefault().country == "PT") portugal else brazil
+    private fun pt(portugal: String, brazil: String) = if (io.github.sirionero.mycar.AppLanguage.country() == "PT") portugal else brazil
 
     private val screen get() = pt("ecrã", "tela")
     private val contacts get() = pt("Contactos", "Contatos")

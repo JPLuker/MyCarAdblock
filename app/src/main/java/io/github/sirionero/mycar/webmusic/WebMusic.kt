@@ -85,8 +85,11 @@ class WebMusicService(
  */
 object WebMusic {
 
-    /** Room at the left of a page's top bar for myCar's Back, which sits in that corner. */
-    private const val BACK_ROOM = "52px"
+    /**
+     * Room at the left of a page's top bar for myCar's Back, which sits in that corner: as wide as the
+     * Back in the page's own pixels, which myCar gives it (WebMusicPage.fit); 52 px until it has.
+     */
+    private const val BACK_ROOM = "var(--mycar-back, 52px)"
 
     val SPOTIFY = WebMusicService(
         "spotify", "Spotify", "https://open.spotify.com/",

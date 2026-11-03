@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="xonos_cat_tracks">Chants</string>
+    <string name="xonos_cat_favorites">Chants au trésor</string>
+    <string name="xonos_cat_browse">Explorer les services</string>
+    <string name="xonos_all_tracks">Tous les chants</string>
+    <string name="xonos_problem_bad_token">Jeton refusé : enrôlez-vous à nouveau dans myCar sur le téléphone</string>
+    <string name="xonos_problem_not_configured">Gréez Xonos dans myCar sur le téléphone</string>
+
+    <plurals name="xonos_count_tracks">
+        <item quantity="one">%d chant</item>
+        <item quantity="other">%d chants</item>
+    </plurals>
+</resources>

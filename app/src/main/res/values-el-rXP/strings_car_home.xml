@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_ui_safety_unofficial">Το myCar είναι ανεπίσημο λογισμικό, με δική του σημαία: δεν το έχει φτιάξει ούτε ελέγξει καμία αυτοκινητοβιομηχανία και μπορεί να αποτύχει χωρίς προειδοποίηση.</string>
+    <string name="car_ui_safety_attention">Μη χρησιμοποιείτε ποτέ αυτή την οθόνη ενώ οδηγείτε. Ορίστε τη διαδρομή ή το τραγούδι πριν σαλπάρετε και μετά κρατήστε την προσοχή σας στον δρόμο.</string>
+    <string name="car_ui_app_wont_start">Το %1$s δεν σαλπάρει ακόμη με το myCar.</string>
+    <string name="car_ui_app_wont_start_unknown">Αυτή η εφαρμογή δεν σαλπάρει ακόμη με το myCar.</string>
+    <string name="car_ui_app_wont_start_detail">Δεν σήκωσε άγκυρα. Μερικές εφαρμογές λειτουργούν μόνο στο Android Auto της Google.</string>
+    <string name="car_ui_search_ignored">Το %1$s δεν έπαιξε κανέναν σκοπό για «%2$s»</string>
+    <string name="car_ui_search_ignored_no_app">Η εφαρμογή μουσικής δεν έπαιξε κανέναν σκοπό για «%1$s»</string>
+    <string name="car_ui_link_opens_app">Αυτός ο σύνδεσμος βάζει πλώρη για μια εφαρμογή στο τηλέφωνο</string>
+
+    <string name="car_dock_dashboard">Σκοπιά</string>
+    <string name="car_dock_now_playing">Στο γραμμόφωνο</string>
+    <string name="car_dock_assistant">Παπαγάλος</string>
+    <string name="car_dock_all_apps">Όλος ο στόλος</string>
+    <string name="car_dock_map_and_music">Χάρτης και γραμμόφωνο</string>
+
+    <string name="car_apps_vehicle_data">Όργανα</string>
+    <string name="car_apps_exit">Αποβίβαση</string>
+    <string name="car_apps_browse_label">%1$s · Εξερεύνηση</string>
+    <string name="car_apps_browse">Εξερεύνηση</string>
+    <string name="car_apps_partial">Με το myCar πάει μόνο με μισά πανιά</string>
+    <string name="car_apps_broken">Δεν σαλπάρει με το myCar</string>
+    <string name="car_apps_pin">Δέσιμο στον μόλο</string>
+    <string name="car_apps_unpin">Λύσιμο από τον μόλο</string>
+    <plurals name="car_apps_dock_full">
+        <item quantity="one">Ο μόλος είναι γεμάτος (%1$d δεμένη)</item>
+        <item quantity="other">Ο μόλος είναι γεμάτος (%1$d δεμένες)</item>
+    </plurals>
+    <string name="car_apps_reset_order">Επαναφορά της σειράς του στόλου</string>
+    <string name="car_apps_hide_from_grid">Στο αμπάρι, εκτός στόλου</string>
+    <string name="car_apps_show_on_grid">Πίσω στον στόλο</string>
+    <string name="car_apps_hidden_toast">Το %1$s έγινε λαθρεπιβάτης. Για να επανέλθει: Ξάρτια, Λαθρεπιβάτες.</string>
+    <string name="car_web_music_elsewhere">Το %1$s παίζει σε άλλη συσκευή, όχι στο καράβι</string>
+    <string name="car_mini_open_player">Άνοιγμα του γραμμοφώνου</string>
+    <string name="car_mini_hide">Στο αμπάρι το μικρό γραμμόφωνο</string>
+    <string name="car_mini_hidden_toast">Το μικρό γραμμόφωνο πήγε στο αμπάρι για αυτό το ταξίδι. Ο σκοπός στον μόλο ανοίγει το γραμμόφωνο.</string>
+    <string name="car_mini_hidden_toast_grid">Το μικρό γραμμόφωνο πήγε στο αμπάρι για αυτό το ταξίδι. Το κουμπί στο κάτω μέρος του μόλου φέρνει πίσω το γραμμόφωνο από τον στόλο.</string>
+
+    <string name="car_map_starting">Το %1$s σαλπάρει…</string>
+    <string name="car_map_starting_unknown">Ξετυλίγουμε τον χάρτη…</string>
+    <string name="car_map_failed_unknown">Η εφαρμογή χαρτών δεν σήκωσε άγκυρα.</string>
+    <string name="car_map_choose_another">Διαλέξτε εσείς άλλη εφαρμογή</string>
+    <string name="car_map_none_installed">Δεν ξετρυπώσαμε καμία εφαρμογή χαρτών.</string>
+    <string name="car_map_none_installed_detail">Εγκαταστήστε μια εφαρμογή πλοήγησης που υποστηρίζει το Android Auto και θα σαλπάρει εδώ μόνη της.</string>
+    <string name="car_map_stopped">Ο χάρτης τυλίχτηκε.</string>
+    <string name="car_map_reopen">Ξετύλιγμα ξανά</string>
+    <string name="car_map_car_apps">Εφαρμογές του καραβιού</string>
+    <string name="car_map_choose">Διαλέξτε εσείς μια εφαρμογή χαρτών.</string>
+    <string name="car_home_hide_lyrics">Λόγια στο αμπάρι</string>
+    <string name="car_home_app_failed">Το %1$s δεν σήκωσε άγκυρα.</string>
+
+    <string name="car_side_close_player">Κλείσιμο του γραμμοφώνου</string>
+    <string name="car_side_music">Γραμμόφωνο</string>
+    <string name="car_side_explained">Με το «Γραμμόφωνο», το γραμμόφωνο μπαίνει δίπλα στον χάρτη όσο παίζει κάποιος σκοπός. Μια εφαρμογή μένει δίπλα στον χάρτη· κλείστε την για το ταξίδι, και το κουμπί στο κάτω μέρος του μόλου τη φέρνει πίσω από τον στόλο.</string>
+
+    <string name="car_pages_nothing_yet">Χωρίς φορτίο</string>
+    <string name="car_pages_app_missing">Η εφαρμογή δεν επιβιβάστηκε στο τηλέφωνο</string>
+    <string name="car_pages_tap_to_choose">Πατήστε και διαλέξτε εσείς τι θα επιβιβαστεί εδώ</string>
+    <string name="car_pages_app_gone">Αυτή η εφαρμογή αποβιβάστηκε από το τηλέφωνο. Πατήστε για να διαλέξετε κάτι άλλο.</string>
+    <string name="car_pages_back_a_page">Όπισθεν μία σελίδα</string>
+    <string name="car_pages_dot_page">Καμπίνα %1$d</string>
+    <string name="car_pages_change">Μερεμέτι αυτής της καμπίνας</string>
+    <string name="car_pages_add">Νέα καμπίνα</string>
+    <string name="car_pages_delete">Βύθιση αυτής της καμπίνας</string>
+    <string name="car_pages_delete_confirm">Βύθιση καμπίνας</string>
+    <string name="car_pages_show_here">Επιβίβαση εδώ</string>
+    <string name="car_pages_one_app">Μια καμπίνα εκτελεί μία εφαρμογή του καραβιού τη φορά: σε αυτήν υπάρχει ήδη το %1$s.</string>
+    <string name="car_pages_layout_full">Ολόκληρη καμπίνα</string>
+    <string name="car_pages_layout_keeps">Το φορτίο της καμπίνας μένει, με τη σειρά, όσο χωράει στη νέα διάταξη.</string>
+    <string name="car_pages_settings_title">Καμπίνες δίπλα στον χάρτη</string>
+    <string name="car_pages_settings_explained">Σύρετε οριζόντια στο Λιμάνι ή πατήστε τις τελείες στο κάτω μέρος του για τις καμπίνες σας: ο καιρός, η ατζέντα, ο περιηγητής ή μια εφαρμογή του καραβιού όπως το Plancia, σε ολόκληρη καμπίνα, σε μισά, σε τέταρτα ή σε συνδυασμό. Το μολύβι δίπλα στις τελείες κάνει μερεμέτι στην καμπίνα που βλέπετε.</string>
+    <string name="car_pages_replace">Αντικατάσταση των καμπινών μου</string>
+    <string name="car_pages_ready_made">Έτοιμες καμπίνες</string>
+
+    <string name="car_dashboard_title">Σήμερα στο πέλαγος</string>
+    <string name="car_dashboard_weather_loading">Φορτώνουμε τον καιρό…</string>
+    <string name="car_dashboard_calendar_loading">Φορτώνουμε το ημερολόγιο…</string>
+    <string name="car_dashboard_nothing_coming">Μπουνάτσα: τίποτα την επόμενη εβδομάδα.</string>
+
+    <string name="car_weather_loading">Φορτώνουμε τον καιρό…</string>
+    <string name="car_weather_waiting_fix">Αναμονή για προσδιορισμό τοποθεσίας, με τον εξάντα στο χέρι.</string>
+    <string name="car_weather_allow_location">Επιτρέψτε στο myCar την τοποθεσία στο τηλέφωνο για να ξέρετε τι καιρό θα βρείτε στο ταξίδι.</string>
+
+    <string name="car_template_car_app">Εφαρμογή του καραβιού</string>
+    <string name="car_template_waiting">η εφαρμογή επιβιβάζεται</string>
+    <string name="car_template_finding_route">Χαράζουμε διαδρομή…</string>
+    <string name="car_template_finding_routes">Χαράζουμε διαδρομές…</string>
+    <string name="car_template_search">Ξετρύπωμα</string>
+    <string name="car_template_clear">Βύθιση</string>
+    <string name="car_template_nothing_playing">Ακόμη σιωπή στο γραμμόφωνο.</string>
+    <string name="car_template_unsupported">Το %1$s δεν σχεδιάζεται ακόμη στο καράβι</string>
+    <string name="car_template_start">Σαλπάρουμε</string>
+
+    <string name="car_host_only_android_auto">Δέχεται στο κατάστρωμα μόνο το host του Android Auto της ίδιας της Google.</string>
+    <string name="car_host_not_allowed">Εμπιστεύεται μόνο τα host της δικής της λίστας επιτρεπόμενων (το Android Auto της Google και λίγα άλλα), και το myCar, με τη δική του σημαία, δεν είναι σε αυτήν.</string>
+    <string name="car_host_no_answer">Δεν απάντησε στο κάλεσμα του myCar. Οι εφαρμογές για νεότερες εκδόσεις του Android Auto λειτουργούν μόνο σε αυτό της Google.</string>
+    <string name="car_host_step_failed">Το %1$s ναυάγησε: %2$s</string>
+    <string name="car_host_step_failed_no_reason">Το %1$s ναυάγησε: δεν δόθηκε αιτία</string>
+    <string name="car_host_failed_at">Ναυάγησε στο %1$s: %2$s</string>
+    <string name="car_host_location_notification">Το myCar μοιράζεται την τοποθεσία με τον χάρτη του καραβιού</string>
+
+    <string name="car_wallpaper_still">Αραγμένες</string>
+    <string name="car_wallpaper_moving">Στον άνεμο</string>
+</resources>

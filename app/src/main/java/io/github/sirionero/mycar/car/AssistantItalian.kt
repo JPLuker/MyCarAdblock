@@ -73,7 +73,7 @@ internal object ItalianPhrases : Phrasebook() {
         Rule("(?:(?:apri|vai alle|vai nelle|mostrami|fammi vedere) )?(?:le )?impostazioni", "open settings"),
         Rule("(?:mostrami |apri |fammi vedere )?(?:le mie app|tutte le app|le app|app|applicazioni)", "open apps"),
         Rule("esci|esci da mycar|chiudi mycar", "exit"),
-        Rule("(?:torna )?indietro", "go back"),
+        Rule("(?:torna |vai )?indietro", "go back"),
         // The route.
         Rule("(?:ferma|interrompi|termina|chiudi|annulla|stop|basta)(?: la| il)? (?:navigazione|percorso|navigatore)|smetti di navigare", "stop navigation"),
         Rule(
@@ -81,6 +81,8 @@ internal object ItalianPhrases : Phrasebook() {
                 "tra quanto arrivo|tra quanto arriviamo|orario di arrivo)(?: .*)?",
             "when do i arrive",
         ),
+        // A call, before the messages take it for a reply to "chiamata persa".
+        Rule("(?:rispondi|rispondere) (?:alla|all'ultima) chiamata persa", "call back"),
         // Messages.
         Rule("(?:leggi|leggimi|leggere|controlla)(?: .*)? (?:messaggi|messaggio|sms)(?: .*)?") { m ->
             val said = m.value
@@ -95,8 +97,7 @@ internal object ItalianPhrases : Phrasebook() {
         },
         // Calls.
         Rule(
-            "(?:richiama|richiamalo|richiamala|richiamali|richiamare|richiama la chiamata persa|richiama l'ultima chiamata(?: persa)?|" +
-                "rispondi alla chiamata persa)",
+            "(?:richiama|richiamalo|richiamala|richiamali|richiamare|richiama la chiamata persa|richiama l'ultima chiamata(?: persa)?)",
             "call back",
         ),
         Rule(
@@ -119,10 +120,20 @@ internal object ItalianPhrases : Phrasebook() {
         Rule(
             "(?:avanti|vai avanti|prossima|prossimo|successiva|successivo|prossima canzone|prossimo brano|canzone successiva|" +
                 "brano successivo|salta|salta questa|salta canzone|cambia canzone|un'altra|un'altra canzone|metti un'altra canzone|" +
-                "metti qualcos'altro|qualcos'altro)",
+                "metti qualcos'altro|qualcos'altro|" +
+                // "Vai alla prossima canzone", "passa al brano successivo": the next song, before "vai…" is taken for a place.
+                "(?:(?:vai|passa|salta|metti|suona|riproduci) )?(?:(?:alla|al|la|il) )?" +
+                "(?:(?:prossima|prossimo|successiva|successivo)(?: (?:canzone|brano|pezzo|traccia))?|(?:canzone|brano|pezzo|traccia) successiv[ao])|" +
+                "vai avanti di (?:una canzone|un brano|un pezzo))",
             "next",
         ),
-        Rule("(?:precedente|canzone precedente|brano precedente|la canzone di prima|quella di prima|torna alla canzone di prima)", "previous"),
+        Rule(
+            "(?:precedente|canzone precedente|brano precedente|la canzone di prima|quella di prima|torna alla canzone di prima|" +
+                "(?:(?:vai|passa|torna|salta|metti|rimetti|suona|riproduci) )?(?:(?:alla|al|la|il) )?" +
+                "(?:(?:(?:canzone|brano|pezzo|traccia) )?precedente|(?:canzone|brano|pezzo|traccia) di prima)|" +
+                "(?:vai|torna) indietro di (?:una canzone|un brano|un pezzo))",
+            "previous",
+        ),
         Rule("(?:ripeti|rimetti|ricomincia)(?: questa| la| questo| il)?(?: canzone| brano| pezzo)?(?: da capo| dall'inizio)?", "play it again"),
         Rule(
             "(?:che canzone è|che canzone e|chi canta|cosa sta suonando|cos'è questa canzone|come si chiama questa canzone|che brano è|" +

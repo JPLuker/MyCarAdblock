@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_ui_app_wont_start">%1$s ainda não funciona a bordo do myCar.</string>
+    <string name="car_ui_app_wont_start_unknown">Este app ainda não funciona a bordo do myCar.</string>
+    <string name="car_ui_app_wont_start_detail">Ele não abriu. Alguns apps só aceitam ordens do Android Auto do Google.</string>
+    <string name="car_ui_search_ignored">%1$s não tocou cantiga nenhuma para “%2$s”</string>
+    <string name="car_ui_search_ignored_no_app">O app de música não tocou cantiga nenhuma para “%1$s”</string>
+
+    <string name="car_dock_dashboard">Vigia</string>
+    <string name="car_dock_now_playing">Tocando a bordo</string>
+    <string name="car_dock_assistant">Papagaio de bordo</string>
+    <string name="car_dock_all_apps">Toda a frota</string>
+    <string name="car_dock_map_and_music">Mapa e cantigas</string>
+
+    <string name="car_apps_vehicle_data">Dados de bordo</string>
+    <string name="car_apps_exit">Desembarcar</string>
+    <string name="car_apps_partial">Funciona só em parte a bordo do myCar</string>
+    <string name="car_apps_broken">Não funciona a bordo do myCar</string>
+    <string name="car_apps_pin">Pregar no mastro</string>
+    <string name="car_apps_unpin">Despregar do mastro</string>
+    <plurals name="car_apps_dock_full">
+        <item quantity="one">O mastro está cheio (%1$d pregado)</item>
+        <item quantity="other">O mastro está cheio (%1$d pregados)</item>
+    </plurals>
+    <string name="car_apps_reset_order">Restaurar a ordem da frota</string>
+    <string name="car_apps_hide_from_grid">Mandar para o porão</string>
+    <string name="car_apps_show_on_grid">Tirar do porão</string>
+    <string name="car_apps_hidden_toast">App no porão: %1$s. Para trazê-lo de volta: Leme, Apps no porão.</string>
+    <string name="car_web_music_elsewhere">%1$s está tocando em outro dispositivo, não a bordo</string>
+    <string name="car_mini_open_player">Abrir a vitrola</string>
+    <string name="car_mini_hide">Recolher a minivitrola</string>
+    <string name="car_mini_hidden_toast">Minivitrola recolhida nesta travessia. A cantiga no mastro abre a vitrola.</string>
+    <string name="car_mini_hidden_toast_grid">Minivitrola recolhida nesta travessia. O botão na base do mastro traz a vitrola de volta a partir da frota.</string>
+
+    <string name="car_map_starting">Içando as velas de %1$s…</string>
+    <string name="car_map_starting_unknown">Içando as velas do mapa…</string>
+    <string name="car_map_none_installed">Nenhum app de mapas à vista.</string>
+    <string name="car_map_none_installed_detail">Instale um app de navegação compatível com o Android Auto, e ele vai atracar aqui sozinho.</string>
+    <string name="car_map_car_apps">Apps de bordo</string>
+    <string name="car_home_hide_lyrics">Recolher os versos</string>
+
+    <string name="car_side_close_player">Fechar a vitrola</string>
+    <string name="car_side_music">Cantigas</string>
+    <string name="car_side_explained">A opção Cantigas coloca a vitrola ao lado do mapa enquanto algo toca. Um app escolhido fica sempre ao lado do mapa; feche-o para esta travessia, e o botão na base do mastro o traz de volta a partir da frota.</string>
+
+    <string name="car_pages_nothing_yet">Nada à vista</string>
+    <string name="car_pages_dot_page">Convés %1$d</string>
+    <string name="car_pages_change">Alterar este convés</string>
+    <string name="car_pages_add">Adicionar convés</string>
+    <string name="car_pages_delete">Afundar este convés</string>
+    <string name="car_pages_delete_confirm">Afundar convés</string>
+    <string name="car_pages_one_app">Um convés roda um app de bordo por vez: %1$s já está neste.</string>
+    <string name="car_pages_layout_full">Convés inteiro</string>
+    <string name="car_pages_layout_keeps">O que o convés mostra continua, na ordem, até onde o novo layout tiver espaço.</string>
+    <string name="car_pages_settings_title">Conveses ao lado do mapa</string>
+    <string name="car_pages_settings_explained">Deslize pelo porto, ou toque nos pontos embaixo dele, para ver seus conveses: o clima, a agenda, o navegador ou um app de bordo como o Plancia, em convés inteiro, metades, quartos ou uma mistura. O lápis ao lado dos pontos altera o convés à vista.</string>
+    <string name="car_pages_replace">Substituir meus conveses</string>
+    <string name="car_pages_ready_made">Conveses prontos</string>
+
+    <string name="car_dashboard_weather_loading">Sondando o clima…</string>
+    <string name="car_dashboard_nothing_coming">Nada à vista na próxima semana.</string>
+
+    <string name="car_weather_loading">Sondando o clima…</string>
+
+    <string name="car_template_car_app">App de bordo</string>
+    <string name="car_template_finding_route">Traçando uma rota…</string>
+    <string name="car_template_finding_routes">Traçando rotas…</string>
+    <string name="car_template_nothing_playing">Ainda silêncio a bordo.</string>
+    <string name="car_template_start">Zarpar</string>
+
+    <string name="car_wallpaper_title">Horizonte</string>
+    <string name="car_wallpaper_still">Ancorados</string>
+    <string name="car_wallpaper_moving">Navegando</string>
+    <string name="car_wallpaper_ocean">Alto-mar</string>
+</resources>

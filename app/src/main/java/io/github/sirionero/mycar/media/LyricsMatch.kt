@@ -238,9 +238,11 @@ object LyricsMatch {
             return if (sameTitle && artist == ArtistFit.SAME && (sameLength || d == null)) Fit(hit, false, sameLength, if (sameLength) 1000 else 0) else null
         }
         // A version of the song by its loose name (a remix, a second title) can have other words:
-        // only at the same length. A live or acoustic take keeps the words, not the times.
+        // only at the same length. A live or acoustic take keeps the words, not the times. A live take is
+        // already the same title (strict leaves "Live" out): one by the loose name only is a sister song's
+        // (a Reprise, a Part 2, a version in another language), never this one's at another length.
         val liveTake = q.live || theirs.live
-        if (!sameTitle && !sameLength && !liveTake) return null
+        if (!sameTitle && !sameLength) return null
         if (q.instrumental != theirs.instrumental && !sameLength) return null
         val farther = d != null && !sameLength
         if (farther && !liveTake && d > max(15.0, q.durationSec * 0.25)) return null

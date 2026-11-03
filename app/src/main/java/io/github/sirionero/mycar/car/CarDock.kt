@@ -34,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -151,6 +152,8 @@ internal fun CarDock(navigator: CarNavigator, modifier: Modifier = Modifier) {
                 }
             }
             val fit = ((maxHeight + DockGap) / (MyCarSize.TouchTarget + DockGap)).toInt().coerceAtLeast(0)
+            val songShown = mediaShown && slots.take(fit).any { it.key == "media" }
+            SideEffect { navigator.dockShowsSong = songShown }
             Column(
                 verticalArrangement = Arrangement.spacedBy(DockGap),
                 horizontalAlignment = Alignment.CenterHorizontally,

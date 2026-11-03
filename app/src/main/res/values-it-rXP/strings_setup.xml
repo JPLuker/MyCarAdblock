@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setup_title">Prepara myCar a salpare</string>
+    <string name="setup_subtitle_first_run">Pochi tocchi prima della prima traversata.</string>
+    <string name="setup_subtitle_return">Quello che resta da fare prima di salpare. Niente di quello che hai già preparato cambia.</string>
+    <string name="setup_unofficial">myCar non batte bandiera ufficiale: configurala ad auto ferma, poi tieni gli occhi sulla strada.</string>
+    <string name="setup_section_connect">Per abbordare</string>
+    <string name="setup_section_drive">Per la traversata</string>
+    <string name="setup_status_done">A posto</string>
+
+    <string name="setup_cert_body">Le auto parlano solo con i telefoni che hanno un certificato di cui si fidano. myCar non ne porta uno nella stiva: scarica quelli pubblici da progetti open source su GitHub (circa 10 KB ciascuno). Se la tua auto ne rifiuta uno, myCar prova il successivo.</string>
+    <string name="setup_cert_getting">Imbarco i certificati…</string>
+    <string name="setup_cert_wrong_file">Un file scaricato non era il certificato atteso, quindi myCar l\'ha gettato fuori bordo. Riprova più tardi.</string>
+    <string name="setup_cert_some_ready">Scaricati %1$d di %2$d. %3$s è pronto; gli altri puoi scaricarli dopo nel Timone.</string>
+    <string name="setup_cert_ready_own">Pronto a salpare: il tuo certificato.</string>
+    <plurals name="setup_cert_ready_spares">
+        <item quantity="one">Pronto a salpare: %1$s. Di riserva: %2$s.</item>
+        <item quantity="other">Pronto a salpare: %1$s. Di riserva: %2$s.</item>
+    </plurals>
+    <string name="setup_cert_ready_one">Pronto a salpare: %1$s.</string>
+    <string name="setup_cert_ready">Pronto a salpare.</string>
+
+    <string name="setup_mycar_on_title">Attiva myCar a bordo</string>
+    <string name="setup_mycar_on_body">È disattivata nel Timone, quindi la nave non può raggiungerla.</string>
+
+    <string name="setup_aa_title">Ammaina Android Auto</string>
+    <string name="setup_aa_off">Android Auto è ammainato.</string>
+    <string name="setup_aa_kept">Sceglierai myCar quando colleghi il telefono alla nave.</string>
+    <string name="setup_aa_body">Android Auto è attivo, e può abbordare l\'auto prima di myCar e prendersi la connessione. Nella schermata che si apre, tocca Disattiva, poi OK, poi torna qui.</string>
+    <string name="setup_aa_no_disable">Niente tasto Disattiva in vista?</string>
+    <string name="setup_aa_keep_body">Allora tienilo a bordo. Quando colleghi il telefono, Android chiede quale app aprire: scegli myCar e tocca Sempre. Se Android Auto si apre da solo, era impostato per aprirsi sempre: nelle sue informazioni app tocca «Apri per impostazione predefinita», poi «Cancella impostazioni predefinite».</string>
+    <string name="setup_aa_keep">Tienilo a bordo</string>
+
+    <string name="setup_drive_title">Chiamate, mappa e ballate</string>
+    <string name="setup_drive_skipped">Hai tirato dritto. Tocca Consenti quando vuoi.</string>
+    <string name="setup_drive_body">L\'auto mostra chi chiama e le chiamate recenti e può chiamare i tuoi contatti, la mappa sa dove sei, e la musica può arrivare a bordo senza Bluetooth. Android lo chiede alcune volte: tocca Consenti ogni volta. myCar legge soltanto, e ascolta solo quando tocchi il microfono.</string>
+
+    <string name="setup_more_show_more">Svela altro</string>
+    <string name="setup_more_show_less">Sottocoperta</string>
+    <string name="setup_more_later">Tutto questo si può fare anche dopo, alla prossima marea.</string>
+    <string name="setup_messages_title">Dispacci</string>
+    <string name="setup_messages_body">L\'auto mostra i tuoi dispacci, li legge ad alta voce e ti fa rispondere. Attiva myCar nella pagina che si apre. Se Android dice che è un\'impostazione con limitazioni: apri le informazioni app di myCar, tocca ⋮, poi «Consenti impostazioni con limitazioni», e riprova.</string>
+    <string name="setup_calendar_body">Lo schermo di bordo mostra il tuo prossimo evento. myCar legge soltanto il tuo calendario.</string>
+    <string name="setup_notifications_body">Permette a myCar di mostrare che è collegata all\'auto, con «Interrompi» mentre manda il suono del telefono, e di avvisarti quando approda un aggiornamento.</string>
+    <string name="setup_screening_body">Con l\'auto collegata, una chiamata da un numero che non è nei tuoi contatti aspetta qualche secondo in rada prima di squillare, così puoi rifiutarla dall\'auto.</string>
+    <string name="setup_audio_title">Audio a bordo</string>
+    <string name="setup_audio_body">Come arrivano le ballate a bordo. Le chiamate passano comunque dal Bluetooth.</string>
+    <string name="setup_usage_title">Aiuta gli altri capitani</string>
+
+    <plurals name="setup_bar_steps_left">
+        <item quantity="one">Manca %1$d passo prima della prima traversata.</item>
+        <item quantity="other">Mancano %1$d passi prima della prima traversata.</item>
+    </plurals>
+    <string name="setup_bar_ready_to_connect">Puoi abbordare.</string>
+    <string name="setup_bar_allow_drive">Consenti chiamate, mappa e ballate</string>
+    <string name="setup_bar_ready">Tutto pronto per salpare. Collega il telefono all\'auto; se Android chiede, scegli myCar e tocca Sempre.</string>
+
+    <plurals name="setup_card_steps_left">
+        <item quantity="one">Manca %1$d passo prima della prima traversata: %2$s.</item>
+        <item quantity="other">Mancano %1$d passi prima della prima traversata: %2$s.</item>
+    </plurals>
+    <plurals name="setup_card_extras_left">
+        <item quantity="one">Puoi già abbordare. Resta %1$d passo facoltativo.</item>
+        <item quantity="other">Puoi già abbordare. Restano %1$d passi facoltativi.</item>
+    </plurals>
+    <string name="setup_card_all_done">È tutto pronto per salpare.</string>
+    <string name="setup_card_title">Preparativi per salpare</string>
+    <string name="setup_card_footer">Non si getta fuori bordo né si azzera niente. Vedrai solo quello che manca, con le cose già fatte spuntate.</string>
+    <string name="setup_card_back">Torna ai preparativi per salpare</string>
+    <string name="setup_left_title">Completa i preparativi</string>
+    <string name="setup_left_body">Da fare prima della prima traversata: %1$s.</string>
+    <string name="setup_left_continue">Avanti tutta coi preparativi</string>
+
+    <string name="setup_guide_skip_for_now">Tira dritto per ora</string>
+    <string name="setup_guide_usage_title">Aiuta gli altri capitani.</string>
+    <string name="setup_guide_safety_body">myCar non batte bandiera ufficiale. Nessuna casa automobilistica l\'ha fatta o controllata, e può smettere di funzionare senza preavviso. Configurala prima di partire, poi tieni gli occhi sulla strada.</string>
+    <string name="setup_guide_mic_body">myCar lo usa per mandare la tua musica all\'auto e per sentirti quando chiedi qualcosa o rispondi a un dispaccio. Quello che dici resta sul telefono.</string>
+    <string name="setup_guide_location_body">La mappa di bordo e le ricerche nei dintorni ne hanno bisogno. Senza, la mappa non compare.</string>
+    <string name="setup_guide_nearby_body">La prima volta che colleghi il telefono, myCar propone di accoppiarlo con l\'auto, così le chiamate passano dalle casse di bordo.</string>
+    <string name="setup_guide_nearby_body_home">La prima volta che colleghi il telefono, myCar propone di accoppiarlo con l\'auto, così le chiamate passano dalle casse di bordo. Con lo stesso permesso, Plancia e Xonos raggiungono Home Assistant e Music Assistant sulla tua rete di casa.</string>
+    <string name="setup_guide_notifications_body">Mentre myCar è collegata, mostra una notifica con un tasto per interrompere. Senza questo permesso, Android la tiene sottocoperta.</string>
+    <string name="setup_guide_messages_title">Dispacci.</string>
+    <string name="setup_guide_messages_body">L\'auto mostra i tuoi dispacci, li legge ad alta voce e ti fa rispondere. Attiva myCar nell\'elenco che si apre.</string>
+    <string name="setup_guide_aa_title">Ammaina Android Auto.</string>
+    <string name="setup_guide_aa_body">Android Auto è ancora installato e contende a myCar l\'abbordaggio USB dell\'auto. Disattivalo o disinstallalo nella schermata che si apre.</string>
+    <string name="setup_guide_choose_title">Rotta su myCar.</string>
+    <string name="setup_guide_choose_body">Se il telefono chiede quale app aprire quando lo colleghi alla nave, scegli myCar e tocca Sempre.</string>
+    <string name="setup_guide_audio_title">Audio a bordo.</string>
+    <string name="setup_guide_audio_body">Scegli come arrivano le ballate a bordo. Le chiamate passano comunque dal Bluetooth.</string>
+    <string name="setup_guide_voice_title">Pappagallo.</string>
+    <string name="setup_guide_voice_body">Chiedi a voce indicazioni, ballate o una chiamata. Il telefono trasforma da solo la voce in testo, e niente di quello che dici esce dal telefono. Servono %1$d MB, scaricati una volta. Usa il Wi-Fi se puoi.</string>
+    <string name="setup_guide_voice_progress">Carico a bordo, %1$d%%. Puoi andare avanti tutta: continua da solo.</string>
+    <string name="setup_guide_voice_ready">La voce è pronta a bordo.</string>
+    <string name="setup_guide_voice_failed">Il download si è arenato. Tocca «Scarica la voce» per riprovare.</string>
+    <string name="setup_guide_project_media_body">Esegui questo comando da un computer con il debug USB attivo, e Android si fida per sempre di myCar per il tuo audio. Senza, tocchi Avvia una volta a ogni traversata.</string>
+    <string name="setup_guide_secure_settings_body">Mentre l\'audio va all\'auto, Android nasconde il testo delle notifiche, come quando condividi lo schermo. Questo comando permette a myCar di mostrarle durante la traversata e di nasconderle di nuovo dopo.</string>
+
+    <string name="setup_audio_automatic_body">Col Bluetooth quando la tua nave riceve così le ballate del telefono, altrimenti tramite myCar.</string>
+    <string name="setup_audio_bluetooth_body">Nessuna domanda a ogni traversata, e la voce della tua app di navigazione arriva a bordo. Alcune navi lo usano solo per le chiamate.</string>
+    <string name="setup_audio_through_mycar_body">Col cavo o in Wi-Fi, come fa Android Auto. Android chiede di condividere l\'audio una volta a ogni traversata.</string>
+
+    <string name="intro_start">Salpiamo</string>
+    <string name="intro_welcome_to">Ohi, ecco la</string>
+    <string name="intro_welcome_tag">alpha · vento in poppa</string>
+    <string name="intro_course">Scegliamo noi le nostre rotte, e al diavolo le imposizioni!</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d bug scovato e affondato dalla 0.6</item>
+        <item quantity="other">%d bug scovati e affondati dalla 0.6</item>
+    </plurals>
+    <string name="intro_music_title">Ballate a bordo.</string>
+    <string name="intro_music_body">Spotify e gli altri servizi suonano dentro myCar, dal loro lettore web. Arruolati una volta sul telefono con il tuo account, nel Timone > Ballate. Lì manda sottocoperta l\'app Spotify del telefono: a bordo un solo Spotify, non due.</string>
+    <string name="intro_mini_title">Tutta la mappa del tesoro.</string>
+    <string name="intro_mini_body">Chiudi l\'organetto accanto alla mappa e un mini organetto galleggia sopra, con la copertina e i suoi tasti: tienilo premuto e trascinalo dove vuoi. Accanto alla mappa l\'organetto ora arriva fino a Molto grande.</string>
+    <string name="intro_lyrics_title">Canta con la ciurma.</string>
+    <string name="intro_lyrics_body">Le strofe delle ballate si trovano molto più spesso, e ogni risultato è controllato, così non compaiono mai le strofe di un\'altra ballata. Le ballate strumentali lo dicono.</string>
+    <string name="intro_location_title">In saccoccia.</string>
+    <string name="intro_location_body">La mappa ha la tua posizione anche col telefono bloccato in tasca: myCar la prende quando l\'auto approda. Se Android la rifiuta lo stesso, l\'auto te lo dice, solo a macchina ferma.</string>
+    <string name="intro_phone_title">Timone dal telefono.</string>
+    <string name="intro_phone_body">Tutte le impostazioni dello schermo di bordo sono anche sul telefono, nel Timone > Schermo di bordo: cambiane una e la nave la segue subito, anche durante la traversata. Lo stesso vale per le pagine accanto alla mappa e per le app clandestine, quelle tolte dalla flotta.</string>
+    <string name="intro_apps_title">Una flotta amica.</string>
+    <string name="intro_voice_title">Dillo al pappagallo.</string>
+    <string name="intro_voice_body">Tocca il microfono, o premi il tasto per parlare sul volante, e parla. Il telefono trasforma da solo la voce in testo, e quello che dici resta sul telefono, tranne quello che chiedi al tuo Home Assistant. A bordo di\' «%1$s» per l\'elenco completo.</string>
+    <string name="intro_voice_body_language">Tocca il microfono, o premi il tasto per parlare sul volante, e parla. Il telefono trasforma da solo la voce in testo, e quello che dici resta sul telefono, tranne quello che chiedi al tuo Home Assistant. Ascolta e risponde in %1$s, la parlata di myCar. A bordo di\' «%2$s» per l\'elenco completo.</string>
+    <string name="intro_voice_downloading">Carico a bordo, %1$d%%</string>
+    <string name="intro_voice_failed">Download arenato. Riprova</string>
+
+    <string name="activity_toast_music_pauses_sharing">La musica del telefono fa tregua mentre ne condividi lo schermo</string>
+    <string name="activity_toast_open_for_music">Apri myCar sul telefono per mandarne le ballate a bordo</string>
+    <string name="activity_toast_open_for_sharing">Apri myCar sul telefono per condividerne lo schermo a bordo</string>
+    <string name="activity_status_taken_title">Un\'altra app ha abbordato l\'auto</string>
+</resources>

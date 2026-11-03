@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.ViewGroup
 import android.webkit.CookieManager
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebResourceRequest
 import android.webkit.WebStorage
 import android.webkit.WebView
@@ -73,10 +74,16 @@ class WebMusicSignInActivity : ComponentActivity() {
         })
         setContent {
             MyCarTheme {
-                SignInScreen(service, onWeb = { web = it }, onClose = ::finish)
+                SignInScreen(service, onWeb = { web = it }, onClose = ::finish, onGone = ::pageGone)
             }
         }
         MyCarLog.i("music: signing in to ${service.id} on the phone")
+    }
+
+    /** The web engine's page process died: the page is gone (destroyed by its client), and so is this screen. */
+    private fun pageGone() {
+        web = null
+        finish()
     }
 
     // What the page kept (the sign-in) written out at once: the car's page may open any moment.
@@ -105,7 +112,7 @@ class WebMusicSignInActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SignInScreen(service: WebMusicService, onWeb: (WebView) -> Unit, onClose: () -> Unit) {
+private fun SignInScreen(service: WebMusicService, onWeb: (WebView) -> Unit, onClose: () -> Unit, onGone: () -> Unit) {
     // Back on the service's player after its sign-in page: a clear end, Done (the same as the X).
     var onPlayer by remember { mutableStateOf(false) }
     Scaffold(
@@ -126,13 +133,13 @@ private fun SignInScreen(service: WebMusicService, onWeb: (WebView) -> Unit, onC
     ) { padding ->
         AndroidView(
             modifier = Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding).imePadding(),
-            factory = { context -> signInWebView(context, service) { onPlayer = true }.also(onWeb) },
+            factory = { context -> signInWebView(context, service, onGone) { onPlayer = true }.also(onWeb) },
         )
     }
 }
 
 @SuppressLint("SetJavaScriptEnabled")
-private fun signInWebView(context: Context, service: WebMusicService, onPlayer: () -> Unit): WebView = WebView(context).apply {
+private fun signInWebView(context: Context, service: WebMusicService, onGone: () -> Unit, onPlayer: () -> Unit): WebView = WebView(context).apply {
     // As tall as its place, said outright. In an AndroidView a WebView gets WRAP_CONTENT, and then
     // WebView lays the page out 0 px tall (setForceZeroLayoutHeight): a page that fills the window
     // from its edges - Spotify's sign-in - came out black, nothing on it to see or touch.
@@ -160,6 +167,17 @@ private fun signInWebView(context: Context, service: WebMusicService, onPlayer: 
             if (url != null && signInHost != null && service.origins.none { Uri.parse(it).host == signInHost } &&
                 service.origins.any { url.startsWith(it) }
             ) onPlayer()
+        }
+
+        // The web engine's page process is one for the whole app, the car's pages included: when it
+        // dies, every web view on it must say it handled that, or Android ends myCar - and a drive
+        // under way. This page goes, and its screen closes.
+        override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+            MyCarLog.w("music: sign-in page closed (crash: ${detail.didCrash()})")
+            (view.parent as? ViewGroup)?.removeView(view)
+            runCatching { view.destroy() }
+            onGone()
+            return true
         }
     }
     loadUrl(service.signIn ?: service.url)
@@ -210,6 +228,12 @@ internal object WebMusicAccounts {
                     if (++next < origins.size) view.loadDataWithBaseURL("${origins[next]}/", BLANK, "text/html", "utf-8", null)
                     else view.destroy()
                 }
+            }
+
+            // As every web view of myCar: the page process dying mustn't end myCar (see signInWebView).
+            override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+                runCatching { view.destroy() }
+                return true
             }
         }
         web.loadDataWithBaseURL("${origins[0]}/", BLANK, "text/html", "utf-8", null)

@@ -104,7 +104,10 @@ class AssistantUnlockActivity : Activity() {
         setShowWhenLocked(true)
         setTurnScreenOn(true)
         val keyguard = getSystemService(KeyguardManager::class.java).also { this.keyguard = it }
-        if (keyguard?.isKeyguardLocked != true) {
+        // Open only with the screen on too: a phone with no lock (or in the moments before it locks)
+        // and the screen off isn't locked, but the assistant doesn't listen until the screen lights,
+        // which this screen does (turnScreenOn) - then [ask] finds it open and goes on.
+        if (keyguard?.isKeyguardLocked != true && getSystemService(PowerManager::class.java)?.isInteractive != false) {
             finishWith { AssistantUnlock.opened() }
             return
         }
@@ -128,6 +131,11 @@ class AssistantUnlockActivity : Activity() {
     private fun ask() {
         val keyguard = keyguard ?: return
         if (done || askedAt != 0L) return
+        // The screen is lit now, and there was no lock to open: on with the assistant.
+        if (!keyguard.isKeyguardLocked) {
+            finishWith { AssistantUnlock.opened() }
+            return
+        }
         askedAt = SystemClock.uptimeMillis()
         MyCarLog.i("assistant: opening the phone first")
         keyguard.requestDismissKeyguard(this, object : KeyguardManager.KeyguardDismissCallback() {
@@ -139,6 +147,10 @@ class AssistantUnlockActivity : Activity() {
 
     /** Dropped at once is the screen still lighting up: ask once more. Later, the driver said no. */
     private fun dropped(why: String) {
+        if (keyguard?.isKeyguardLocked != true) {
+            finishWith { AssistantUnlock.opened() }
+            return
+        }
         if (!askedAgain && SystemClock.uptimeMillis() - askedAt < DROPPED_AT_ONCE_MS) {
             askedAgain = true
             askedAt = 0L

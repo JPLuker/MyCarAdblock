@@ -47,4 +47,14 @@ class AssistPlanTest {
     fun `no pipelines at all, Home Assistant's default agent`() {
         assertEquals(AssistPlan.Process(null, "fr"), AssistPlan.of(emptyList(), null, "fr"))
     }
+
+    private val claudeAll = AssistPipeline("claude", "*", "conversation.claude")
+
+    @Test
+    fun `a pipeline with a model speaks every language`() {
+        // Home Assistant saves "*" for an agent that is a model (Claude, Gemini, ChatGPT, Ollama).
+        assertEquals(AssistPlan.Run("claude"), AssistPlan.of(listOf(homeIt, claudeAll), "claude", "it"))
+        assertEquals(AssistPlan.Run("claude"), AssistPlan.of(listOf(homeEn, claudeAll), "home-en", "it"))
+        assertEquals(AssistPlan.Run("home-it"), AssistPlan.of(listOf(homeIt, claudeAll), "home-it", "it"))
+    }
 }
