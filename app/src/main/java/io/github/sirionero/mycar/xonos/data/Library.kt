@@ -12,6 +12,9 @@ import org.json.JSONObject
 /** Le domande che il menu dell'auto fa alla libreria di Music Assistant, e i comandi della coda. */
 class Library(private val repo: MaRepository) {
 
+    /** Spotify (Soloist) occupato da un ascolto appeso: lo si sblocca e si riprova (vedi [SoloistUnlock]). */
+    private val unlock = SoloistUnlock(repo)
+
     /**
      * Un elenco di elementi: diventano MaItem man mano che arrivano, lontano dal thread principale.
      * [onPart] riceve quelli arrivati fin lì a ogni pezzo (gli elenchi lunghi arrivano a pezzi di 500).
@@ -229,13 +232,15 @@ class Library(private val repo: MaRepository) {
                 put("shuffle_enabled", true)
             }
         }
-        repo.command("player_queues/play_media", 60_000) {
-            put("queue_id", queueId)
-            put("media", if (media.size == 1) media[0] else JSONArray(media))
-            put("option", option)
-            if (startItem != null) put("start_item", startItem)
-            // Dalla 2.10 un album suona in ordine anche con il casuale acceso, se non si chiede altro.
-            if (shuffle) put("shuffle", true)
+        unlock.retrying(queueId) {
+            repo.command("player_queues/play_media", 60_000) {
+                put("queue_id", queueId)
+                put("media", if (media.size == 1) media[0] else JSONArray(media))
+                put("option", option)
+                if (startItem != null) put("start_item", startItem)
+                // Dalla 2.10 un album suona in ordine anche con il casuale acceso, se non si chiede altro.
+                if (shuffle) put("shuffle", true)
+            }
         }
     }
 
@@ -277,7 +282,7 @@ class Library(private val repo: MaRepository) {
 
     /** Riprende la coda da dove si era fermata (play su una coda ferma la fa ripartire). */
     suspend fun resume(queueId: String) {
-        repo.command("player_queues/play") { put("queue_id", queueId) }
+        unlock.retrying(queueId) { repo.command("player_queues/play") { put("queue_id", queueId) } }
     }
 
     /** Aggiunge o toglie dai preferiti; per toglierlo serve l'elemento della libreria. */
