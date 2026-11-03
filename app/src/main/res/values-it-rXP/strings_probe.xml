@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Probe for pirate speak's resource folder (region XP): removed once the real texts are in. -->
-<resources>
-    <string name="language_close">Molla gli ormeggi</string>
-</resources>
