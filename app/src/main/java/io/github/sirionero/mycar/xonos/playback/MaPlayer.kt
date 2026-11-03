@@ -828,8 +828,8 @@ class MaPlayer(
     }
 
     /**
-     * Si è staccato il Bluetooth (o le cuffie) mentre la musica era ferma per un calo di rete: al ritorno della rete
-     * non si riprende da soli, perché uscirebbe dall'altoparlante del telefono.
+     * Si è staccato il Bluetooth (o le cuffie, o in myCar il canale dell'auto) mentre la musica era ferma per un calo di
+     * rete: al ritorno della rete non si riprende da soli, perché uscirebbe dall'altoparlante del telefono.
      */
     fun forgetDrop() {
         if (drop != null) Log.i(TAG, "Uscita audio staccata: dopo il calo di rete non riprendo da solo")
