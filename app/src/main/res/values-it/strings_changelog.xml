@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.2-alpha -->
+    <string-array name="changelog_48">
+        <item>L\'Autoplay non suona più dall\'altoparlante del telefono, in tasca, quando il Bluetooth della musica dell\'auto non è ancora collegato: lo aspetta fino a un minuto, e una pausa o un brano che scegli nel frattempo restano.</item>
+    </string-array>
+
     <!-- 0.7.1-alpha -->
     <string-array name="changelog_47">
         <item>La mappa non resta più nera, senza posizione, quando il Wi-Fi dell\'auto cade e torna durante il viaggio, o quando l\'auto si collega con myCar rimasta aperta sul telefono bloccato.</item>

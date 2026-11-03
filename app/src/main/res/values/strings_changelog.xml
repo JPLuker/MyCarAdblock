@@ -5,6 +5,11 @@
   "Settings >" are the app's own: translate them as the app's screens say them.
 -->
 <resources>
+    <!-- 0.7.2-alpha -->
+    <string-array name="changelog_48">
+        <item>Autoplay no longer plays on the phone\'s speaker, in your pocket, when the car\'s Bluetooth music isn\'t connected yet: it waits for it up to a minute, and a pause or a song you choose meanwhile stays.</item>
+    </string-array>
+
     <!-- 0.7.1-alpha -->
     <string-array name="changelog_47">
         <item>The map no longer stays black, without its position, when the car\'s Wi-Fi drops and comes back during a drive, or when the car connects while myCar is left open on the locked phone.</item>

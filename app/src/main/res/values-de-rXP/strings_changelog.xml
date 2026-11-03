@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_48">
+        <item>Autoplay spielt die Shantys nicht mehr über den Lautsprecher des Telefons in deiner Tasche auf, wenn die Bluetooth-Musik an Bord noch fehlt: Es wartet bis zu einer Minute, und eine Pause oder ein Titel, den du inzwischen wählst, bleibt.</item>
+    </string-array>
+
     <string-array name="changelog_47">
         <item>Die Karte bleibt nicht mehr schwarz und ohne Standort, wenn das WLAN des Autos auf dem Törn abbricht und wiederkommt oder wenn du an Bord gehst, während myCar auf dem gesperrten Telefon offen geblieben ist. Kurs halten!</item>
         <item>Mit der Piratensprache folgen die Stimme und die Telefonnummern wieder dem Heimathafen deines Telefons.</item>

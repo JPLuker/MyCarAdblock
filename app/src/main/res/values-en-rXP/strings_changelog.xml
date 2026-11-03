@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_48">
+        <item>Autoplay no longer strikes up the shanties on the phone\'s speaker, down in yer pocket, when the ship\'s Bluetooth music ain\'t aboard yet: it waits up to a minute, and a pause or a song ye pick meanwhile stays.</item>
+    </string-array>
+
     <string-array name="changelog_47">
         <item>The chart no longer goes black and loses its position when the ship\'s Wi-Fi drops and comes back mid-voyage, or when ye board while myCar is left open on the locked phone. Steady as she goes!</item>
         <item>With pirate speak, the voice and the phone numbers follow yer phone\'s home port again.</item>

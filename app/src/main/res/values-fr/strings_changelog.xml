@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.2-alpha -->
+    <string-array name="changelog_48">
+        <item>La lecture automatique ne joue plus sur le haut-parleur du téléphone, dans votre poche, quand la musique en Bluetooth de la voiture n’est pas encore connectée : elle l’attend jusqu’à une minute, et une pause ou un titre que vous choisissez entre-temps est respecté.</item>
+    </string-array>
+
     <!-- 0.7.1-alpha -->
     <string-array name="changelog_47">
         <item>La carte ne reste plus noire, sans votre position, quand le Wi-Fi de la voiture tombe puis revient pendant le trajet, ou quand la voiture se connecte alors que myCar est resté ouvert sur le téléphone verrouillé.</item>

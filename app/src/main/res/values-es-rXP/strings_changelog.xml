@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_48">
+        <item>«Que suene al abordar» ya no canta las tonadas por el altavoz del teléfono, en tu bolsillo, cuando el Bluetooth de música del barco aún no está a bordo: lo espera hasta un minuto, y una pausa o una canción que elijas mientras tanto se respetan.</item>
+    </string-array>
+
     <string-array name="changelog_47">
         <item>La carta ya no se queda negra y sin tu ubicación cuando el Wi-Fi del coche se cae y vuelve en plena travesía, o cuando subes a bordo con myCar abierta en el teléfono bloqueado. ¡Rumbo firme!</item>
         <item>Con el habla pirata, la voz y los números de teléfono vuelven a seguir el puerto de origen de tu teléfono.</item>
