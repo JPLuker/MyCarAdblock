@@ -464,6 +464,16 @@ object CarServices {
         if (!media.now.value.playing) media.togglePlay()
     }
 
+    /**
+     * Cinema opened (CinemaMusic): an Autoplay still waiting doesn't start the music later. When the
+     * car's Bluetooth came back within the minute, it took the speakers from the film.
+     */
+    fun dropAutoplay() {
+        if (!autoplayPending) return
+        autoplayPending = false
+        io.github.sirionero.mycar.MyCarLog.i("media: Autoplay left alone - Cinema opened")
+    }
+
     /** How long the drive's Autoplay waits for a Bluetooth output on the Bluetooth way. */
     private const val AUTOPLAY_BLUETOOTH_MS = 60_000L
 

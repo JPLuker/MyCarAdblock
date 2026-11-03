@@ -20,8 +20,9 @@ internal object CinemaMusic {
     /** What [opened] saw: the music app, while it played, and when (elapsedRealtime). */
     class Playing internal constructor(val component: android.content.ComponentName, val openedAt: Long)
 
-    /** Cinema opens: the music app, if it's playing now. */
+    /** Cinema opens: the music app, if it's playing now. An Autoplay still waiting is dropped, not to play over the film. */
     fun opened(): Playing? {
+        CarServices.dropAutoplay()
         val app = CarServices.mediaApp.value ?: return null
         return if (CarServices.media.now.value.playing) Playing(app.component, SystemClock.elapsedRealtime()) else null
     }
