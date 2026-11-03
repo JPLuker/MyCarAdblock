@@ -202,7 +202,10 @@ Rispondi sempre in **italiano**.
   `res/values/strings_changelog.xml` (un `string-array` `changelog_<versionCode>` per versione, scritto
   anche nelle 8 cartelle `values-xx`, più la riga `Release(code, nome, R.array.changelog_<code>)` in
   `Changelog.kt`: schermata "Novità" sull'auto e sul telefono) e in `.github/release-notes.md` (testo
-  del rilascio, in inglese).
+  del rilascio, in inglese). Dalla 0.7.0 le novità si scrivono anche in **piratesco** (richiesta
+  dell'utente: col piratesco scelto, anche le descrizioni dei prossimi aggiornamenti sono pirata, più
+  colorite, ogni termine un emblema della libertà): lo stesso `changelog_<versionCode>` in ognuna delle
+  cartelle `values-<lingua>-rXP` (vedi "Il piratesco").
 - Il workflow **Release** parte dai tag `v*`, firma l'APK con i secret e lo allega al rilascio
   (non pre-release, così Obtainium lo trova).
 - Dalla sessione cloud di Claude il push dei tag è rifiutato (403): il rilascio lo crea l'utente su
@@ -797,6 +800,53 @@ Tutti i token in un solo posto, `car/design/`:
   dell'intro della 0.6 non fa saltare le prime della 0.7. Scatti: `setup-phone/09-intro-page-2…7` e, per
   lingua, `lang-<lingua>/phone/intro-page-2…7`. Provato col banco Compose Desktop (sopra, "Build"): le
   pagine nuove in inglese, greco, russo, tedesco, francese e cinese stanno anche a 320×640 dp.
+- **Il piratesco** (0.7.0, richiesta dell'utente: "un'ulteriore lingua, il piratesco, che funziona in
+  tutte le lingue e scrive ogni testo in termini pirateschi, l'emblema della libertà di scelta"): non una
+  lingua a sé ma un modo di parlare ciascuna delle 9, la lingua con la regione a uso privato **XP**
+  (`it-XP`, `en-XP`…, `AppLanguage.PIRATE`), testi in `res/values-<lingua>-rXP` (inglese `values-en-rXP`,
+  cinese `values-zh-rXP`). Un testo che manca lì viene dalla cartella della lingua: si può scrivere a
+  pezzi. Non la variante BCP 47 `it-pirate`: aapt2 non costruisce `values-b+it+pirate` ("configuration
+  has invalid locale 'it-'"). Impostazioni > Lingua > "Parla da pirata" (`language_pirate`,
+  `AppLanguage.choose(…, pirate)`); da Android 13 Android tiene `it-XP` come lingua di myCar, su
+  Android 12 la applica myCar (chiave `app_language_pirate`); col piratesco e la lingua del telefono si
+  fissa quella in cui è myCar. `AppLanguage.wanted` è un `Locale` (la regione conta per lo schermo
+  dell'auto e `Words`); ciò che va col paese (unità automatiche, formato dei numeri di telefono,
+  portoghese del Portogallo o del Brasile) prende `AppLanguage.country()`, il paese del telefono quando
+  la regione è XP. `tools/check_strings.py` controlla anche le cartelle `-rXP` (chiavi della lingua,
+  segnaposto, plurali). Testi scritti da agenti (glossario piratesco per lingua, poi un agente per gruppo
+  di file; glossari nella scratchpad della sessione): gergo pirata della lingua, ribelle e colorito ma
+  mai volgare (in auto ci sono bambini), stesso registro della lingua, etichette brevi, e i testi di
+  sicurezza (video in marcia, chiamate, permessi, errori) seri e chiari come prima. Nomi propri e di
+  marchi invariati. Le frasi dell'assistente (codice, non risorse) restano normali.
+- **Sfondo myCar «Ribelle»** (0.7.0, richiesta dell'utente: "il tema myCar, le onde, la barra del menu
+  con effetto glass, e tra le onde un veliero con la bandiera col teschio che sopravvive alle
+  intemperie: se va sotto un'onda poi rispunta fuori"): `Motion.Rebel` in `Wallpapers.kt`, disegno in
+  `car/design/RebelSea.kt` (le bande di Waves; la nave sulla seconda, in unità sue come il veliero
+  dell'intro ma più semplice; ogni 30 s un'onda grande con la schiuma la copre fin quasi alla bandiera,
+  poi la nave risale oltre la sua linea e si assesta). Id `mycar`, primo tra gli sfondi in movimento;
+  non è il predefinito (ogni fotogramma che cambia costa al video). Il dock resta di vetro sopra di lui
+  come con gli altri sfondi. Scatti `motion-mycar`, `motion-mycar-800x480`; provato col banco Compose
+  Desktop (`flagbench`, modo `rebel`).
+- **Il motto dell'intro della 0.7** (richiesta dell'utente: "un'animazione dopo l'arrivo della nave:
+  scegliamo noi le nostre rotte"): issata la bandiera, sul mare si disegna dalla prua una rotta a
+  puntini dorati fino a una stella (`PirateShip.drawCourse`, 3,25-4,55 s); sotto l'etichetta della 0.7
+  una bussola il cui ago gira e si ferma, e «Scegliamo noi le nostre rotte.» parola per parola
+  (`ui/IntroCourse.kt`, `WelcomeCourse`, `intro_course` nelle 9 lingue); sotto, il numero dei bug trovati
+  e corretti dalla release prima (`Intro.BUGS_FIXED`, plurale `intro_bugs_fixed`: 212 dalla 0.6.0 alla
+  0.7.0, contati commit per commit, nel dubbio come funzione nuova; elenco in `bugcount.tsv` nella
+  scratchpad di quella sessione). La pagina dà al testo lo spazio che serve e alla nave quello che resta
+  (su un telefono basso la nave è più piccola). Da aggiornare a ogni intro nuova.
+- **Seconda caccia della 0.7.0** (richiesta dell'utente: "controlla se trovi altri bug, in merito a crash
+  e assistente digitale"): sette cercatori (cuore dell'assistente, comandi, assistenti esterni, crash di
+  Compose, crash del processo, WebView, i log dei viaggi), unione, un verificatore scettico per ognuno:
+  13 bug veri su 14. Corretti: lo stesso crash di Plancia per altre strade (l'app Plancia che prende il
+  posto, account tolto, cambio di tema: `afterFocusLeaves` in CarUi e `rememberAllEntries`); «non
+  inviare» e «annulla» come risposta (`VoiceReply`); pausa rimandata che annullava il comando musicale
+  dopo; frasi della casa prese per musica; domande inglesi prese per comandi; «vai alla prossima
+  canzone» presa per navigazione; «hör auf»; «rispondi alla chiamata persa»; fuoco audio perso e mai
+  richiesto (`VoiceFocus`); assistente del telefono a schermo spento senza blocco (`AssistantUnlock`);
+  pipeline di Home Assistant con un modello ("*", `AssistPlan`); lunghezze enormi nel log dei messaggi
+  dell'auto (`Protobuf.describe`).
 - Condivisione schermo (`mirror/`): mentre il telefono è copiato in auto, `TouchRelayService`
   (accessibilità, già usato per i tocchi) aggiunge un pixel trasparente
   `TYPE_ACCESSIBILITY_OVERLAY` con `screenOrientation = LANDSCAPE` (fisso, non sensore) che gira il
