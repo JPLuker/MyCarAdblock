@@ -72,6 +72,12 @@ internal object GermanPhrases : Phrasebook() {
                 else -> "read my messages"
             }
         },
+        // A call, before the messages take it for a reply to "den verpassten Anruf".
+        Rule(
+            "(?:antworte|antworten|beantworte|beantworten)(?: auf)? (?:den )?(?:letzten )?(?:verpassten|entgangenen) anruf|" +
+                "(?:auf )?(?:den )?(?:letzten )?(?:verpassten|entgangenen) anruf (?:beantworten|antworten)",
+            "call back",
+        ),
         Rule("(?:antworte|antworten|schreib|schreibe|schicke eine nachricht an|sende eine nachricht an|nachricht an) (.+)") { m ->
             "reply to " + who(m.groupValues[1])
         },

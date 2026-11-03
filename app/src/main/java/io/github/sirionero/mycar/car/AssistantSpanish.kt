@@ -82,6 +82,8 @@ internal object SpanishPhrases : Phrasebook() {
                 else -> "read my messages"
             }
         },
+        // A call, before the messages take it for a reply to "llamada perdida".
+        Rule("(?:responde|contesta|responder|contestar) (?:a )?la (?:última |ultima )?llamada perdida", "call back"),
         Rule(
             "(?:responde|contesta|responder|contestar|escribe|escribir|envía un mensaje|envia un mensaje|manda un mensaje|" +
                 "mándale un mensaje|mandale un mensaje|mandar un mensaje) (?:a|al|a la) (.+)",

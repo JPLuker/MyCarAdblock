@@ -85,6 +85,8 @@ internal object FrenchPhrases : Phrasebook() {
                 else -> "read my messages"
             }
         },
+        // A call, before the messages take it for a reply to "l'appel manqué".
+        Rule("(?:réponds|reponds|répond|repond|répondre|repondre) (?:(?:à|a) l'appel|au dernier appel) (?:manqué|manque)", "call back"),
         Rule(
             "(?:réponds|reponds|répond|repond|répondre|repondre|écris|ecris|écrire|ecrire|envoie un message|envoyer un message|envoie un sms|" +
                 "envoie un texto) (?:à|a) (.+)",

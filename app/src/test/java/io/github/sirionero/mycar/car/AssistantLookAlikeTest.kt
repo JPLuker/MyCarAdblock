@@ -14,7 +14,8 @@ import org.junit.Test
 
 /**
  * Phrases that a later rule would take for something else: the next song said with "go to" (a
- * place for the map), "hör auf" (a song called "auf"). Next to them, what must stay as it was.
+ * place for the map), "hör auf" (a song called "auf"), a missed call "answered" (a reply to a
+ * person called "missed call"). Next to them, what must stay as it was.
  */
 class AssistantLookAlikeTest {
 
@@ -123,4 +124,51 @@ class AssistantLookAlikeTest {
         "Hör Queen." to "play queen",
         "Spiel Herbert Grönemeyer" to "play herbert grönemeyer",
     )
+
+    @Test
+    fun `a missed call answered is a call back, a person answered a reply`() {
+        heard(
+            IT,
+            "Rispondi alla chiamata persa." to "call back",
+            "Rispondi all'ultima chiamata persa." to "call back",
+            "Rispondi alla mamma." to "reply to mamma",
+            "Rispondi a Giulia." to "reply to giulia",
+        )
+        heard(
+            ES,
+            "Responde a la llamada perdida." to "call back",
+            "Contesta la llamada perdida." to "call back",
+            "Responde a Carlos." to "reply to carlos",
+        )
+        heard(
+            FR,
+            "Réponds à l'appel manqué." to "call back",
+            "Réponds au dernier appel manqué." to "call back",
+            "Réponds à Marie." to "reply to marie",
+        )
+        heard(
+            DE,
+            "Antworte auf den verpassten Anruf." to "call back",
+            "Beantworte den verpassten Anruf." to "call back",
+            "Auf den verpassten Anruf antworten." to "call back",
+            "Antworte Anna." to "reply to anna",
+        )
+        heard(
+            PT,
+            "Responda à chamada perdida." to "call back",
+            "Responder a ligação perdida." to "call back",
+            "Responda ao João." to "reply to joão",
+        )
+        heard(
+            EL,
+            "Απάντησε στην αναπάντητη κλήση." to "call back",
+            "Απάντησε στη Μαρία." to "reply to μαρία",
+        )
+        heard(
+            ZH,
+            "回复未接来电。" to "call back",
+            "回复刚才的未接来电。" to "call back",
+            "回复张伟。" to "reply to 张伟",
+        )
+    }
 }

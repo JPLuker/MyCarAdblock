@@ -81,6 +81,8 @@ internal object ItalianPhrases : Phrasebook() {
                 "tra quanto arrivo|tra quanto arriviamo|orario di arrivo)(?: .*)?",
             "when do i arrive",
         ),
+        // A call, before the messages take it for a reply to "chiamata persa".
+        Rule("(?:rispondi|rispondere) (?:alla|all'ultima) chiamata persa", "call back"),
         // Messages.
         Rule("(?:leggi|leggimi|leggere|controlla)(?: .*)? (?:messaggi|messaggio|sms)(?: .*)?") { m ->
             val said = m.value
@@ -95,8 +97,7 @@ internal object ItalianPhrases : Phrasebook() {
         },
         // Calls.
         Rule(
-            "(?:richiama|richiamalo|richiamala|richiamali|richiamare|richiama la chiamata persa|richiama l'ultima chiamata(?: persa)?|" +
-                "rispondi alla chiamata persa)",
+            "(?:richiama|richiamalo|richiamala|richiamali|richiamare|richiama la chiamata persa|richiama l'ultima chiamata(?: persa)?)",
             "call back",
         ),
         Rule(

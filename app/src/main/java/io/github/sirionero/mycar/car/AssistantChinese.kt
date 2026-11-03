@@ -186,6 +186,8 @@ internal object ChinesePhrases : Phrasebook() {
                 else -> "read my messages"
             }
         },
+        // A call, before the messages take it for a reply to "未接来电".
+        rule("(?:回复|答复)(?:一下)?(?:刚才|刚刚|最后|最近|上一个|最近一个)?(?:的|那个|那通)?(?:未接|漏接)的?(?:电话|来电)", "call back"),
         rule("(?:回复|答复)(?:一下)? ?(?:给)? ?(.+?)(?: ?的)?(?:消息|信息|短信|微信|简讯|讯息)?") { m -> reply(m.groupValues[1]) },
         rule("回(?!复|拨|电) ?(.+?) ?的?(?:消息|信息|短信|微信|简讯|讯息)") { m -> reply(m.groupValues[1]) },
         rule("给 ?(.+?) ?(?:回复|回|发送|发|写|留言|留)(?:一)?(?:条|个|句)?(?:消息|信息|短信|微信|简讯|讯息|话)?") { m -> reply(m.groupValues[1]) },

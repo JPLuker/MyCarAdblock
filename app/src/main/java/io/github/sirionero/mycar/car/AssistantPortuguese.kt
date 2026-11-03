@@ -101,6 +101,11 @@ internal object PortuguesePhrases : Phrasebook() {
                 else -> "read my messages"
             }
         },
+        // A call, before the messages take it for a reply to "chamada perdida".
+        Rule(
+            "(?:responda|responde|responder) (?:à|a) (?:última |ultima )?(?:chamada|ligação|ligacao) (?:perdida|não atendida|nao atendida)",
+            "call back",
+        ),
         Rule(
             "(?:responda|responde|responder|escreva|escreve|escrever|mande uma mensagem|manda uma mensagem|envie uma mensagem|" +
                 "envia uma mensagem) (?:para o|para a|para|pro|pra|ao|à|a) (.+)",
