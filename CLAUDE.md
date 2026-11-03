@@ -511,15 +511,21 @@ Tutti i token in un solo posto, `car/design/`:
     chiama anche `forgetDrop()`, come il Bluetooth che si stacca, così un calo di rete visto dopo non fa ripartire la
     musica dall'altoparlante del telefono al ritorno della rete, e toglie la ripresa a fine telefonata
     (`resumeAfterInterruption`, col volume della chiamata rimesso: `setDuck(1f)`); i rifiuti NOT_OURS/NOT_MYCAR del
-    ponte non si aspettano più (sopra); la pausa durante una scelta vale (sopra); il segnaposto di una scelta non ha
-    copertina (`getPlaceholderMediaItemData`): Media3 1.11.1 (`MediaSessionLegacyStub.updateMetadataIfChanged`,
-    verificato nel bytecode) per i controller vecchi come l'auto carica la copertina e annulla il caricamento di prima
-    solo se il brano nuovo ne ha una; col segnaposto (con copertina) seguito da un brano senza, l'immagine finita dopo
-    rimetteva i metadati della voce scelta fino al brano dopo ("Preview Album" per oltre 15 s negli scatti
-    `xonos-lyrics` e `bridge-xonos`, 2 volte su 5; il meccanismo c'era già nella 0.7.2: stesso Media3, stesso segnaposto). Righe "Scelta:" (tempi
+    ponte non si aspettano più (sopra); la pausa durante una scelta vale (sopra); ogni brano pubblicato ha una copertina,
+    l'icona dei brani di Xonos quando manca (`artwork.uriFor(...) ?: artwork.iconUri("track")` in `PlaybackService`, come
+    il menu in `BrowseTree`): Media3 1.11.1 (`MediaSessionLegacyStub.updateMetadataIfChanged`, verificato nel bytecode)
+    per i controller vecchi come l'auto carica la copertina e annulla il caricamento di prima solo se il brano nuovo ne
+    ha una; col segnaposto di una scelta (con copertina) seguito da un brano senza, l'immagine finita dopo rimetteva i
+    metadati della voce scelta fino al brano dopo ("Preview Album" per oltre 15 s negli scatti `xonos-lyrics` e
+    `bridge-xonos`, 2 volte su 5; il meccanismo c'era già nella 0.7.2: stesso Media3, stesso segnaposto), e lo stesso
+    col brano di prima dopo due "avanti" veloci. Un primo tentativo toglieva la copertina al segnaposto
+    (`getPlaceholderMediaItemData`): copriva solo quella strada, e toglieva la copertina della voce scelta durante la
+    preparazione (con Soloist circa 7 s). Una telefonata cominciata e finita durante una scelta non lascia la musica
+    ferma (`resumeFromSystem` toglie `pauseAfterChoice`); finché una pausa è voluta (`pauseWanted`, non per una
+    telefonata) la musica partita non conta come ascolto recente (`apply`) e un calo di rete non si segna (`onLost`). Righe "Scelta:" (tempi
     di una scelta) e "Lettore:" (cosa vede l'auto) nel registro. **Da portare in Xonos**: la pausa durante una scelta
-    (`pauseAfterChoice` → stop), `awaitReady` che non aspetta col server fallito, il segnaposto senza copertina
-    (Gearslip è un controller vecchio anche lui), e per il Bluetooth la ripresa a fine telefonata rimandata finché non
+    (`pauseAfterChoice` → stop, `resumeFromSystem`, `apply`/`onLost` con `pauseWanted`), `awaitReady` che non aspetta col
+    server fallito, la copertina per ogni brano (l'icona quando manca: Gearslip è un controller vecchio anche lui), e per il Bluetooth la ripresa a fine telefonata rimandata finché non
     torna un'uscita esterna (non cancellata: alcune auto staccano l'A2DP durante la chiamata).
   - Prove: il pacchetto `xonos` compilato contro android-all 17 di Robolectric e Media3 1.11.1 (scratchpad,
     stub del resto di myCar) e i banchi JVM di Xonos sul motore di myCar (SkipCheck, LoggedCheck, DecoderCheck,
