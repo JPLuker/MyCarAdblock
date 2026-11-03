@@ -449,6 +449,12 @@ object CarServices {
             io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the car's Bluetooth music (or a cable), not to play on the phone's speaker")
             return
         }
+        // The assistant up (listening, answering): the drive's pick doesn't start the music over it. It
+        // plays as the assistant closes (AutoplayWhenReady calls again then).
+        if (autoplayAutoPicked && CarAssistant.state.value.phase != CarAssistant.Phase.IDLE) {
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the assistant to close")
+            return
+        }
         autoplayPending = false
         // After a wait for the Bluetooth, the song has its own 20 s from the Play to say itself.
         if (autoplayBluetoothSince != 0L && _musicStarting.value) {
