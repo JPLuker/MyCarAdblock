@@ -315,7 +315,8 @@ object AssistantCommands {
         return when {
             forMusic && (("pause" in heard && "unpause" !in heard) || heard.startsWith("stop") || heard == "quiet" || heard == "shut up") -> {
                 media.pause()
-                VoiceFocus.afterRelease { media.pause() }
+                // Not if something was asked of the music meanwhile: "pause", then at once "resume".
+                VoiceFocus.afterRelease(media.pauseLater())
                 "Paused."
             }
             // Before "play" below: "play the next song", "play something else", "play it again".
@@ -341,7 +342,7 @@ object AssistantCommands {
                         "Open a music app first, then ask again."
                     }
                 }
-                if (!media.now.value.playing) media.togglePlay()
+                media.resume()
                 "Playing."
             }
             ("what" in heard && "playing" in heard) || "what song" in heard || "who sings" in heard ||
