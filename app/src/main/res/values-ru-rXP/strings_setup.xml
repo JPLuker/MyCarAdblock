@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setup_title">Снарядить myCar</string>
+    <string name="setup_subtitle_first_run">Несколько касаний перед первым плаванием.</string>
+    <string name="setup_subtitle_return">Что осталось снарядить. Уже снаряжённое не изменится.</string>
+    <string name="setup_unofficial">myCar — неофициальное приложение: снарядите его на стоянке, а в пути следите за дорогой.</string>
+    <string name="setup_section_connect">Для абордажа</string>
+    <string name="setup_section_drive">Для плавания</string>
+    <string name="setup_status_done">Порядок</string>
+    <string name="setup_status_blocked">В блокаде</string>
+
+    <string name="setup_cert_body">Автомобили пускают на борт только те телефоны, у которых есть сертификат, которому они доверяют. В myCar его нет: он скачивает общедоступные сертификаты из проектов с открытым исходным кодом на GitHub (около 10 КБ каждый). Если ваш автомобиль отклонит один, myCar попробует следующий.</string>
+    <string name="setup_cert_get">Добыть сертификаты</string>
+    <string name="setup_cert_getting">Добываем сертификаты…</string>
+    <string name="setup_cert_wrong_file">Скачанный файл оказался не тем сертификатом, который ожидался, поэтому myCar выбросил его за борт. Попробуйте позже.</string>
+    <string name="setup_cert_no_download">Не удалось добыть сертификаты. Проверьте подключение к интернету и попробуйте ещё раз.</string>
+    <string name="setup_cert_some_ready">Добыто %1$d из %2$d. %3$s готов, остальные можно получить позже в такелаже.</string>
+
+    <string name="setup_mycar_on_title">Включите myCar для корабля</string>
+    <string name="setup_mycar_on_body">Он выключен в такелаже, поэтому корабль не может к нему причалить.</string>
+
+    <string name="setup_aa_off">Android Auto отключён и стоит на якоре.</string>
+    <string name="setup_aa_kept">Когда возьмёте корабль на абордаж, вы выберете myCar.</string>
+    <string name="setup_aa_body">Android Auto включён и может взять корабль на абордаж раньше myCar. На открывшемся экране нажмите «Отключить», затем «ОК» и вернитесь сюда.</string>
+    <string name="setup_aa_keep_body">Тогда оставьте его. Когда будете брать корабль на абордаж, Android спросит, какое приложение открыть: выберите myCar и нажмите «Всегда» — и штурвал перейдёт к myCar. Если Android Auto открывается сам, значит, ему задано открываться всегда: на его странице «О приложении» нажмите «Открывать по умолчанию», затем «Удалить настройки по умолчанию».</string>
+
+    <string name="setup_drive_title">Звонки, карта и песни</string>
+    <string name="setup_drive_skipped">Пропущено. Нажмите «Разрешить», когда будете готовы к плаванию.</string>
+    <string name="setup_drive_body">Автомобиль покажет, кто звонит, и недавние звонки, сможет звонить вашим контактам, карта будет знать, где вы, а песни смогут попасть в автомобиль без Bluetooth. Android спросит несколько раз: каждый раз нажимайте «Разрешить». myCar только читает данные, а слушает лишь тогда, когда вы нажимаете на микрофон.</string>
+
+    <string name="setup_more_later">Всё это может подождать до следующего прилива.</string>
+    <string name="setup_calendar_body">На бортовом экране будет ваше следующее событие. myCar только читает календарь.</string>
+    <string name="setup_notifications_body">myCar сможет показывать, что он подключён к автомобилю (с кнопкой «Остановить», пока он передаёт звук телефона), и сообщать, когда появятся новые паруса.</string>
+    <string name="setup_screening_button">Снарядить</string>
+    <string name="setup_audio_title">Звук на борту</string>
+    <string name="setup_audio_body">Как песни попадают на борт. Звонки в любом случае идут через Bluetooth.</string>
+    <string name="setup_usage_title">Помогите другим капитанам</string>
+
+    <plurals name="setup_bar_steps_left">
+        <item quantity="one">До первого плавания остался %1$d шаг.</item>
+        <item quantity="few">До первого плавания осталось %1$d шага.</item>
+        <item quantity="many">До первого плавания осталось %1$d шагов.</item>
+        <item quantity="other">До первого плавания осталось %1$d шага.</item>
+    </plurals>
+    <string name="setup_bar_ready_to_connect">Можно идти на абордаж.</string>
+    <string name="setup_bar_allow_drive">Разрешить звонки, карту и песни</string>
+    <string name="setup_bar_ready">Всё готово к отплытию. Возьмите корабль на абордаж; если Android спросит, выберите myCar и нажмите «Всегда».</string>
+    <string name="setup_bar_finish_later">Снарядить позже</string>
+
+    <plurals name="setup_card_steps_left">
+        <item quantity="one">До первого плавания остался %1$d шаг: %2$s.</item>
+        <item quantity="few">До первого плавания осталось %1$d шага: %2$s.</item>
+        <item quantity="many">До первого плавания осталось %1$d шагов: %2$s.</item>
+        <item quantity="other">До первого плавания осталось %1$d шага: %2$s.</item>
+    </plurals>
+    <plurals name="setup_card_extras_left">
+        <item quantity="one">Можно идти на абордаж. Остался %1$d необязательный шаг.</item>
+        <item quantity="few">Можно идти на абордаж. Осталось %1$d необязательных шага.</item>
+        <item quantity="many">Можно идти на абордаж. Осталось %1$d необязательных шагов.</item>
+        <item quantity="other">Можно идти на абордаж. Осталось %1$d необязательного шага.</item>
+    </plurals>
+    <string name="setup_card_all_done">Корабль снаряжён.</string>
+    <string name="setup_card_title">Снаряжение корабля</string>
+    <string name="setup_card_footer">Ничего не будет затоплено или сброшено. Вы увидите только то, что осталось, а сделанное будет отмечено.</string>
+    <string name="setup_card_back">Вернуться к снаряжению корабля</string>
+    <string name="setup_left_title">Завершите снаряжение</string>
+    <string name="setup_left_body">До первого плавания осталось: %1$s.</string>
+    <string name="setup_left_continue">Продолжить снаряжение</string>
+
+    <string name="setup_guide_optional">ПО ВАШЕЙ ВОЛЕ</string>
+    <string name="setup_guide_usage_title">Помогите другим капитанам.</string>
+    <string name="setup_guide_safety_body">myCar — неофициальное приложение. Ни один автопроизводитель его не создавал и не проверял, и оно может отказать без предупреждения. Снарядите его до поездки, а в пути следите за дорогой.</string>
+    <string name="setup_guide_mic_body">myCar использует его, чтобы передавать ваши песни в автомобиль и слышать вас, когда вы о чём-то просите или отвечаете на сообщение. Всё сказанное остаётся на телефоне.</string>
+    <string name="setup_guide_location_body">Оно нужно карте в автомобиле и поиску мест поблизости. Без него на «Вахте» не будет карты.</string>
+    <string name="setup_guide_aa_body">Android Auto всё ещё установлен и, как чужой экипаж, спорит с myCar за USB-подключение корабля. Отключите или удалите его на открывшемся экране.</string>
+    <string name="setup_guide_choose_title">Выберите myCar, капитан.</string>
+    <string name="setup_guide_choose_body">Если при абордаже телефон спросит, какое приложение открыть, выберите myCar и нажмите «Всегда».</string>
+    <string name="setup_guide_audio_title">Звук на борту.</string>
+    <string name="setup_guide_audio_body">Выберите, как песни попадают на борт. Звонки в любом случае идут через Bluetooth.</string>
+    <string name="setup_guide_voice_title">Попугай.</string>
+    <string name="setup_guide_voice_body">Просите голосом маршрут, песни или звонок. Телефон сам превращает речь в текст, и ничего из сказанного его не покидает. Попугай весит %1$d МБ и скачивается один раз. По возможности используйте Wi-Fi.</string>
+    <string name="setup_guide_voice_download">Скачать попугая</string>
+    <string name="setup_guide_voice_progress">Загрузка: %1$d%%. Можно плыть дальше — загрузка не прервётся.</string>
+    <string name="setup_guide_voice_ready">Попугай готов.</string>
+    <string name="setup_guide_voice_failed">Загрузка села на мель. Нажмите «Скачать попугая», чтобы попробовать снова.</string>
+    <string name="setup_guide_project_media_title">Отставить вопрос о звуке.</string>
+
+    <string name="setup_audio_recommended">Выбор капитана</string>
+    <string name="setup_audio_automatic_body">По Bluetooth, если корабль так принимает песни с телефона, иначе через myCar.</string>
+    <string name="setup_audio_bluetooth_body">Без вопроса в каждой поездке, и голос навигатора звучит на борту. Некоторые корабли принимают по нему только звонки.</string>
+
+    <string name="intro_start">Отплыть</string>
+    <string name="intro_welcome_to">Добро пожаловать на борт</string>
+    <string name="intro_course">Свой курс мы прокладываем сами — и к дьяволу чужие указки!</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d пробоина найдена и залатана с версии 0.6</item>
+        <item quantity="few">%d пробоины найдены и залатаны с версии 0.6</item>
+        <item quantity="many">%d пробоин найдено и залатано с версии 0.6</item>
+        <item quantity="other">%d пробоины найдено и залатано с версии 0.6</item>
+    </plurals>
+    <string name="intro_music_title">Песни на борту.</string>
+    <string name="intro_music_body">Spotify и другие сервисы играют внутри myCar через собственный веб-плеер. Один раз поднимитесь на борт с телефона со своим аккаунтом, в разделе «Такелаж > Песни». Там же спрячьте приложение Spotify на телефоне: на корабле один Spotify, а не два.</string>
+    <string name="intro_mini_body">Закройте шарманку рядом с картой, и поверх неё появится мини-шарманка с обложкой и кнопками: удерживайте её и перетащите куда угодно. Шарманка рядом с картой теперь бывает до размера «Очень большой».</string>
+    <string name="intro_lyrics_title">Споём, экипаж!</string>
+    <string name="intro_lyrics_body">Куплеты находятся гораздо чаще, а каждая добыча проверяется, чтобы никогда не показывались куплеты другой песни. Мелодии без слов так и помечены.</string>
+    <string name="intro_phone_body">Весь такелаж бортового экрана есть и на телефоне, в разделе «Такелаж > Бортовой экран»: поменяйте что-нибудь одно, и корабль сразу это подхватит, даже в плавании. Так же и палубы рядом с картой, и приложения, убранные из флота.</string>
+    <string name="intro_graphene_title">Люки снова задраены.</string>
+    <string name="intro_apps_title">Славный экипаж.</string>
+    <string name="intro_voice_title">Скажите попугаю.</string>
+    <string name="intro_voice_body">Нажмите на микрофон или кнопку голосового управления на штурвале и говорите. Телефон сам превращает речь в текст, и сказанное остаётся на нём, кроме вопросов, которые вы задаёте своему Home Assistant. Скажите на борту «%1$s», чтобы увидеть весь список.</string>
+    <string name="intro_voice_body_language">Нажмите на микрофон или кнопку голосового управления на штурвале и говорите. Телефон сам превращает речь в текст, и сказанное остаётся на нём, кроме вопросов, которые вы задаёте своему Home Assistant. Попугай слушает и отвечает на языке myCar: %1$s. Скажите на борту «%2$s», чтобы увидеть весь список.</string>
+    <string name="intro_voice_failed">Загрузка села на мель. Повторить</string>
+    <string name="intro_voice_download">Скачать попугая, %1$d МБ</string>
+
+    <string name="activity_toast_music_pauses_sharing">Песни телефона замолкают, пока транслируется его экран</string>
+    <string name="activity_toast_open_for_music">Откройте myCar на телефоне, чтобы передавать его песни на борт</string>
+    <string name="activity_toast_open_for_sharing">Откройте myCar на телефоне, чтобы транслировать его экран на борт</string>
+    <string name="activity_status_taken_title">Автомобиль взят на абордаж другим приложением</string>
+    <string name="activity_status_taken_detail">Другое приложение взяло автомобиль на абордаж раньше myCar. Если Android спросит, какое приложение открыть для автомобиля, выберите myCar.</string>
+</resources>
