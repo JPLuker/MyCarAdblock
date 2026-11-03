@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="xonos_cat_recent">Played of late</string>
+    <string name="xonos_cat_foryou">For the captain</string>
+    <string name="xonos_cat_tracks">Shanties</string>
+    <string name="xonos_cat_favorites">Treasured shanties</string>
+    <string name="xonos_all_tracks">Every shanty</string>
+
+    <string name="xonos_problem_bad_token">Token not accepted: sign on again in myCar on the phone</string>
+    <string name="xonos_problem_not_configured">Fit out Xonos in myCar on the phone</string>
+
+    <plurals name="xonos_results">
+        <item quantity="one">%d find</item>
+        <item quantity="other">%d finds</item>
+    </plurals>
+    <plurals name="xonos_count_tracks">
+        <item quantity="one">%d shanty</item>
+        <item quantity="other">%d shanties</item>
+    </plurals>
+</resources>

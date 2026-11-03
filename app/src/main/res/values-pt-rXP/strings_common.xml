@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_done">Nos trinques</string>
+    <string name="common_delete">Afundar</string>
+    <string name="common_next">Avante</string>
+    <string name="common_yes">Positivo</string>
+    <string name="common_no">Negativo</string>
+    <string name="common_settings">Leme</string>
+</resources>

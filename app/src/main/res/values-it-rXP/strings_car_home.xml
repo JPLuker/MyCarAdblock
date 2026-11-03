@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_ui_safety_unofficial">myCar è un software non ufficiale, che batte bandiera propria: nessuna casa automobilistica l\'ha fatto o controllato, e può smettere di funzionare senza preavviso.</string>
+    <string name="car_ui_safety_attention">Non usare mai questo schermo mentre guidi. Imposta la rotta o la canzone prima di partire, poi tieni l\'attenzione sulla strada.</string>
+    <string name="car_ui_app_wont_start">%1$s non salpa ancora con myCar.</string>
+    <string name="car_ui_app_wont_start_unknown">Questa app non salpa ancora con myCar.</string>
+    <string name="car_ui_app_wont_start_detail">Non ha levato l\'ancora. Alcune app funzionano solo con l\'Android Auto di Google.</string>
+    <string name="car_ui_search_ignored">%1$s non ha intonato nessuna ballata per «%2$s»</string>
+    <string name="car_ui_search_ignored_no_app">L\'app delle ballate non ha intonato niente per «%1$s»</string>
+    <string name="car_ui_link_opens_app">Questo link fa rotta verso un\'app sul telefono</string>
+
+    <string name="car_dock_dashboard">Vedetta</string>
+    <string name="car_dock_now_playing">Ora si canta</string>
+    <string name="car_dock_assistant">Pappagallo di bordo</string>
+    <string name="car_dock_all_apps">Tutta la flotta</string>
+    <string name="car_dock_map_and_music">Mappa e ballate</string>
+
+    <string name="car_apps_screen_sharing">Spartizione</string>
+    <string name="car_apps_vehicle_data">Dati di bordo</string>
+    <string name="car_apps_exit">Sbarca</string>
+    <string name="car_apps_browse_label">%1$s · Esplora</string>
+    <string name="car_apps_browse">Esplora</string>
+    <string name="car_apps_partial">Va solo a mezza vela con myCar</string>
+    <string name="car_apps_broken">Non salpa con myCar</string>
+    <string name="car_apps_pin">Ormeggia al molo</string>
+    <string name="car_apps_unpin">Molla dal molo</string>
+    <plurals name="car_apps_dock_full">
+        <item quantity="one">Il molo è pieno (%1$d app ormeggiata)</item>
+        <item quantity="other">Il molo è pieno (%1$d app ormeggiate)</item>
+    </plurals>
+    <string name="car_apps_reset_order">Ripristina l\'ordine della flotta</string>
+    <string name="car_apps_hide_from_grid">Manda sottocoperta dalla flotta</string>
+    <string name="car_apps_show_on_grid">Svela nella flotta</string>
+    <string name="car_apps_hidden_toast">App clandestina: %1$s. Per farla tornare: Timone, App clandestine.</string>
+    <string name="car_web_music_elsewhere">%1$s sta suonando su un altro dispositivo, non a bordo</string>
+    <string name="car_mini_open_player">Apri l\'organetto</string>
+    <string name="car_mini_hide">Mini organetto sottocoperta</string>
+    <string name="car_mini_hidden_toast">Mini organetto sottocoperta per questa traversata. La ballata nel molo apre l\'organetto.</string>
+    <string name="car_mini_hidden_toast_grid">Mini organetto sottocoperta per questa traversata. Il tasto in fondo al molo riporta l\'organetto dalla flotta.</string>
+
+    <string name="car_map_starting">Faccio salpare %1$s…</string>
+    <string name="car_map_starting_unknown">Srotolo la mappa…</string>
+    <string name="car_map_failed_unknown">L\'app di navigazione non ha levato l\'ancora.</string>
+    <string name="car_map_choose_another">Scegli tu un\'altra app</string>
+    <string name="car_map_none_installed">Nessuna app di navigazione in vista.</string>
+    <string name="car_map_none_installed_detail">Installa un\'app di navigazione che supporta Android Auto e salperà qui da sola.</string>
+    <string name="car_map_stopped">Mappa arrotolata.</string>
+    <string name="car_map_reopen">Srotola</string>
+    <string name="car_map_car_apps">App di bordo</string>
+    <string name="car_map_choose">Scegli tu un\'app di navigazione.</string>
+    <string name="car_home_hide_lyrics">Strofe sottocoperta</string>
+    <string name="car_home_app_failed">Impossibile far salpare %1$s.</string>
+
+    <string name="car_side_close_player">Chiudi l\'organetto</string>
+    <string name="car_side_music">Ballate</string>
+    <string name="car_side_explained">«Ballate» mette l\'organetto accanto alla mappa mentre qualcosa suona. Un\'app invece resta sempre accanto alla mappa; chiudila per la traversata, e il tasto in fondo al molo la riporta dalla flotta.</string>
+
+    <string name="car_pages_nothing_yet">Niente a bordo</string>
+    <string name="car_pages_app_missing">App non imbarcata</string>
+    <string name="car_pages_tap_to_choose">Tocca e scegli tu cosa imbarcare qui</string>
+    <string name="car_pages_app_gone">Questa app non è più a bordo del telefono. Tocca per scegliere altro.</string>
+    <string name="car_pages_add">Imbarca una pagina</string>
+    <string name="car_pages_delete">Affonda questa pagina</string>
+    <string name="car_pages_delete_confirm">Affonda pagina</string>
+    <string name="car_pages_show_here">Svela qui</string>
+    <string name="car_pages_one_app">Una pagina fa girare un\'app di bordo alla volta: %1$s è già in questa.</string>
+    <string name="car_pages_layout_keeps">Il carico della pagina resta, in ordine, finché il nuovo formato ha posto.</string>
+    <string name="car_pages_settings_explained">Scorri in porto, o tocca i puntini in basso, per vedere le tue pagine: meteo, agenda, browser o un\'app di bordo come Plancia, a pagina intera, a metà, a quarti o misti. La matita accanto ai puntini modifica la pagina in vista.</string>
+
+    <string name="car_dashboard_title">Oggi in mare</string>
+    <string name="car_dashboard_weather_loading">Carico a bordo il meteo…</string>
+    <string name="car_dashboard_allow_calendar">Consenti il calendario a myCar sul telefono per avvistare i prossimi eventi.</string>
+    <string name="car_dashboard_calendar_loading">Carico a bordo il calendario…</string>
+    <string name="car_dashboard_nothing_coming">Mare calmo: niente nella prossima settimana.</string>
+
+    <string name="car_weather_loading">Carico a bordo il meteo…</string>
+    <string name="car_weather_waiting_fix">In attesa della posizione, sestante alla mano.</string>
+    <string name="car_weather_allow_location">Consenti la posizione a myCar sul telefono per scrutare il meteo.</string>
+    <string name="car_weather_unreachable">Il servizio meteo è fuori portata.</string>
+
+    <string name="car_template_car_app">App di bordo</string>
+    <string name="car_template_finding_route">Traccio la rotta…</string>
+    <string name="car_template_finding_routes">Traccio le rotte…</string>
+    <string name="car_template_end_route">Termina la rotta</string>
+    <string name="car_template_search">Scova</string>
+    <string name="car_template_clear">Fuori bordo</string>
+    <string name="car_template_nothing_playing">Ancora nessuna ballata in corso.</string>
+    <string name="car_template_unsupported">myCar non traccia ancora %1$s</string>
+    <string name="car_template_start">Salpa</string>
+
+    <string name="car_host_service_disconnected">il servizio dell\'app si è sganciato</string>
+    <string name="car_host_refused_bind">l\'app ha respinto l\'abbordaggio: host non accettato</string>
+    <string name="car_host_would_not_connect">l\'app non ha lasciato abbordare myCar</string>
+    <string name="car_host_only_android_auto">Accetta a bordo solo l\'host Android Auto di Google.</string>
+    <string name="car_host_not_allowed">Si fida solo degli host del suo elenco (l\'Android Auto di Google e pochi altri), e myCar, che batte bandiera propria, non c\'è.</string>
+    <string name="car_host_no_answer">Non ha risposto al richiamo di myCar. Le app fatte per le versioni più recenti di Android Auto funzionano solo con quello di Google.</string>
+    <string name="car_host_step_failed">%1$s naufragato: %2$s</string>
+    <string name="car_host_step_failed_no_reason">%1$s naufragato: nessun motivo indicato</string>
+    <string name="car_host_rejected_at">Ha respinto myCar come host durante %1$s: %2$s</string>
+    <string name="car_host_failed_at">È finita sugli scogli durante %1$s: %2$s</string>
+    <string name="car_host_location_notification">myCar condivide la posizione con la mappa di bordo</string>
+
+    <string name="car_wallpaper_title">Orizzonte</string>
+    <string name="car_wallpaper_still">All\'ancora</string>
+    <string name="car_wallpaper_moving">Al vento</string>
+</resources>

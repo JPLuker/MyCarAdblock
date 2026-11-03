@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_done">Klar</string>
+    <string name="common_save">Bunkern</string>
+    <string name="common_delete">Versenken</string>
+    <string name="common_add">An Bord holen</string>
+    <string name="common_next">Voraus</string>
+    <string name="common_copy">Abkupfern</string>
+    <string name="common_yes">Aye</string>
+    <string name="common_no">Nix da</string>
+    <string name="common_loading">Wird verladen…</string>
+    <string name="common_settings">Takelage</string>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_done">Paré</string>
+    <string name="common_delete">Saborder</string>
+    <string name="common_add">Embarquer</string>
+    <string name="common_next">En avant</string>
+    <string name="common_settings">Timonerie</string>
+</resources>

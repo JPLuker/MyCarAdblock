@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_whats_new_in">Neue Beute in %1$s</string>
+    <string name="home_how_to_connect_subtitle">Welche Autos funktionieren und was noch seeklar zu machen ist</string>
+    <string name="home_disconnect">Ablegen</string>
+    <string name="home_disconnect_title">Vom Schiff ablegen?</string>
+    <string name="home_disconnect_text">myCar verlässt jetzt den Bordbildschirm. Mit Kabel: Zieh es ab und steck es wieder ein, um wieder an Bord zu kommen.</string>
+    <string name="home_bluetooth_missing_calls">Anrufe laufen über Bluetooth, aber dein Telefon ist nicht mit dem Auto verbunden. Verbinde es hier oder über das Bluetooth-Menü an Bord.</string>
+    <string name="home_bluetooth_missing_calls_music">Anrufe und Musik laufen über Bluetooth, aber dein Telefon ist nicht mit dem Auto verbunden. Verbinde es hier oder über das Bluetooth-Menü an Bord.</string>
+    <string name="home_voice_downloading">Sprachmodelle werden verladen, %1$d %%</string>
+
+    <string name="wireless_button_connect">Kabellos entern</string>
+    <string name="wireless_button_switched_off">myCar ist fürs Schiff ausgeschaltet (Takelage, „myCar an Bord verwenden“).</string>
+    <string name="wireless_button_which_car">Welches Schiff?</string>
+    <string name="wireless_button_bluetooth_off">Bluetooth ist aus. Schalte es ein und tippe dann erneut auf „Kabellos entern“.</string>
+    <string name="wireless_button_not_paired">Dein Telefon ist noch mit nichts gekoppelt. Kopple es zuerst mit dem Schiff.</string>
+    <string name="wireless_button_not_listed">Schiff nicht in der Liste? Kopple es zuerst mit deinem Telefon.</string>
+
+    <string name="help_title">Hilfe zum Entern</string>
+    <string name="help_in_the_car">An Bord</string>
+    <string name="help_step_connect">Anschließen oder kabellos entern.</string>
+    <string name="help_step_connect_detail">myCar öffnet sich von selbst, wenn sich das Schiff verbindet. Zum kabellosen Entern kopple zuerst das Telefon mit dem Schiff und tippe dann im Heimathafen auf „Kabellos entern“.</string>
+    <string name="help_set_up">Klarmachen</string>
+    <string name="help_step_audio_prompt">Die Audiofrage bei jedem Törn abschalten.</string>
+    <string name="help_step_audio_prompt_detail">Verbinde das Telefon mit einem Computer mit aktiviertem USB-Debugging und führe das hier einmal aus. Ohne das tippst du bei jedem Auslaufen auf „Starten“.</string>
+    <string name="help_step_notifications_detail">Android blendet den Inhalt von Benachrichtigungen aus, während es Ton teilt. Führe auch das aus, dann hebt myCar das nur auf, solange Musik an Bord geht.</string>
+
+    <string name="cert_notice_own_refused_text">Um stattdessen die öffentlichen zu verwenden, entferne deins in der Takelage unter „Zertifikat“.</string>
+    <string name="cert_notice_getting_spare">Wird verladen…</string>
+    <string name="cert_notice_getting_certificates">Zertifikate werden verladen…</string>
+
+    <string name="cert_setup_continue">Voraus</string>
+
+    <string name="update_title">Neue Segel</string>
+    <string name="update_out">myCar %1$s ist eingelaufen</string>
+    <string name="update_downloading">Wird verladen… %1$d %%</string>
+    <string name="update_unplug_first">Leg erst vom Schiff ab, um zu installieren. Die Installation schließt myCar.</string>
+    <string name="update_downloaded">Fertig verladen. Android fragt vor der Installation.</string>
+    <string name="update_download_now">Hol es jetzt an Bord. Android fragt vor der Installation.</string>
+    <string name="update_download">An Bord holen</string>
+    <string name="update_check_now">Jetzt peilen</string>
+    <string name="update_status_debug">Debug-Builds peilen nur, wenn du auf „Jetzt peilen“ tippst</string>
+    <string name="update_status_daily">myCar peilt einmal am Tag</string>
+    <string name="update_status_checking">Wird gepeilt…</string>
+    <string name="update_status_latest">Du segelst mit der neuesten Version</string>
+    <string name="update_status_available">Version %1$s ist eingelaufen</string>
+    <string name="update_status_ready">Version %1$s ist klar zur Installation</string>
+    <string name="update_check_automatically">Von selbst peilen</string>
+    <string name="update_notification_text">Tippen, um neue Segel zu setzen.</string>
+    <string name="update_error_no_github">GitHub ist außer Sichtweite. Prüfe die Verbindung und versuche es erneut.</string>
+    <string name="update_error_no_space">Nicht genug Stauraum auf dem Telefon für das Update. Schaff etwas Platz und versuche es dann erneut.</string>
+    <string name="update_error_stopped">Der Download ist auf Grund gelaufen. Prüfe die Verbindung und versuche es dann erneut.</string>
+    <string name="update_error_not_sent">GitHub hat das Update nicht verschifft (Code %1$d). Versuche es später erneut.</string>
+    <string name="update_error_stopped_early">Der Download hat zu früh die Segel gestrichen. Versuche es erneut.</string>
+    <string name="update_error_damaged">Der Download ist beschädigt eingelaufen. Versuche es erneut.</string>
+    <string name="update_splash_updated_to">Neu getakelt auf</string>
+    <string name="update_splash_tap">Tippe irgendwo, um weiterzusegeln</string>
+
+    <string name="whatsnew_title">Neue Beute</string>
+
+    <string name="recommended_title">Tipps vom Käpt\'n</string>
+    <string name="recommended_intro">Diese kostenlosen Apps laufen auf dem Bordbildschirm von myCar. Jede Taste öffnet die Seite der App auf GitHub.</string>
+    <string name="recommended_section_maps">Schatzkarten</string>
+    <string name="recommended_section_music">Shantys</string>
+    <string name="recommended_about_organic_maps">Offline-Karten und Kursplanung.</string>
+    <string name="recommended_about_vela">Navigation mit Abbiegehinweisen, frei von Google.</string>
+    <string name="recommended_about_youtube_music">Eine Drehorgel für YouTube Music.</string>
+    <string name="recommended_about_antennapod">Podcasts, mit Kapiteln und der ganzen Ladung.</string>
+    <string name="recommended_installed">Schon an Bord</string>
+
+    <string name="logs_title">Live-Logbuch</string>
+    <string name="logs_empty">Noch nichts im Logbuch. Zeilen erscheinen hier live, während ein Törn läuft.</string>
+    <string name="logs_share_subject">myCar-Logbuch</string>
+    <string name="logs_share_chooser">Logbuch teilen</string>
+    <string name="logs_earlier_title">Ältere Logbücher</string>
+    <string name="logs_earlier_empty">Noch keine älteren Logbücher. Bei jedem Start beginnt myCar ein neues.</string>
+    <string name="logs_crashed">Gekentert</string>
+
+    <string name="preview_title">Fernrohr</string>
+    <string name="preview_size">%1$dx%2$d @ %3$ddpi – Berührungen gehen an die Oberfläche an Bord</string>
+    <string name="preview_car_screen">Bordbildschirm</string>
+    <string name="preview_waiting">Halte Ausschau nach einem Bild…</string>
+    <string name="preview_leave">Fernrohr absetzen</string>
+
+    <string name="donate_title">Schön, dass der Törn geklappt hat</string>
+    <string name="donate_text">myCar ist kostenlos, ohne Werbung und ohne Tracking. Wenn es dich auf Kurs bringt, hält deine Unterstützung es über Wasser.</string>
+    <string name="audio_not_reaching_title">Die Musik kommt nicht an Bord</string>
+    <string name="audio_not_reaching_text">Die Frage von Android, den Ton über myCar zu senden, wurde abgelehnt, deshalb kommt keine Musik an Bord.</string>
+</resources>

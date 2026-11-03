@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="session_idle">Sin abordar</string>
+    <string name="session_idle_detail">Conecta el cable al puerto USB del coche o aborda sin cable. myCar se abre solo cuando el coche responde.</string>
+    <string name="session_connecting">Abordando</string>
+    <string name="session_connected">A bordo</string>
+    <string name="session_connected_detail">myCar está al timón.</string>
+    <string name="session_disconnected">Amarras sueltas</string>
+    <string name="session_disconnected_detail">El barco ya no está conectado.</string>
+
+    <string name="connection_stage_talking">Parlamentando con el barco</string>
+    <string name="connection_stage_accepted">Certificado aceptado: izando velas</string>
+
+    <string name="wireless_link_bt_reaching">Bluetooth: rumbo a %1$s</string>
+    <string name="wireless_link_bt_talking">Bluetooth: parlamentando con %1$s</string>
+    <string name="wireless_link_wifi_joining">Wi-Fi: abordando la red de %1$s</string>
+    <string name="wireless_link_wifi_reaching">Wi-Fi: rumbo a %1$s</string>
+
+    <string name="channel_session">Abordaje del barco</string>
+    <string name="channel_audio">Sonido a bordo</string>
+    <string name="session_notification_title">myCar está a bordo</string>
+    <string name="audio_notification_title">Sonando a bordo</string>
+    <string name="audio_notification_text">myCar está enviando el audio del teléfono a bordo.</string>
+    <string name="mirror_notification_title">Duplicando la pantalla a bordo</string>
+</resources>

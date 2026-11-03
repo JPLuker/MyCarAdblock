@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_done">Shipshape</string>
+    <string name="common_save">Stash</string>
+    <string name="common_delete">Scuttle</string>
+    <string name="common_next">Onward</string>
+    <string name="common_yes">Aye</string>
+    <string name="common_no">Nay</string>
+    <string name="common_loading">Hauling aboard…</string>
+    <string name="common_settings">Rigging</string>
+</resources>

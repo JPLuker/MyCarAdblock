@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialer_tab_recents">Squilli</string>
+    <string name="dialer_tab_contacts">Ciurma</string>
+    <string name="dialer_loading_contacts">Carico a bordo la ciurma…</string>
+    <string name="dialer_no_contacts">Nessuno della ciurma ha un numero di telefono.</string>
+    <string name="dialer_no_match">Nessuno della ciurma corrisponde a «%1$s».</string>
+    <string name="dialer_search_contacts">Scova nella ciurma</string>
+    <string name="dialer_favourite">Nel forziere</string>
+
+    <string name="recents_loading">Carico a bordo gli squilli…</string>
+    <string name="recents_empty">Acque calme: nessuno squillo recente.</string>
+
+    <plurals name="message_new_count">
+        <item quantity="one">%1$s · %2$d dispaccio nuovo</item>
+        <item quantity="other">%1$s · %2$d dispacci nuovi</item>
+    </plurals>
+    <string name="message_listening">Ti ascolto, capitano</string>
+    <string name="message_sending_to">In rotta per %1$s</string>
+    <string name="message_sent_to">Salpato per %1$s</string>
+    <string name="message_reply_failed">Risposta naufragata</string>
+
+    <string name="message_screen_title">Dispacci</string>
+    <string name="message_empty">Nessun dispaccio recente. I nuovi dispacci di %1$s compaiono qui appena approdano sul telefono.</string>
+    <string name="message_quick_replies_hide">Manda sottocoperta le risposte rapide</string>
+
+    <string name="message_test_channel">Dispacci di prova</string>
+    <string name="message_test_late">Approdo con dieci minuti di ritardo, mi tieni un posto?</string>
+    <string name="message_test_tonight">Allora fai rotta da me stasera?</string>
+    <string name="message_test_milk">Prendi il latte sulla rotta di casa?</string>
+    <string name="message_test_parked">Chiamami quando hai gettato l\'ancora.</string>
+
+    <string name="notifications_title">Segnali</string>
+    <string name="notifications_clear_all">Affonda tutto</string>
+    <string name="notifications_clear_confirm">Affondali tutti</string>
+    <string name="notifications_empty">Mare piatto, per ora. I nuovi segnali del telefono compariranno qui.</string>
+
+    <string name="assistant_needs_model">Per ora il pappagallo capisce solo l\'inglese: per i comandi in %1$s scarica %2$s nel Timone di myCar sul telefono.</string>
+    <string name="assistant_mic">Pappagallo</string>
+    <string name="assistant_phone_inline">il pappagallo del telefono</string>
+    <string name="assistant_listening_on_phone">Pappagallo in ascolto sul telefono</string>
+    <string name="assistant_picker_title">Pappagallo di bordo</string>
+    <string name="assistant_choice_phone">Pappagallo del telefono</string>
+    <string name="assistant_picker_footer">Il pappagallo del telefono si sveglia come quando scorri verso l\'alto da un angolo in basso dello schermo del telefono. Un altro pappagallo ascolta e risponde sul telefono, e la sua voce arriva a bordo solo via Bluetooth; col telefono bloccato parte quando il telefono viene sbloccato, oppure, con Home Assistant configurato in myCar, ascolta myCar e risponde Home Assistant. Quello di myCar funziona senza rete, col telefono bloccato o no, e si vede sullo schermo di bordo; con Home Assistant configurato, quello che non sa fare da solo va all\'assistente vocale di Home Assistant.</string>
+
+    <string name="bluetooth_hide">Sottocoperta</string>
+
+    <string name="cinema_continue">Avanti tutta: %1$s</string>
+    <string name="cinema_empty">Imbarca siti di video e liste TV nel Timone di myCar sul telefono, in Cinema.</string>
+    <string name="cinema_protected">Video sotto chiave: probabilmente nero</string>
+    <string name="cinema_page_failed_title">La pagina non è salita a bordo</string>
+    <string name="cinema_pause">Tregua</string>
+    <string name="cinema_error_stopped_early">Si è arenato prima della fine: controlla la connessione del telefono.</string>
+    <string name="cinema_error_channel_stopped">Il canale si è arenato.</string>
+    <string name="cinema_error_other">Non è salpato (errore %1$d, %2$d).</string>
+    <string name="cinema_videos_none_picked">Nessun video scelto per myCar. Sul telefono, nel Timone di myCar in Cinema, scegli quali può vedere.</string>
+    <string name="cinema_videos_none">Stiva vuota: nessun video su questo telefono.</string>
+    <string name="cinema_find_channel">Scova un canale</string>
+    <string name="cinema_tv_found">Canali scovati con «%1$s»: %2$d</string>
+    <string name="cinema_tv_refused">Il server della lista ha detto giammai (%1$d).</string>
+    <string name="cinema_tv_too_big">La lista è troppo grande per la nave (oltre %1$d MB).</string>
+    <string name="cinema_tv_unknown_host">Impossibile scovare %1$s: controlla l\'indirizzo o la connessione del telefono.</string>
+    <string name="cinema_tv_failed">La lista non è salita a bordo: %1$s</string>
+
+    <string name="plancia_set_up_title">Prepara Plancia sul telefono</string>
+    <string name="plancia_set_up_text">In myCar sul telefono: Timone, poi Plancia. Servono l\'indirizzo del tuo Home Assistant e un token.</string>
+    <string name="plancia_connecting">Abbordo Home Assistant</string>
+
+    <string name="directions_ferry">Imbarcati sul traghetto</string>
+    <string name="directions_destination_ahead">L\'approdo è davanti a te</string>
+    <string name="directions_destination_left">L\'approdo è sulla sinistra</string>
+    <string name="directions_destination_right">L\'approdo è sulla destra</string>
+</resources>

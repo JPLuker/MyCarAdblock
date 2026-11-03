@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_settings_open_on_connect">Apri all\'abbordaggio</string>
+    <string name="car_settings_open_home">Porto</string>
+    <string name="car_settings_size">Stazza</string>
+    <string name="car_settings_player_size">Stazza dell\'organetto accanto alla mappa</string>
+    <string name="car_settings_mini_player">Mini organetto sulla mappa intera</string>
+    <string name="car_settings_mini_player_detail">Chiuso l\'organetto accanto alla mappa, un mini organetto galleggia sopra la mappa. Tienilo premuto, poi trascinalo per spostarlo.</string>
+    <string name="car_settings_hidden_apps">App clandestine</string>
+    <string name="car_settings_hidden_apps_none">Nessuna clandestina a bordo. Per nascondere un\'app, tienila premuta nella flotta e scegli la voce che la manda sottocoperta.</string>
+    <string name="car_settings_hidden_apps_show">Svela</string>
+    <string name="car_settings_app_theme">Tema di bordo</string>
+    <string name="car_settings_autoplay">Suona all\'abbordaggio</string>
+    <string name="car_settings_car_audio">Audio a bordo</string>
+    <string name="car_settings_car_audio_note">«Tramite myCar» manda il suono del telefono sul collegamento di myCar, il cavo o il Wi-Fi, come fa Android Auto. Android chiede di condividere lo schermo a ogni traversata, e alcune app lo bloccano. Il Bluetooth suona come farebbe normalmente il telefono, e Android non chiede mai niente, ma alcune navi lo usano solo per le chiamate. «Automatico» usa il Bluetooth quando la nave riceve così le ballate del telefono, e il collegamento di myCar quando no.</string>
+    <string name="car_settings_bluetooth_warning">Dai l\'allarme se il Bluetooth non è collegato</string>
+    <string name="car_settings_location_warning">Dai l\'allarme se la posizione è disattivata</string>
+    <string name="car_settings_spoken_directions">Rotta a voce</string>
+    <string name="car_settings_spoken_directions_note">myCar annuncia ogni svolta ad alta voce dalle casse di bordo, e le ballate si abbassano mentre parla. Disattivala se la voce della tua app di navigazione si sente già a bordo.</string>
+    <string name="car_settings_system_speech_note">Il pappagallo ascolta con il servizio vocale del telefono invece che con quello di myCar. Sulla maggior parte dei telefoni è quello di Google, che può mandare la tua voce a Google. GrapheneOS non ne ha, quindi myCar continua a usare il suo.</string>
+    <string name="car_settings_experimental">Acque inesplorate</string>
+    <string name="car_settings_experimental_hide">Sottocoperta</string>
+    <string name="car_settings_experimental_show">Svela</string>
+    <string name="car_settings_vehicle_data_note">Aggiunge il riquadro «Dati di bordo»: i dati grezzi del canale dei sensori dell\'autoradio, in tempo reale. I nomi dei campi (velocità, giri, carburante…) vengono da altri progetti di reverse engineering e non sono verificati su questa nave: considerali un\'ipotesi, non un fatto, finché non ne hai visto uno cambiare con i tuoi occhi.</string>
+    <string name="car_settings_connection">Abbordaggio</string>
+    <string name="car_settings_info_vehicle">Nave</string>
+    <string name="car_settings_unknown_vehicle">Nave senza nome</string>
+    <string name="car_settings_about">Bandiera</string>
+    <string name="car_settings_whats_new_after_updates">Bottino dopo gli aggiornamenti</string>
+    <string name="car_settings_whats_new_after_updates_note">Mostra l\'elenco del bottino una volta, la prima volta che la nave si collega dopo un aggiornamento.</string>
+    <string name="car_settings_whats_new">Bottino</string>
+    <string name="car_settings_web_page_default">DuckDuckGo (predefinita): tocca per far rotta su un\'altra pagina</string>
+    <string name="car_settings_web_page_note">La mostra l\'app Browser dalla prossima volta che si apre, e un browser nelle tue pagine dalla prossima traversata.</string>
+    <string name="car_settings_screen_fit">Assetto dello schermo</string>
+    <string name="car_settings_save_for_vehicle">Salva per questa nave</string>
+    <string name="car_settings_no_vehicle_profile">Nessun profilo per questa nave</string>
+
+    <string name="car_whatsnew_title">Bottino della %1$s</string>
+    <string name="car_whatsnew_show_after_updates">Svela dopo gli aggiornamenti</string>
+    <string name="car_whatsnew_got_it">Ricevuto</string>
+
+    <string name="car_keyboard_hide">Tastiera sottocoperta</string>
+    <string name="car_clipboard_copied">Copiato sul telefono, capitano.</string>
+    <string name="car_clipboard_nothing">Niente da copiare, capitano.</string>
+    <string name="car_clipboard_empty">Negli appunti del telefono non c\'è testo, capitano.</string>
+
+    <string name="car_player_previous">Ballata precedente</string>
+    <string name="car_player_play">Suona</string>
+    <string name="car_player_pause">Tregua</string>
+    <string name="car_player_next">Prossima ballata</string>
+    <string name="car_player_like">Nel forziere</string>
+    <string name="car_player_unlike">Fuori dal forziere</string>
+    <string name="car_player_shuffle_on">Attiva la rotta alla ventura</string>
+    <string name="car_player_shuffle_off">Disattiva la rotta alla ventura</string>
+    <string name="car_player_repeat">Bis</string>
+    <string name="car_player_lyrics">Strofe</string>
+    <string name="car_player_close">Chiudi l\'organetto</string>
+
+    <string name="car_media_tab_now_playing">Ora si canta</string>
+    <string name="car_media_tab_browse">Esplora</string>
+    <string name="car_media_tab_queue">In stiva</string>
+    <string name="car_media_nothing_playing">Nessuna ballata in corso</string>
+    <string name="car_media_up">Risali</string>
+    <string name="car_media_connecting">Faccio rotta su %1$s…</string>
+    <string name="car_media_library_closed">%1$s tiene la sua libreria chiusa nella stiva.</string>
+    <string name="car_media_needs_notification_access">myCar può comunque governarla quando ha l\'accesso alle notifiche sul telefono. Consentilo in Impostazioni > Notifiche > Accesso alle notifiche.</string>
+    <string name="car_media_library_closed_detail">Fai partire le ballate nell\'app sul telefono. Da qui puoi suonare, mettere in pausa, saltare e spostarti nella ballata.</string>
+    <string name="car_media_not_running">%1$s è all\'ancora: non è in esecuzione.</string>
+    <string name="car_media_not_running_detail">%1$s suona con l\'organetto di myCar, ma solo mentre è aperta sul telefono. Aprila una volta e continua a suonare qui a bordo.</string>
+    <string name="car_media_refused">%1$s non si lascia esplorare da myCar.</string>
+    <string name="car_media_refused_detail">Alcune app multimediali accettano solo l\'host di Google. Aprila sul telefono e myCar può comunque suonarla, metterla in pausa e saltare le ballate.</string>
+    <string name="car_media_keeps_closing">%1$s continua a naufragare sul telefono.</string>
+    <string name="car_media_keeps_closing_detail">Si è chiusa due volte in un minuto, quindi myCar ha smesso di tentare l\'abbordaggio.</string>
+    <string name="car_media_list_failed">Impossibile caricare a bordo questo elenco.</string>
+    <string name="car_media_list_empty">Qui non c\'è nemmeno un doblone.</string>
+    <string name="car_media_queue_empty">Stiva vuota.</string>
+    <string name="car_media_queue_empty_idle">Nessuna ballata in corso: non tutte le app svelano a myCar cosa viene dopo.</string>
+    <string name="car_media_queue_empty_playing">Solo quello che sta già suonando: non tutte le app svelano a myCar cosa viene dopo.</string>
+    <string name="car_media_search_app">Scova in %1$s</string>
+    <string name="car_media_search_hint">Scrivi una ballata, un artista, un album o una playlist.</string>
+    <string name="car_media_search_no_list">%1$s non può elencare i risultati. Premi il tasto di ricerca e %1$s sceglie la ballata da suonare.</string>
+    <string name="car_media_search_unsupported">%1$s non lascia scovare niente da bordo.</string>
+    <string name="car_media_searching">Frugo in %1$s…</string>
+    <string name="car_media_search_nothing">%1$s non ha scovato niente per «%2$s».</string>
+    <string name="car_media_search_running">Vado a caccia di «%2$s» in %1$s…</string>
+    <string name="car_media_search_ignored">%1$s non ha suonato nemmeno una nota per «%2$s».</string>
+
+    <string name="car_lyrics_looking">A caccia delle strofe…</string>
+    <string name="car_lyrics_nothing_playing">Nessuna ballata in corso.</string>
+    <string name="car_lyrics_none">Ancora nessuna strofa per questa ballata.</string>
+    <string name="car_lyrics_none_detail">Le strofe vengono da LRCLIB, un archivio libero scritto da chi ascolta: non tutte le ballate ci sono ancora.</string>
+    <string name="car_lyrics_instrumental">Ballata strumentale</string>
+    <string name="car_lyrics_instrumental_detail">In questa ballata non ci sono parole da cantare: fischietta pure!</string>
+    <string name="car_lyrics_unreachable">Impossibile raggiungere le strofe.</string>
+
+    <string name="car_vehicle_title">Dati di bordo</string>
+    <string name="car_vehicle_intro">Canale grezzo dei sensori dell\'autoradio collegata. Il significato dei campi è un\'ipotesi: guarda una riga cambiare mentre fai la manovra (frena, guida, accendi i fari) per averne la conferma.</string>
+
+    <string name="car_web_select_title">Scegli tu</string>
+    <string name="car_player_sound_bluetooth">Audio in Bluetooth. Tocca per cambiare rotta e farlo passare da myCar</string>
+    <string name="car_player_sound_mycar">Audio tramite myCar. Tocca per cambiare rotta e mandarlo in Bluetooth</string>
+    <string name="car_player_sound_now_mycar">Ora il suono passa da myCar, per questa nave</string>
+    <string name="car_player_sound_now_bluetooth">Ora il suono va in Bluetooth, per questa nave</string>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="xonos_cat_recent">Zuletzt erklungen</string>
+    <string name="xonos_cat_tracks">Shantys</string>
+    <string name="xonos_cat_favorites">Schatztruhe</string>
+    <string name="xonos_cat_browse">Dienste erkunden</string>
+    <string name="xonos_top_tracks">Top-Shantys</string>
+    <string name="xonos_all_tracks">Alle Shantys</string>
+    <string name="xonos_problem_bad_token">Token nicht akzeptiert: Heuere in myCar auf dem Telefon erneut an</string>
+    <string name="xonos_problem_lost">Verbindung verloren, entere erneut</string>
+    <string name="xonos_problem_not_configured">Mach Xonos in myCar auf dem Telefon klar</string>
+
+    <plurals name="xonos_results">
+        <item quantity="one">%d Fund</item>
+        <item quantity="other">%d Funde</item>
+    </plurals>
+    <plurals name="xonos_count_tracks">
+        <item quantity="one">%d Shanty</item>
+        <item quantity="other">%d Shantys</item>
+    </plurals>
+</resources>

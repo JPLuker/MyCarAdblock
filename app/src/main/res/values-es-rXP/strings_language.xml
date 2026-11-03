@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">Lengua</string>
+    <string name="language_phone">Lengua del teléfono (%1$s)</string>
+    <string name="language_footer">myCar en el teléfono y al timón, y su loro de a bordo, en esta lengua.</string>
+    <string name="language_pirate_detail">Cada texto de myCar en jerga pirata, en la lengua de arriba. Nuestro rumbo lo elegimos nosotros, sin rey ni amo. ¡Arrr!</string>
+</resources>

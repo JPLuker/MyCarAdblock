@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_settings_open_on_connect">Open on boarding</string>
+    <string name="car_settings_open_home">Home port</string>
+    <string name="car_settings_size_extra_small">Extra wee</string>
+    <string name="car_settings_size_small">Wee</string>
+    <string name="car_settings_size_large">Hefty</string>
+    <string name="car_settings_size_extra_large">Extra hefty</string>
+    <string name="car_settings_size_medium">Middlin\'</string>
+    <string name="car_settings_player_size">Size of the shanty box beside the chart</string>
+    <string name="car_settings_mini_player">Wee shanty box over the whole chart</string>
+    <string name="car_settings_mini_player_detail">With the shanty box beside the chart closed, a wee shanty box bobs over the chart. Hold it, then drag it to move it.</string>
+    <string name="car_settings_hidden_apps">Stowaways</string>
+    <string name="car_settings_hidden_apps_none">No stowaways. To stow an app away, hold it in the fleet and choose Stow away from the fleet.</string>
+    <string name="car_settings_app_theme">App paint</string>
+    <string name="car_settings_app_theme_phone">Follow phone\'s wake</string>
+    <string name="car_settings_app_theme_light">Sunlit</string>
+    <string name="car_settings_app_theme_dark">Pitch dark</string>
+    <string name="car_settings_controls_theme">Paint</string>
+    <string name="car_settings_map_day_night">Chart day/night</string>
+    <string name="car_settings_map_auto">By the sky</string>
+    <string name="car_settings_map_day">Day watch</string>
+    <string name="car_settings_map_night">Night watch</string>
+    <string name="car_settings_autoplay">Autoplay on boarding</string>
+    <string name="car_settings_car_audio">Sound aboard</string>
+    <string name="car_settings_car_audio_note">Through myCar sends the phone\'s sound over myCar\'s own link, the cable or Wi-Fi, as Android Auto does. Android asks to share your screen each drive, and a few apps block it. Bluetooth plays as the phone normally would, and Android never asks, but some cars only take calls over it. Automatic uses Bluetooth when the car takes the phone\'s shanties that way, and myCar\'s link when it doesn\'t.</string>
+    <string name="car_settings_bluetooth_warning">Raise a flag when Bluetooth isn\'t connected</string>
+    <string name="car_settings_location_warning">Raise a flag when location is off</string>
+    <string name="car_settings_spoken_directions_note">myCar calls out each turn through the ship\'s speakers, and the shanties dip while it speaks. Turn it off if your chart app\'s own voice already plays aboard.</string>
+    <string name="car_settings_experimental">Uncharted waters</string>
+    <string name="car_settings_experimental_hide">Stow</string>
+    <string name="car_settings_vehicle_data_note">Adds a Vehicle data tile: a live, raw dump of the head unit\'s sensor channel. Field labels (speed, RPM, fuel...) are salvaged from other reverse-engineering projects and unverified against this ship - treat them as a guess, not a fact, until you\'ve watched one change for yourself.</string>
+    <string name="car_settings_connection">Boarding</string>
+    <string name="car_settings_info_vehicle">Vessel</string>
+    <string name="car_settings_unknown_vehicle">Unknown vessel</string>
+    <string name="car_settings_about">Our flag</string>
+    <string name="car_settings_whats_new_after_updates">Fresh plunder after refits</string>
+    <string name="car_settings_whats_new_after_updates_note">Show the list of changes once, the first time the ship connects after a refit.</string>
+    <string name="car_settings_whats_new">Fresh plunder</string>
+    <string name="car_settings_web_page_default">DuckDuckGo (default) - tap to set a course for a different page</string>
+    <string name="car_settings_web_page_note">Shown by the Browser app from the next time it opens, and by a browser on your decks from the next voyage.</string>
+    <string name="car_settings_screen_fit">Screen trim</string>
+    <string name="car_settings_saved_to">Stashed for %1$s</string>
+    <string name="car_settings_save_failed">Could not stash</string>
+    <string name="car_settings_save_for_vehicle">Stash for this vessel</string>
+    <string name="car_settings_no_vehicle_profile">No vessel profile matched</string>
+
+    <string name="car_whatsnew_title">Fresh plunder in %1$s</string>
+    <string name="car_whatsnew_show_after_updates">Show after refits</string>
+    <string name="car_whatsnew_got_it">Aye aye</string>
+
+    <string name="car_keyboard_hide">Stow keyboard</string>
+    <string name="car_keyboard_submit">Fire away</string>
+    <string name="car_clipboard_copied">Copied into the phone\'s hold.</string>
+    <string name="car_clipboard_nothing">Naught to copy.</string>
+    <string name="car_clipboard_empty">Not a scrap of text on the phone\'s clipboard.</string>
+
+    <string name="car_player_previous">Back a shanty</string>
+    <string name="car_player_play">Play on</string>
+    <string name="car_player_pause">Avast</string>
+    <string name="car_player_next">Next shanty</string>
+    <string name="car_player_like">Treasure</string>
+    <string name="car_player_unlike">Treasure no more</string>
+    <string name="car_player_lyrics">Verses</string>
+    <string name="car_player_close">Close the shanty box</string>
+
+    <string name="car_media_tab_now_playing">Now a-playing</string>
+    <string name="car_media_tab_queue">Next to sail</string>
+    <string name="car_media_nothing_playing">No shanty playing</string>
+    <string name="car_media_connecting">Boarding %1$s…</string>
+    <string name="car_media_library_closed">%1$s keeps its library under lock and key.</string>
+    <string name="car_media_needs_notification_access">myCar can still steer it once it has Notification access on the phone. Allow it under Settings > Notifications > Notification access.</string>
+    <string name="car_media_library_closed_detail">Strike up the shanties in the app on your phone. Play, pause, skip and seek work from the helm.</string>
+    <string name="car_media_not_running">%1$s isn\'t afloat.</string>
+    <string name="car_media_not_running_detail">%1$s plays through myCar\'s own shanty box, but only while it\'s open on the phone. Open it once and it keeps playing here aboard.</string>
+    <string name="car_media_refused">%1$s wouldn\'t let myCar rummage through its hold.</string>
+    <string name="car_media_refused_detail">Some media apps only take orders from Google\'s own host. Open it on the phone and myCar can still play, pause and skip it.</string>
+    <string name="car_media_keeps_closing">%1$s keeps capsizing on the phone.</string>
+    <string name="car_media_keeps_closing_detail">It capsized twice in a minute, so myCar stopped trying to board it again.</string>
+    <string name="car_media_list_failed">Couldn\'t haul in this list.</string>
+    <string name="car_media_list_empty">Naught here.</string>
+    <string name="car_media_queue_empty">No shanties lined up.</string>
+    <string name="car_media_queue_empty_idle">No shanty playing - not every app tells myCar what sails next.</string>
+    <string name="car_media_queue_empty_playing">Only the shanty already playing - not every app tells myCar what sails next.</string>
+    <string name="car_media_search_app">Scour %1$s</string>
+    <string name="car_media_search_hint">Type a shanty, artist, album, or playlist.</string>
+    <string name="car_media_search_no_list">%1$s can\'t list its finds. Press search, and %1$s picks what to play.</string>
+    <string name="car_media_search_unsupported">%1$s can\'t scour from the helm.</string>
+    <string name="car_media_searching">Scouring %1$s…</string>
+    <string name="car_media_search_nothing">%1$s found naught for \"%2$s\".</string>
+    <string name="car_media_search_ask">Bid %1$s to play it</string>
+    <string name="car_media_search_running">Scouring %1$s for \"%2$s\"…</string>
+    <string name="car_media_search_ignored">%1$s played naught for \"%2$s\".</string>
+
+    <string name="car_lyrics_looking">Hunting for verses…</string>
+    <string name="car_lyrics_nothing_playing">No shanty playing.</string>
+    <string name="car_lyrics_none">No verses for this shanty yet.</string>
+    <string name="car_lyrics_none_detail">Verses come from LRCLIB, a free archive penned by fellow listeners: not every shanty has made it aboard yet.</string>
+    <string name="car_lyrics_instrumental_detail">No words to bellow along to in this one.</string>
+    <string name="car_lyrics_unreachable">Couldn\'t reach the verses.</string>
+    <string name="car_lyrics_unreachable_detail">They sail in from lrclib.net: check the phone\'s connection.</string>
+
+    <string name="car_vehicle_intro">Raw sensor channel from the connected head unit. Field meaning is a sailor\'s best guess - watch a row change while you do the thing (brake, drive, headlights) to confirm it.</string>
+
+    <string name="car_web_select_title">Take yer pick</string>
+    <string name="car_player_sound_bluetooth">Sound sails over Bluetooth. Tap to send it through myCar</string>
+    <string name="car_player_sound_mycar">Sound sails through myCar. Tap to send it over Bluetooth</string>
+    <string name="car_player_sound_now_mycar">Sound now sails through myCar, for this ship</string>
+    <string name="car_player_sound_now_bluetooth">Sound now sails over Bluetooth, for this ship</string>
+</resources>

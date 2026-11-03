@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="session_idle">Nicht an Bord</string>
+    <string name="session_idle_detail">Schließ das Telefon an den USB-Anschluss an Bord an oder entere kabellos. myCar öffnet sich von selbst, wenn das Schiff antwortet.</string>
+    <string name="session_connecting">Wird geentert</string>
+    <string name="session_connected">An Bord</string>
+    <string name="session_connected_detail">myCar ist auf dem Bordbildschirm.</string>
+    <string name="session_disconnected">Abgelegt</string>
+    <string name="session_disconnected_detail">Das Schiff ist nicht mehr verbunden.</string>
+
+    <string name="connection_stage_talking">Funkverkehr mit dem Schiff</string>
+    <string name="connection_stage_accepted">Zertifikat akzeptiert: wird klargemacht</string>
+
+    <string name="wireless_link_bt_reaching">Bluetooth: Kurs auf %1$s</string>
+    <string name="wireless_link_bt_talking">Bluetooth: Funkverkehr mit %1$s</string>
+    <string name="wireless_link_bt_waiting">Halte Ausschau nach %1$s. Wenn nichts passiert, trenne das Telefon im Bluetooth-Menü an Bord und verbinde es erneut</string>
+    <string name="wireless_link_wifi_joining">WLAN: Entere das Netz von %1$s</string>
+    <string name="wireless_link_wifi_reaching">WLAN: Kurs auf %1$s</string>
+
+    <string name="channel_session">Mit dem Schiff verbunden</string>
+    <string name="channel_audio">Ton an Bord</string>
+    <string name="session_notification_title">myCar ist mit dem Schiff verbunden</string>
+    <string name="audio_notification_title">Wiedergabe an Bord</string>
+    <string name="audio_notification_text">myCar sendet den Ton des Telefons an Bord.</string>
+    <string name="mirror_notification_title">Bildschirm wird an Bord geteilt</string>
+    <string name="mirror_notification_text">Der Bordbildschirm zeigt dieses Telefon.</string>
+</resources>

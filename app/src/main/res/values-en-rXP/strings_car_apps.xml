@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialer_tab_recents">Logbook</string>
+    <string name="dialer_tab_contacts">Crew</string>
+    <string name="dialer_loading_contacts">Mustering the crew…</string>
+    <string name="dialer_no_contacts">No crewmates with a phone number found.</string>
+    <string name="dialer_no_match">No crewmates match \"%1$s\".</string>
+    <string name="dialer_search_contacts">Scour the crew</string>
+
+    <string name="recents_incoming">Inbound</string>
+    <string name="recents_outgoing">Outbound</string>
+    <string name="recents_loading">Reading the logbook…</string>
+    <string name="recents_empty">The logbook is empty.</string>
+
+    <string name="message_listening">A-listening</string>
+
+    <string name="message_screen_title">Bottle mail</string>
+    <string name="message_empty">No recent bottle mail. New %1$s messages wash up here as they arrive on the phone.</string>
+    <string name="message_quick_replies_hide">Stow quick replies</string>
+
+    <string name="message_test_channel">Test bottle mail</string>
+    <string name="message_test_late">Running ten minutes late, save me a seat on deck?</string>
+    <string name="message_test_tonight">Are you still coming aboard tonight?</string>
+    <string name="message_test_milk">Can you grab milk on the way back to port?</string>
+    <string name="message_test_parked">Call me once you\'ve dropped anchor.</string>
+
+    <string name="notifications_title">Signal flags</string>
+    <string name="notifications_clear_all">Clear flags</string>
+    <string name="notifications_clear_confirm">Clear every flag</string>
+    <string name="notifications_empty">No flags flying yet. New notifications from the phone will show up here.</string>
+
+    <string name="assistant_needs_model">The parrot understands only English for now: for commands in %1$s, download %2$s in myCar\'s rigging on the phone.</string>
+    <string name="assistant_mic">Parrot</string>
+    <string name="assistant_phone_inline">the phone\'s parrot</string>
+    <string name="assistant_start_failed">Couldn\'t start %1$s. myCar is a-listening instead.</string>
+    <string name="assistant_listening_on_phone">A-listening on the phone</string>
+    <string name="assistant_app_listening_on_phone">%1$s is a-listening on the phone</string>
+    <string name="assistant_picker_title">Ship\'s parrot</string>
+    <string name="assistant_choice_phone">Phone\'s parrot</string>
+    <string name="assistant_picker_footer">The phone\'s parrot wakes as with the swipe up from a bottom corner of the phone\'s screen. Another parrot listens and answers on the phone, and its voice comes aboard only over Bluetooth; with the phone locked, it starts once the phone is unlocked - or, with Home Assistant set up in myCar, myCar listens instead and Home Assistant answers. myCar\'s own works offline, locked or not, and shows at the helm; with Home Assistant set up, what it can\'t do itself goes to Home Assistant\'s voice assistant.</string>
+
+    <string name="bluetooth_not_connected_calls_music">Calls and shanties play over Bluetooth, but your phone isn\'t connected to the car. Connect it from the car\'s Bluetooth menu or your phone\'s.</string>
+    <string name="bluetooth_location_off_body">Chart apps can\'t show where you are or give directions. Turn on location in your phone\'s quick settings when you\'re parked.</string>
+    <string name="bluetooth_pair_body_calls_music">Calls and shanties play through the car\'s speakers once your phone and the car are paired. Your phone then asks you to confirm a code.</string>
+    <string name="bluetooth_hide">Stow</string>
+
+    <string name="cinema_continue">Onward: %1$s</string>
+    <string name="cinema_on_this_phone">This phone\'s hold</string>
+    <string name="cinema_empty">Add video sites and TV lists in myCar\'s rigging on the phone, under Cinema.</string>
+    <string name="cinema_protected">Protected video: likely pitch black</string>
+    <string name="cinema_play">Play on</string>
+    <string name="cinema_pause">Avast</string>
+    <string name="cinema_error_stopped_early">It ran aground before the end: check the phone\'s connection.</string>
+    <string name="cinema_error_channel_stopped">The channel dropped anchor.</string>
+    <string name="cinema_error_unreachable">Couldn\'t reach those shores: check the phone\'s connection.</string>
+    <string name="cinema_error_timeout">It didn\'t answer our hail in time.</string>
+    <string name="cinema_error_player_died">The phone\'s player went overboard.</string>
+    <string name="cinema_videos_none_picked">No videos picked for myCar. On the phone, in myCar\'s rigging under Cinema, choose which ones it may see.</string>
+    <string name="cinema_videos_none">No videos in this phone\'s hold.</string>
+    <string name="cinema_find_channel">Scour channels</string>
+    <string name="cinema_reload_list">Haul in the list again</string>
+    <string name="cinema_tv_old_channels">%1$s Showing the channels from the last haul.</string>
+    <string name="cinema_tv_refused">The list\'s server said nay (%1$d).</string>
+    <string name="cinema_tv_too_big">The list is too big for the ship (over %1$d MB).</string>
+    <string name="cinema_tv_unknown_host">Couldn\'t find %1$s on any chart: check the address, or the phone\'s connection.</string>
+    <string name="cinema_tv_no_answer">%1$s didn\'t answer our hail.</string>
+    <string name="cinema_tv_failed">The list didn\'t come aboard: %1$s</string>
+
+    <string name="plancia_set_up_title">Fit out Plancia on the phone</string>
+    <string name="plancia_set_up_text">In myCar on the phone: Rigging, then Plancia - your Home Assistant\'s address and a token.</string>
+    <string name="plancia_connecting">Hailing Home Assistant</string>
+
+    <string name="directions_destination_ahead">Land ho! Your destination is ahead</string>
+    <string name="directions_destination_left">Land ho! Your destination is on the left</string>
+    <string name="directions_destination_right">Land ho! Your destination is on the right</string>
+</resources>

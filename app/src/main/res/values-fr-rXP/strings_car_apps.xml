@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialer_tab_contacts">Équipage</string>
+    <string name="dialer_loading_contacts">Chargement de l’équipage…</string>
+    <string name="dialer_no_contacts">Aucun membre d’équipage avec un numéro de téléphone.</string>
+    <string name="dialer_no_match">Aucun membre d’équipage ne correspond à « %1$s ».</string>
+    <string name="dialer_search_contacts">Chercher dans l’équipage</string>
+    <string name="dialer_favourite">Trésor</string>
+
+    <string name="recents_empty">Calme plat : aucun appel récent.</string>
+
+    <plurals name="message_new_count">
+        <item quantity="one">%1$s · %2$d nouvelle missive</item>
+        <item quantity="other">%1$s · %2$d nouvelles missives</item>
+    </plurals>
+
+    <string name="message_screen_title">Missives</string>
+    <string name="message_empty">Aucune missive récente. Les nouvelles missives %1$s accostent ici dès qu’elles arrivent sur le téléphone.</string>
+    <plurals name="message_earlier">
+        <item quantity="one">%d missive plus ancienne</item>
+        <item quantity="other">%d missives plus anciennes</item>
+    </plurals>
+    <string name="message_quick_replies_hide">Planquer les réponses rapides</string>
+
+    <string name="message_test_channel">Missives d’essai</string>
+    <string name="message_test_late">J’ai dix minutes de retard, tu me gardes une place à bord ?</string>
+    <string name="message_test_tonight">Tu mets toujours le cap chez moi ce soir ?</string>
+    <string name="message_test_milk">Tu peux embarquer du lait en rentrant ?</string>
+    <string name="message_test_parked">Appelle-moi quand tu as jeté l’ancre.</string>
+
+    <string name="notifications_title">Signaux</string>
+    <string name="notifications_clear_all">Par-dessus bord</string>
+    <string name="notifications_clear_confirm">Oui, par-dessus bord</string>
+    <string name="notifications_empty">Rien en vue pour l’instant. Les nouveaux signaux du téléphone s’afficheront ici.</string>
+
+    <string name="assistant_needs_model">Le perroquet ne comprend que l’anglais pour l’instant : pour les commandes en %1$s, téléchargez %2$s dans la Timonerie de myCar sur le téléphone.</string>
+    <string name="assistant_mic">Perroquet</string>
+    <string name="assistant_phone_inline">le perroquet du téléphone</string>
+    <string name="assistant_start_failed">Impossible de démarrer %1$s. myCar prend la barre et écoute à sa place.</string>
+    <string name="assistant_picker_title">Perroquet de bord</string>
+    <string name="assistant_choice_phone">Perroquet du téléphone</string>
+    <string name="assistant_picker_footer">Le perroquet du téléphone se réveille comme avec un balayage vers le haut depuis un coin inférieur de l’écran du téléphone. Un autre perroquet écoute et répond sur le téléphone, et sa voix n’arrive à bord que par le Bluetooth ; téléphone verrouillé, il démarre une fois le téléphone déverrouillé, ou bien, si Home Assistant est configuré dans myCar, myCar écoute à sa place et Home Assistant répond. Celui de myCar fonctionne hors ligne, verrouillé ou non, et s’affiche sur l’écran de bord ; si Home Assistant est configuré, ce qu’il ne sait pas faire lui-même va à l’assistant vocal de Home Assistant.</string>
+
+    <string name="bluetooth_hide">Planquer</string>
+
+    <string name="cinema_on_this_phone">Cale du téléphone</string>
+    <string name="cinema_empty">Embarquez des sites vidéo et des listes TV dans la Timonerie de myCar sur le téléphone, sous Cinema.</string>
+    <string name="cinema_back_10s">Machine arrière, 10 secondes</string>
+    <string name="cinema_forward_10s">En avant, 10 secondes</string>
+    <string name="cinema_pause">Trêve</string>
+    <string name="cinema_videos_none_picked">Aucune vidéo choisie pour myCar. Sur le téléphone, dans la Timonerie de myCar sous Cinema, choisissez celles qu’il peut voir.</string>
+    <string name="cinema_videos_none">Aucune vidéo dans la cale du téléphone.</string>
+    <string name="cinema_find_channel">Fouiller les chaînes</string>
+    <string name="cinema_tv_too_big">La liste est trop grosse pour le navire (plus de %1$d Mo).</string>
+
+    <string name="plancia_set_up_title">Gréez Plancia sur le téléphone</string>
+    <string name="plancia_set_up_text">Dans myCar sur le téléphone : Timonerie, puis Plancia (l’adresse de votre Home Assistant et un jeton).</string>
+</resources>

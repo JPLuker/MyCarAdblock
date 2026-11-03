@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setup_title">Fit out myCar</string>
+    <string name="setup_subtitle_first_run">A few taps before yer maiden voyage.</string>
+    <string name="setup_subtitle_return">What\'s left to fit out. Nothing you\'ve fitted out changes.</string>
+    <string name="setup_unofficial">myCar is unofficial: fit it out while parked, then keep your eyes on the road.</string>
+    <string name="setup_section_connect">To board</string>
+    <string name="setup_section_drive">For your voyage</string>
+    <string name="setup_status_done">Shipshape</string>
+    <string name="setup_status_blocked">Blockaded</string>
+
+    <string name="setup_cert_body">Cars only parley with phones holding a certificate they trust. myCar doesn\'t include one: it downloads public ones from open-source projects on GitHub (about 10 KB each). If your car turns one down, myCar tries the next.</string>
+    <string name="setup_cert_get">Haul in certificates</string>
+    <string name="setup_cert_getting">Hauling in certificates…</string>
+    <string name="setup_cert_wrong_file">A downloaded file wasn\'t the expected certificate, so myCar threw it overboard. Try again later.</string>
+    <string name="setup_cert_no_download">Couldn\'t haul in the certificates. Check your internet connection, then try again.</string>
+    <string name="setup_cert_some_ready">Hauled in %1$d of %2$d. %3$s is ready; you can get the others later in Rigging.</string>
+    <string name="setup_cert_ready_own">Ready to sail: your own certificate.</string>
+    <plurals name="setup_cert_ready_spares">
+        <item quantity="one">Ready to sail: %1$s. Spare: %2$s.</item>
+        <item quantity="other">Ready to sail: %1$s. Spares: %2$s.</item>
+    </plurals>
+    <string name="setup_cert_ready_one">Ready to sail: %1$s.</string>
+    <string name="setup_cert_ready">Ready to sail.</string>
+
+    <string name="setup_mycar_on_title">Turn myCar on for the ship</string>
+    <string name="setup_mycar_on_body">It\'s switched off in Rigging, so the ship can\'t hail it.</string>
+
+    <string name="setup_aa_title">Douse Android Auto</string>
+    <string name="setup_aa_off">Android Auto is doused.</string>
+    <string name="setup_aa_kept">You\'ll pick myCar for the voyage when you plug in.</string>
+    <string name="setup_aa_body">Android Auto is on, and it can seize the ship\'s connection before myCar does. On the screen this opens, tap Disable, then OK, then sail back here.</string>
+    <string name="setup_aa_keep_body">Then keep it. When you plug in, Android asks which app to open: choose myCar and tap Always, and myCar takes the helm. If Android Auto opens by itself, it was set to always open: on its app info, tap Open by default, then Clear defaults.</string>
+
+    <string name="setup_drive_title">Calls, chart and shanties</string>
+    <string name="setup_drive_skipped">Skipped. Tap Allow when you\'re ready to sail.</string>
+    <string name="setup_drive_body">Your car shows who\'s calling and your recent calls, and can dial your contacts, the chart knows where you are, and music can reach the car without Bluetooth. Android asks a few times: tap Allow each time. myCar only reads, and listens only when you tap the mic.</string>
+
+    <string name="setup_more_later">Everything here can wait for a later tide.</string>
+    <string name="setup_messages_title">Bottle mail</string>
+    <string name="setup_messages_body">The car shows your messages, reads them aloud and lets you send word back. Turn myCar on in the page this opens. If Android says it\'s a restricted setting: open myCar\'s app info, tap ⋮, then Allow restricted settings, and try again.</string>
+    <string name="setup_calendar_body">The helm shows your next event. myCar only reads your calendar.</string>
+    <string name="setup_notifications_body">Lets myCar show that it\'s connected to the car, with Stop while it sends the phone\'s sound, and tell you when a refit is out.</string>
+    <string name="setup_screening_button">Fit out</string>
+    <string name="setup_audio_title">Sound aboard</string>
+    <string name="setup_audio_body">How shanties reach the ship. Calls go over Bluetooth either way.</string>
+    <string name="setup_usage_title">Help other captains</string>
+
+    <plurals name="setup_bar_steps_left">
+        <item quantity="one">%1$d step left before your maiden voyage.</item>
+        <item quantity="other">%1$d steps left before your maiden voyage.</item>
+    </plurals>
+    <string name="setup_bar_ready_to_connect">You\'re ready to board.</string>
+    <string name="setup_bar_allow_drive">Allow calls, chart and shanties</string>
+    <string name="setup_bar_ready">You\'re ready to set sail. Plug into the ship; if Android asks, choose myCar and tap Always.</string>
+    <string name="setup_bar_finish_later">Fit out later</string>
+
+    <plurals name="setup_card_steps_left">
+        <item quantity="one">%1$d step left before your maiden voyage: %2$s.</item>
+        <item quantity="other">%1$d steps left before your maiden voyage: %2$s.</item>
+    </plurals>
+    <plurals name="setup_card_extras_left">
+        <item quantity="one">Ready to board. %1$d extra left.</item>
+        <item quantity="other">Ready to board. %1$d extras left.</item>
+    </plurals>
+    <string name="setup_card_all_done">Everything\'s shipshape.</string>
+    <string name="setup_card_title">Fitting out</string>
+    <string name="setup_card_footer">Nothing is scuttled or reset. You\'ll see only what\'s left, with what\'s shipshape ticked.</string>
+    <string name="setup_card_back">Take me back to fitting out</string>
+    <string name="setup_left_title">Finish fitting out</string>
+    <string name="setup_left_body">Left before your maiden voyage: %1$s.</string>
+    <string name="setup_left_continue">Keep fitting out</string>
+
+    <string name="setup_guide_optional">YER CHOICE</string>
+    <string name="setup_guide_usage_title">Help other captains.</string>
+    <string name="setup_guide_safety_body">myCar is unofficial. No carmaker made or checked it, and it can fail without warning. Fit it out before you go, then keep your eyes on the road.</string>
+    <string name="setup_guide_mic_body">myCar uses it to send your shanties to the car and to hear you when you ask for something or reply to a message. What you say stays on the phone.</string>
+    <string name="setup_guide_location_body">The car\'s chart and nearby searches need it. Without it, the crow\'s nest shows no chart.</string>
+    <string name="setup_guide_messages_title">Bottle mail.</string>
+    <string name="setup_guide_messages_body">The car shows your messages, reads them aloud and lets you send word back. Turn myCar on in the list this opens.</string>
+    <string name="setup_guide_aa_title">Douse Android Auto.</string>
+    <string name="setup_guide_aa_body">Android Auto is still installed, and like a rival crew it fights myCar for the ship\'s USB connection. Disable or uninstall it on the screen this opens.</string>
+    <string name="setup_guide_choose_title">Choose myCar, matey.</string>
+    <string name="setup_guide_choose_body">If your phone asks which app to open when you plug into the ship, pick myCar and tap Always.</string>
+    <string name="setup_guide_audio_title">Sound aboard.</string>
+    <string name="setup_guide_audio_body">Pick how shanties reach the ship. Calls go over Bluetooth either way.</string>
+    <string name="setup_guide_voice_title">Parrot.</string>
+    <string name="setup_guide_voice_body">Ask for directions, shanties, or a call by voice. Your phone turns speech into text by itself, and nothing you say leaves it. It needs %1$d MB, downloaded once. Use Wi-Fi if you can.</string>
+    <string name="setup_guide_voice_download">Download the parrot</string>
+    <string name="setup_guide_voice_progress">Downloading, %1$d%%. You can sail on; it keeps going.</string>
+    <string name="setup_guide_voice_ready">The parrot is ready.</string>
+    <string name="setup_guide_voice_failed">The download ran aground. Tap Download the parrot to try again.</string>
+    <string name="setup_guide_project_media_title">Belay the audio prompt.</string>
+    <string name="setup_guide_project_media_body">Run this from a computer with USB debugging on, and Android trusts myCar with your audio for good. Without it, you tap Start once each voyage.</string>
+    <string name="setup_guide_secure_settings_body">While audio goes to the car, Android hides what notifications say, as if you were sharing your screen. This lets myCar show them during a voyage and hide them again after.</string>
+
+    <string name="setup_audio_recommended">Captain\'s pick</string>
+    <string name="setup_audio_automatic_body">Over Bluetooth when your ship takes the phone\'s shanties that way, otherwise through myCar.</string>
+    <string name="setup_audio_bluetooth_body">No prompt each voyage, and your chart app\'s voice reaches the ship. Some ships take only calls over it.</string>
+    <string name="setup_audio_through_mycar_body">Over the cable or Wi-Fi, as Android Auto does. Android asks to share audio once each voyage.</string>
+
+    <string name="intro_start">Set sail</string>
+    <string name="intro_welcome_to">Ahoy, welcome to</string>
+    <string name="intro_welcome_tag">alpha · under full sail</string>
+    <string name="intro_course">We chart our own course and bow to no crown.</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d bug found and made to walk the plank since 0.6</item>
+        <item quantity="other">%d bugs found and made to walk the plank since 0.6</item>
+    </plurals>
+    <string name="intro_music_title">Shanties, built in.</string>
+    <string name="intro_music_body">Spotify and other services play inside myCar, from their own web player. Sign on once on the phone with your own account, in Rigging > Shanties. Stow the phone\'s Spotify app there: one Spotify aboard, not two.</string>
+    <string name="intro_mini_title">The whole chart.</string>
+    <string name="intro_mini_body">Close the shanty box beside the chart and a wee shanty box floats over it, with the cover and its buttons: hold it, then drag it anywhere. Beside the chart, the shanty box now goes up to Extra large.</string>
+    <string name="intro_lyrics_title">Sing along, crew.</string>
+    <string name="intro_lyrics_body">Shanty verses are found far more often, and every haul is checked, so another shanty\'s words never show up. Instrumental tracks say so.</string>
+    <string name="intro_location_title">In yer pocket.</string>
+    <string name="intro_location_body">The chart gets your position even with the phone locked in your pocket: myCar takes it as the car arrives. If Android still refuses, the car tells you, only when you\'re stopped.</string>
+    <string name="intro_phone_title">Steer from the phone.</string>
+    <string name="intro_phone_body">All the helm\'s rigging is on the phone too, in Rigging > Helm: change any of it and the ship follows at once, even mid-voyage. So are the decks beside the chart and the apps stowed away from the fleet.</string>
+    <string name="intro_graphene_title">Hatches battened again.</string>
+    <string name="intro_apps_title">A fine crew.</string>
+    <string name="intro_voice_title">Tell the parrot.</string>
+    <string name="intro_voice_body">Tap the mic, or press the talk button on your wheel, and speak. Your phone turns speech into text by itself, and what you say stays on it, unless you ask your own Home Assistant. Say \"%1$s\" aboard for the full list.</string>
+    <string name="intro_voice_body_language">Tap the mic, or press the talk button on your wheel, and speak. Your phone turns speech into text by itself, and what you say stays on it, unless you ask your own Home Assistant. It listens and answers in %1$s, myCar\'s tongue. Say \"%2$s\" aboard for the full list.</string>
+    <string name="intro_voice_downloading">Hauling in, %1$d%%</string>
+    <string name="intro_voice_failed">Download ran aground. Try again</string>
+    <string name="intro_voice_download">Download the parrot, %1$d MB</string>
+
+    <string name="activity_toast_music_pauses_sharing">The phone\'s shanties pause while its screen is shared</string>
+    <string name="activity_toast_open_for_music">Open myCar on the phone to send its shanties to the ship</string>
+    <string name="activity_toast_open_for_sharing">Open myCar on the phone to share its screen at the helm</string>
+    <string name="activity_status_no_car_title">Can\'t hail the car</string>
+    <string name="activity_status_taken_title">Another app boarded the car</string>
+    <string name="activity_status_taken_detail">Another app seized the car\'s connection before myCar could. If Android asks which app to open for the car, choose myCar.</string>
+</resources>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_ui_safety_attention">Never interact with this screen while driving. Set the course or the song before you go, then keep your attention on the road.</string>
+    <string name="car_ui_app_wont_start">%1$s isn\'t seaworthy with myCar yet.</string>
+    <string name="car_ui_app_wont_start_unknown">This app isn\'t seaworthy with myCar yet.</string>
+    <string name="car_ui_app_wont_start_detail">It never left port. Some apps only sail with Google\'s Android Auto.</string>
+    <string name="car_ui_search_ignored">%1$s played nary a note for “%2$s”</string>
+    <string name="car_ui_search_ignored_no_app">The shanty app played nary a note for “%1$s”</string>
+    <string name="car_ui_link_opens_app">This link sails off to an app on the phone</string>
+
+    <string name="car_dock_dashboard">Crow\'s nest</string>
+    <string name="car_dock_map">Chart</string>
+    <string name="car_dock_now_playing">Now a-playing</string>
+    <string name="car_dock_assistant">Ship\'s parrot</string>
+    <string name="car_dock_all_apps">Whole fleet</string>
+    <string name="car_dock_map_and_music">Chart and shanties</string>
+
+    <string name="car_apps_exit">Abandon ship</string>
+    <string name="car_apps_partial">Only half seaworthy with myCar</string>
+    <string name="car_apps_broken">Not seaworthy with myCar</string>
+    <string name="car_apps_pin">Nail to the mast</string>
+    <string name="car_apps_unpin">Pry off the mast</string>
+    <plurals name="car_apps_dock_full">
+        <item quantity="one">The mast is full (%1$d nailed)</item>
+        <item quantity="other">The mast is full (%1$d nailed)</item>
+    </plurals>
+    <string name="car_apps_move_left">Heave left</string>
+    <string name="car_apps_move_right">Heave right</string>
+    <string name="car_apps_reset_order">Reset fleet order</string>
+    <string name="car_apps_hide_from_grid">Stow away from the fleet</string>
+    <string name="car_apps_show_on_grid">Show in the fleet</string>
+    <string name="car_apps_hidden_toast">%1$s is stowed away. Rigging, Stowaways brings it back.</string>
+    <string name="car_web_music_elsewhere">%1$s is playing on another device, not aboard</string>
+    <string name="car_mini_open_player">Open the shanty box</string>
+    <string name="car_mini_hide">Stow the wee shanty box</string>
+    <string name="car_mini_hidden_toast">Wee shanty box stowed for this voyage. The shanty on the mast opens the shanty box.</string>
+    <string name="car_mini_hidden_toast_grid">Wee shanty box stowed for this voyage. The button at the foot of the mast brings the shanty box back from the fleet.</string>
+
+    <string name="car_map_starting">Hoisting %1$s…</string>
+    <string name="car_map_starting_unknown">Unrolling the chart…</string>
+    <string name="car_map_failed_unknown">The chart app would not set sail.</string>
+    <string name="car_map_choose_another">Choose another chart app</string>
+    <string name="car_map_none_installed">No chart apps aboard.</string>
+    <string name="car_map_none_installed_detail">Install a navigation app that supports Android Auto and it will hoist its sails here on its own.</string>
+    <string name="car_map_stopped">Chart stowed.</string>
+    <string name="car_map_car_apps">Ship\'s apps</string>
+    <string name="car_map_choose">Choose a chart app.</string>
+    <string name="car_home_hide_lyrics">Stow the verses</string>
+    <string name="car_home_app_failed">%1$s would not set sail.</string>
+
+    <string name="car_side_close_player">Close the shanty box</string>
+    <string name="car_side_title">Beside the chart</string>
+    <string name="car_side_music">Shanties</string>
+    <string name="car_side_explained">Shanties puts the shanty box beside the chart while something plays. An app stays beside the chart; close it for the voyage, and the button at the foot of the mast brings it back from the fleet.</string>
+
+    <string name="car_pages_nothing_yet">Naught yet</string>
+    <string name="car_pages_nothing">Naught</string>
+    <string name="car_pages_app_missing">App gone overboard</string>
+    <string name="car_pages_tap_to_choose">Tap to choose what sails here</string>
+    <string name="car_pages_app_gone">This app went overboard: it isn\'t on the phone any more. Tap to choose something else.</string>
+    <string name="car_pages_dot_map">Chart</string>
+    <string name="car_pages_dot_page">Deck %1$d</string>
+    <string name="car_pages_change">Change this deck</string>
+    <string name="car_pages_move_left">Heave left</string>
+    <string name="car_pages_move_right">Heave right</string>
+    <string name="car_pages_add">Add a deck</string>
+    <string name="car_pages_delete">Scuttle this deck</string>
+    <string name="car_pages_delete_confirm">Scuttle deck</string>
+    <string name="car_pages_one_app">A deck runs one ship\'s app at a time: %1$s is already aboard this one.</string>
+    <string name="car_pages_layout">Deck plan</string>
+    <string name="car_pages_layout_now">Deck plan: %1$s</string>
+    <string name="car_pages_layout_full">Whole deck</string>
+    <string name="car_pages_layout_grid">Four quarters</string>
+    <string name="car_pages_layout_map">Chart</string>
+    <string name="car_pages_layout_keeps">What the deck shows stays, in order, as far as the new deck plan has room.</string>
+    <string name="car_pages_settings_title">Decks beside the chart</string>
+    <string name="car_pages_settings_explained">Swipe across Home port, or tap the dots at its foot, for your decks: the weather, the agenda, the browser or a ship\'s app such as Plancia, as a whole deck, halves, quarters or a mix. The pencil beside the dots changes the deck in view.</string>
+    <string name="car_pages_replace">Replace my decks</string>
+    <string name="car_pages_ready_made">Ready-built decks</string>
+
+    <string name="car_dashboard_weather_loading">Reading the skies…</string>
+    <string name="car_dashboard_coming_up">On the horizon</string>
+    <string name="car_dashboard_allow_calendar">Allow the calendar for myCar on the phone to see what\'s on the horizon.</string>
+    <string name="car_dashboard_calendar_loading">Unrolling the calendar…</string>
+    <string name="car_dashboard_nothing_coming">Calm seas: nothing in the next week.</string>
+
+    <string name="car_weather_loading">Reading the skies…</string>
+    <string name="car_weather_waiting_fix">Waiting to take a fix on our position.</string>
+    <string name="car_weather_unreachable">Could not hail the weather service.</string>
+
+    <string name="car_template_car_app">Ship\'s app</string>
+    <string name="car_template_waiting">weighing anchor</string>
+    <string name="car_template_finding_route">Plotting a course…</string>
+    <string name="car_template_finding_routes">Plotting courses…</string>
+    <string name="car_template_search">Scour</string>
+    <string name="car_template_nothing_playing">Nothing a-playing yet.</string>
+    <string name="car_template_unsupported">%1$s isn\'t charted yet</string>
+    <string name="car_template_start">Set sail</string>
+
+    <string name="car_host_service_disconnected">the app\'s service cast off</string>
+    <string name="car_host_refused_bind">the app refused to bind - host not welcome aboard</string>
+    <string name="car_host_would_not_connect">the app would not let myCar board</string>
+    <string name="car_host_needs_permission">It only sails with Google\'s own Android Auto: its service requires the permission %1$s, which myCar can\'t hold.</string>
+    <string name="car_host_only_android_auto">It only sails with Google\'s own Android Auto host.</string>
+    <string name="car_host_not_allowed">It only welcomes aboard the hosts on its own allow-list (Google\'s Android Auto and a few others), and myCar isn\'t on it.</string>
+    <string name="car_host_no_answer">It didn\'t answer myCar\'s hail. Apps built for newer versions of Android Auto only sail with Google\'s.</string>
+    <string name="car_host_rejected_at">It wouldn\'t let myCar aboard as a host at %1$s: %2$s</string>
+    <string name="car_host_location_notification">myCar is sharing location with the chart in the car</string>
+    <string name="car_map_no_position_title">The chart has no position</string>
+
+    <string name="car_wallpaper_still">Becalmed</string>
+    <string name="car_wallpaper_moving">Under sail</string>
+    <string name="car_wallpaper_none">Naught</string>
+    <string name="car_wallpaper_sunset">Red sky</string>
+    <string name="car_wallpaper_ocean">Open sea</string>
+    <string name="car_wallpaper_graphite">Gunmetal</string>
+</resources>
