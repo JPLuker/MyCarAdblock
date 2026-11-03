@@ -16,6 +16,12 @@ internal class MusicAsks {
         count.incrementAndGet()
     }
 
+    /** Where the count is now, for [since]. */
+    fun mark(): Int = count.get()
+
+    /** The music was asked for something after [mark]. */
+    fun since(mark: Int): Boolean = count.get() != mark
+
     /** [action] for later, which does nothing if the music was asked for anything after this call. */
     fun unlessAskedSince(action: () -> Unit): () -> Unit {
         val at = count.get()

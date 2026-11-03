@@ -19,7 +19,8 @@ internal fun AutoplayWhenReady(phase: CarMedia.Phase) {
     val throughMyCar by CarSettings.pipeAudio.collectAsStateWithLifecycle()
     val capture by CarAudio.capture.collectAsStateWithLifecycle()
     val direct by CarAudio.direct.collectAsStateWithLifecycle()
-    LaunchedEffect(phase, deciding, throughMyCar, capture, direct) {
+    val bluetoothOut by CarAudioRoute.bluetoothOut.collectAsStateWithLifecycle()
+    LaunchedEffect(phase, deciding, throughMyCar, capture, direct, bluetoothOut) {
         if (phase == CarMedia.Phase.READY) CarServices.autoplayIfDue()
     }
 }

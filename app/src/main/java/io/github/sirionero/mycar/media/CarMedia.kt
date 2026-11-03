@@ -575,6 +575,11 @@ class CarMedia(private val context: Context) {
      */
     fun pauseLater(): () -> Unit = asks.unlessAskedSince { pause() }
 
+    /** Where the driver's asks of the music are now ([askedSince]): Autoplay doesn't override them. */
+    fun askMark(): Int = asks.mark()
+
+    fun askedSince(mark: Int): Boolean = asks.since(mark)
+
     /** "Resume": plays if the app is stopped, and counts as asked even if it already plays, for [pauseLater]. */
     fun resume() {
         asks.asked()

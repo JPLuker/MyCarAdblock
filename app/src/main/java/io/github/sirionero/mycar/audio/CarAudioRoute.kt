@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.AudioDeviceCallback
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import io.github.sirionero.mycar.MyCarLog
@@ -70,15 +71,27 @@ object CarAudioRoute {
     val onBluetooth: Boolean
         get() = CarSettings.audioRoute.value == AudioRoute.AUTO && !CarSettings.pipeAudio.value
 
+    private val _bluetoothOut = MutableStateFlow(true)
+
+    /**
+     * The phone has a Bluetooth output for music, the car's or any other (LE Audio too): music started
+     * now doesn't play on the phone's speaker. Watched from the car's picture to the drive's end, for
+     * the drive's own Autoplay (CarServices.autoplayIfDue); true outside a drive, where nothing waits.
+     */
+    val bluetoothOut: StateFlow<Boolean> = _bluetoothOut.asStateFlow()
+    private var outputs: AudioDeviceCallback? = null
+
     /** The car shows myCar. Called again whenever the video restarts, so it decides once a drive. */
     fun onProjecting() = main.post {
         if (projecting) return@post
         projecting = true
+        watchOutputs()
         if (CarSettings.audioRoute.value == AudioRoute.AUTO) decide()
     }
 
     fun onCarDisconnected() = main.post {
         projecting = false
+        stopWatchingOutputs()
         _deciding.value = false
         sawCall = false
         callWaits = 0
@@ -218,6 +231,44 @@ object CarAudioRoute {
     private fun stopWatching() {
         watching?.let { audio?.unregisterAudioDeviceCallback(it) }
         watching = null
+    }
+
+    private fun watchOutputs() {
+        if (outputs != null) return
+        val callback = object : AudioDeviceCallback() {
+            override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>) {
+                _bluetoothOut.value = anyBluetoothOut()
+            }
+
+            override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>) {
+                _bluetoothOut.value = anyBluetoothOut()
+            }
+        }
+        outputs = callback
+        _bluetoothOut.value = anyBluetoothOut()
+        audio?.registerAudioDeviceCallback(callback, main)
+    }
+
+    private fun stopWatchingOutputs() {
+        outputs?.let { audio?.unregisterAudioDeviceCallback(it) }
+        outputs = null
+        _bluetoothOut.value = true
+    }
+
+    /**
+     * Any Bluetooth output for music, not only the car's address and not only A2DP: what matters to
+     * Autoplay is that the music doesn't come out of the phone. Matched to the car (as Automatic does)
+     * it waited for good with an LE Audio car or one that names another address.
+     */
+    private fun anyBluetoothOut(): Boolean {
+        val manager = audio ?: return true
+        val types = mutableSetOf(
+            AudioDeviceInfo.TYPE_BLUETOOTH_A2DP,
+            AudioDeviceInfo.TYPE_BLE_HEADSET,
+            AudioDeviceInfo.TYPE_BLE_SPEAKER,
+        )
+        if (Build.VERSION.SDK_INT >= 33) types += AudioDeviceInfo.TYPE_BLE_BROADCAST
+        return manager.getDevices(AudioManager.GET_DEVICES_OUTPUTS).any { it.type in types }
     }
 
     /** A Bluetooth music output that may be the car: any, unless the car named another address. */

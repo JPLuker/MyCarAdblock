@@ -28,4 +28,18 @@ class AutoplayWaitTest {
     fun `Xonos inside myCar plays straight into the car, no capture needed`() {
         assertFalse(autoplayWaits(deciding = false, throughMyCar = true, captureOn = false, straightIn = true))
     }
+
+    @Test
+    fun `on the Bluetooth way with no Bluetooth output, it waits rather than play on the phone's speaker`() {
+        assertTrue(autoplayWaits(deciding = false, throughMyCar = false, captureOn = false, straightIn = false, bluetoothOut = false))
+        assertTrue(autoplayWaits(deciding = false, throughMyCar = false, captureOn = false, straightIn = true, bluetoothOut = false))
+        assertFalse(autoplayWaits(deciding = false, throughMyCar = false, captureOn = false, straightIn = false, bluetoothOut = true))
+    }
+
+    @Test
+    fun `through myCar, a Bluetooth output doesn't matter`() {
+        assertFalse(autoplayWaits(deciding = false, throughMyCar = true, captureOn = true, straightIn = false, bluetoothOut = false))
+        assertFalse(autoplayWaits(deciding = false, throughMyCar = true, captureOn = false, straightIn = true, bluetoothOut = false))
+        assertTrue(autoplayWaits(deciding = false, throughMyCar = true, captureOn = false, straightIn = false, bluetoothOut = true))
+    }
 }
