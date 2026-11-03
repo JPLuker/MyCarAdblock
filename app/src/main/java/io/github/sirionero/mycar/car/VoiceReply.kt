@@ -191,7 +191,16 @@ object VoiceReply {
         _state.value = _state.value.copy(phase = Phase.LISTENING, heard = "")
         CarAssistant.dictate(
             onPartial = { text -> if (id == run) _state.value = _state.value.copy(heard = text) },
-            onResult = { text -> if (id == run) confirm(id, text) },
+            onResult = { text ->
+                if (id != run) return@dictate
+                // "Cancel" said in place of the reply ends it: taken as the reply, it was read back and sent to the chat.
+                if (ReplyWords.onlyCancel(text)) {
+                    close()
+                    CarAssistant.say(AssistantLanguage.answer("Not sent.")) {}
+                } else {
+                    confirm(id, text)
+                }
+            },
             onError = { message ->
                 if (id != run) return@dictate
                 _state.value = _state.value.copy(phase = Phase.ERROR, error = message)

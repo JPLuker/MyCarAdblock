@@ -5,8 +5,8 @@ import java.text.Normalizer
 
 /**
  * What the driver's words mean to [VoiceReply]: a yes to "Do you want to reply?", a command while
- * the reply counts down. The words of the language the assistant works in count besides the
- * English ones. Nothing here needs Android (ReplyWordsTest).
+ * the reply counts down, a reply that is only a cancel. The words of the language the assistant
+ * works in count besides the English ones. Nothing here needs Android (ReplyWordsTest).
  */
 internal object ReplyWords {
 
@@ -27,6 +27,22 @@ internal object ReplyWords {
         says(text, CHANGE_WORDS + AssistantLanguage.change(l)) -> Command.CHANGE
         says(text, SEND_WORDS + AssistantLanguage.send(l)) -> Command.SEND
         else -> null
+    }
+
+    /**
+     * Whether the reply the driver said is nothing but a cancel ("Cancel", "Annulla", "Abbrechen",
+     * "取消"): they changed their mind, and it isn't read back and sent as the text. A plain no ("No",
+     * "Nein", "Нет", "不") is a real answer to a message, so it stays a reply.
+     */
+    fun onlyCancel(text: String, l: VoiceLanguage = AssistantLanguage.language): Boolean {
+        val stops = (CANCEL_WORDS + AssistantLanguage.cancel(l) - ANSWERS).sortedByDescending { it.length }
+        var rest = words(text).joinToString(" ")
+        if (rest.isEmpty()) return false
+        while (rest.isNotEmpty()) {
+            val stop = stops.firstOrNull { rest == it || rest.startsWith("$it ") } ?: return false
+            rest = rest.removePrefix(stop).trim()
+        }
+        return true
     }
 
     /** Whether [text] has one of [phrases] in it, as whole words ("va bene", "laisse tomber"). */
@@ -144,6 +160,12 @@ internal object ReplyWords {
     /** 不/别 (and 不要, 别再, 别给他…) right before 发 as sending: 发送, 发出, 发给, 发了, 发吧, or 发 at the end. */
     private val CHINESE_DENIED = Regex(
         "[不别別勿甭](?:要|用|想|必|再|先){0,2}(?:[给給][^发發]{1,4})?[发發](?:送|出|过|過|给|給|了|啦|吧|这|這|那|信|消息|短信|微信|$)",
+    )
+
+    /** Words that are an answer by themselves, never only a cancel: "No" is a reply to send. */
+    private val ANSWERS = setOf(
+        "no", "nope", "nah", "don't", "dont", "non", "nein", "não", "nao", "όχι", "οχι", "μη", "μην", "нет", "неа", "не надо",
+        "не нужно", "不", "不要", "不是", "否", "别", "別",
     )
 
     private val YES_WORDS = setOf("yes", "yeah", "yep", "yup", "sure", "ok", "okay", "reply", "please")

@@ -18,7 +18,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** What VoiceReply hears: the countdown's commands and a yes to "Do you want to reply?". */
+/** What VoiceReply hears: the countdown's commands, a yes to "Do you want to reply?", a reply that only cancels. */
 class ReplyWordsTest {
 
     private fun heard(l: VoiceLanguage, vararg pairs: Pair<String, ReplyWords.Command?>) {
@@ -68,6 +68,24 @@ class ReplyWordsTest {
         heard(IT, "Annulla" to CANCEL, "Cambia" to CHANGE)
         heard(DE, "Abbrechen" to CANCEL, "Ändern" to CHANGE)
         heard(ZH, "取消" to CANCEL, "修改" to CHANGE)
+    }
+
+    @Test
+    fun `a reply of only a cancel is not sent`() {
+        for ((l, said) in listOf(
+            EN to "Cancel", EN to "Stop.", EN to "Cancel, cancel.", IT to "Annulla", IT to "Annulla.", IT to "annulla annulla",
+            ES to "Cancela", FR to "Annule.", DE to "Abbrechen", PT to "Cancela", EL to "Ακύρωση", EL to "ακυρωση", EL to "Άσ' το",
+            RU to "Отмена", RU to "Не отправляй", ZH to "取消", ZH to "取消。",
+        )) assertTrue("$l: $said", ReplyWords.onlyCancel(said, l))
+    }
+
+    @Test
+    fun `a no or a reply with more in it is a reply`() {
+        for ((l, said) in listOf(
+            EN to "No", EN to "Nope.", EN to "Don't", EN to "Cancel the dinner", EN to "", IT to "No", IT to "No.",
+            IT to "Annulla la cena", ES to "No", FR to "Non", DE to "Nein", PT to "Não", EL to "Όχι", RU to "Нет", RU to "Не надо",
+            ZH to "不", ZH to "不要", ZH to "取消晚饭吧",
+        )) assertFalse("$l: $said", ReplyWords.onlyCancel(said, l))
     }
 
     @Test
