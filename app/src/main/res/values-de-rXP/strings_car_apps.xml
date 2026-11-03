@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="dialer_tab_recents">Funkbuch</string>
+    <string name="dialer_tab_contacts">Crew</string>
+    <string name="dialer_loading_contacts">Crew wird an Deck gepfiffen…</string>
+    <string name="dialer_no_contacts">Keine Crew mit Telefonnummer aufzutreiben.</string>
+    <string name="dialer_no_match">Niemand von der Crew passt zu „%1$s“.</string>
+    <string name="dialer_search_contacts">Crew absuchen</string>
+    <string name="dialer_favourite">In der Schatztruhe</string>
+
+    <string name="recents_loading">Funkbuch wird aufgeschlagen…</string>
+    <string name="recents_empty">Das Funkbuch ist leer.</string>
+    <string name="recents_permission">Das Funkbuch kommt aus der Anrufliste des Telefons. Erlaube sie auf dem Telefon, wenn du parkst.</string>
+
+    <plurals name="message_new_count">
+        <item quantity="one">%1$s · %2$d neue Flaschenpost</item>
+        <item quantity="other">%1$s · %2$d neue Flaschenposten</item>
+    </plurals>
+    <string name="message_reply_to">Flaschenpost an %1$s</string>
+    <string name="message_listening">Ich lausche</string>
+    <string name="message_sending_to">Flaschenpost geht an %1$s</string>
+    <string name="message_sent_to">Flaschenpost an %1$s ist raus</string>
+    <string name="message_reply_failed">Antwort lief auf Grund</string>
+
+    <string name="message_screen_title">Flaschenpost</string>
+    <string name="message_empty">Keine Flaschenpost in Sicht. Neue Flaschenposten von %1$s landen hier, sobald sie auf dem Telefon einlaufen.</string>
+    <plurals name="message_earlier">
+        <item quantity="one">%d ältere Flaschenpost</item>
+        <item quantity="other">%d ältere Flaschenposten</item>
+    </plurals>
+    <string name="message_quick_replies_hide">Antworten verstauen</string>
+    <string name="message_line_you">Käpt\'n: %1$s</string>
+
+    <string name="message_test_channel">Test-Flaschenposten</string>
+    <string name="message_test_you">Käpt\'n</string>
+    <string name="message_test_late">Laufe zehn Minuten später ein, hältst du mir eine Koje frei?</string>
+    <string name="message_test_tonight">Legst du heute Abend noch bei uns an?</string>
+    <string name="message_test_milk">Kannst du auf dem Heimweg Milch an Bord nehmen?</string>
+    <string name="message_test_parked">Ruf mich an, wenn du vor Anker liegst.</string>
+
+    <string name="notifications_title">Signalflaggen</string>
+    <string name="notifications_clear_all">Alle versenken</string>
+    <string name="notifications_clear_confirm">Wirklich alle versenken</string>
+    <string name="notifications_access_off">Signalflaggen sind aus. Erlaube myCar auf dem Telefon unter Einstellungen &gt; Benachrichtigungen &gt; Zugriff auf Benachrichtigungen.</string>
+    <string name="notifications_empty">Noch ruhige See. Neue Signalflaggen vom Telefon werden hier gehisst.</string>
+
+    <string name="assistant_needs_model">Der Papagei versteht vorerst nur Englisch: Für Befehle auf %1$s lade %2$s in der Takelage von myCar auf dem Telefon herunter.</string>
+    <string name="assistant_mic">Papagei</string>
+    <string name="assistant_phone_inline">der Papagei des Telefons</string>
+    <string name="assistant_locked_brain">Das Telefon ist gesperrt: myCar lauscht, und Home Assistant antwortet.</string>
+    <string name="assistant_start_failed">Da %1$s nicht gestartet ist, lauscht stattdessen myCar.</string>
+    <string name="assistant_listening_on_phone">Lauscht auf dem Telefon</string>
+    <string name="assistant_app_listening_on_phone">%1$s lauscht auf dem Telefon</string>
+    <string name="assistant_picker_title">Bordpapagei</string>
+    <string name="assistant_choice_phone">Papagei des Telefons</string>
+    <string name="assistant_picker_footer">Der Papagei des Telefons startet wie beim Wischen von einer unteren Ecke des Telefonbildschirms nach oben. Ein anderer Papagei lauscht und antwortet auf dem Telefon, und seine Stimme kommt nur über Bluetooth an Bord; bei gesperrtem Telefon startet er, sobald das Telefon entsperrt ist – oder, wenn Home Assistant in myCar eingerichtet ist, lauscht stattdessen myCar, und Home Assistant antwortet. Der Papagei von myCar funktioniert offline, gesperrt oder nicht, und erscheint auf dem Bordbildschirm; ist Home Assistant eingerichtet, geht, was er nicht selbst kann, an den Sprachassistenten von Home Assistant.</string>
+
+    <string name="bluetooth_pair_title">Mit diesem Schiff koppeln?</string>
+    <string name="bluetooth_pair_body_calls_music">Anrufe und Musik laufen über die Bordlautsprecher, sobald dein Telefon und das Schiff gekoppelt sind. Dein Telefon bittet dich dann, einen Code zu bestätigen.</string>
+    <string name="bluetooth_pair_body_calls">Anrufe laufen über die Bordlautsprecher, sobald dein Telefon und das Schiff gekoppelt sind. Dein Telefon bittet dich dann, einen Code zu bestätigen.</string>
+    <string name="bluetooth_confirm_body">Prüfe den Code auf deinem Telefon und tippe auf „Koppeln“. Vielleicht fragt auch das Schiff.</string>
+    <string name="bluetooth_hide">Verstauen</string>
+    <string name="bluetooth_paired">Gekoppelt. Anrufe laufen jetzt über das Schiff.</string>
+
+    <string name="cinema_continue">Weiter auf Kurs: %1$s</string>
+    <string name="cinema_empty">Hol Videoseiten und TV-Listen in der Takelage von myCar auf dem Telefon unter „Cinema“ an Bord.</string>
+    <string name="cinema_protected">Geschütztes Video: wohl pechschwarz</string>
+    <string name="cinema_forward_10s">10 Sekunden voraus</string>
+    <string name="cinema_play">Aufspielen</string>
+    <string name="cinema_pause">Flaute</string>
+    <string name="cinema_videos_none_picked">Keine Videos für myCar ausgewählt. Wähle auf dem Telefon in der Takelage von myCar unter „Cinema“ aus, welche es sehen darf.</string>
+    <string name="cinema_videos_none">Auf diesem Telefon ist kein Video in Sicht.</string>
+    <string name="cinema_find_channel">Sender absuchen</string>
+    <string name="cinema_reload_list">Liste neu einholen</string>
+    <string name="cinema_tv_found">Sender mit „%1$s“ gesichtet: %2$d</string>
+    <string name="cinema_tv_no_channels">In dieser Liste ist kein Sender in Sicht.</string>
+    <string name="cinema_tv_all_channels">Ganze Senderflotte</string>
+    <string name="cinema_tv_refused">Der Server der Liste sagt „Nix da“ (%1$d).</string>
+    <string name="cinema_tv_too_big">Die Liste ist zu groß für das Schiff (über %1$d MB).</string>
+
+    <string name="plancia_set_up_title">Mach Plancia auf dem Telefon klar</string>
+    <string name="plancia_set_up_text">In myCar auf dem Telefon: Takelage, dann Plancia – die Adresse deines Home Assistant und ein Token.</string>
+    <string name="plancia_connecting">Home Assistant wird geentert</string>
+    <string name="plancia_menu_opens">Plancia sticht in See mit</string>
+    <string name="plancia_no_dashboards">Keine Dashboards in Sicht</string>
+    <string name="plancia_note_opens_first">Beim Auslaufen</string>
+
+
+    <string name="directions_straight">Geradeaus Kurs halten</string>
+    <string name="directions_straight_onto">Geradeaus Kurs halten auf %1$s</string>
+    <string name="directions_continue">Kurs halten</string>
+    <string name="directions_continue_onto">Kurs halten auf %1$s</string>
+    <string name="directions_ferry">An Bord der Fähre gehen</string>
+    <string name="directions_destination_ahead">Das Ziel liegt voraus</string>
+</resources>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="session_idle">未登船</string>
+    <string name="session_idle_detail">插入汽车的 USB 接口，或无线登船。汽车响应后，myCar 会自动打开。</string>
+    <string name="session_connecting">正在登船</string>
+    <string name="session_connected">已登船</string>
+    <string name="session_connected_detail">myCar 正显示在船上屏幕上。</string>
+    <string name="session_disconnected">已解缆离船</string>
+
+    <string name="connection_stage_talking">正在向汽车喊话</string>
+    <string name="connection_stage_accepted">证书已接受：正在准备起航</string>
+    <string name="connection_stage_picture">正在升起画面</string>
+
+    <string name="wireless_link_bt_reaching">蓝牙：正在驶向 %1$s</string>
+    <string name="wireless_link_bt_talking">蓝牙：正在与 %1$s 谈判</string>
+    <string name="wireless_link_wifi_joining">WLAN：正在登上 %1$s 的网络</string>
+    <string name="wireless_link_wifi_reaching">WLAN：正在驶向 %1$s</string>
+
+    <string name="channel_session">已登船</string>
+    <string name="channel_audio">船上音频</string>
+    <string name="session_notification_title">myCar 已登船</string>
+    <string name="audio_notification_title">正在向船上播放</string>
+    <string name="audio_notification_text">myCar 正在将手机的音频送上船。</string>
+    <string name="mirror_notification_title">正在镜像到船上</string>
+    <string name="mirror_notification_text">船上屏幕正在显示这部手机。</string>
+</resources>

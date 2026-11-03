@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="session_idle_detail">Подключите кабель к USB-порту корабля или возьмите его на абордаж без кабеля. myCar откроется сам, когда корабль ответит.</string>
+    <string name="session_connected_detail">myCar на бортовом экране.</string>
+    <string name="session_disconnected_detail">Корабль больше не подключён.</string>
+
+    <string name="connection_stage_talking">Окликаем корабль</string>
+    <string name="connection_stage_accepted">Сертификат принят: поднимаем якорь</string>
+
+    <string name="wireless_link_bt_reaching">Bluetooth: курс на %1$s</string>
+    <string name="wireless_link_bt_talking">Bluetooth: переговоры с %1$s</string>
+    <string name="wireless_link_wifi_joining">Wi-Fi: берём на абордаж сеть %1$s</string>
+    <string name="wireless_link_wifi_reaching">Wi-Fi: окликаем %1$s</string>
+
+    <string name="channel_session">Абордаж корабля</string>
+    <string name="channel_audio">Звук на борту</string>
+    <string name="session_notification_title">myCar взял корабль на абордаж</string>
+    <string name="audio_notification_title">Звук идёт на борт</string>
+    <string name="audio_notification_text">myCar передаёт звук телефона на борт.</string>
+    <string name="mirror_notification_title">Трансляция на борт</string>
+    <string name="mirror_notification_text">На бортовом экране показывается этот телефон.</string>
+</resources>

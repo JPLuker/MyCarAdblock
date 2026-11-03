@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_support_title">Back the voyage</string>
+    <string name="settings_support_footer">myCar is free, with no ads and no tracking. Your backing keeps the ship afloat.</string>
+    <string name="settings_usage_notes_title">Voyage notes</string>
+    <string name="settings_updates_title">Refits</string>
+
+    <string name="settings_about_title">Our flag</string>
+    <string name="settings_about_whats_new">Fresh plunder</string>
+    <string name="settings_about_replay_intro">Sail the %1$s intro again</string>
+    <string name="settings_about_replay_intro_detail">What this release brings aboard, in a few taps</string>
+    <string name="settings_about_setup">Fitting out</string>
+    <string name="settings_about_setup_detail">What\'s shipshape and what\'s left. Nothing is scuttled.</string>
+
+    <string name="settings_connection_title">Boarding</string>
+    <string name="settings_use_mycar">Use myCar aboard</string>
+    <string name="settings_use_mycar_on">myCar answers the hail when you plug into a ship</string>
+    <string name="settings_use_mycar_off">Off: Android Auto can take the helm instead</string>
+    <string name="settings_wireless_auto">Board wirelessly by itself</string>
+    <string name="settings_wireless_auto_on">A ship you boarded without the cable is boarded again when she starts. Android asks once.</string>
+    <string name="settings_wireless_auto_cars">Boards %1$s again by itself when it starts. Another ship: Android asks once, after a voyage without the cable.</string>
+    <string name="settings_wireless_auto_off">Off: tap Board wirelessly each time</string>
+
+    <string name="settings_help_title">Help and tackle</string>
+    <string name="settings_help_connect">How to board</string>
+    <string name="settings_help_connect_detail">Which ships sail, and what\'s left to fit out</string>
+    <string name="settings_help_preview">Helm spyglass</string>
+    <string name="settings_help_preview_detail">See the helm on your phone</string>
+    <string name="settings_preview_busy">Available when no ship is boarded</string>
+    <string name="settings_help_logs">Ship\'s log</string>
+    <string name="settings_help_logs_detail">What myCar and the ship signal to each other</string>
+
+    <string name="settings_audio_title">Sound aboard</string>
+    <string name="settings_audio_footer_ask">Calls go over Bluetooth either way. Run the command in How to board once, and myCar stops asking to share audio.</string>
+    <string name="settings_audio_auto">Automatic (Captain\'s pick)</string>
+    <string name="settings_audio_auto_detail">Bluetooth when the ship takes the phone\'s shanties that way, otherwise through myCar</string>
+    <string name="settings_audio_bluetooth_detail">No prompt each voyage, and your chart app\'s voice reaches the ship. Some ships take only calls over it</string>
+    <string name="settings_audio_mycar_detail">Over the cable or Wi-Fi, as Android Auto does. Android asks to share audio once each voyage</string>
+
+    <string name="settings_apps_recommended">Captain\'s picks</string>
+
+    <string name="settings_cert_footer">Changes take effect on the next boarding.</string>
+    <string name="settings_cert_hide_details">Stow details</string>
+    <string name="settings_cert_ready_own_first">%1$s is ready, but your own certificate comes first: remove it to sail with %1$s.</string>
+    <string name="settings_cert_in_use_next">%1$s is in use from the next boarding.</string>
+    <string name="settings_cert_download_failed">Couldn\'t haul %1$s aboard: check your internet connection, then try again.</string>
+    <string name="settings_cert_downloaded">Hauled aboard.</string>
+    <string name="settings_cert_not_downloaded">Not downloaded yet: tap to haul it aboard.</string>
+    <string name="settings_cert_import">Bring my own file aboard</string>
+    <string name="settings_cert_import_detail">A .p12 file with its private key, hauled from wherever you choose</string>
+    <string name="settings_cert_imported">Certificate brought aboard.</string>
+    <string name="settings_cert_import_failed">Could not bring it aboard: wrong password, or not a PKCS#12 file with a private key.</string>
+
+    <string name="settings_test_trying">Hailing…</string>
+    <string name="settings_test_away">At sea</string>
+    <string name="settings_address_away">Address at sea (optional)</string>
+    <string name="settings_save_and_test">Stash and test</string>
+
+    <string name="settings_plancia_footer">Your Home Assistant dashboards aboard, ready the moment you open them: from the fleet, on a deck next to the chart\'s, or in the panel beside the chart. Make the token in Home Assistant: your profile, Security, Long-lived access tokens.</string>
+    <string name="settings_plancia_use_app">Bring aboard the Plancia app\'s account</string>
+    <string name="settings_plancia_use_app_detail">Its addresses and token, with nary a thing to type</string>
+    <string name="settings_plancia_asking">Hailing Plancia…</string>
+    <string name="settings_plancia_app_no_account">Plancia has no account to share yet: fit it out in Plancia first, or type it below.</string>
+    <string name="settings_plancia_missing_remove">Add an address and a token. To jettison Plancia from myCar, use Remove.</string>
+    <string name="settings_plancia_remove_title">Jettison Plancia from myCar?</string>
+    <string name="settings_plancia_remove_text">myCar forgets its addresses and token. The Plancia app, if it\'s on the phone, is back aboard.</string>
+    <string name="settings_plancia_removed">Plancia went overboard: the Plancia app is back aboard, if it\'s on the phone.</string>
+    <plurals name="settings_plancia_test_ok">
+        <item quantity="one">Home Assistant %1$s, %2$d entity mustered</item>
+        <item quantity="other">Home Assistant %1$s, %2$d entities mustered</item>
+    </plurals>
+    <string name="settings_plancia_error_no_answer">no answer to our hail</string>
+    <string name="settings_plancia_error_other">it ran aground</string>
+    <string name="settings_ask_ha">Ask Home Assistant aboard</string>
+    <string name="settings_ask_ha_detail">What myCar\'s parrot can\'t do itself goes to the voice assistant set up in Home Assistant (Settings &gt; Voice assistants there): Claude, Gemini, ChatGPT, a model at home, or Home Assistant\'s own, which also runs the house. With the phone locked, it answers in place of the phone\'s parrot. Only those words go to your Home Assistant, as text.</string>
+
+    <string name="settings_xonos_footer">Your Music Assistant library among the ship\'s shanty apps. With the sound aboard going through myCar, its shanties sail straight to the ship, and Android doesn\'t ask to share the audio while you listen to them.</string>
+    <string name="settings_xonos_use_app">Bring aboard the Xonos app\'s account</string>
+    <string name="settings_xonos_use_app_detail">Its addresses and sign-on, with nary a thing to type</string>
+    <string name="settings_xonos_asking">Hailing Xonos…</string>
+    <string name="settings_xonos_app_no_account">Xonos has no account to share yet: sign on in Xonos first, or below.</string>
+    <string name="settings_xonos_signed_in">Signed on. Sign on again to change it.</string>
+    <string name="settings_xonos_signed_in_as">Signed on as %1$s. Sign on again to change it.</string>
+    <string name="settings_xonos_signing_in">Signing on…</string>
+    <string name="settings_xonos_sign_in">Sign on</string>
+    <string name="settings_xonos_remove_title">Jettison Xonos from myCar?</string>
+    <string name="settings_xonos_remove_text">myCar forgets its address and sign-on, and signing on again takes the password. The Xonos app, if it\'s on the phone, is back aboard.</string>
+    <string name="settings_xonos_removed">Xonos went overboard from myCar: the Xonos app is back aboard, if it\'s on the phone.</string>
+    <string name="settings_xonos_test_ok">Music Assistant %1$s, playing shanties as %2$s</string>
+
+    <string name="settings_cinema_footer">Video sites as tiles aboard, each opened in a browser made for video. Protected video (Netflix, DAZN, Prime Video, Disney+ and the like) most likely stays black aboard: Android hides it from a screen made into a video stream, as the helm is.</string>
+    <string name="settings_cinema_reset_title">Sail back to the suggested sites?</string>
+    <string name="settings_cinema_reset_text">Cinema sails back to %1$s.</string>
+    <string name="settings_cinema_reset_text_own">Cinema sails back to %1$s. Your own sites walk the plank: %2$s.</string>
+    <string name="settings_cinema_remove_title">Jettison %1$s?</string>
+    <string name="settings_cinema_remove_site_text">It goes overboard from Cinema. To haul it back, its address is typed in again.</string>
+    <string name="settings_cinema_remove">Jettison %1$s</string>
+    <string name="settings_cinema_protected">protected video, likely pitch black aboard</string>
+    <string name="settings_cinema_videos">Videos in this phone\'s hold</string>
+    <string name="settings_cinema_videos_ask">Allow myCar to show them aboard, under \"This phone\'s hold\"</string>
+    <string name="settings_cinema_videos_limited">Only the videos picked for myCar show aboard</string>
+    <string name="settings_cinema_videos_allowed">They show aboard, under \"This phone\'s hold\"</string>
+    <string name="settings_cinema_tv_footer">IPTV lists in the M3U format, from your provider, a public list or a TV server at home: each one is a tile in Cinema with its channels. They play on the phone\'s own player; protected channels (DRM) and multicast ones are left ashore.</string>
+    <string name="settings_cinema_tv_remove_text">Its address and its channels go overboard from myCar. To haul it back, the address is typed in again.</string>
+    <string name="settings_cinema_tv_loading">hauling aboard…</string>
+
+    <string name="settings_phone_typing_close">Close the helm\'s keyboard</string>
+    <string name="settings_phone_typing_label">Type for the helm</string>
+    <string name="settings_phone_typing_search">Scour at the helm</string>
+
+    <string name="settings_audio_choice_title">Play the sound aboard over Bluetooth?</string>
+    <string name="settings_audio_choice_text">Android treats shanties sent through myCar like sharing your screen, so it asks every voyage. Over Bluetooth it never asks, if your ship plays the phone\'s shanties that way. You can change this later in Rigging.</string>
+    <string name="settings_audio_choice_command">Or keep it and sink the question for good: plug the phone into a computer with USB debugging on, and run this once.</string>
+    <string name="settings_mic_blocked_title">Sound aboard needs the microphone permission</string>
+    <string name="settings_mic_blocked_text">Android lets an app send other apps\' sound to the car only if it has the microphone permission. It\'s turned off for myCar, so the shanties play on the phone. Turn it on under Permissions, then Microphone.</string>
+
+    <string name="about_no_wallet">No Bitcoin wallet app in sight. Copy the address instead.</string>
+    <string name="about_give_once_detail">Any amount of doubloons, by card</string>
+    <string name="about_bitcoin_title">Back it with Bitcoin</string>
+    <string name="about_bitcoin_text">Send any amount to this address from your Bitcoin wallet, matey.</string>
+    <string name="about_matrix">Gearslip crew chat on Matrix</string>
+    <string name="about_matrix_detail">The Gearslip crew, the project myCar is built on</string>
+    <string name="about_source_detail">Read or refit myCar\'s code under the AGPL</string>
+    <string name="about_upstream">Built on Gearslip\'s keel</string>
+    <string name="about_license_detail">Free software under the GNU AGPL v3, free as the open sea, with no warranty</string>
+    <string name="about_voice_credits">Parrot credits</string>
+
+    <string name="voice_model_live_title">Parrot: live words</string>
+    <string name="voice_model_live_about">The ship\'s parrot turns speech into text on this phone, and nothing you say leaves it - except, with Home Assistant set up, what myCar can\'t do itself, sent to your Home Assistant as text. It needs two models, about %1$d MB together, downloaded once. This one writes your words as you speak, in English; in another language it only hears when you stop.</string>
+    <string name="voice_model_final_title">Parrot: final words</string>
+    <string name="voice_model_final_about">When you stop talking, this model reads the whole phrase again. It nets the names and places the live model lets slip.</string>
+    <string name="voice_model_none_detail">Keep the live words. Swiftest, least accurate</string>
+    <string name="voice_model_delete_title">Scuttle %1$s?</string>
+    <string name="voice_model_delete_in_use">Its %1$d MB go overboard from the phone. It\'s the one in use: the ship\'s parrot can\'t listen until it\'s hauled aboard again.</string>
+    <string name="voice_model_delete_again">Its %1$d MB go overboard from the phone. It can be hauled aboard again here.</string>
+    <string name="voice_model_downloaded">Hauled aboard. %1$s</string>
+    <string name="voice_model_downloading">Hauling aboard, %1$d%%</string>
+    <string name="voice_model_failed">Hauling aboard failed: %1$s</string>
+    <string name="voice_model_download">Haul aboard</string>
+    <string name="voice_model_parakeet_small_detail">Lighter and swifter, lets more names slip. NVIDIA NeMo, CC BY 4.0</string>
+    <string name="voice_model_canary_detail">Captain\'s pick. Swift, and hears names and places well. English, Spanish, German and French. NVIDIA NeMo, CC BY 4.0</string>
+    <string name="voice_model_parakeet_large_detail">Hears names best, but slower and three times the heft. NVIDIA NeMo, CC BY 4.0</string>
+    <string name="voice_model_parakeet_multi_detail">Italian, Portuguese, Spanish, French, German, Greek, Russian and English, and 17 more European tongues. As hefty and slow as Parakeet large. NVIDIA NeMo, CC BY 4.0</string>
+
+    <string name="voice_model_language_title">Parrot: %1$s</string>
+    <string name="voice_model_language_ready">myCar speaks %1$s, so the ship\'s parrot listens and answers in %1$s, with %2$s.</string>
+    <string name="voice_model_language_phone">myCar speaks %1$s, so the ship\'s parrot listens and answers in %1$s, with the phone\'s speech recognition.</string>
+    <string name="voice_model_language_ready_try">myCar speaks %1$s, so the ship\'s parrot listens and answers in %1$s, with %2$s. Try “%3$s”.</string>
+    <string name="voice_model_language_missing">myCar speaks %1$s. With %2$s (%3$d MB) the ship\'s parrot listens and answers in %1$s; till then it understands English only.</string>
+    <string name="voice_model_language_tts">It answers with the phone\'s own text-to-speech voice for %1$s. If it squawks wrong, pick or download that voice in Android\'s text-to-speech settings.</string>
+    <string name="voice_model_language_download">Haul aboard %1$s</string>
+
+    <string name="speech_download_channel">Voice haul</string>
+    <string name="speech_download_title">Hauling the voice aboard</string>
+    <string name="speech_download_not_stored">couldn\'t stow the model</string>
+
+    <string name="stats_intro">Turn this on, and myCar sends a short note when you open it and after each voyage. %1$s The notes show which cars work and where the others fail.</string>
+    <string name="stats_send">Send voyage notes</string>
+    <string name="stats_hide_note">Stow the note</string>
+    <string name="stats_worked_title_year">myCar sailed true with your %1$s %2$s</string>
+    <string name="stats_worked_title_named">myCar sailed true with your %1$s</string>
+    <string name="stats_worked_title_car">myCar sailed true with your ship</string>
+    <string name="stats_worked_text">Share that so the next captain knows it works? No name, account, or location.</string>
+
+    <string name="network_home_said_no">Android said nay. Tap, then Permissions, Nearby devices, Allow.</string>
+
+    <string name="settings_group_general">All hands</string>
+    <string name="settings_group_general_detail">Tongue, paint, refits</string>
+    <string name="settings_group_connection_detail">Wireless, sound aboard, certificate</string>
+    <string name="settings_group_voice">Parrot</string>
+    <string name="settings_group_voice_detail">Ship\'s parrot and speech models</string>
+    <string name="settings_group_plancia_detail">Home Assistant aboard</string>
+    <string name="settings_group_xonos_detail">Music Assistant aboard</string>
+    <string name="settings_group_help_detail">How to board, ship\'s log</string>
+    <string name="settings_group_about_detail">Version, licenses, back the voyage</string>
+    <string name="settings_group_car">Helm</string>
+    <string name="settings_group_car_detail">Home port, decks, look, wallpaper, warnings</string>
+    <string name="settings_car_pages_header">Your decks either side of the chart in the ship\'s Home port. Change them here, or aboard with the pencil beside the dots.</string>
+    <string name="settings_car_pages_ready_text">Your decks give way to the ready-built ones: the weather and the agenda left of the chart, and on its right Plancia beside the browser, when Plancia is fitted out or installed.</string>
+    <string name="settings_car_fit_offline">Board the ship to fit the helm: the ship shows each change as you make it.</string>
+    <string name="settings_grid_apps">Apps in the ship\'s fleet</string>
+    <string name="settings_grid_apps_all">All in sight</string>
+    <plurals name="settings_grid_apps_hidden">
+        <item quantity="one">%d stowaway</item>
+        <item quantity="other">%d stowaways</item>
+    </plurals>
+    <string name="settings_grid_apps_note">Untick an app to keep it out of the ship\'s fleet. Aboard: hold an app and choose Stow away from the fleet. An app nailed to the mast stays there.</string>
+    <string name="theme_title">Paint</string>
+    <string name="theme_footer">How myCar is painted on the phone. The helm has its own paint, in the ship\'s rigging.</string>
+    <string name="settings_audio_per_car">With a ship boarded, the choice is kept for that ship, and the shanty box\'s sound button changes it too. With no ship boarded, it\'s for every ship.</string>
+
+    <string name="settings_group_music">Shanties</string>
+    <string name="settings_group_music_detail">Xonos, Spotify and more shanties aboard</string>
+    <string name="music_in_the_car">Aboard</string>
+    <string name="music_xonos_on">Music Assistant at the helm, as one of its shanty apps</string>
+    <string name="music_xonos_off">Off: Xonos isn\'t at the helm, nor is the Xonos app</string>
+    <string name="music_service_on">In the fleet; it plays through myCar</string>
+    <string name="music_service_off">Off: not at the helm</string>
+    <string name="music_sign_in">Sign on from the phone</string>
+    <string name="music_sign_in_detail">With the phone\'s keyboard: you stay signed on aboard too</string>
+    <string name="music_sign_in_title">%1$s: sign on</string>
+    <string name="music_sign_out">Sign off</string>
+    <string name="music_sign_out_detail">Of this service in myCar, on the phone and aboard</string>
+    <string name="music_hide_app">Stow the phone\'s %1$s app</string>
+    <string name="music_hide_app_detail">The ship\'s fleet keeps only %1$s inside myCar: the %1$s app on this phone stays out of sight, so there aren\'t two.</string>
+    <string name="music_sign_out_title">Sign off from %1$s?</string>
+    <string name="music_sign_out_text">myCar forgets its sign-on to %1$s and what its pages kept. Your account stays as it is.</string>
+    <string name="music_add_footer">Other shanty services, each its own web player inside myCar: their sound reaches the ship through myCar, as Cinema\'s does.</string>
+    <string name="music_add_note">Each one ticked shows here, and in the ship\'s fleet.</string>
+    <string name="music_needs_google">Google may not let you sign on inside an app: then YouTube Music plays signed off.</string>
+    <string name="music_needs_apple">Sails only with an Apple Music subscription.</string>
+    <string name="music_needs_amazon">Sails only with Amazon Prime or Amazon Music Unlimited.</string>
+    <string name="music_needs_tidal">Sails only with a TIDAL subscription.</string>
+    <string name="music_needs_qobuz">Sails only with a Qobuz subscription.</string>
+</resources>

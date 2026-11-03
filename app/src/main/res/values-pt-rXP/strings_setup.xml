@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setup_title">Preparar o myCar para zarpar</string>
+    <string name="setup_subtitle_first_run">Alguns toques antes da sua primeira travessia.</string>
+    <string name="setup_subtitle_return">O que falta antes de zarpar. Nada do que você já preparou muda.</string>
+    <string name="setup_unofficial">O myCar não é oficial: faça os preparativos com o carro parado e depois mantenha os olhos na estrada.</string>
+    <string name="setup_section_connect">Para abordar</string>
+    <string name="setup_section_drive">Para a sua travessia</string>
+    <string name="setup_status_done">Nos trinques</string>
+
+    <string name="setup_cert_some_ready">%1$d de %2$d obtidos. O %3$s está pronto; você pode obter os outros depois no Leme.</string>
+
+    <string name="setup_mycar_on_title">Ative o myCar para o navio</string>
+    <string name="setup_mycar_on_body">Ele está desativado no Leme, então o navio não consegue alcançá-lo.</string>
+
+    <string name="setup_aa_off">O Android Auto está desativado: mar livre para o myCar.</string>
+    <string name="setup_aa_kept">Você vai escolher o myCar quando conectar o cabo no navio.</string>
+    <string name="setup_aa_body">O Android Auto está ativado e pode tomar a conexão do navio antes do myCar. Na tela que vai abrir, toque em Desativar, confirme e depois volte para cá.</string>
+    <string name="setup_aa_keep_body">Então mantenha-o: quem escolhe é você. Quando você conectar o cabo, o Android pergunta qual app abrir: escolha o myCar e toque em Sempre. Se o Android Auto abrir sozinho, ele foi definido para abrir sempre: nas informações do app dele, toque em Abrir por padrão e depois em Limpar preferências padrão.</string>
+
+    <string name="setup_drive_title">Chamadas, mapa e cantigas</string>
+    <string name="setup_drive_skipped">Pulado. Toque em Permitir quando estiver pronto para zarpar.</string>
+    <string name="setup_drive_body">Seu carro mostra quem está ligando e suas chamadas recentes, e pode ligar para seus contatos; o mapa sabe onde você está; e as cantigas podem chegar ao carro sem Bluetooth. O Android pergunta algumas vezes: toque em Permitir em todas. O myCar só lê, e só ouve quando você toca no microfone.</string>
+
+    <string name="setup_more_later">Tudo aqui também pode ser feito depois, na próxima maré.</string>
+    <string name="setup_messages_title">Correio</string>
+    <string name="setup_messages_body">O Correio de bordo mostra suas mensagens, lê em voz alta e deixa você responder. Ative o myCar na página que vai abrir. Se o Android disser que é uma configuração restrita: abra as informações do app myCar, toque em ⋮, depois em Permitir configurações restritas, e tente de novo.</string>
+    <string name="setup_calendar_body">A tela de bordo mostra seu próximo evento. O myCar só lê sua agenda.</string>
+    <string name="setup_screening_button">Preparar</string>
+    <string name="setup_audio_title">Som a bordo</string>
+    <string name="setup_audio_body">Como as cantigas chegam a bordo. As chamadas vão pelo Bluetooth em qualquer caso.</string>
+    <string name="setup_usage_title">Ajude outros capitães</string>
+
+    <plurals name="setup_bar_steps_left">
+        <item quantity="one">Falta %1$d passo antes da sua primeira travessia.</item>
+        <item quantity="other">Faltam %1$d passos antes da sua primeira travessia.</item>
+    </plurals>
+    <string name="setup_bar_ready_to_connect">Tudo pronto para abordar.</string>
+    <string name="setup_bar_allow_drive">Permitir chamadas, mapa e cantigas</string>
+    <string name="setup_bar_ready">Tudo pronto para zarpar. Conecte o cabo no navio; se o Android perguntar, escolha o myCar e toque em Sempre.</string>
+
+    <plurals name="setup_card_steps_left">
+        <item quantity="one">Falta %1$d passo antes da sua primeira travessia: %2$s.</item>
+        <item quantity="other">Faltam %1$d passos antes da sua primeira travessia: %2$s.</item>
+    </plurals>
+    <plurals name="setup_card_extras_left">
+        <item quantity="one">Pronto para abordar. Falta %1$d extra.</item>
+        <item quantity="other">Pronto para abordar. Faltam %1$d extras.</item>
+    </plurals>
+    <string name="setup_card_all_done">Tudo preparado e nos trinques.</string>
+    <string name="setup_card_title">Preparativos para zarpar</string>
+    <string name="setup_card_footer">Nada é jogado ao mar nem redefinido. Você vai ver só o que falta, com o que já foi feito marcado.</string>
+    <string name="setup_card_back">Voltar aos preparativos</string>
+    <string name="setup_left_title">Termine os preparativos</string>
+    <string name="setup_left_body">O que falta antes da sua primeira travessia: %1$s.</string>
+    <string name="setup_left_continue">Continuar os preparativos</string>
+
+    <string name="setup_guide_usage_title">Ajude outros capitães.</string>
+    <string name="setup_guide_mic_body">O myCar o usa para enviar suas cantigas ao carro e para ouvir você quando pede algo ou responde a uma mensagem. O que você diz fica no telefone.</string>
+    <string name="setup_guide_location_body">O mapa do carro e as buscas por perto precisam dela. Sem ela, a Vigia não mostra o mapa.</string>
+    <string name="setup_guide_messages_title">Correio.</string>
+    <string name="setup_guide_messages_body">O Correio de bordo mostra suas mensagens, lê em voz alta e deixa você responder. Ative o myCar na lista que vai abrir.</string>
+    <string name="setup_guide_aa_body">O Android Auto ainda está instalado e disputa com o myCar a conexão USB do navio. Desative ou desinstale o app na tela que vai abrir.</string>
+    <string name="setup_guide_choose_body">Se o telefone perguntar qual app abrir quando você conectar o cabo no navio, escolha o myCar e toque em Sempre.</string>
+    <string name="setup_guide_audio_title">Som a bordo.</string>
+    <string name="setup_guide_audio_body">Escolha como as cantigas chegam a bordo. As chamadas vão pelo Bluetooth em qualquer caso.</string>
+    <string name="setup_guide_voice_title">Papagaio.</string>
+    <string name="setup_guide_voice_body">Peça direções, cantigas ou uma chamada pela voz. Seu telefone transforma a fala em texto sozinho, e nada do que você diz sai dele. São necessários %1$d MB, baixados uma vez. Use Wi-Fi se puder.</string>
+    <string name="setup_guide_voice_download">Baixar o papagaio</string>
+    <string name="setup_guide_voice_progress">Baixando, %1$d%%. Você pode seguir avante; o download continua.</string>
+    <string name="setup_guide_voice_ready">O papagaio está pronto.</string>
+    <string name="setup_guide_voice_failed">O download encalhou. Toque em Baixar o papagaio para tentar de novo.</string>
+
+    <string name="setup_audio_recommended">Escolha do capitão</string>
+    <string name="setup_audio_automatic_body">Pelo Bluetooth quando o seu navio aceita as cantigas do telefone assim; senão, pelo myCar.</string>
+    <string name="setup_audio_bluetooth_body">Nenhuma pergunta a cada viagem, e a voz do seu app de mapas chega a bordo. Alguns navios só aceitam chamadas por ele.</string>
+
+    <string name="intro_start">Zarpar!</string>
+    <string name="intro_welcome_to">Boas-vindas a bordo da</string>
+    <string name="intro_welcome_tag">alpha · de vento em popa, arrr!</string>
+    <string name="intro_course">Nós escolhemos nossas rotas, e ao diabo com as imposições!</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="one">%d bug avistado e afundado desde a 0.6</item>
+        <item quantity="other">%d bugs avistados e afundados desde a 0.6</item>
+    </plurals>
+    <string name="intro_music_title">Cantigas a bordo.</string>
+    <string name="intro_music_body">O Spotify e outros serviços tocam dentro do myCar, pelo próprio player web. Embarque uma vez no telefone com a sua própria conta, em Leme > Cantigas. Lá, mande o app Spotify do telefone para o porão: um só Spotify a bordo, não dois.</string>
+    <string name="intro_mini_title">Mapa todo à vista.</string>
+    <string name="intro_mini_body">Feche a vitrola ao lado do mapa e uma minivitrola flutua sobre ele, com a capa e os botões: mantenha-a pressionada e arraste para onde quiser. Ao lado do mapa, a vitrola agora vai até Muito grande.</string>
+    <string name="intro_lyrics_title">Cante os versos.</string>
+    <string name="intro_lyrics_body">Os versos são encontrados com muito mais frequência, e cada resultado é conferido, para nunca aparecerem os versos de outra cantiga. Cantigas instrumentais avisam.</string>
+    <string name="intro_phone_title">Leme no telefone.</string>
+    <string name="intro_phone_body">Todas as configurações da tela de bordo estão também no telefone, em Leme > Tela de bordo: mude uma e o navio acompanha na hora, inclusive durante a travessia. O mesmo vale para os conveses ao lado do mapa e os apps no porão.</string>
+    <string name="intro_apps_title">Boa marujada.</string>
+    <string name="intro_voice_title">Fale ao papagaio.</string>
+    <string name="intro_voice_body">Toque no microfone, ou aperte o botão de voz no volante, e fale. Seu telefone transforma a fala em texto sozinho, e o que você diz fica nele, a não ser o que você pergunta ao seu próprio Home Assistant. Diga “%1$s” a bordo para ver a lista completa.</string>
+    <string name="intro_voice_body_language">Toque no microfone, ou aperte o botão de voz no volante, e fale. Seu telefone transforma a fala em texto sozinho, e o que você diz fica nele, a não ser o que você pergunta ao seu próprio Home Assistant. Ele ouve e responde em %1$s, a língua do myCar. Diga “%2$s” a bordo para ver a lista completa.</string>
+    <string name="intro_voice_failed">O download encalhou. Tente de novo</string>
+    <string name="intro_voice_download">Baixar o papagaio, %1$d MB</string>
+
+    <string name="activity_toast_music_pauses_sharing">As cantigas do telefone pausam enquanto a tela dele é compartilhada</string>
+    <string name="activity_toast_open_for_music">Abra o myCar no telefone para enviar as cantigas dele a bordo</string>
+    <string name="activity_status_taken_title">Outro app abordou o carro</string>
+</resources>

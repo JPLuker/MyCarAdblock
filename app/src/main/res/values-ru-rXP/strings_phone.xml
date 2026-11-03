@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_whats_new_in">Свежая добыча в %1$s</string>
+    <string name="home_how_to_connect_subtitle">Какие автомобили подходят и что ещё нужно снарядить</string>
+    <string name="home_disconnect">Отчалить</string>
+    <string name="home_disconnect_title">Отчалить от корабля?</string>
+    <string name="home_disconnect_text">myCar сейчас покинет бортовой экран. Если вы подключены кабелем, отключите и снова подключите его, чтобы вернуться на борт.</string>
+    <string name="home_bluetooth_missing_calls_music">Звонки и песни идут через Bluetooth, но телефон не подключён к автомобилю. Подключите его здесь или через меню Bluetooth автомобиля.</string>
+    <string name="home_voice_downloading">Загрузка попугая: %1$d%%</string>
+
+    <string name="wireless_button_connect">Абордаж без кабеля</string>
+    <string name="wireless_button_denied">Для абордажа без кабеля myCar нужен доступ к Bluetooth и к устройствам Wi-Fi поблизости.</string>
+    <string name="wireless_button_switched_off">myCar выключен на борту (Такелаж, «Использовать myCar на борту»).</string>
+    <string name="wireless_button_which_car">Какой корабль?</string>
+    <string name="wireless_button_bluetooth_off">Bluetooth выключен. Включите его и снова нажмите «Абордаж без кабеля».</string>
+    <string name="wireless_button_not_paired">Телефон пока ни с чем не сопряжён. Сначала выполните сопряжение с кораблём.</string>
+    <string name="wireless_button_not_listed">Корабля нет в списке? Сначала выполните сопряжение телефона с ним.</string>
+
+    <string name="help_title">Как взять на абордаж</string>
+    <string name="help_see_full_list">Судовой реестр</string>
+    <string name="help_in_the_car">На борту</string>
+    <string name="help_step_connect">Подключите кабель или возьмите корабль на абордаж без кабеля.</string>
+    <string name="help_step_connect_detail">myCar открывается сам, когда корабль подключается. Для абордажа без кабеля сначала выполните сопряжение телефона с кораблём, затем нажмите «Абордаж без кабеля» в гавани.</string>
+    <string name="help_step_screening">Отражайте неизвестные звонки до того, как они зазвонят.</string>
+    <string name="help_set_up">Снарядить</string>
+    <string name="help_step_audio_prompt">Долой вопрос о звуке в каждой поездке.</string>
+    <string name="help_step_notifications_detail">Пока идёт трансляция звука, Android скрывает текст уведомлений. Выполните и эту команду, и myCar будет снимать это ограничение только на то время, пока песни звучат на борту.</string>
+
+    <string name="cert_notice_switched_text">Теперь myCar использует %1$s. Подключитесь к автомобилю снова: переподключите кабель или нажмите «Абордаж без кабеля».</string>
+    <string name="cert_notice_switched_next_text">Теперь myCar использует следующий сертификат. Подключитесь к автомобилю снова: переподключите кабель или нажмите «Абордаж без кабеля».</string>
+    <string name="cert_notice_own_refused_text">Чтобы вместо него использовать общедоступные, удалите свой в такелаже, в разделе «Сертификат».</string>
+
+    <string name="cert_role_recommended">Выбор капитана</string>
+
+    <string name="cert_setup_continue">Вперёд</string>
+
+    <string name="update_title">Новые паруса</string>
+    <string name="update_out">На горизонте myCar %1$s</string>
+    <string name="update_unplug_first">Чтобы поставить новые паруса, отчальте от корабля. Установка закроет myCar.</string>
+    <string name="update_status_debug">Отладочные сборки высматривают новые паруса, только когда вы нажимаете «Проверить сейчас»</string>
+    <string name="update_status_daily">myCar высматривает раз в день</string>
+    <string name="update_status_checking">Высматриваем…</string>
+    <string name="update_status_latest">У вас самые новые паруса</string>
+    <string name="update_status_available">На горизонте версия %1$s</string>
+    <string name="update_status_ready">Версия %1$s у причала, готова к установке</string>
+    <string name="update_check_automatically">Высматривать автоматически</string>
+    <string name="update_notification_text">Нажмите, чтобы поставить новые паруса.</string>
+    <string name="update_car_notification_text">Поставьте новые паруса в приложении myCar или на GitHub</string>
+    <string name="update_splash_updated_to">Под новыми парусами</string>
+    <string name="update_splash_tap">Нажмите где угодно, чтобы плыть дальше</string>
+
+    <string name="whatsnew_title">Свежая добыча</string>
+    <string name="whatsnew_this_version">%1$s (та, что на борту)</string>
+
+    <string name="recommended_title">Выбор капитана</string>
+    <string name="recommended_intro">Эти бесплатные приложения работают на бортовом экране в myCar. Каждая кнопка открывает страницу приложения на GitHub.</string>
+    <string name="recommended_section_music">Песни</string>
+    <string name="recommended_about_organic_maps">Офлайн-карты и прокладка курса.</string>
+    <string name="recommended_about_vela">Пошаговая навигация — и никакого Google на борту.</string>
+    <string name="recommended_about_youtube_music">Шарманка для YouTube Music.</string>
+    <string name="recommended_about_antennapod">Подкасты — с главами и всем прочим грузом.</string>
+
+    <string name="logs_title">Судовой журнал</string>
+    <string name="logs_earlier">Старые</string>
+    <string name="logs_clear">За борт</string>
+    <string name="logs_jump_to_latest">К свежим записям</string>
+    <string name="logs_empty">В судовом журнале пока пусто. Строки появляются здесь в реальном времени, пока идёт плавание.</string>
+    <string name="logs_share_subject">Судовой журнал myCar</string>
+    <string name="logs_share_chooser">Поделиться судовым журналом</string>
+    <string name="logs_earlier_title">Старые судовые журналы</string>
+    <string name="logs_earlier_empty">Старых судовых журналов пока нет. При каждом выходе в море myCar начинает новый.</string>
+    <string name="logs_crashed">Крушение</string>
+
+    <string name="preview_title">Подзорная труба</string>
+    <string name="preview_size">%1$d×%2$d @ %3$d dpi — касания передаются на бортовой экран</string>
+    <string name="preview_car_screen">Бортовой экран</string>
+    <string name="preview_waiting">Ждём кадр на горизонте…</string>
+    <string name="preview_leave">Сложить подзорную трубу</string>
+
+    <string name="donate_title">Рады, что плавание удалось</string>
+    <string name="donate_text">myCar бесплатный, без рекламы и слежки. Если он помогает вам в плавании, ваша поддержка держит корабль на плаву.</string>
+    <string name="audio_not_reaching_title">Песни не доходят до автомобиля</string>
+    <string name="audio_not_reaching_text">Запрос Android на передачу звука через myCar был отклонён, поэтому автомобиль остаётся без песен.</string>
+</resources>

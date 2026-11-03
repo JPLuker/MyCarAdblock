@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="changelog_46">
+        <item>Corrigido um travamento que fechava o myCar e a conexão: acontecia depois de um toque na página do Plancia e da passagem para o mapa ou para a frota, quando o app Plancia tomava o seu lugar ou ao mudar a pintura.</item>
+        <item>Fala de pirata: em Leme &gt; Língua, cada texto do myCar em termos piratas, na sua língua. Nós escolhemos nossas rotas, e ao diabo com as imposições!</item>
+        <item>Um novo horizonte animado, myCar · Rebelde: as ondas e um galeão que resiste a cada tempestade com sua bandeira de caveira.</item>
+        <item>Se o myCar fechar sozinho, a próxima abertura escreve no diário de bordo por que o Android o fechou (um travamento, a memória, sem resposta), para que possa ser corrigido.</item>
+        <item>Os modelos do papagaio carregam um de cada vez, nunca depois do fim da travessia, e antes do primeiro comando só se sobrar memória.</item>
+        <item>Minivitrola: em telas pequenas ela aparece longe dos botões do mapa, solta embaixo deles ela se afasta só o necessário, e os botões esmaecidos do mapa não pegam mais os toques destinados ao mapa.</item>
+        <item>Versos: cada cantiga começa pela primeira linha, e a versão ao vivo de outra cantiga não traz mais os versos dela.</item>
+        <item>Spotify e os outros serviços de música: «toque …» espera a página por até 25 segundos, e um Play ainda esperando não começa se você tiver trocado a cantiga nesse meio-tempo.</item>
+        <item>Escolher o rádio de bordo para um vídeo ou uma rádio no Cinema ou no navegador, e eles não voltam a tocar sozinhos. A reprodução automática começa as cantigas só quando o som tem um caminho até o navio.</item>
+        <item>Papagaio: «próxima», «pausa» ou «parar» dentro de uma pergunta mais longa não trocam mais a cantiga; «não envie» e «cancelar» são ouvidos enquanto você responde uma mensagem; uma pausa logo antes de outro comando de música não o cancela mais.</item>
+        <item>Butim novo espera o fim de uma chamada, e durante uma chamada os conveses ao lado do mapa e o menu deles ficam abaixo da barra da chamada.</item>
+        <item>Mudar a língua do myCar durante uma travessia muda na hora a tela de bordo; no Android 12 e 13, abrir o myCar durante uma travessia devolve a posição ao mapa.</item>
+    </string-array>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="changelog_46">
+        <item>Tappata una falla: un crash chiudeva myCar e il collegamento dopo un tocco nella pagina di Plancia, passando poi alla mappa o alla flotta, quando l\'app Plancia ne prendeva il posto o al cambio di tema.</item>
+        <item>Arrr, parla da pirata: nel Timone &gt; Parlata, ogni testo di myCar in termini pirateschi, nella tua lingua. La rotta la scegliamo noi, e al diavolo le imposizioni!</item>
+        <item>Un nuovo orizzonte in movimento, myCar · Ribelle: le onde e un veliero che resiste a ogni burrasca con la sua bandiera col teschio.</item>
+        <item>Se myCar si chiude da sola, all\'avvio successivo il diario di bordo dice perché Android l\'ha chiusa (un crash, la memoria, nessuna risposta), così si può tappare la falla.</item>
+        <item>I modelli della voce si caricano a bordo uno alla volta, mai dopo la fine della traversata, e prima del primo comando solo se avanza memoria.</item>
+        <item>Mini organetto: sugli schermi piccoli salpa lontano dai tasti della mappa, lasciato sotto di loro si sposta appena fuori, e i tasti sbiaditi della mappa non prendono più i tocchi destinati alla mappa.</item>
+        <item>Strofe: ogni ballata parte dalla prima riga, e la versione live di un\'altra ballata non porta più le sue parole.</item>
+        <item>Spotify e gli altri servizi musicali: «metti …» aspetta la pagina fino a 25 secondi, e un Play ancora in attesa non parte se nel frattempo hai cambiato ballata.</item>
+        <item>Scegliere la radio di bordo ferma un video o una radio in Cinema o nel browser, e non ripartono da soli. L\'Autoplay fa partire le ballate solo quando il suono ha una rotta verso la nave.</item>
+        <item>Pappagallo: «avanti», «pausa» o «stop» dentro una domanda più lunga non cambiano più la ballata; «non inviare» e «annulla» vengono sentiti mentre rispondi a un dispaccio; una pausa subito prima di un altro comando musicale non lo annulla più.</item>
+        <item>Il Bottino aspetta la fine di una chiamata, e durante una chiamata le pagine accanto alla mappa e il loro menu stanno sotto la barra della chiamata.</item>
+        <item>Cambiare la parlata di myCar durante la traversata cambia subito lo schermo di bordo; su Android 12 e 13 aprire myCar durante la traversata ridà la posizione alla mappa.</item>
+    </string-array>
+</resources>
