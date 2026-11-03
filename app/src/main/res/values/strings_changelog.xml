@@ -5,6 +5,12 @@
   "Settings >" are the app's own: translate them as the app's screens say them.
 -->
 <resources>
+    <!-- 0.7.1-alpha -->
+    <string-array name="changelog_47">
+        <item>The map no longer stays black, without its position, when the car\'s Wi-Fi drops and comes back during a drive, or when the car connects while myCar is left open on the locked phone.</item>
+        <item>With pirate speak, the voice and the phone numbers follow your phone\'s country again.</item>
+    </string-array>
+
     <!-- 0.7.0-alpha -->
     <string-array name="changelog_46">
         <item>Fixed a crash that closed myCar and ended the drive: it came after a tap in Plancia\'s page, then a turn to the map or the app grid, the Plancia app taking its place, or a change of theme.</item>

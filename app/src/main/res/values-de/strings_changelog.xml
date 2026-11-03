@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.1-alpha -->
+    <string-array name="changelog_47">
+        <item>Die Karte bleibt nicht mehr schwarz und ohne Standort, wenn das WLAN des Autos während der Fahrt abbricht und wiederkommt oder wenn sich das Auto verbindet, während myCar auf dem gesperrten Telefon offen geblieben ist.</item>
+        <item>Mit der Piratensprache folgen die Stimme und die Telefonnummern wieder dem Land deines Telefons.</item>
+    </string-array>
+
     <!-- 0.7.0-alpha -->
     <string-array name="changelog_46">
         <item>Ein Absturz ist behoben, der myCar schloss und die Verbindung beendete: Er kam nach einem Tippen in die Plancia-Seite und dem Wechsel zur Karte oder zur App-Übersicht, wenn die Plancia-App ihren Platz einnahm, oder beim Wechsel des Designs.</item>

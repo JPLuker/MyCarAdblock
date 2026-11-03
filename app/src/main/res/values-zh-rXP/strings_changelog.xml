@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_47">
+        <item>航行中车辆的 Wi-Fi 断开又恢复时，或你登船时 myCar 仍在锁定的手机上开着，海图不再一片漆黑、没有你的位置。稳住航向！</item>
+        <item>使用海盗腔时，语音和电话号码重新跟随你手机的母港。</item>
+    </string-array>
+
     <string-array name="changelog_46">
         <item>修复了一个会让 myCar 沉没并中断航程的崩溃：在 Plancia 页面上点一下后切换到海图或船队、由 Plancia 应用接替它，或更换船漆时出现。</item>
         <item>海盗腔：在“舵轮 &gt; 船上语言”中，myCar 的每段文字都用海盗的说法，仍是你的语言。航向我们自己定，绝不向任何王冠低头。</item>

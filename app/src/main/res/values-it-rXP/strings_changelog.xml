@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_47">
+        <item>La mappa non resta più nera e senza posizione quando il Wi-Fi dell\'auto cade e torna durante la navigazione, o quando sali a bordo con myCar rimasta aperta sul telefono bloccato. Barra dritta!</item>
+        <item>Col piratesco, la voce e i numeri di telefono seguono di nuovo il porto di casa del tuo telefono.</item>
+    </string-array>
+
     <string-array name="changelog_46">
         <item>Tappata una falla: un crash chiudeva myCar e il collegamento dopo un tocco nella pagina di Plancia, passando poi alla mappa o alla flotta, quando l\'app Plancia ne prendeva il posto o al cambio di tema.</item>
         <item>Arrr, parla da pirata: nel Timone &gt; Parlata, ogni testo di myCar in termini pirateschi, nella tua lingua. La rotta la scegliamo noi, e al diavolo le imposizioni!</item>

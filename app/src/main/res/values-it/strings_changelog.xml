@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.1-alpha -->
+    <string-array name="changelog_47">
+        <item>La mappa non resta più nera, senza posizione, quando il Wi-Fi dell\'auto cade e torna durante il viaggio, o quando l\'auto si collega con myCar rimasta aperta sul telefono bloccato.</item>
+        <item>Col piratesco, la voce e i numeri di telefono seguono di nuovo il paese del telefono.</item>
+    </string-array>
+
     <!-- 0.7.0-alpha -->
     <string-array name="changelog_46">
         <item>Corretto un crash che chiudeva myCar e il collegamento: arrivava dopo un tocco nella pagina di Plancia, passando poi alla mappa o alla griglia delle app, quando l\'app Plancia ne prendeva il posto o al cambio di tema.</item>
