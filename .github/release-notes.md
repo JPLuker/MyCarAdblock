@@ -1,4 +1,4 @@
-myCar 0.7.0-alpha: the release that gathers the whole 0.6 series, and the steadiest myCar so far. **216 bugs found and fixed since 0.6.0**, counted commit by commit (a doubtful one counted as a feature): 158 had reached a published version, 58 were caught before they shipped. The crash that closed myCar and ended the drive on the Home pages is fixed, two more ways to it are closed, and two bug hunts went through the new features first, then crashes and the voice assistant; a last independent review went through pirate speak and the new wallpaper.
+myCar 0.7.0-alpha: the release that gathers the whole 0.6 series, and the steadiest myCar so far. **220 bugs found and fixed since 0.6.0**, counted commit by commit (a doubtful one counted as a feature): 158 had reached a published version, 62 were caught before they shipped. The crash that closed myCar and ended the drive on the Home pages is fixed, two more ways to it are closed, and two bug hunts went through the new features first, then crashes and the voice assistant; two last independent reviews went through pirate speak, the new wallpaper and the assistant.
 
 And because we chart our own course: **pirate speak**, every text of myCar the pirate way in each of its languages, and **myCar · Rebel**, a moving wallpaper with a pirate ship that rides out every storm.
 
@@ -36,12 +36,12 @@ And because we chart our own course: **pirate speak**, every text of myCar the p
 - Automatic: after the music's Bluetooth drops, waiting for a VoIP app that leaves the phone "in a call" now has a limit (half an hour); a real phone call is still waited for in full.
 
 ## Assistant and messages
-- "Next", "pause", "stop" or "resume" act on the music only when they're the whole command: "when is my next appointment" or "pause the TV" no longer skip or stop the song, and reach the agenda or Home Assistant.
+- "Next", "pause", "stop" or "resume" act on the music only when they're the whole command ("stop la musica", "stopp die Musik" and the like in every language too): "when is my next appointment" or "pause the TV" no longer skip or stop the song, and reach the agenda or Home Assistant.
 - A "cancel" said at the end of a reply's countdown is heard instead of being lost while the message goes.
 - Reading a message aloud has a time limit, like the answers: a voice engine that never says it's done no longer leaves the music paused.
 - "Don't send", "nicht senden", "ne pas envoyer", "не отправляй" during the countdown no longer send the message; "cancel" said as the reply itself no longer goes to the person as text.
 - A pause followed at once by "resume", "next", "play X" or ▶ no longer cancels them (the pause sent again for apps that ignore it while the assistant speaks now goes only if nothing else was asked).
-- "Turn the heating up to 21", "metti il riscaldamento a 21", "set the lights"… go to Home Assistant instead of a music search; English questions such as "what time is sunset" too.
+- "Turn the heating up to 21", "metti il riscaldamento a 21", "set the lights"… go to Home Assistant instead of a music search; English questions such as "what time is sunset" too. A song named with its app ("play the lights on Spotify") stays a song, and without Home Assistant "play the lights" still looks for the song.
 - "Go to the next song" ("vai alla prossima canzone", "geh zum nächsten Lied"…) skips the song instead of looking for a place on the map; German "hör auf" pauses; Italian "rispondi alla chiamata persa" calls back.
 - When an app took the audio focus while the assistant held it, the next answers spoke over the music: the focus is asked for again.
 - With "Phone's assistant" and a phone with no screen lock, screen off, the assistant now waits for the screen to light instead of starting where it can't listen.

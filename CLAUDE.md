@@ -845,7 +845,7 @@ Tutti i token in un solo posto, `car/design/`:
   puntini dorati fino a una stella (`PirateShip.drawCourse`, 3,25-4,55 s); sotto l'etichetta della 0.7
   una bussola il cui ago gira e si ferma, e «Scegliamo noi le nostre rotte.» parola per parola
   (`ui/IntroCourse.kt`, `WelcomeCourse`, `intro_course` nelle 9 lingue); sotto, il numero dei bug trovati
-  e corretti dalla release prima (`Intro.BUGS_FIXED`, plurale `intro_bugs_fixed`: 216 dalla 0.6.0 alla
+  e corretti dalla release prima (`Intro.BUGS_FIXED`, plurale `intro_bugs_fixed`: 220 dalla 0.6.0 alla
   0.7.0, contati commit per commit, nel dubbio come funzione nuova; elenco in `bugcount.tsv` nella
   scratchpad di quella sessione). La pagina dà al testo lo spazio che serve e alla nave quello che resta
   (su un telefono basso la nave è più piccola). Da aggiornare a ogni intro nuova.
