@@ -5,6 +5,7 @@
         <item>当 Music Assistant 在你的手机上（Xonos 应用中）运行时：播放、切歌和选歌会等它重新扬帆，最多一分钟，而不是大喊未连接。</item>
         <item>Xonos 更结实：漏水的音频解码器会被换掉，登录会在过期前续期；Spotify 若因一段已无人收听的播放而在 Music Assistant 中搁浅，在没有其他播放器使用时会被拉出浅滩（需管理员账户）。</item>
         <item>如果在没有网络时或通话期间关闭了车辆，网络恢复或通话结束后 Xonos 不再从手机扬声器重新唱起来。</item>
+        <item>在船上选择专辑或船歌单后，播放器不再一直显示它们的名称，而会显示正在唱的船歌。</item>
     </string-array>
 
     <string-array name="changelog_48">

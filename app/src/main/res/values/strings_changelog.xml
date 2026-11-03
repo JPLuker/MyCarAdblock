@@ -11,6 +11,7 @@
         <item>With Music Assistant on your phone, in the Xonos app: playing, skipping and picking a song wait up to a minute while it starts again, instead of saying it isn\'t connected.</item>
         <item>Steadier Xonos: a sound decoder that breaks down is replaced, the sign-in is renewed before it runs out, and Spotify, left busy in Music Assistant by a stream nobody hears any more, is freed when no other player uses it (with an admin account).</item>
         <item>If the car is switched off while the network is down or during a call, Xonos no longer starts again from the phone\'s speaker when the network returns or the call ends.</item>
+        <item>After you pick an album or a playlist in the car, the player no longer keeps showing its name instead of the song that is playing.</item>
     </string-array>
 
     <!-- 0.7.2-alpha -->

@@ -6,6 +6,7 @@
         <item>Avec Music Assistant sur votre téléphone, dans l’app Xonos : la lecture, les sauts et le choix d’un titre attendent jusqu’à une minute qu’il redémarre, au lieu de dire qu’il n’est pas connecté.</item>
         <item>Xonos plus solide : un décodeur audio qui tombe en panne est remplacé, l’accès au compte se renouvelle avant d’expirer, et Spotify, resté occupé dans Music Assistant par une écoute que plus personne n’entend, est libéré si aucun autre lecteur ne l’utilise (avec un compte administrateur).</item>
         <item>Si la voiture est éteinte pendant une coupure de réseau ou pendant un appel, Xonos ne repart plus sur le haut-parleur du téléphone au retour du réseau ou à la fin de l’appel.</item>
+        <item>Après avoir choisi un album ou une playlist dans la voiture, le lecteur n’affiche plus leur nom à la place du titre qui joue.</item>
     </string-array>
 
     <!-- 0.7.2-alpha -->

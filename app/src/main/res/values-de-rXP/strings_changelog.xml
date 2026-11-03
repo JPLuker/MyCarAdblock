@@ -5,6 +5,7 @@
         <item>Mit Music Assistant auf deinem Telefon, in der Xonos-App: Abspielen, Springen und das Wählen eines Titels warten bis zu einer Minute, bis er wieder die Segel setzt, statt zu rufen, dass er nicht verbunden ist.</item>
         <item>Xonos ist seefester: Ein Audio-Decoder, der leckschlägt, wird ausgetauscht, die Anmeldung wird erneuert, bevor sie abläuft, und Spotify, in Music Assistant von einer Wiedergabe festgehalten, die niemand mehr hört, wird losgemacht, wenn kein anderer Player es nutzt (mit einem Administratorkonto).</item>
         <item>Wird das Auto ausgeschaltet, während das Netz fehlt oder während eines Anrufs, stimmt Xonos nicht mehr über den Lautsprecher des Telefons an, wenn das Netz zurückkommt oder der Anruf endet.</item>
+        <item>Nachdem du an Bord ein Album oder eine Playlist gewählt hast, zeigt der Player nicht mehr deren Namen statt des Shantys, der läuft.</item>
     </string-array>
 
     <string-array name="changelog_48">

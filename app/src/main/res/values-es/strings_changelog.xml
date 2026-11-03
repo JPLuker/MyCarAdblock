@@ -6,6 +6,7 @@
         <item>Con Music Assistant en tu teléfono, en la app Xonos: reproducir, saltar y elegir una canción esperan hasta un minuto a que vuelva a arrancar, en lugar de decir que no está conectado.</item>
         <item>Xonos más estable: un decodificador de audio que falla se sustituye, el inicio de sesión se renueva antes de caducar y Spotify, ocupado en Music Assistant por una escucha que ya nadie oye, se libera si ningún otro reproductor lo usa (con una cuenta de administrador).</item>
         <item>Si el coche se apaga mientras no hay red o durante una llamada, Xonos ya no vuelve a sonar por el altavoz del teléfono cuando vuelve la red o termina la llamada.</item>
+        <item>Después de elegir un álbum o una playlist en el coche, el reproductor ya no sigue mostrando su nombre en lugar de la canción que suena.</item>
     </string-array>
 
     <!-- 0.7.2-alpha -->

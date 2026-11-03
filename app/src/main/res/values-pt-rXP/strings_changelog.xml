@@ -5,6 +5,7 @@
         <item>Com o Music Assistant no seu telefone, no app Xonos: tocar, pular e escolher uma música esperam até um minuto que ele volte a içar as velas, em vez de gritar que não está conectado.</item>
         <item>Xonos mais firme: um decodificador de áudio que faz água é trocado, o login é renovado antes de expirar, e o Spotify, encalhado no Music Assistant por uma reprodução que ninguém ouve mais, é desencalhado se nenhum outro player o usa (com uma conta de administrador).</item>
         <item>Se o carro for desligado enquanto falta rede ou durante uma chamada, o Xonos não volta mais a cantar pelo alto-falante do telefone quando a rede volta ou a chamada termina.</item>
+        <item>Depois de escolher um álbum ou uma playlist a bordo, o player não mostra mais o nome deles no lugar da cantiga que está tocando.</item>
     </string-array>
 
     <string-array name="changelog_48">
