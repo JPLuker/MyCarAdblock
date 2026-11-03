@@ -41,7 +41,6 @@
     <string name="settings_test_trying">Sondando…</string>
 
     <string name="settings_plancia_footer">Seus painéis do Home Assistant a bordo, prontos assim que você os abre: pela frota, num convés ao lado do convés do mapa ou ao lado do próprio mapa. Crie o token no Home Assistant: seu perfil, Segurança, Tokens de acesso de longa duração.</string>
-    <string name="settings_plancia_missing_remove">Adicione um endereço e um token. Para tirar o Plancia do myCar, use Remover.</string>
     <string name="settings_plancia_remove_title">Jogar o Plancia do myCar ao mar?</string>
     <string name="settings_plancia_remove_text">O myCar esquece os endereços e o token. O app Plancia, se estiver no telefone, volta a bordo.</string>
     <string name="settings_plancia_removed">O Plancia foi jogado ao mar: o app Plancia volta a bordo, se estiver no telefone.</string>
