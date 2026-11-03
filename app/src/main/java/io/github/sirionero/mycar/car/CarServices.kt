@@ -552,7 +552,10 @@ object CarServices {
         // Xonos's column still kept for its first song: kept for the app's (Xonos gives way 20 s in, as
         // the wait ends: closed and opened again, the map would be lent two more surfaces).
         val waiting = _musicStarting.value
-        openMedia(app, autoplay = CarSettings.autoplay.value || media.now.value.playing, remember = false, auto = mediaAutoPicked)
+        // The drive's own Autoplay, still waiting, stays the drive's: the app's waits for the sound's way
+        // to the car too. Xonos's player (full screen, its tile) clears mediaAutoPicked, and the app then
+        // played at once, on the phone's speaker.
+        openMedia(app, autoplay = CarSettings.autoplay.value || media.now.value.playing, remember = false, auto = mediaAutoPicked || (autoplayPending && autoplayAutoPicked))
         if (waiting) expectMusic(true)
     }
 
