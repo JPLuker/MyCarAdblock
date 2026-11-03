@@ -6,7 +6,7 @@
         <item>Mit Music Assistant auf deinem Telefon, in der Xonos-App: Abspielen, Springen und das Wählen eines Titels warten bis zu einer Minute, bis er wieder startet, statt zu melden, dass er nicht verbunden ist.</item>
         <item>Xonos läuft stabiler: Ein Audio-Decoder, der ausfällt, wird ersetzt, die Anmeldung wird erneuert, bevor sie abläuft, und Spotify, in Music Assistant von einer Wiedergabe belegt, die niemand mehr hört, wird freigegeben, wenn kein anderer Player es nutzt (mit einem Administratorkonto).</item>
         <item>Wird das Auto ausgeschaltet, während das Netz fehlt oder während eines Anrufs, spielt Xonos nicht mehr über den Lautsprecher des Telefons weiter, wenn das Netz zurückkommt oder der Anruf endet.</item>
-        <item>Nachdem du im Auto ein Album oder eine Playlist gewählt hast, zeigt der Player nicht mehr deren Namen statt des Titels, der läuft.</item>
+        <item>Nachdem du im Auto ein Album oder eine Playlist gewählt hast, zeigt der Player nicht mehr deren Namen statt des Titels, der läuft. Titel ohne Cover zeigen jetzt das Titel-Symbol von Xonos.</item>
     </string-array>
 
     <!-- 0.7.2-alpha -->
