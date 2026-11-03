@@ -14,7 +14,7 @@ import org.junit.Test
 
 /**
  * Phrases that a later rule would take for something else: the next song said with "go to" (a
- * place for the map). Next to them, what must stay as it was.
+ * place for the map), "hör auf" (a song called "auf"). Next to them, what must stay as it was.
  */
 class AssistantLookAlikeTest {
 
@@ -110,4 +110,17 @@ class AssistantLookAlikeTest {
         heard(RU, "Перейди в настройки." to "open settings", "Перейди на Spotify." to "open spotify")
         heard(ZH, "去北京。" to "go to 北京", "去下一个路口。" to "go to 下一个路口")
     }
+
+    @Test
+    fun `hör auf pauses`() = heard(
+        DE,
+        "Hör auf!" to "pause",
+        "Hör auf damit." to "pause",
+        "Höre auf." to "pause",
+        "Hör jetzt auf." to "pause",
+        "Aufhören." to "pause",
+        "Hör auf mit der Musik." to "pause",
+        "Hör Queen." to "play queen",
+        "Spiel Herbert Grönemeyer" to "play herbert grönemeyer",
+    )
 }

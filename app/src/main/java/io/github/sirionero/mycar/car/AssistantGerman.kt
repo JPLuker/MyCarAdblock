@@ -93,7 +93,12 @@ internal object GermanPhrases : Phrasebook() {
         Rule("(?:ruf|rufe) (.+) (?:an|zurück|zurueck)") { m -> "call " + who(m.groupValues[1]) },
         Rule("(?:telefoniere mit|wähle|waehle) (.+)") { m -> "call " + who(m.groupValues[1]) },
         Rule("(.+) anrufen") { m -> "call " + who(m.groupValues[1]) },
-        Rule("(?:pause|pausieren|pausiere|musik (?:aus|stoppen|anhalten)|stopp|stop|halt|anhalten|ruhe|leise)", "pause"),
+        // "Hör auf" before "hör…" is taken for a song.
+        Rule(
+            "(?:pause|pausieren|pausiere|musik (?:aus|stoppen|anhalten)|stopp|stop|halt|anhalten|ruhe|leise|" +
+                "(?:hör|höre|hoer|hoere)(?: jetzt| mal)? auf(?: damit| mit der musik)?|aufhören|aufhoeren)",
+            "pause",
+        ),
         Rule("(?:weiter|fortsetzen|weiterspielen|spiel weiter|musik an|musik|play|abspielen|wiedergabe)", "continue"),
         Rule(
             "(?:nächster|naechster|nächstes|naechstes|nächste|naechste|nächster titel|nächstes lied|nächster song|überspringen|" +
