@@ -113,7 +113,8 @@ enum class AppLanguage(
                 val system = runCatching { app?.getSystemService(LocaleManager::class.java)?.systemLocales }.getOrNull()
                 if (system != null && !system.isEmpty) return system[0]
             }
-            return Resources.getSystem().configuration.locales[0] ?: Locale.ENGLISH
+            // Null outside Android (the JVM tests), where it threw.
+            return runCatching { Resources.getSystem().configuration.locales[0] }.getOrNull() ?: Locale.ENGLISH
         }
 
         /** One of these for [locale], by language: any Chinese is the simplified one. */
