@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.1-alpha -->
+    <string-array name="changelog_47">
+        <item>行驶中车辆的 Wi-Fi 断开又恢复时，或车辆连接时 myCar 仍在锁定的手机上开着，地图不再一片漆黑、没有你的位置。</item>
+        <item>使用海盗腔时，语音和电话号码重新跟随你手机所在的国家或地区。</item>
+    </string-array>
+
     <!-- 0.7.0-alpha -->
     <string-array name="changelog_46">
         <item>修复了一个会关闭 myCar 并断开连接的崩溃：在 Plancia 页面上点一下后切换到地图或应用网格、由 Plancia 应用接替它，或更换主题时出现。</item>

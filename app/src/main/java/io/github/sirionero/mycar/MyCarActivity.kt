@@ -284,7 +284,14 @@ class MyCarActivity : ComponentActivity(), Projection {
                 }
             }
             MyCarTheme {
-                MyCarApp(onDisconnect = { closeAccessory() }, onRequestCallScreening = ::requestCallScreeningRole)
+                MyCarApp(
+                    onDisconnect = {
+                        closeAccessory()
+                        // The driver's own end: the car map's position isn't kept for a car coming back.
+                        io.github.sirionero.mycar.host.LocationKeepAlive.letGo(this@MyCarActivity)
+                    },
+                    onRequestCallScreening = ::requestCallScreeningRole,
+                )
                 val offer by offerBluetooth.collectAsState()
                 if (offer) {
                     fun close() {

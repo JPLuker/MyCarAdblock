@@ -10,6 +10,7 @@ import android.app.Application
 class MyCarApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        AppLanguage.init(this)
         Words.init(this)
         AppLanguage.applyToProcess(this)
     }

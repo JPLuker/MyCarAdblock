@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_47">
+        <item>La carta ya no se queda negra y sin tu ubicación cuando el Wi-Fi del coche se cae y vuelve en plena travesía, o cuando subes a bordo con myCar abierta en el teléfono bloqueado. ¡Rumbo firme!</item>
+        <item>Con el habla pirata, la voz y los números de teléfono vuelven a seguir el puerto de origen de tu teléfono.</item>
+    </string-array>
+
     <string-array name="changelog_46">
         <item>Tapada una vía de agua que cerraba myCar y cortaba la conexión: llegaba tras tocar la página de Plancia y pasar luego a la carta o a la flota, cuando la app Plancia ocupaba su lugar o al cambiar la pinta.</item>
         <item>Habla pirata: en Aparejos &gt; Lengua, cada texto de myCar en jerga pirata, en tu lengua. Nuestro rumbo lo elegimos nosotros, sin rey ni amo. ¡Arrr!</item>

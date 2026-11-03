@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.1-alpha -->
+    <string-array name="changelog_47">
+        <item>O mapa não fica mais preto, sem a sua localização, quando o Wi-Fi do carro cai e volta durante a viagem, ou quando o carro se conecta com o myCar deixado aberto no telefone bloqueado.</item>
+        <item>Com a fala de pirata, a voz e os números de telefone voltam a seguir o país do seu telefone.</item>
+    </string-array>
+
     <!-- 0.7.0-alpha -->
     <string-array name="changelog_46">
         <item>Corrigido um travamento que fechava o myCar e a conexão: acontecia depois de um toque na página do Plancia e da passagem para o mapa ou para a grade de apps, quando o app Plancia tomava o seu lugar ou ao mudar o tema.</item>

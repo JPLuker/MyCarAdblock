@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.SystemClock
 import androidx.car.app.CarAppService
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.R
@@ -59,7 +60,7 @@ class LocationKeepAlive : Service() {
         runCatching {
             startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
         }.onSuccess {
-            MyCarLog.i("location keep-alive: running")
+            MyCarLog.i("location keep-alive: running (${phoneState(this)})")
             settle(State.ON)
             // Every hold went while it was starting: stop now, as it may only once in the foreground.
             main.post {
@@ -94,8 +95,11 @@ class LocationKeepAlive : Service() {
         /** How often a start-up's hold checks whether that start-up is still going on. */
         private const val START_UP_CHECK_MS = 60_000L
 
-        /** How long after the drive's service went the drive's hold is weighed (see [releaseDrive]). */
-        private const val RELEASE_CHECK_MS = 1_000L
+        /**
+         * How long the drive's hold stays once no drive, start-up or listening for the car is going on
+         * (see [startUpCheck]): a car back within it finds the service running.
+         */
+        private const val AFTER_DRIVE_MS = 5 * 60_000L
 
         /** Public flag value; the constant itself is hidden from the SDK. */
         const val BIND_INCLUDE_CAPABILITIES = 0x1000
@@ -113,6 +117,8 @@ class LocationKeepAlive : Service() {
         private var driveHold = false
         /** [driveHold] taken as the car's Bluetooth (or a tap) started a start-up, before SessionService holds it. */
         private var startUpOnly = false
+        /** When a drive, a start-up or the listening after a drive was last seen going on (elapsedRealtime). */
+        private var lastNeeded = 0L
         private var appContext: Context? = null
         /** The driver said OK to the car's "no position" card this drive: it doesn't come back. */
         private var told = false
@@ -135,19 +141,25 @@ class LocationKeepAlive : Service() {
         }
 
         /**
-         * A start-up's hold goes by itself if that start-up ends without a drive. The rule of
-         * [releaseDrive]: not kept for the listening after a drive, which lasts 10 minutes - with
-         * WirelessLink.busy alone the service and its notification stayed all that time after a drive
-         * whose car closed the session before its Bluetooth channel.
+         * The drive's hold, once no drive holds it (a start-up's, or a drive's that ended), goes only
+         * when nothing has gone on for [AFTER_DRIVE_MS]: no drive, no start-up, no start-over and no
+         * listening for the car after its drive. Android lets this service start with the phone locked
+         * only within 10 s of one of myCar's screens being created, so a hold given back between two
+         * sessions of the same trip was never had again: in 0.7.0 it went 1 s after each session the
+         * car's Wi-Fi dropped (the listening after a drive didn't count, so as not to keep the
+         * notification for its 10 minutes), the car came back 4 s later, the start was refused, and
+         * the map had no position - black - for the rest of the trip.
          */
         private val startUpCheck = object : Runnable {
             override fun run() {
                 if (!driveHold || !startUpOnly) return
-                if (startUpGoesOn()) {
+                val now = SystemClock.elapsedRealtime()
+                if (startUpGoesOn()) lastNeeded = now
+                if (now - lastNeeded < AFTER_DRIVE_MS) {
                     main.postDelayed(this, START_UP_CHECK_MS)
                     return
                 }
-                MyCarLog.i("location keep-alive: no drive or start-up going on - letting go")
+                MyCarLog.i("location keep-alive: no drive or start-up going on for ${AFTER_DRIVE_MS / 60_000} minutes - letting go")
                 startUpOnly = false
                 driveHold = false
                 appContext?.let { release(it) }
@@ -215,6 +227,7 @@ class LocationKeepAlive : Service() {
                     told = false
                     holders++
                     startUpOnly = untilStartUpEnds
+                    lastNeeded = SystemClock.elapsedRealtime()
                     if (startUpOnly) main.postDelayed(startUpCheck, START_UP_CHECK_MS)
                 } else if (!untilStartUpEnds && startUpOnly) {
                     // The drive's service holds it from here: given back with SessionService.stop.
@@ -225,37 +238,47 @@ class LocationKeepAlive : Service() {
             }
         }
 
-        /** No one holds the drive's service any more: the drive's hold goes too, or a wireless start-up's it becomes. */
+        /**
+         * No one holds the drive's service any more: the drive's hold becomes a start-up's, kept while a
+         * wireless start-up, a start-over or the listening after the drive goes on, and for
+         * [AFTER_DRIVE_MS] after (see [startUpCheck]). Given back, it was taken anew from the
+         * background, past Android's 10 s, and refused: the map had no position for the next session.
+         */
         fun releaseDrive(context: Context) {
             val app = context.applicationContext
             main.post {
                 // Taken again meanwhile: a start-up's end on WirelessLink's thread racing a drive's start.
                 if (!driveHold || SessionService.held) return@post
-                // A wireless start-up still going (a tap on a car while another held the service) or
-                // about to start over (the car's Wi-Fi didn't come, a certificate turned down): the hold
-                // stays, as a start-up's again. Given back, it was taken anew from the background,
-                // past Android's 10 s, and refused: the map had no position for the drive. Not for the
-                // listening after a drive, which lasts 10 minutes.
-                if ((WirelessLink.busy && !WirelessLink.listeningQuietly) || WirelessLink.startingOver) {
-                    startUpOnly = true
-                    main.removeCallbacks(startUpCheck)
-                    main.postDelayed(startUpCheck, START_UP_CHECK_MS)
-                    return@post
-                }
-                // Decided a moment later, not now: a start-up whose car's Wi-Fi or TCP failed gives the
-                // service back from WirelessLink's own thread and only then marks its start-over, and
-                // this ran in between - the hold went, and the start-over took it anew past Android's
-                // 10 s: refused, the map had no position for the drive. A drive over lets go 1 s later.
                 appContext = app
                 startUpOnly = true
+                lastNeeded = SystemClock.elapsedRealtime()
                 main.removeCallbacks(startUpCheck)
-                main.postDelayed(startUpCheck, RELEASE_CHECK_MS)
+                main.postDelayed(startUpCheck, START_UP_CHECK_MS)
             }
         }
 
-        /** A wireless start-up still going (not the listening after a drive), about to start over, or the drive's service held. */
+        /**
+         * The driver tapped Disconnect: the drive's hold goes now, without waiting for the car to come
+         * back. A drive still holding the service keeps it (its end gives it back).
+         */
+        fun letGo(context: Context) {
+            val app = context.applicationContext
+            main.post {
+                if (!driveHold || SessionService.held) return@post
+                MyCarLog.i("location keep-alive: disconnected by the driver - letting go")
+                main.removeCallbacks(startUpCheck)
+                startUpOnly = false
+                driveHold = false
+                release(app)
+            }
+        }
+
+        /**
+         * A wireless start-up still going, the listening after a drive among them (a car whose session
+         * dropped comes back through it), a start-up about to start over, or the drive's service held.
+         */
         private fun startUpGoesOn(): Boolean =
-            (WirelessLink.busy && !WirelessLink.listeningQuietly) || WirelessLink.startingOver || SessionService.held
+            WirelessLink.busy || WirelessLink.startingOver || SessionService.held
 
         /**
          * Tries again after a refusal, while something holds the service: myCar on screen, or its
@@ -270,6 +293,16 @@ class LocationKeepAlive : Service() {
                 if (holders > 0 && state == State.FAILED) {
                     MyCarLog.i("location keep-alive: $why, trying again")
                     begin(context.applicationContext)
+                } else if (holders > 0 && state == State.STARTING) {
+                    // A start asked for before this moment, and maybe refused: once Android has said,
+                    // a refusal is tried again now that it lets the service start.
+                    val app = context.applicationContext
+                    waiting += {
+                        if (holders > 0 && state == State.FAILED) {
+                            MyCarLog.i("location keep-alive: $why, trying again")
+                            begin(app)
+                        }
+                    }
                 } else if (holders > 0 && state == State.ON && Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     val app = context.applicationContext
                     runCatching { app.startForegroundService(Intent(app, LocationKeepAlive::class.java)) }
@@ -278,12 +311,46 @@ class LocationKeepAlive : Service() {
             }
         }
 
-        private fun begin(context: Context) {
-            // Approximate location is enough for the service to lend: the map asks for what it needs.
-            val granted = context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED ||
+        /**
+         * A car came up over Bluetooth with myCar's screen already open from before (WirelessAuto)
+         * and the phone locked. That screen isn't created again, so Android gave this service no 10 s:
+         * the start was refused and the map had no position until myCar was opened. A screen of its
+         * own, [LocationStartActivity] (nothing shown, gone at once), is created for it, and with it
+         * the service starts ([retry]). Only with a car map and the permission, the service not
+         * running yet (on Android 12 and 13 always: there a start from the background runs with
+         * nothing to lend), and the phone locked or its screen off: unlocked and on, myCar's screen
+         * comes to the front and does it itself (onResume).
+         */
+        fun screenForArrival(context: Context, evenIfLit: Boolean = false) {
+            val app = context.applicationContext
+            if (state == State.ON && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
+            val locked = runCatching { app.getSystemService(KeyguardManager::class.java)?.isKeyguardLocked }.getOrNull() == true
+            // Screen off and not locked yet (the lock waits a while after the screen goes off): myCar's
+            // screen brought to the front doesn't resume either.
+            val dark = runCatching { app.getSystemService(android.os.PowerManager::class.java)?.isInteractive }.getOrNull() == false
+            // [evenIfLit]: after a call nothing brings myCar's screen to the front; this one has no window.
+            if (!(locked || dark || evenIfLit) || !hasPermission(app) || !carMapInstalled(app)) return
+            // The CI's control run (debug builds only, scatto location-arrival): the same arrival without it.
+            if (io.github.sirionero.mycar.BuildConfig.DEBUG && java.io.File(app.filesDir, "no-arrival-screen").exists()) {
+                MyCarLog.i("location keep-alive: no screen for the car's arrival (test control)")
+                return
+            }
+            MyCarLog.i("location keep-alive: the phone is ${if (locked) "locked" else if (dark) "dark" else "in use"} and myCar's screen was open already - a screen of its own for the map's position")
+            runCatching {
+                app.startActivity(
+                    Intent(app, LocationStartActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION),
+                )
+            }.onFailure { MyCarLog.w("location keep-alive: couldn't open that screen (${it.message})") }
+        }
+
+        /** Approximate location is enough for the service to lend: the map asks for what it needs. */
+        private fun hasPermission(context: Context): Boolean =
+            context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
                 context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-            if (!granted) {
+
+        private fun begin(context: Context) {
+            if (!hasPermission(context)) {
                 MyCarLog.w("location keep-alive: no location permission, car maps won't get a fix in the background")
                 refused(NoPosition.NO_PERMISSION)
                 settle(State.FAILED)

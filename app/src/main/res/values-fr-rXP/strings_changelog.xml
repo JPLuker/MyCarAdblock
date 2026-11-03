@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_47">
+        <item>La carte ne reste plus noire et sans votre position quand le Wi-Fi de la voiture tombe puis revient en pleine traversée, ou quand vous montez à bord alors que myCar est resté ouvert sur le téléphone verrouillé. Cap tenu !</item>
+        <item>Avec le parler pirate, la voix et les numéros de téléphone suivent de nouveau le port d’attache de votre téléphone.</item>
+    </string-array>
+
     <string-array name="changelog_46">
         <item>Voie d’eau colmatée : un plantage qui fermait myCar et la connexion. Il survenait après un appui dans la page de Plancia puis un passage à la carte ou à la flotte, quand l’app Plancia prenait sa place ou au changement de couleurs.</item>
         <item>Parler pirate : dans Timonerie &gt; Langue, chaque texte de myCar en langage de pirate, dans votre langue. Notre cap, c’est nous qui le choisissons : ni roi ni maître !</item>

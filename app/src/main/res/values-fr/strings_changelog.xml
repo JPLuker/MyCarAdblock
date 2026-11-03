@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.1-alpha -->
+    <string-array name="changelog_47">
+        <item>La carte ne reste plus noire, sans votre position, quand le Wi-Fi de la voiture tombe puis revient pendant le trajet, ou quand la voiture se connecte alors que myCar est resté ouvert sur le téléphone verrouillé.</item>
+        <item>Avec le parler pirate, la voix et les numéros de téléphone suivent de nouveau le pays de votre téléphone.</item>
+    </string-array>
+
     <!-- 0.7.0-alpha -->
     <string-array name="changelog_46">
         <item>Correction d’un plantage qui fermait myCar et la connexion : il survenait après un appui dans la page de Plancia puis un passage à la carte ou à la grille des apps, quand l’app Plancia prenait sa place ou au changement de thème.</item>

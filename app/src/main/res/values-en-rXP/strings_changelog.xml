@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_47">
+        <item>The chart no longer goes black and loses its position when the ship\'s Wi-Fi drops and comes back mid-voyage, or when ye board while myCar is left open on the locked phone. Steady as she goes!</item>
+        <item>With pirate speak, the voice and the phone numbers follow yer phone\'s home port again.</item>
+    </string-array>
+
     <string-array name="changelog_46">
         <item>Fixed a crash that sank myCar and ended the voyage: it struck after a tap in Plancia\'s page, then a turn to the chart or the fleet, the Plancia app taking its place, or a change of paint.</item>
         <item>Pirate speak: in Rigging &gt; Tongue, every text of myCar in pirate terms, in yer own tongue. We chart our own course and bow to no crown.</item>

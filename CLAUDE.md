@@ -830,7 +830,10 @@ Tutti i token in un solo posto, `car/design/`:
   regione XP non conta (trovato da una revisione con una replica in C++ della scelta di AOSP; scatto
   `lang-en-GB`). Da Android 13 Android tiene `it-XP`: le impostazioni leggono la scelta da
   `AppLanguage.saved` (la lingua del telefono resta tale), e la voce riceve il paese del telefono, non
-  XP (`VoiceLanguages.speakingLocale`).
+  XP (`VoiceLanguages.speakingLocale`). Da Android 13 anche `Resources.getSystem()` ha la lingua scelta per
+  myCar (`it-XP`): la lingua del telefono si legge da `LocaleManager.systemLocales` (`AppLanguage.phoneLocale`,
+  0.7.1; prima la voce riceveva `it_XP`, "no voice for it_XP" nel log), e `country()` prende il paese del
+  telefono anche quando la lingua scelta in myCar non ha regione.
 - **Sfondo myCar «Ribelle»** (0.7.0, richiesta dell'utente: "il tema myCar, le onde, la barra del menu
   con effetto glass, e tra le onde un veliero con la bandiera col teschio che sopravvive alle
   intemperie: se va sotto un'onda poi rispunta fuori"): `Motion.Rebel` in `Wallpapers.kt`, disegno in
@@ -1325,9 +1328,29 @@ Tutti i token in un solo posto, `car/design/`:
   (`releaseDrive` in `SessionService.stop`; quella d'avvio va dopo 60 s se non si arriva a un viaggio), solo con
   un'app di navigazione per auto installata; riprova all'accensione dell'accessibilità e con myCar in vista; se
   Android rifiuta lo stesso, scheda in auto solo da fermi (`noPosition`, una volta per viaggio). Non serve
-  ACCESS_BACKGROUND_LOCATION: non dà la capability a Vela. Con myCar già aperta da un viaggio prima la finestra
-  dei 10 s non c'è (resta la scheda). Verificato in emulatore 37.0 bloccato (scatto `location-locked`): a 1 s
-  "running" (allowWiu ACTIVITY_STARTER), a 15 s rifiutato. (2) Colonna della musica riservata dall'avvio
+  ACCESS_BACKGROUND_LOCATION: non dà la capability a Vela. Verificato in emulatore 37.0 bloccato (scatto
+  `location-locked`): a 1 s "running" (allowWiu ACTIVITY_STARTER), a 15 s rifiutato.
+  **0.7.1** (log del 3 novembre con la 0.7.0, "ancora la mappa nera"): il Wi-Fi dell'auto (lo smartBox, che cade e
+  riparte: Bluetooth e Wi-Fi insieme) è caduto quattro volte; il servizio veniva lasciato 1 s dopo la fine di ogni
+  sessione (l'ascolto dopo il viaggio non contava, per non tenere la notifica 10 minuti), l'auto tornava dopo 4 s e
+  Android lo rifiutava: mappa nera fino all'apertura di myCar. Ora la presa del viaggio resta finché c'è viaggio,
+  avvio, ripartenza o ascolto dopo il viaggio (`WirelessLink.busy`, anche `listeningQuietly`) e per 5 minuti dopo
+  l'ultimo di questi (`AFTER_DRIVE_MS`, `lastNeeded`, controllo ogni 60 s); Disconnetti la lascia subito (`letGo`).
+  La notifica della posizione resta quindi qualche minuto dopo la fine del viaggio: è voluto. E con myCar già aperta
+  da prima (succede spesso: la schermata resta dietro per ore) l'arrivo dell'auto non creava nessuna schermata, quindi
+  niente 10 s: ora `WirelessAuto.carAppeared` → `LocationKeepAlive.screenForArrival` apre `host/LocationStartActivity`
+  (Theme.NoDisplay, fuori dai recenti, task suo, si chiude in onCreate e chiama `retry`, che aspetta anche l'esito di
+  un avvio in corso) col telefono bloccato o lo schermo spento, una mappa per auto installata e il servizio non acceso
+  (su Android 12-13 sempre); non durante una chiamata; sbloccato e acceso, myCar viene davanti e riprova in onResume.
+  Auto arrivata durante una chiamata: a chiamata finita (controllo ogni 2 s, al massimo mezz'ora, `afterCall`) la
+  schermata per l'arrivo, anche col telefono in uso (`evenIfLit`: dopo una chiamata nessuno porta davanti myCar).
+  Scatto `location-arrival`: auto finta associata dalla shell (`cmd companiondevice associate 0 <pkg> <mac>`; su
+  Android 17 `list` stampa `Association{mId=…}`), myCar aperta, PIN e 15 s, poi `cmd companiondevice
+  simulate-device-appeared <id>`, in quattro situazioni (myCar ultima schermata o dietro la home; schermo spento o
+  blocco acceso), ognuna senza (prova di controllo: nella build debug il file `files/no-arrival-screen` salta la
+  schermata) e con. Verificato (0.7.1, API 37.0): senza, rifiutato in tre su quattro col messaggio del log del
+  guidatore (uid IMPORTANT_FOREGROUND o TOP_SLEEPING); con, sempre "running" (uid TOP, `getFgsAllowWiu_forCapabilities
+  =PROC_STATE_TOP`). Solo "dietro la home, schermo spento" passava anche senza: portare davanti myCar la rende TOP lì. (2) Colonna della musica riservata dall'avvio
   (`CarServices.musicStarting`, 20 s, "Starting <app>…") così la prima superficie della mappa è già quella
   stretta (scatto `map-start`: prima superficie 1195x720). (3) Area visibile ridetta a una superficie rifatta
   alla stessa misura; tocchi sulla superficie nel log. (4) Spotify su un altro dispositivo: solo con l'orologio

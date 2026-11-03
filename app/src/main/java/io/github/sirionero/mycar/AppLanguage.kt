@@ -65,9 +65,10 @@ enum class AppLanguage(
 
         /**
          * The phone's country, for what goes by it (units, how phone numbers are written, Portugal's or
-         * Brazil's Portuguese): the language's own region, but not pirate speak's, which is no country.
+         * Brazil's Portuguese): the language's own region, but not pirate speak's, which is no country,
+         * nor none at all (a language chosen in myCar has no region): then the phone's.
          */
-        fun country(): String = Locale.getDefault().country.takeIf { it != PIRATE } ?: phoneLocale().country
+        fun country(): String = Locale.getDefault().country.takeIf { it.isNotEmpty() && it != PIRATE } ?: phoneLocale().country
 
         /** The one chosen in Settings; null for the phone's. */
         fun chosen(context: Context): AppLanguage? {
@@ -94,8 +95,27 @@ enum class AppLanguage(
         /** The language myCar is in now: the chosen one, else the phone's when it's one of these. */
         fun current(context: Context): AppLanguage = chosen(context) ?: of(phoneLocale()) ?: ENGLISH
 
-        /** The phone's own language, whatever myCar is in. */
-        fun phoneLocale(): Locale = Resources.getSystem().configuration.locales[0] ?: Locale.ENGLISH
+        /** The application, for [phoneLocale]: set by MyCarApplication. */
+        @Volatile private var app: Context? = null
+
+        fun init(context: Context) {
+            app = context.applicationContext
+        }
+
+        /**
+         * The phone's own language, whatever myCar is in. From Android 13 Android gives myCar's process
+         * the language chosen for myCar, Resources.getSystem() included: with pirate speak that is
+         * "it-XP", and the country for the voice and the units came out "XP" ("no voice for it_XP"),
+         * and "the phone's language" read as the one chosen. Android's own list of the phone's languages.
+         */
+        fun phoneLocale(): Locale {
+            if (Build.VERSION.SDK_INT >= 33) {
+                val system = runCatching { app?.getSystemService(LocaleManager::class.java)?.systemLocales }.getOrNull()
+                if (system != null && !system.isEmpty) return system[0]
+            }
+            // Null outside Android (the JVM tests), where it threw.
+            return runCatching { Resources.getSystem().configuration.locales[0] }.getOrNull() ?: Locale.ENGLISH
+        }
 
         /** One of these for [locale], by language: any Chinese is the simplified one. */
         fun of(locale: Locale): AppLanguage? = entries.firstOrNull { it.locale.language == locale.language }

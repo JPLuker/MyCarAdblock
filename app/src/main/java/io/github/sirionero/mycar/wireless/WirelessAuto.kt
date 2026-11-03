@@ -59,6 +59,39 @@ object WirelessAuto {
     @Volatile private var askedAt = 0L
     @Volatile private var lastAppeared = 0L
 
+    /** Bumped at each wait for a call to end ([afterCall]), so only the latest one acts. */
+    private var callTurn = 0
+    private val main = Handler(Looper.getMainLooper())
+
+    /**
+     * A car arrived during a call (WirelessAuto.carAppeared): the position service for the car's map
+     * wasn't given the screen it needs, and nothing gave it one later - the map had no position for the
+     * whole drive. Checked every 2 s, for half an hour at most: once the call is over, the arrival's
+     * own screen (LocationKeepAlive.screenForArrival), with the phone lit and in use too, since after a
+     * call nothing brings myCar's screen to the front. Not during the call: the call's screen is in
+     * front. No more checks once the service runs (Android 14 and later) or nothing holds it.
+     */
+    private fun afterCall(context: Context, turn: Int, checks: Int = 0) {
+        main.postDelayed({
+            if (turn != callTurn) return@postDelayed
+            val position = io.github.sirionero.mycar.host.LocationKeepAlive.state
+            if (position == io.github.sirionero.mycar.host.LocationKeepAlive.State.OFF ||
+                (position == io.github.sirionero.mycar.host.LocationKeepAlive.State.ON && android.os.Build.VERSION.SDK_INT >= 34)
+            ) {
+                return@postDelayed
+            }
+            if (inCall(context)) {
+                if (checks < AFTER_CALL_CHECKS) afterCall(context, turn, checks + 1)
+                return@postDelayed
+            }
+            log.i("auto-connect: the call is over")
+            io.github.sirionero.mycar.host.LocationKeepAlive.screenForArrival(context, evenIfLit = true)
+        }, AFTER_CALL_CHECK_MS)
+    }
+
+    private const val AFTER_CALL_CHECK_MS = 2_000L
+    private const val AFTER_CALL_CHECKS = 900
+
     private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
     /** Whether myCar connects by itself to the cars it manages. On unless the driver turned it off. */
@@ -268,8 +301,14 @@ object WirelessAuto {
             // front. The start-up goes on behind; Android's questions wait for myCar to be opened.
             if (inCall(context)) {
                 log.i("auto-connect: on a call - myCar's screen isn't brought up over it")
+                // The map's position can't wait for myCar to be opened: once the call is over, the
+                // arrival's own screen (with the phone locked or dark), as without a call.
+                afterCall(context.applicationContext, ++callTurn)
                 return
             }
+            // The screen open from before isn't created again, and Android starts the car map's
+            // position service with the phone locked only near a screen just created: one of its own.
+            io.github.sirionero.mycar.host.LocationKeepAlive.screenForArrival(context)
             // Brought to the front as before, with nothing to do: Android's questions that wait for
             // myCar on screen (the music's sharing, the "Allow") come up as soon as the phone is
             // unlocked, instead of only once the driver opened myCar.

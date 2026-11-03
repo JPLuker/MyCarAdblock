@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_47">
+        <item>O mapa não fica mais preto e sem a sua localização quando o Wi-Fi do carro cai e volta em plena travessia, ou quando você sobe a bordo com o myCar deixado aberto no telefone bloqueado. Rumo firme!</item>
+        <item>Com a fala de pirata, a voz e os números de telefone voltam a seguir o porto de origem do seu telefone.</item>
+    </string-array>
+
     <string-array name="changelog_46">
         <item>Corrigido um travamento que fechava o myCar e a conexão: acontecia depois de um toque na página do Plancia e da passagem para o mapa ou para a frota, quando o app Plancia tomava o seu lugar ou ao mudar a pintura.</item>
         <item>Fala de pirata: em Leme &gt; Língua, cada texto do myCar em termos piratas, na sua língua. Nós escolhemos nossas rotas, e ao diabo com as imposições!</item>
