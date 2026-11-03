@@ -458,6 +458,45 @@ Tutti i token in un solo posto, `car/design/`:
   suona; poi myCar sveglia l'app Xonos, che avvia Music Assistant, dice "still starting" e riprova, si collega
   attraverso il ponte dopo circa 14 s e Music Assistant suona sul lettore "myCar". Subito dopo l'emulatore è
   caduto: le immagini dello scatto mancano, il log è in `stream.txt`.
+  **Motore di Xonos portato: v0.1.55** (0.7.3, branch `feature/xonos-0.1.55`; il repository di Xonos ora si
+  chiama anche `SirioNero/MusicAssistantServer-on_Android`, tag `v0.1.55` = commit `568041a`). Confronto file
+  per file di `data/`, `sendspin/`, `playback/` con `app/src/main/java/it/xonos/ma/{data,sendspin,playback}` di
+  Xonos: identici a parte il package Account, ArtCache, MaClient, Model, SkipSender, Menu, AndroidAudio e i nuovi
+  `Logged`, `SkipTrace`, `TokenInfo`, `SoloistUnlock`, `SkipPlan`; portati tenendo le parti di myCar Library
+  (`lyrics(uri, timeoutMs)`), MaRepository (ponte, `locale()`), AudioEngine (`reroute()`), SendspinClient
+  (`start()` riparte se l'audio non è READY), MaPlayer (`pauseWanted`, `heldByCall`, `onUserPause`,
+  `pauseFromSystem(transient)`: le pause del sistema passano da `pause()` con `SystemPause` CALL/OTHER, così una
+  telefonata tiene la ripresa dopo un calo e non conta come pausa del guidatore), PlaybackService (uscita
+  diretta nel canale dell'auto, focus e chiamate, `linkGone`, notifica che apre `MyCarActivity`). Restano in
+  Xonos: AccountProvider, MyCarBridge e ServerKeeper (lato app), PhoneServer e `server/`, Devices, Services,
+  PlaylistRemover, ScreenCache, il rientro con la password su BAD_TOKEN (myCar non ha la password: c'è "Use the
+  Xonos app's account"). Il Sendspin cifrato non c'è nemmeno in Xonos. Quello che conta in myCar:
+  - **Logcat**: `Logged.details = BuildConfig.DEBUG` nell'init di `Xonos`; nella release il motore scrive solo
+    la forma di id, uri ed errori (`Logged.id`, `Logged.error`, `Logged.trace`), mai titoli, ricerche, nomi,
+    indirizzi, token o testi d'errore del server; il JSON rotto di `MaClient` non va nel log.
+  - **Server sul telefono** (`Xonos.onPhoneServer`: indirizzo di casa su 127.0.0.1, `Bridges.onThePhone`): dalla
+    0.1.55 l'app Xonos lo ferma un minuto dopo che nessuno lo usa (`ServerKeeper`), e lo tiene acceso finché
+    myCar tiene legato il ponte (`MyCarBridge.onCreate` → `keeper.hold(MYCAR)`). myCar lo tiene legato per il
+    viaggio: `CarServices` tiene `repo.acquire()`, ogni tentativo passa dal ponte e rimanda di 5 minuti lo
+    stacco; su NO_ANSWER l'app lo riavvia (`keeper.touch`) e myCar riprova da sola (2-20 s, e
+    `Xonos.wakePhoneServer()` riprova subito, al massimo ogni 2 s). `MaPlayer.wake()` dà vero solo con quel
+    server, l'app Xonos col ponte e nessun rifiuto definitivo: play, salti e scelte aspettano fino a 60 s
+    (`PHONE_READY_TIMEOUT_MS`), il menu dell'auto 45 s (`PHONE_BROWSE_WAIT_MS`), `play_media` 180 s
+    (`Library.playTimeoutMs`, 60 s con gli altri). Una pausa o uno stop durante l'attesa non fanno partire niente
+    e non mostrano errori (`pauses`). `phoneServerFailed()` = `Xonos.phoneServerRefused()`: un rifiuto che non
+    passa da solo di Music Assistant (token, versione, permessi…) o dell'app Xonos (`AppBridge.refusedForGood`:
+    NOT_MYCAR / NOT_OURS per quell'host, l'app passata a un altro Music Assistant o senza il suo).
+  - **Salti**: `SkipPlan` (play_index invece di next/previous, che Music Assistant fa partire dopo 1 s; ritorno a
+    capo con ripeti tutto); `SkipSender` coi servizi a un flusso alla volta raccoglie i tocchi per 400 ms, 250 col
+    server sul telefono (con gli altri salta subito); righe "Salto:" (`SkipTrace`).
+  - **Due correzioni della revisione** (tre revisori indipendenti, ogni punto verificato): con l'audio tramite
+    myCar l'auto che se ne va (`CarAudio.linkGone`) chiama anche `forgetDrop()`, come il Bluetooth che si stacca,
+    così un calo di rete visto dopo non fa ripartire la musica dall'altoparlante del telefono al ritorno della
+    rete; i rifiuti NOT_OURS/NOT_MYCAR del ponte non si aspettano più (sopra).
+  - Prove: il pacchetto `xonos` compilato contro android-all 17 di Robolectric e Media3 1.11.1 (scratchpad,
+    stub del resto di myCar) e i banchi JVM di Xonos sul motore di myCar (SkipCheck, LoggedCheck, DecoderCheck,
+    SilenceCheck, StartCheck, SlowListCheck) passano; quelli con un Music Assistant vero (MenuCheck, PlayCheck,
+    TokenCheck, HomeCheck) vogliono Docker, che nella sessione non partiva.
 
 - **Cinema** (dopo la 0.5.13; `cinema/`, `car/CinemaApp.kt`, `car/CarDriving.kt`, `ui/CinemaSettings.kt`,
   nome scelto dall'utente): l'app video, che in realtà è un browser fatto per il video. In auto i
@@ -1534,8 +1573,9 @@ Tutti i token in un solo posto, `car/design/`:
   e per far suonare l'app Spotify del telefono; l'audio arriva via myCar o Bluetooth. Regole di
   Spotify da febbraio 2026: Premium del proprietario, massimo 5 utenti per Client ID, alcuni
   endpoint tolti. Il motore ufficiale per terze parti (Spotify Soloist, quello di Music
-  Assistant) esiste solo per Linux: non gira sul telefono. librespot non suona con gli account
-  creati da dicembre 2024.
+  Assistant) gira sul telefono sotto proot, dentro il server Music Assistant dell'app Xonos (dalla
+  0.1.49; in modalità Spotify Connect dalla 0.1.54): con Xonos dentro myCar collegato a quel server
+  Spotify suona già così. librespot non suona con gli account creati da dicembre 2024.
 
 ## Note F-Droid
 
