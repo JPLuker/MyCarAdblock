@@ -392,7 +392,13 @@ object CarServices {
             autoplayAsks = media.askMark()
         } else if (media.askedSince(autoplayAsks)) {
             autoplayPending = false
-            if (_musicStarting.value) expectMusic(false)
+            // The music asked for may still be coming (a web page that loads at its first key): the
+            // column kept for it stays, with 20 s from now after a wait for the Bluetooth. Closed here,
+            // the map widened and narrowed again when that music came.
+            if (autoplayBluetoothSince != 0L && _musicStarting.value) {
+                musicWait.removeCallbacks(musicWaitOver)
+                musicWait.postDelayed(musicWaitOver, MUSIC_START_MS)
+            }
             io.github.sirionero.mycar.MyCarLog.i("media: Autoplay left alone - the music was asked for something meanwhile")
             return
         }
