@@ -68,9 +68,9 @@
     <string name="settings_cinema_reset_text_own">Cinema remet le cap sur %1$s. Vos propres sites passent par-dessus bord : %2$s.</string>
     <string name="settings_cinema_remove_site_text">Il débarque de Cinema. Pour le récupérer, il faudra saisir à nouveau son adresse.</string>
     <string name="settings_cinema_protected">vidéo protégée, sans doute noire à bord</string>
-    <string name="settings_cinema_videos_ask">Autorisez myCar à les afficher à bord, sous « Sur ce téléphone »</string>
+    <string name="settings_cinema_videos_ask">Autorisez myCar à les afficher à bord, sous « Cale du téléphone »</string>
     <string name="settings_cinema_videos_limited">Seules les vidéos choisies pour myCar s’affichent à bord</string>
-    <string name="settings_cinema_videos_allowed">Elles s’affichent à bord, sous « Sur ce téléphone »</string>
+    <string name="settings_cinema_videos_allowed">Elles s’affichent à bord, sous « Cale du téléphone »</string>
     <string name="settings_cinema_tv_footer">Des listes IPTV au format M3U, de votre fournisseur, d’une liste publique ou d’un serveur TV à la maison : chacune devient une tuile dans Cinema, avec ses chaînes. Elles passent dans le lecteur du téléphone ; les chaînes protégées (DRM) et multicast restent à quai.</string>
     <string name="settings_cinema_tv_remove_text">Son adresse et ses chaînes débarquent de myCar. Pour la récupérer, il faudra saisir à nouveau l’adresse.</string>
     <string name="settings_cinema_tv_add">Embarquer la liste</string>
