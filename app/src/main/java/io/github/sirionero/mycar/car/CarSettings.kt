@@ -409,6 +409,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
     internal fun carIdentified(key: String) {
         val route = CarRoutes.connected(key) ?: return
         carRoute = route
+        io.github.sirionero.mycar.SessionReport.carRoute(route.id)
         if (route == audioRouteFlow.value) return
         io.github.sirionero.mycar.MyCarLog.i("audio: this car's own route - ${route.id}")
         audioRouteFlow.value = route

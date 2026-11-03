@@ -119,6 +119,19 @@ object SessionReport {
     fun audio(summary: String) { audio = summary }
 
     fun audioRoute(summary: String) { audioRoute = summary }
+
+    /**
+     * The car's own route, set as the car is recognised (CarSettings.carIdentified): taken from the
+     * route for every car at [begin], a wireless car with Bluetooth music read "audio route link".
+     */
+    fun carRoute(id: String) {
+        audioMode = id
+        audioRoute = "this car's own route: $id"
+    }
+
+    /** The category as the report says it: a transport that failed over Wi-Fi isn't the USB's. */
+    private fun shown(category: Category): String =
+        if (category == Category.USB && link == "wireless") "Wi-Fi transport" else category.label
     fun stream(summary: String) { lastStream = summary; reached(Stage.STREAMING) }
 
     /**
@@ -188,7 +201,7 @@ object SessionReport {
         return buildString {
             append("=".repeat(60)).append('\n')
             append("SESSION REPORT\n")
-            append(row("result", if (category == Category.NONE) "ok / no failure recorded" else "FAILED - ${category.label}"))
+            append(row("result", if (category == Category.NONE) "ok / no failure recorded" else "FAILED - ${shown(category)}"))
             append(row("detail", failure))
             append(row("failed in state", lastState))
             append(row("duration", "${seconds}s"))
