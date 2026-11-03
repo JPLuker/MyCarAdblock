@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_done">Όλα πρίμα</string>
+    <string name="common_back">Όπισθεν</string>
+    <string name="common_delete">Βύθιση</string>
+    <string name="common_add">Επιβίβαση</string>
+    <string name="common_edit">Μερεμέτι</string>
+    <string name="common_skip">Τραβάμε ίσια</string>
+    <string name="common_next">Εμπρός</string>
+    <string name="common_not_now">Άλλη βάρδια</string>
+    <string name="common_yes">Μάλιστα</string>
+    <string name="common_no">Αρνητικό</string>
+    <string name="common_loading">Φορτώνουμε…</string>
+    <string name="common_settings">Ξάρτια</string>
+</resources>
