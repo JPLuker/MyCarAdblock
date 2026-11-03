@@ -143,8 +143,10 @@ Rispondi sempre in **italiano**.
   (dalla griglia, poi il menu dal ☰ di Home Assistant), `plancia-page/` (pagina pronta a destra
   della mappa), `plancia-side/` (accanto alla mappa).
   Ponte: con gli ingressi `plancia_ref` / `xonos_ref` le app Plancia e Xonos si compilano da quel
-  loro ramo (`.github/build-apps.sh`, build debug, Gradle 8.14.3 scaricato: le app non hanno il
-  wrapper) al posto degli ultimi rilasci, e gli scatti `bridge-plancia`, `bridge-plancia-page`,
+  loro ramo o tag (`.github/build-apps.sh`, build debug, Gradle 8.14.3 scaricato: le app non hanno il
+  wrapper; Xonos dalla 0.1.49 compila proot con talloc da samba.org, che a volte non risponde ai runner:
+  `.github/talloc-curl.sh`, un curl davanti a quello del runner, prova allora altre copie dello stesso file,
+  tenute solo con lo SHA-256 di `proot.sh`) al posto degli ultimi rilasci, e gli scatti `bridge-plancia`, `bridge-plancia-page`,
   `bridge-xonos` aprono Plancia e Xonos dentro myCar con `--ez bridge true` (tutto dal ponte: senza
   Tailscale nell'emulatore), le app configurate da root sugli stessi server; nel log le app scrivono
   "Ponte per <myCar> verso <server>" per ogni connessione. Dopo la compilazione delle app lo script

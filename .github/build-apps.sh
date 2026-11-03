@@ -37,6 +37,13 @@ fi
 
 if [ -n "${XONOS_REF:-}" ]; then
     fetch xonos SirioNero/Music-Assistant-on-Gearslip "$XONOS_REF"
+    # talloc for proot comes from samba.org, or from another copy of it when samba.org doesn't answer:
+    # the curl in front of the runner's own (.github/talloc-curl.sh) passes every other call through.
+    shim=$(mktemp -d)
+    ln -s "$PWD/.github/talloc-curl.sh" "$shim/curl"
+    REAL_CURL=$(command -v curl)
+    export REAL_CURL TALLOC_PINS="$PWD/apps-src/xonos/app/native/proot.sh"
+    export PATH="$shim:$PATH"
     if [ -n "${XONOS_SERVER:-}" ]; then
         export ANDROID_NDK="${ANDROID_NDK_LATEST_HOME:-${ANDROID_NDK_HOME:-}}"
         export XONOS_KEYSTORE_PASSWORD=xonos-android XONOS_KEY_ALIAS=xonos
