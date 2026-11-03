@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="changelog_49">
-        <item>Xonos dentro de myCar ahora navega con el motor de Xonos 0.1.55: los saltos llegan hasta un segundo antes, un artista se abre al instante (sus canciones suben a bordo cuando las abres) y el menú de a bordo espera a Music Assistant en lugar de mostrar bodegas vacías.</item>
+        <item>Xonos dentro de myCar ahora navega con el motor de Xonos 0.1.55: un artista se abre sin subir antes a bordo todas sus canciones (suben a bordo cuando abres «Todas las tonadas») y el menú de a bordo espera a Music Assistant en lugar de mostrar bodegas vacías.</item>
         <item>Con Music Assistant en tu teléfono, en la app Xonos: reproducir, saltar y elegir una canción esperan hasta un minuto a que vuelva a izar velas, en lugar de gritar que no está conectado.</item>
-        <item>Xonos más firme: un decodificador de audio que hace agua se cambia, el inicio de sesión se renueva antes de caducar y Spotify, encallado en Music Assistant por una escucha que ya nadie oye, se desencalla solo.</item>
-        <item>Si el coche se apaga mientras no hay red, Xonos ya no vuelve a sonar por el altavoz del teléfono cuando vuelve la red. Sus líneas en el diario de a bordo ya no contienen canciones, búsquedas ni direcciones.</item>
+        <item>Xonos más firme: un decodificador de audio que hace agua se cambia, el inicio de sesión se renueva antes de caducar y Spotify, encallado en Music Assistant por una escucha que ya nadie oye, se desencalla si ningún otro reproductor lo usa (con una cuenta de administrador).</item>
+        <item>Si el coche se apaga mientras no hay red o durante una llamada, Xonos ya no vuelve a cantar por el altavoz del teléfono cuando vuelve la red o termina la llamada.</item>
     </string-array>
 
     <string-array name="changelog_48">
