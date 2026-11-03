@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.3-alpha -->
+    <string-array name="changelog_49">
+        <item>O Xonos dentro do myCar agora tem o motor do Xonos 0.1.55: os pulos são até um segundo mais rápidos, um artista abre na hora (as músicas dele carregam quando você as abre) e o menu do carro espera o Music Assistant em vez de mostrar pastas vazias.</item>
+        <item>Com o Music Assistant no seu telefone, no app Xonos: tocar, pular e escolher uma música esperam até um minuto que ele reinicie, em vez de dizer que não está conectado.</item>
+        <item>Xonos mais estável: um decodificador de áudio que falha é substituído, o login é renovado antes de expirar, e o Spotify, preso no Music Assistant por uma reprodução que ninguém ouve mais, se libera sozinho.</item>
+        <item>Se o carro for desligado enquanto falta rede, o Xonos não volta mais a tocar pelo alto-falante do telefone quando a rede volta. As linhas dele no log não contêm mais músicas, buscas nem endereços.</item>
+    </string-array>
+
     <!-- 0.7.2-alpha -->
     <string-array name="changelog_48">
         <item>A reprodução automática não toca mais pelo alto-falante do telefone, no seu bolso, quando o Bluetooth de música do carro ainda não está conectado: ela espera até um minuto, e uma pausa ou uma música que você escolher nesse meio-tempo é respeitada.</item>

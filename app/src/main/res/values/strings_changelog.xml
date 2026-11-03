@@ -5,6 +5,14 @@
   "Settings >" are the app's own: translate them as the app's screens say them.
 -->
 <resources>
+    <!-- 0.7.3-alpha -->
+    <string-array name="changelog_49">
+        <item>Xonos inside myCar now has the engine of Xonos 0.1.55: skips are up to a second quicker, an artist opens at once (its songs load when you open them), and the car\'s menu waits for Music Assistant instead of showing empty folders.</item>
+        <item>With Music Assistant on your phone, in the Xonos app: playing, skipping and picking a song wait up to a minute while it starts again, instead of saying it isn\'t connected.</item>
+        <item>Steadier Xonos: a sound decoder that breaks down is replaced, the sign-in is renewed before it runs out, and Spotify, left busy in Music Assistant by a stream nobody hears any more, frees itself.</item>
+        <item>If the car is switched off while the network is down, Xonos no longer starts again from the phone\'s speaker when the network returns. Its lines in the log no longer hold songs, searches or addresses.</item>
+    </string-array>
+
     <!-- 0.7.2-alpha -->
     <string-array name="changelog_48">
         <item>Autoplay no longer plays on the phone\'s speaker, in your pocket, when the car\'s Bluetooth music isn\'t connected yet: it waits for it up to a minute, and a pause or a song you choose meanwhile stays.</item>

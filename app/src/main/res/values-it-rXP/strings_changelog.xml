@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_49">
+        <item>Xonos dentro myCar ora naviga col motore di Xonos 0.1.55: i salti arrivano fino a un secondo prima, un artista si apre subito (i suoi brani salgono a bordo quando li apri) e il menu di bordo aspetta Music Assistant invece di mostrare stive vuote.</item>
+        <item>Con Music Assistant sul telefono, nell\'app Xonos: play, salti e scelta di un brano aspettano fino a un minuto che rimetta le vele al vento, invece di gridare che non è collegato.</item>
+        <item>Xonos più robusto: un decoder audio che fa acqua viene sostituito, l\'accesso si rinnova prima che scada, e Spotify, rimasto incagliato in Music Assistant da un ascolto che nessuno sente più, si disincaglia da solo.</item>
+        <item>Se l\'auto si spegne mentre manca la rete, Xonos non riattacca più a suonare dall\'altoparlante del telefono quando la rete torna. Le sue righe nel diario di bordo non contengono più brani, ricerche o indirizzi.</item>
+    </string-array>
+
     <string-array name="changelog_48">
         <item>L\'Autoplay non intona più le ballate dall\'altoparlante del telefono, giù in tasca, quando il Bluetooth della musica di bordo non è ancora salito: lo aspetta fino a un minuto, e una pausa o un brano che scegli nel frattempo restano.</item>
     </string-array>

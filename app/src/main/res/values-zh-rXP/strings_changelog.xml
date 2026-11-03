@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_49">
+        <item>myCar 内置的 Xonos 现在换上 Xonos 0.1.55 的引擎扬帆：切歌最多快一秒，打开艺人时立即显示（其歌曲在你打开时才登船），船上的菜单会等待 Music Assistant，而不是露出空空的货舱。</item>
+        <item>当 Music Assistant 在你的手机上（Xonos 应用中）运行时：播放、切歌和选歌会等它重新扬帆，最多一分钟，而不是大喊未连接。</item>
+        <item>Xonos 更结实：漏水的音频解码器会被换掉，登录会在过期前续期；Spotify 若因一段已无人收听的播放而在 Music Assistant 中搁浅，会自行脱浅。</item>
+        <item>如果在没有网络时关闭了车辆，网络恢复后 Xonos 不再从手机扬声器开始播放。它在航海日志中的记录不再包含歌曲、搜索内容或地址。</item>
+    </string-array>
+
     <string-array name="changelog_48">
         <item>当船上的蓝牙音乐还没登船时，自动播放不再从你口袋里手机的扬声器唱起船歌：它最多等待一分钟，期间你选择的暂停或歌曲会被保留。</item>
     </string-array>

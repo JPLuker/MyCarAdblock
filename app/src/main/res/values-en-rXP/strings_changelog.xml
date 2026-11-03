@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_49">
+        <item>Xonos inside myCar now sails with the engine of Xonos 0.1.55: skips come up to a second quicker, an artist opens at once (its songs come aboard when ye open them), and the ship\'s menu waits for Music Assistant instead of showing empty holds.</item>
+        <item>With Music Assistant on yer phone, in the Xonos app: playing, skipping and picking a song wait up to a minute while it hoists sail again, instead of crying it ain\'t connected.</item>
+        <item>Sturdier Xonos: a sound decoder that springs a leak is swapped out, the sign-in is renewed before it runs dry, and Spotify, left tied up in Music Assistant by a stream nobody hears any more, cuts itself loose.</item>
+        <item>If the car is switched off while the network is down, Xonos no longer strikes up again on the phone\'s speaker when the network returns. Its lines in the ship\'s log no longer hold songs, searches or addresses.</item>
+    </string-array>
+
     <string-array name="changelog_48">
         <item>Autoplay no longer strikes up the shanties on the phone\'s speaker, down in yer pocket, when the ship\'s Bluetooth music ain\'t aboard yet: it waits up to a minute, and a pause or a song ye pick meanwhile stays.</item>
     </string-array>
