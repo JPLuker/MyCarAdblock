@@ -761,7 +761,10 @@ class MaPlayer(
                 choosing--
                 if (choosing == 0 && pauseAfterChoice) {
                     pauseAfterChoice = false
-                    pauseFromSystem()
+                    // La pausa toccata mentre la scelta partiva: Media3 mostra già la pausa (playWhenReady falso), quindi
+                    // pauseFromSystem() non faceva niente e la musica partiva lo stesso. Come per i salti, stop: Music
+                    // Assistant lo esegue dopo l'avvio.
+                    if (ready.value) command("player_queues/stop") { it?.playing != true }
                 }
                 done.set(null)
                 Log.i(TAG, "Scelta: finita dopo ${since()} ms")
