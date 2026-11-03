@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_whats_new_in">Νέα λάφυρα της %1$s</string>
+    <string name="home_how_to_connect_subtitle">Ποια καράβια λειτουργούν και τι λείπει από το ξάρτισμα</string>
+    <string name="home_disconnect">Ξεγάντζωμα</string>
+    <string name="home_disconnect_title">Ξεγάντζωμα από το καράβι;</string>
+    <string name="home_disconnect_text">Το myCar αφήνει τώρα την οθόνη του καραβιού. Με το καλώδιο, βγάλτε το και ξαναβάλτε το για να γυρίσει πίσω.</string>
+    <string name="home_voice_downloading">Φορτώνουμε τη φωνή, %1$d%%</string>
+
+    <string name="wireless_button_connect">Ρεσάλτο ασύρματα</string>
+    <string name="wireless_button_denied">Για ρεσάλτο ασύρματα, το myCar χρειάζεται πρόσβαση στο Bluetooth και στις κοντινές συσκευές Wi-Fi.</string>
+    <string name="wireless_button_switched_off">Το myCar είναι απενεργοποιημένο για το καράβι (Ξάρτια, «Χρήση του myCar στο καράβι»).</string>
+    <string name="wireless_button_which_car">Ποιο καράβι;</string>
+    <string name="wireless_button_bluetooth_off">Το Bluetooth είναι ανενεργό. Ενεργοποιήστε το και πατήστε ξανά «Ρεσάλτο ασύρματα».</string>
+    <string name="wireless_button_not_paired">Το τηλέφωνό σας δεν έχει ακόμη σύζευξη με καμία συσκευή. Κάντε πρώτα σύζευξη με το καράβι.</string>
+    <string name="wireless_button_not_listed">Το καράβι δεν είναι στη λίστα; Κάντε πρώτα σύζευξη με το τηλέφωνό σας.</string>
+
+    <string name="help_title">Πώς να κάνετε ρεσάλτο</string>
+    <string name="help_which_cars">Ποια καράβια λειτουργούν</string>
+    <string name="help_see_full_list">Ξετυλίξτε όλη τη λίστα</string>
+    <string name="help_in_the_car">Στο καράβι</string>
+    <string name="help_step_connect">Βάλτε το καλώδιο ή κάντε ρεσάλτο ασύρματα.</string>
+    <string name="help_step_connect_detail">Το myCar ανοίγει μόνο του όταν συνδεθεί το καράβι. Για ρεσάλτο ασύρματα, κάντε πρώτα σύζευξη του τηλεφώνου με το καράβι και μετά πατήστε «Ρεσάλτο ασύρματα» στο Λιμάνι.</string>
+    <string name="help_step_audio_prompt">Ξεφορτωθείτε την ερώτηση για τον ήχο σε κάθε ταξίδι.</string>
+    <string name="help_step_audio_prompt_detail">Συνδέστε το τηλέφωνο σε έναν υπολογιστή με ενεργό τον εντοπισμό σφαλμάτων USB και εκτελέστε αυτό μία φορά. Αν το παραλείψετε, πατάτε «Έναρξη» κάθε φορά που σαλπάρετε.</string>
+    <string name="help_step_notifications_detail">Το Android κρύβει το περιεχόμενο των ειδοποιήσεων όσο κάνει κοινή χρήση του ήχου. Εκτελέστε και αυτό, και το myCar το αίρει μόνο όσο η μουσική πηγαίνει στο καράβι.</string>
+
+    <string name="cert_notice_own_refused_text">Για να χρησιμοποιήσετε στη θέση του τα δημόσια, αφαιρέστε το δικό σας στα Ξάρτια, στο Πιστοποιητικό.</string>
+
+    <string name="cert_setup_continue">Εμπρός</string>
+    <string name="cert_setup_skip">Τραβάμε ίσια, χωρίς ρύθμιση σύνδεσης με το αυτοκίνητο</string>
+
+    <string name="update_title">Νέα πανιά</string>
+    <string name="update_out">Φάνηκαν νέα πανιά: myCar %1$s</string>
+    <string name="update_downloading">Φορτώνουμε… %1$d%%</string>
+    <string name="update_unplug_first">Ξεγαντζωθείτε από το καράβι για την εγκατάσταση. Η εγκατάσταση κλείνει το myCar.</string>
+    <string name="update_downloaded">Φορτώθηκε. Το Android ρωτά πριν από την εγκατάσταση.</string>
+    <string name="update_download_now">Φορτώστε το τώρα. Το Android ρωτά πριν από την εγκατάσταση.</string>
+    <string name="update_check_now">Ματιά τώρα</string>
+    <string name="update_status_debug">Οι εκδόσεις debug ρίχνουν ματιά μόνο όταν πατάτε «Ματιά τώρα»</string>
+    <string name="update_status_daily">Το myCar κοιτάζει τον ορίζοντα μία φορά την ημέρα</string>
+    <string name="update_status_checking">Κοιτάμε τον ορίζοντα…</string>
+    <string name="update_status_latest">Έχετε την πιο πρόσφατη έκδοση, καπετάνιε</string>
+    <string name="update_status_available">Φάνηκε η έκδοση %1$s</string>
+    <string name="update_status_ready">Η έκδοση %1$s φορτώθηκε, έτοιμη για εγκατάσταση</string>
+    <string name="update_check_automatically">Αυτόματη ματιά</string>
+    <string name="update_once_a_day">Μία ματιά τη μέρα</string>
+    <string name="update_error_no_github">Δεν μπορέσαμε να αράξουμε στο GitHub. Ελέγξτε τη σύνδεση και δοκιμάστε ξανά.</string>
+    <string name="update_error_no_space">Η ενημέρωση δεν χωράει στο αμπάρι του τηλεφώνου. Αδειάστε λίγο χώρο και δοκιμάστε ξανά.</string>
+    <string name="update_error_stopped">Η λήψη κάθισε στα ρηχά. Ελέγξτε τη σύνδεση και δοκιμάστε ξανά.</string>
+    <string name="update_error_not_sent">Το GitHub δεν ξεφόρτωσε την ενημέρωση (κωδικός %1$d). Δοκιμάστε ξανά αργότερα.</string>
+    <string name="update_error_stopped_early">Η λήψη κάθισε στα ρηχά πριν τελειώσει. Δοκιμάστε ξανά.</string>
+    <string name="update_error_damaged">Η λήψη έφτασε με αβαρίες. Δοκιμάστε ξανά.</string>
+    <string name="update_splash_updated_to">Σηκώσαμε τα πανιά της έκδοσης</string>
+    <string name="update_splash_tap">Πατήστε οπουδήποτε για να σαλπάρουμε</string>
+    <string name="update_flag_description">Μια πειρατική σημαία στον άνεμο: 100% τοπικό. Φυλάμε τα δεδομένα μας.</string>
+    <string name="update_ship_description">Ένα πειρατικό καράβι που υψώνει τη σημαία του myCar: 100% τοπικό. Φυλάμε τα δεδομένα μας.</string>
+
+    <string name="whatsnew_title">Νέα λάφυρα</string>
+    <string name="whatsnew_this_version">%1$s (αυτή που σαλπάρει τώρα)</string>
+
+    <string name="recommended_title">Προτάσεις του καπετάνιου</string>
+    <string name="recommended_intro">Αυτές οι δωρεάν εφαρμογές σαλπάρουν στην οθόνη καραβιού του myCar. Κάθε κουμπί ανοίγει τη σελίδα της εφαρμογής στο GitHub.</string>
+    <string name="recommended_section_music">Γραμμόφωνο</string>
+    <string name="recommended_about_organic_maps">Χάρτες και ρότες χωρίς σύνδεση.</string>
+    <string name="recommended_about_vela">Πλοήγηση στροφή προς στροφή, ελεύθερη από τη Google.</string>
+    <string name="recommended_about_youtube_music">Ένα γραμμόφωνο για το YouTube Music.</string>
+    <string name="recommended_about_antennapod">Podcast, με κεφάλαια και όλο το φορτίο.</string>
+    <string name="recommended_installed">Ήδη επιβιβασμένη</string>
+
+    <string name="logs_title">Ημερολόγιο πλοίου</string>
+    <string name="logs_share">Μοιρασιά</string>
+    <string name="logs_clear">Βύθιση</string>
+    <string name="logs_jump_to_latest">Ρότα στα πιο πρόσφατα</string>
+    <string name="logs_empty">Το ημερολόγιο πλοίου είναι ακόμη άγραφο. Οι γραμμές εμφανίζονται εδώ ζωντανά όσο κρατά ένα ταξίδι.</string>
+    <string name="logs_share_subject">Ημερολόγιο πλοίου του myCar</string>
+    <string name="logs_share_chooser">Μοιρασιά του ημερολογίου πλοίου</string>
+    <string name="logs_earlier_title">Παλαιότερα ημερολόγια πλοίου</string>
+    <string name="logs_earlier_empty">Δεν υπάρχουν ακόμη παλαιότερα ημερολόγια πλοίου. Κάθε φορά που σαλπάρει το myCar, ξεκινά ένα νέο.</string>
+    <string name="logs_crashed">Ναυάγιο</string>
+
+    <string name="preview_title">Κιάλια του καραβιού</string>
+    <string name="preview_size">%1$dx%2$d @ %3$ddpi – τα αγγίγματα πηγαίνουν στο περιβάλλον του καραβιού</string>
+    <string name="preview_car_screen">Οθόνη καραβιού</string>
+    <string name="preview_waiting">Περιμένουμε να φανεί ένα καρέ…</string>
+    <string name="preview_leave">Έξοδος από τα Κιάλια του καραβιού</string>
+
+    <string name="donate_title">Χαιρόμαστε που το ταξίδι πήγε καλά</string>
+    <string name="donate_text">Το myCar είναι δωρεάν, χωρίς διαφημίσεις και χωρίς παρακολούθηση. Αν σας βγάζει στο πέλαγος, η στήριξή σας του κρατά τα πανιά φουσκωμένα.</string>
+    <string name="audio_not_reaching_title">Η μουσική δεν φτάνει στο καράβι</string>
+    <string name="audio_not_reaching_text">Η ερώτηση του Android για την αποστολή του ήχου μέσω του myCar απορρίφθηκε, οπότε το καράβι δεν λαμβάνει μουσική.</string>
+</resources>
