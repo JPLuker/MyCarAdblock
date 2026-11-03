@@ -12,7 +12,14 @@ Twink Software LLC. It keeps Gearslip's license (AGPL-3.0) and builds on its wor
 
 ## What's new in 0.7
 
-Everything the 0.6 releases brought, together in 0.7. First of all, **myCar speaks your language**:
+Everything the 0.6 releases brought, together in 0.7, and **212 bugs found and fixed since 0.6.0**
+(counted commit by commit; 158 of them had reached a published version), among them the crash that
+closed myCar on the Home pages. We chart our own course: **pirate speak** (Settings > Language >
+Pirate speak) rewrites every text of myCar the pirate way, in each of its languages, and the new
+moving wallpaper **myCar · Rebel** sails a pirate ship through the waves, one that rides out every
+storm.
+
+First of all, **myCar speaks your language**:
 English, Italian, Spanish, German, French, Portuguese, Greek, Russian or Chinese, on the phone, on
 the car's screen and in the voice assistant. It follows the phone, or takes the one picked in
 Settings > Language.
