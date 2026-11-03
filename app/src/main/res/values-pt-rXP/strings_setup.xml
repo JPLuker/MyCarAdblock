@@ -84,7 +84,7 @@
         <item quantity="other">%d bugs avistados e afundados desde a 0.6</item>
     </plurals>
     <string name="intro_music_title">Cantigas a bordo.</string>
-    <string name="intro_music_body">O Spotify e outros serviços tocam dentro do myCar, pelo próprio player web. Embarque uma vez no telefone com a sua própria conta, em Leme > Cantigas. Lá, mande o app Spotify do telefone para o porão: um só Spotify a bordo, não dois.</string>
+    <string name="intro_music_body">O Spotify e outros serviços tocam dentro do myCar, pela própria vitrola web. Embarque uma vez no telefone com a sua própria conta, em Leme > Cantigas. Lá, mande o app Spotify do telefone para o porão: um só Spotify a bordo, não dois.</string>
     <string name="intro_mini_title">Mapa todo à vista.</string>
     <string name="intro_mini_body">Feche a vitrola ao lado do mapa e uma minivitrola flutua sobre ele, com a capa e os botões: mantenha-a pressionada e arraste para onde quiser. Ao lado do mapa, a vitrola agora vai até Muito grande.</string>
     <string name="intro_lyrics_title">Cante os versos.</string>

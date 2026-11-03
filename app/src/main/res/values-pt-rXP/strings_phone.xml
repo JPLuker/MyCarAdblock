@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="home_whats_new_in">Butim da %1$s</string>
-    <string name="home_how_to_connect_subtitle">Quais carros funcionam e o que falta preparar para zarpar</string>
+    <string name="home_how_to_connect_subtitle">Quais carros funcionam e o que falta preparar</string>
     <string name="home_disconnect">Soltar amarras</string>
     <string name="home_disconnect_title">Soltar amarras do navio?</string>
     <string name="home_disconnect_text">O myCar deixa a tela de bordo agora. Com o cabo, desconecte e conecte de novo para voltar a bordo.</string>
-    <string name="home_voice_downloading">Baixando a voz do papagaio, %1$d%%</string>
+    <string name="home_voice_downloading">Baixando o papagaio, %1$d%%</string>
 
     <string name="wireless_button_connect">Abordar sem fio</string>
     <string name="wireless_button_switched_off">O myCar está desativado para o navio (Leme, “Usar o myCar a bordo”).</string>
