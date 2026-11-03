@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.File
+import java.net.URI
 
 /**
  * Xonos inside myCar: Music Assistant's player, set up on the phone and played in the car as one
@@ -89,7 +90,7 @@ object Xonos {
             socketFactory(BridgeSocketFactory(Bridges.xonos))
         }
     }
-    val library: Library by lazy { Library(repo) }
+    val library: Library by lazy { Library(repo).also { it.playTimeoutMs = playTimeout() } }
 
     /** The covers fetched for the car, the notification and the player (see playback/Artwork). */
     val artCache: ArtCache by lazy { ArtCache(File(app.cacheDir, "xonos-art"), repo.http) }
@@ -121,6 +122,7 @@ object Xonos {
         if (config.isComplete) AppSettings.putString(context, KEY_IMPORT_OFF, "")
         settings.save(config)
         settings.username = username
+        library.playTimeoutMs = playTimeout()
         _setUp.value = config.isComplete
         repo.reconnect()
     }
@@ -136,6 +138,20 @@ object Xonos {
 
     /** Whether "Remove" was the last word: no account taken from the Xonos app by itself. */
     fun importOff(context: Context): Boolean = AppSettings.getString(context, KEY_IMPORT_OFF, "") == "1"
+
+    /**
+     * Whether the account's Music Assistant is the one inside the Xonos app on this phone (127.0.0.1:8095): myCar
+     * reaches it through the bridge, and the Xonos app stops it when nobody uses it and starts it again when the
+     * bridge is opened (see bridge/Bridges.onThePhone).
+     */
+    val onPhoneServer: Boolean
+        get() = runCatching { URI(settings.load().homeUrl).host }.getOrNull()?.let(Bridges::onThePhone) == true
+
+    /**
+     * How long play_media is waited for (see Library.playTimeoutMs): longer with the Xonos app's Music Assistant,
+     * where Spotify's requests keep to its limit and the first play of a long playlist or an artist takes longer.
+     */
+    private fun playTimeout() = if (onPhoneServer) Library.PHONE_PLAY_TIMEOUT_MS else Library.PLAY_TIMEOUT_MS
 
     /** The player, as the car's media screens connect to it. */
     fun component(context: Context) = ComponentName(context, PlaybackService::class.java)

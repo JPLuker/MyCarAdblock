@@ -16,6 +16,13 @@ class Library(private val repo: MaRepository) {
     private val unlock = SoloistUnlock(repo)
 
     /**
+     * Quanto si aspetta la risposta di play_media: Music Assistant risponde quando la musica parte, dopo aver letto
+     * tutto l'elenco. Col server sul telefono le richieste a Spotify rispettano il suo limite (30 ogni 30 s), e il primo
+     * play di una playlist lunga o di un artista può volerci di più: lì myCar lo allunga (vedi Xonos).
+     */
+    @Volatile var playTimeoutMs = PLAY_TIMEOUT_MS
+
+    /**
      * Un elenco di elementi: diventano MaItem man mano che arrivano, lontano dal thread principale.
      * [onPart] riceve quelli arrivati fin lì a ogni pezzo (gli elenchi lunghi arrivano a pezzi di 500).
      */
@@ -233,7 +240,7 @@ class Library(private val repo: MaRepository) {
             }
         }
         unlock.retrying(queueId) {
-            repo.command("player_queues/play_media", 60_000) {
+            repo.command("player_queues/play_media", playTimeoutMs) {
                 put("queue_id", queueId)
                 put("media", if (media.size == 1) media[0] else JSONArray(media))
                 put("option", option)
@@ -278,6 +285,18 @@ class Library(private val repo: MaRepository) {
             put("media_type", item.mediaType)
             put("library_item_id", item.itemId)
         }
+    }
+
+    /**
+     * Le ultime righe del registro di Music Assistant (`logging/get`, solo per gli amministratori): il
+     * registro intero può essere di qualche MB, a chi aiuta servono le ultime [chars] lettere, da una riga intera.
+     */
+    suspend fun serverLog(chars: Int = LOG_CHARS): String {
+        val log = repo.command("logging/get", 60_000) as? String ?: return ""
+        if (log.length <= chars) return log
+        val start = log.length - chars
+        val line = log.indexOf('\n', start)
+        return log.substring(if (line >= 0) line + 1 else start)
     }
 
     /** Riprende la coda da dove si era fermata (play su una coda ferma la fa ripartire). */
@@ -359,6 +378,12 @@ class Library(private val repo: MaRepository) {
         private const val PAGE = 500
         private const val PAGES_AT_ONCE = 4
 
+        /** Quanto si aspetta play_media di solito (vedi [playTimeoutMs]). */
+        const val PLAY_TIMEOUT_MS = 60_000L
+
+        /** Lo stesso col Music Assistant sul telefono (vedi [playTimeoutMs]). */
+        const val PHONE_PLAY_TIMEOUT_MS = 180_000L
+
         /** Le pagine degli elenchi del telefono: abbastanza per riempire lo schermo più volte. */
         const val PHONE_PAGE = 100
 
@@ -367,6 +392,9 @@ class Library(private val repo: MaRepository) {
 
         /** Risultati per tipo: il valore predefinito di Music Assistant. */
         const val SEARCH_LIMIT = 25
+
+        /** Quanto registro di Music Assistant si condivide: come per il server sul telefono, circa 96 KB. */
+        const val LOG_CHARS = 96 * 1024
 
         val SEARCH_TYPES = listOf("artists", "tracks", "albums", "playlists", "podcasts", "audiobooks", "radio", "genres")
     }
