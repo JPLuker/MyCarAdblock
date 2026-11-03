@@ -822,7 +822,15 @@ Tutti i token in un solo posto, `car/design/`:
   (confermano anche una chiamata, la rimozione o la password di un certificato): un testo pirata che li
   nomina usa il loro testo normale. Un testo pirata uguale a quello normale non si tiene (copie vecchie
   quando la lingua cambia). Dopo gli scrittori, un passaggio di coerenza per lingua allinea i nomi citati
-  fra virgolette (es. «Usa myCar a bordo» = `settings_use_mycar`) e i termini.
+  fra virgolette (es. «Usa myCar a bordo» = `settings_use_mycar`) e i termini. Restano normali anche le
+  indicazioni di guida dette a voce (`directions_*`).
+  **`values-en`** (generata in build da `values/strings*.xml`, task `EnglishStrings` in
+  `app/build.gradle.kts`): senza, ogni inglese tranne en-US (en-GB, en-AU, «English» scelto in myCar)
+  prendeva `values-en-rXP`, perché Android preferisce una cartella con la lingua a quella senza e la
+  regione XP non conta (trovato da una revisione con una replica in C++ della scelta di AOSP; scatto
+  `lang-en-GB`). Da Android 13 Android tiene `it-XP`: le impostazioni leggono la scelta da
+  `AppLanguage.saved` (la lingua del telefono resta tale), e la voce riceve il paese del telefono, non
+  XP (`VoiceLanguages.speakingLocale`).
 - **Sfondo myCar «Ribelle»** (0.7.0, richiesta dell'utente: "il tema myCar, le onde, la barra del menu
   con effetto glass, e tra le onde un veliero con la bandiera col teschio che sopravvive alle
   intemperie: se va sotto un'onda poi rispunta fuori"): `Motion.Rebel` in `Wallpapers.kt`, disegno in
@@ -837,7 +845,7 @@ Tutti i token in un solo posto, `car/design/`:
   puntini dorati fino a una stella (`PirateShip.drawCourse`, 3,25-4,55 s); sotto l'etichetta della 0.7
   una bussola il cui ago gira e si ferma, e «Scegliamo noi le nostre rotte.» parola per parola
   (`ui/IntroCourse.kt`, `WelcomeCourse`, `intro_course` nelle 9 lingue); sotto, il numero dei bug trovati
-  e corretti dalla release prima (`Intro.BUGS_FIXED`, plurale `intro_bugs_fixed`: 212 dalla 0.6.0 alla
+  e corretti dalla release prima (`Intro.BUGS_FIXED`, plurale `intro_bugs_fixed`: 216 dalla 0.6.0 alla
   0.7.0, contati commit per commit, nel dubbio come funzione nuova; elenco in `bugcount.tsv` nella
   scratchpad di quella sessione). La pagina dà al testo lo spazio che serve e alla nave quello che resta
   (su un telefono basso la nave è più piccola). Da aggiornare a ogni intro nuova.

@@ -112,7 +112,7 @@ object Intro {
      * Bugs found and fixed from the release before to this one (0.6.0 to 0.7.0), said on the welcome
      * page: counted commit by commit, a doubtful one as a feature (the list is in the release notes).
      */
-    const val BUGS_FIXED = 212
+    const val BUGS_FIXED = 216
 
     /** "0.3" from "0.3.00-alpha": the intro belongs to a release, not to each patch. */
     val release: String = BuildConfig.VERSION_NAME.split('.').take(2).joinToString(".")
