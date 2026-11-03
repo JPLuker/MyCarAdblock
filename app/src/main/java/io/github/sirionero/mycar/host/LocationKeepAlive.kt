@@ -321,20 +321,21 @@ class LocationKeepAlive : Service() {
          * nothing to lend), and the phone locked or its screen off: unlocked and on, myCar's screen
          * comes to the front and does it itself (onResume).
          */
-        fun screenForArrival(context: Context) {
+        fun screenForArrival(context: Context, evenIfLit: Boolean = false) {
             val app = context.applicationContext
             if (state == State.ON && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
             val locked = runCatching { app.getSystemService(KeyguardManager::class.java)?.isKeyguardLocked }.getOrNull() == true
             // Screen off and not locked yet (the lock waits a while after the screen goes off): myCar's
             // screen brought to the front doesn't resume either.
             val dark = runCatching { app.getSystemService(android.os.PowerManager::class.java)?.isInteractive }.getOrNull() == false
-            if (!(locked || dark) || !hasPermission(app) || !carMapInstalled(app)) return
+            // [evenIfLit]: after a call nothing brings myCar's screen to the front; this one has no window.
+            if (!(locked || dark || evenIfLit) || !hasPermission(app) || !carMapInstalled(app)) return
             // The CI's control run (debug builds only, scatto location-arrival): the same arrival without it.
             if (io.github.sirionero.mycar.BuildConfig.DEBUG && java.io.File(app.filesDir, "no-arrival-screen").exists()) {
                 MyCarLog.i("location keep-alive: no screen for the car's arrival (test control)")
                 return
             }
-            MyCarLog.i("location keep-alive: the phone is ${if (locked) "locked" else "dark"} and myCar's screen was open already - a screen of its own for the map's position")
+            MyCarLog.i("location keep-alive: the phone is ${if (locked) "locked" else if (dark) "dark" else "in use"} and myCar's screen was open already - a screen of its own for the map's position")
             runCatching {
                 app.startActivity(
                     Intent(app, LocationStartActivity::class.java)

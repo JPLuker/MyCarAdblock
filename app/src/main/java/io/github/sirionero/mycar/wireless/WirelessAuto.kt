@@ -67,17 +67,25 @@ object WirelessAuto {
      * A car arrived during a call (WirelessAuto.carAppeared): the position service for the car's map
      * wasn't given the screen it needs, and nothing gave it one later - the map had no position for the
      * whole drive. Checked every 2 s, for half an hour at most: once the call is over, the arrival's
-     * own screen (LocationKeepAlive.screenForArrival, which does nothing if the service runs already).
+     * own screen (LocationKeepAlive.screenForArrival), with the phone lit and in use too, since after a
+     * call nothing brings myCar's screen to the front. Not during the call: the call's screen is in
+     * front. No more checks once the service runs (Android 14 and later) or nothing holds it.
      */
     private fun afterCall(context: Context, turn: Int, checks: Int = 0) {
         main.postDelayed({
             if (turn != callTurn) return@postDelayed
+            val position = io.github.sirionero.mycar.host.LocationKeepAlive.state
+            if (position == io.github.sirionero.mycar.host.LocationKeepAlive.State.OFF ||
+                (position == io.github.sirionero.mycar.host.LocationKeepAlive.State.ON && android.os.Build.VERSION.SDK_INT >= 34)
+            ) {
+                return@postDelayed
+            }
             if (inCall(context)) {
                 if (checks < AFTER_CALL_CHECKS) afterCall(context, turn, checks + 1)
                 return@postDelayed
             }
             log.i("auto-connect: the call is over")
-            io.github.sirionero.mycar.host.LocationKeepAlive.screenForArrival(context)
+            io.github.sirionero.mycar.host.LocationKeepAlive.screenForArrival(context, evenIfLit = true)
         }, AFTER_CALL_CHECK_MS)
     }
 
