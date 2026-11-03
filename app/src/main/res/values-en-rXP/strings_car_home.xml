@@ -89,7 +89,7 @@
     <string name="car_weather_unreachable">Could not hail the weather service.</string>
 
     <string name="car_template_car_app">Ship\'s app</string>
-    <string name="car_template_waiting">weighing anchor</string>
+    <string name="car_template_waiting">awaiting the app</string>
     <string name="car_template_finding_route">Plotting a course…</string>
     <string name="car_template_finding_routes">Plotting courses…</string>
     <string name="car_template_search">Scour</string>

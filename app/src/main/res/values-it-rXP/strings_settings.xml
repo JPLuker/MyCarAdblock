@@ -61,7 +61,7 @@
     <string name="settings_plancia_app_no_account">Plancia non ha ancora un account da spartire: preparalo prima in Plancia, o scrivilo qui sotto.</string>
     <string name="settings_plancia_address_home">Indirizzo del porto di casa</string>
     <string name="settings_plancia_missing">Imbarca un indirizzo e un token.</string>
-    <string name="settings_plancia_missing_remove">Imbarca un indirizzo e un token. Per togliere Plancia da myCar, usa Fuori bordo.</string>
+    <string name="settings_plancia_missing_remove">Imbarca un indirizzo e un token. Per togliere Plancia da myCar, usa Togli.</string>
     <string name="settings_plancia_remove_title">Gettare Plancia fuori bordo da myCar?</string>
     <string name="settings_plancia_remove_text">myCar dimentica i suoi indirizzi e il token. L\'app Plancia, se è sul telefono, torna a bordo.</string>
     <string name="settings_plancia_removed">Plancia è fuori bordo: l\'app Plancia torna a bordo, se è sul telefono.</string>

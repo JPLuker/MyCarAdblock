@@ -66,8 +66,4 @@
     <string name="plancia_set_up_text">In myCar sul telefono: Timone, poi Plancia. Servono l\'indirizzo del tuo Home Assistant e un token.</string>
     <string name="plancia_connecting">Abbordo Home Assistant</string>
 
-    <string name="directions_ferry">Imbarcati sul traghetto</string>
-    <string name="directions_destination_ahead">L\'approdo è davanti a te</string>
-    <string name="directions_destination_left">L\'approdo è sulla sinistra</string>
-    <string name="directions_destination_right">L\'approdo è sulla destra</string>
 </resources>

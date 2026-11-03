@@ -69,8 +69,4 @@
     <string name="plancia_set_up_title">Fit out Plancia on the phone</string>
     <string name="plancia_set_up_text">In myCar on the phone: Rigging, then Plancia - your Home Assistant\'s address and a token.</string>
     <string name="plancia_connecting">Hailing Home Assistant</string>
-
-    <string name="directions_destination_ahead">Land ho! Your destination is ahead</string>
-    <string name="directions_destination_left">Land ho! Your destination is on the left</string>
-    <string name="directions_destination_right">Land ho! Your destination is on the right</string>
 </resources>

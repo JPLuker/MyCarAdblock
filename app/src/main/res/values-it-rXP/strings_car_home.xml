@@ -15,7 +15,6 @@
     <string name="car_dock_all_apps">Tutta la flotta</string>
     <string name="car_dock_map_and_music">Mappa e ballate</string>
 
-    <string name="car_apps_screen_sharing">Spartizione</string>
     <string name="car_apps_vehicle_data">Dati di bordo</string>
     <string name="car_apps_exit">Sbarca</string>
     <string name="car_apps_browse_label">%1$s · Esplora</string>
