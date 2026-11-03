@@ -554,8 +554,9 @@ object CarServices {
         val waiting = _musicStarting.value
         // The drive's own Autoplay, still waiting, stays the drive's: the app's waits for the sound's way
         // to the car too. Xonos's player (full screen, its tile) clears mediaAutoPicked, and the app then
-        // played at once, on the phone's speaker.
-        openMedia(app, autoplay = CarSettings.autoplay.value || media.now.value.playing, remember = false, auto = mediaAutoPicked || (autoplayPending && autoplayAutoPicked))
+        // played at once, on the phone's speaker. The preview on the phone (Settings, no car) plays nothing
+        // by itself, as at autostart: the Autoplay setting started the app there, on the phone's speaker.
+        openMedia(app, autoplay = (CarSettings.autoplay.value && !phonePreview) || media.now.value.playing, remember = false, auto = mediaAutoPicked || (autoplayPending && autoplayAutoPicked))
         if (waiting) expectMusic(true)
     }
 
