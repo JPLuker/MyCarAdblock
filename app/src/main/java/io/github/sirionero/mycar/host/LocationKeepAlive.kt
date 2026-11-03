@@ -60,7 +60,7 @@ class LocationKeepAlive : Service() {
         runCatching {
             startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
         }.onSuccess {
-            MyCarLog.i("location keep-alive: running")
+            MyCarLog.i("location keep-alive: running (${phoneState(this)})")
             settle(State.ON)
             // Every hold went while it was starting: stop now, as it may only once in the foreground.
             main.post {
@@ -318,15 +318,18 @@ class LocationKeepAlive : Service() {
          * own, [LocationStartActivity] (nothing shown, gone at once), is created for it, and with it
          * the service starts ([retry]). Only with a car map and the permission, the service not
          * running yet (on Android 12 and 13 always: there a start from the background runs with
-         * nothing to lend), and the phone locked: unlocked, myCar's screen comes to the front and
-         * does it itself (onResume).
+         * nothing to lend), and the phone locked or its screen off: unlocked and on, myCar's screen
+         * comes to the front and does it itself (onResume).
          */
         fun screenForArrival(context: Context) {
             val app = context.applicationContext
             if (state == State.ON && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
             val locked = runCatching { app.getSystemService(KeyguardManager::class.java)?.isKeyguardLocked }.getOrNull() == true
-            if (!locked || !hasPermission(app) || !carMapInstalled(app)) return
-            MyCarLog.i("location keep-alive: the phone is locked and myCar's screen was open already - a screen of its own for the map's position")
+            // Screen off and not locked yet (the lock waits a while after the screen goes off): myCar's
+            // screen brought to the front doesn't resume either.
+            val dark = runCatching { app.getSystemService(android.os.PowerManager::class.java)?.isInteractive }.getOrNull() == false
+            if (!(locked || dark) || !hasPermission(app) || !carMapInstalled(app)) return
+            MyCarLog.i("location keep-alive: the phone is ${if (locked) "locked" else "dark"} and myCar's screen was open already - a screen of its own for the map's position")
             runCatching {
                 app.startActivity(
                     Intent(app, LocationStartActivity::class.java)
