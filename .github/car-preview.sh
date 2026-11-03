@@ -714,68 +714,97 @@ esac
 # shell, as Android's "Allow" makes it, and its arrival simulated by Android's companion service.
 # myCar's screen was created well over 10 s before, so only the screen made for the arrival can let
 # the position service start. In the log: the refusal, then "trying again" and "running".
+# Android's view of the phone and of myCar at a moment of location-arrival, in <file>.
+arrival_state() {
+    {
+        echo "uid state: $(adb shell cmd activity get-uid-state "$ARRIVAL_UID" 2>&1 | tr -d '\r')"
+        adb shell dumpsys power | grep -E "mWakefulness=|mStayOn=|mIsPowered=" | tr -d '\r'
+        adb shell dumpsys window | grep -iE "KeyguardShowing|KeyguardOccluded|mCurrentFocus|mFocusedApp" | tr -d '\r' | head -8
+        adb shell dumpsys activity activities | grep -iE "ResumedActivity|isSleeping|mSleeping" | tr -d '\r' | head -8
+        adb shell dumpsys activity processes "$PKG" | grep -iE "procState|curAdj|ProcessRecord" | tr -d '\r' | head -8
+    } > "$1" 2>&1
+}
+
+# arrival <where myCar was left: home|top> <screen at the arrival: off|keyguard> <without|with>
+arrival() {
+    local d=previews/location-arrival/$1-$2-$3 id out logpid
+    mkdir -p $d
+    adb shell cmd companiondevice associate 0 $PKG $CAR > $d/companion.txt 2>&1
+    adb shell cmd companiondevice list 0 >> $d/companion.txt 2>&1
+    # "pkg mac id" before Android 15 or so, "Association{mId=1, ... mDeviceMacAddress=...}" on 17.
+    id=$(tr -d '\r' < $d/companion.txt | grep -i "$CAR" | grep -o 'mId=[0-9]*' | head -n 1 | cut -d= -f2)
+    [ -n "$id" ] || id=$(tr -d '\r' < $d/companion.txt | grep -i " $CAR " | awk '{print $NF}' | tail -n 1)
+    adb shell am force-stop "$PKG"
+    # files/ doesn't exist yet on a fresh install: made first, or the control had no file.
+    adb shell run-as $PKG mkdir -p files
+    if [ $3 = without ]; then
+        adb shell run-as $PKG touch files/no-arrival-screen
+    else
+        adb shell run-as $PKG rm -f files/no-arrival-screen
+    fi
+    echo "control file: $(adb shell run-as $PKG ls files/no-arrival-screen 2>&1 | tr -d '\r')" >> $d/companion.txt
+    adb logcat -c
+    timeout 300 "$ADB_BIN" logcat -v time -s myCar ActivityManager ActivityTaskManager > $d/log.txt 2>&1 &
+    logpid=$!
+    # myCar opened as on any day (it watches the cars it may connect to), then left: behind another
+    # screen (home) or as the last screen when the phone was locked (top).
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity"
+    sleep 8
+    if [ $1 = home ]; then adb shell input keyevent KEYCODE_HOME; sleep 2; fi
+    adb shell locksettings set-pin $PIN
+    adb shell input keyevent KEYCODE_SLEEP
+    sleep 15
+    # The lock screen up, as when the car's Bluetooth or a notification lights the phone.
+    if [ $2 = keyguard ]; then adb shell input keyevent KEYCODE_WAKEUP; sleep 2; fi
+    arrival_state $d/before.txt
+    adb shell cmd companiondevice list 0 >> $d/companion.txt 2>&1
+    if [ -n "$id" ]; then
+        out=$(adb shell cmd companiondevice simulate-device-appeared "$id" 2>&1)
+        echo "simulate-device-appeared: $out" >> $d/companion.txt
+        if grep -qiE "unknown|error|exception|usage" <<< "$out"; then
+            out=$(adb shell cmd companiondevice simulate-device-event "$id" 0 2>&1)
+            echo "simulate-device-event 0: $out" >> $d/companion.txt
+        fi
+    fi
+    sleep 3
+    arrival_state $d/after.txt
+    sleep 9
+    adb shell dumpsys activity services "$PKG" > $d/dumpsys.txt 2>&1
+    if [ -n "$id" ]; then adb shell cmd companiondevice simulate-device-disappeared "$id" || true; fi
+    kill $logpid 2>/dev/null
+    adb logcat -d -b crash > $d/crash.txt 2>&1
+    adb shell am force-stop "$PKG"
+    adb shell run-as $PKG rm -f files/no-arrival-screen
+    adb shell cmd companiondevice disassociate 0 $PKG $CAR || true
+    adb shell locksettings clear --old $PIN || true
+    adb shell input keyevent KEYCODE_WAKEUP
+    adb shell wm dismiss-keyguard || true
+    sleep 2
+    echo "--- location-arrival $1-$2-$3: a car arriving with myCar open behind the lock screen ---"
+    grep -h "uid state\|mWakefulness\|KeyguardShowing" $d/before.txt | head -4 | sed 's/^/  before: /'
+    grep -h "location keep-alive\|Background started FGS\|startForeground\|while-in-use\|eligible state" $d/log.txt | cut -c1-260 | head -12
+    grep -h "uid state" $d/after.txt | sed 's/^/  after: /'
+    grep -B2 -A40 "host.LocationKeepAlive c:" $d/dumpsys.txt | grep -iE "isForeground|getFgsAllowWiu_forCapabilities|infoAllowStartForeground" | cut -c1-200 | head -4
+}
+
+# A car arriving over Bluetooth with myCar's screen open from before and the phone locked
+# (LocationKeepAlive.screenForArrival, 0.7.1): the car allowed through an association made by the
+# shell, as Android's "Allow" makes it, and its arrival simulated by Android's companion service.
+# myCar's screen was created well over 10 s before. Each case twice: "without" is the control
+# (debug builds skip the arrival's screen when told to, as 0.7.0 did), "with" the fix.
 case " ${ONLY:-location-arrival} " in *" location-arrival "*)
     rm -rf previews/location-arrival
     CAR=02:11:22:33:44:55
+    ARRIVAL_UID=$(adb shell cmd package list packages -U $PKG | tr -d '\r' | grep -o 'uid:[0-9]*' | head -n 1 | cut -d: -f2)
     adb shell pm grant $PKG android.permission.ACCESS_FINE_LOCATION || true
     adb shell pm grant $PKG android.permission.ACCESS_COARSE_LOCATION || true
     adb shell pm grant $PKG android.permission.BLUETOOTH_CONNECT || true
-    # Twice: "without" is the control (debug builds skip the arrival's screen when told to, as 0.7.0
-    # did), "with" the fix. The first should end like the driver's log, refused; the second running.
-    for run in without with; do
-        d=previews/location-arrival/$run
-        mkdir -p $d
-        adb shell cmd companiondevice associate 0 $PKG $CAR > $d/companion.txt 2>&1
-        adb shell cmd companiondevice list 0 >> $d/companion.txt 2>&1
-        # "pkg mac id" before Android 15 or so, "Association{mId=1, ... mDeviceMacAddress=...}" on 17.
-        id=$(tr -d '\r' < $d/companion.txt | grep -i "$CAR" | grep -o 'mId=[0-9]*' | head -n 1 | cut -d= -f2)
-        [ -n "$id" ] || id=$(tr -d '\r' < $d/companion.txt | grep -i " $CAR " | awk '{print $NF}' | tail -n 1)
-        echo "location-arrival ($run): association ${id:-none}"
-        adb shell am force-stop "$PKG"
-        # files/ doesn't exist yet on a fresh install: made first, or the control had no file.
-        adb shell run-as $PKG mkdir -p files
-        if [ $run = without ]; then
-            adb shell run-as $PKG touch files/no-arrival-screen
-        else
-            adb shell run-as $PKG rm -f files/no-arrival-screen
-        fi
-        echo "control file: $(adb shell run-as $PKG ls files/no-arrival-screen 2>&1 | tr -d '\r')" >> $d/companion.txt
-        adb logcat -c
-        timeout 300 "$ADB_BIN" logcat -v time -s myCar ActivityManager > $d/log.txt 2>&1 &
-        logpid=$!
-        # myCar opened as on any day (it watches the cars it may connect to), then left behind.
-        adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity"
-        sleep 8
-        adb shell input keyevent KEYCODE_HOME
-        sleep 2
-        adb shell locksettings set-pin $PIN
-        adb shell input keyevent KEYCODE_SLEEP
-        sleep 15
-        # Watched by myCar now (mNotifyOnDeviceNearby), then the car's arrival as Android reports it.
-        adb shell cmd companiondevice list 0 >> $d/companion.txt 2>&1
-        if [ -n "$id" ]; then
-            out=$(adb shell cmd companiondevice simulate-device-appeared "$id" 2>&1)
-            echo "simulate-device-appeared: $out" >> $d/companion.txt
-            if grep -qiE "unknown|error|exception|usage" <<< "$out"; then
-                out=$(adb shell cmd companiondevice simulate-device-event "$id" 0 2>&1)
-                echo "simulate-device-event 0: $out" >> $d/companion.txt
-            fi
-        fi
-        sleep 12
-        adb shell dumpsys activity services "$PKG" > $d/dumpsys.txt 2>&1
-        if [ -n "$id" ]; then adb shell cmd companiondevice simulate-device-disappeared "$id" || true; fi
-        kill $logpid 2>/dev/null
-        adb logcat -d -b crash > $d/crash.txt 2>&1
-        adb shell am force-stop "$PKG"
-        adb shell run-as $PKG rm -f files/no-arrival-screen
-        adb shell cmd companiondevice disassociate 0 $PKG $CAR || true
-        adb shell locksettings clear --old $PIN || true
-        adb shell input keyevent KEYCODE_WAKEUP
-        adb shell wm dismiss-keyguard || true
-        sleep 2
-        echo "--- location-arrival ($run): a car arriving with myCar open behind the lock screen ---"
-        grep -h "auto-connect\|location keep-alive\|Background started FGS" $d/log.txt | cut -c1-300 | head -30
-        grep -iE "LocationKeepAlive|isForeground|getFgsAllowWiu_forCapabilities" $d/dumpsys.txt | head -10
+    for left in top home; do
+        for screen in off keyguard; do
+            for run in without with; do
+                arrival $left $screen $run
+            done
+        done
     done
     ;;
 esac
