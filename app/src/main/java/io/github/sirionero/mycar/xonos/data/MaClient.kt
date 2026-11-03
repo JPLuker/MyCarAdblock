@@ -19,6 +19,9 @@ class MaException(
     val code: Int? = null,
     val problem: Problem = Problem.REFUSED,
     val detail: String? = null,
+    /** Il nome dell'errore per Music Assistant (`translation_key`) e i suoi argomenti, se li ha mandati. */
+    val key: String? = null,
+    val args: List<String> = emptyList(),
 ) : Exception(message)
 
 /**
@@ -189,10 +192,18 @@ class MaClient(
 
     private val listener = object : WebSocketListener() {
         override fun onMessage(webSocket: WebSocket, text: String) {
-            try {
-                handle(traced("Xonos.json") { JSONObject(text) })
+            val msg = try {
+                traced("Xonos.json") { JSONObject(text) }
             } catch (e: Exception) {
-                Log.w(TAG, "Messaggio non valido da Music Assistant", e)
+                // Il testo dell'errore di org.json ha tutto il messaggio (una pagina di libreria, titoli e nomi): solo
+                // la classe e quanto è lungo.
+                Log.w(TAG, "Messaggio non valido da Music Assistant: ${e.javaClass.simpleName} (${text.length} caratteri)")
+                return
+            }
+            try {
+                handle(msg)
+            } catch (e: Exception) {
+                Log.w(TAG, "Errore nella gestione di un messaggio di Music Assistant", Logged.trace(e))
             }
         }
 
@@ -220,7 +231,7 @@ class MaClient(
             try {
                 onEvent?.invoke(msg.optString("event"), msg.str("object_id"), data)
             } catch (e: Exception) {
-                Log.w(TAG, "Errore nella gestione di un evento", e)
+                Log.w(TAG, "Errore nella gestione di un evento", Logged.trace(e))
             }
             return
         }
@@ -232,7 +243,8 @@ class MaClient(
         }
         if (msg.has("error_code")) {
             val details = msg.str("details")
-            val error = MaException(details ?: "Comando rifiutato", msg.optInt("error_code"), Problem.REFUSED, details)
+            val args = msg.optJSONArray("translation_args")?.let { a -> (0 until a.length()).map { a.optString(it) } }.orEmpty()
+            val error = MaException(details ?: "Comando rifiutato", msg.optInt("error_code"), Problem.REFUSED, details, msg.str("translation_key"), args)
             if (id == "connection") {
                 // Per esempio "Setup required" (un Music Assistant appena installato, senza account): il server chiude subito dopo.
                 val setup = msg.optInt("error_code") == SETUP_REQUIRED || msg.str("translation_key") == "setup_required"
@@ -255,7 +267,7 @@ class MaClient(
                     try {
                         show(ArrayList(list))
                     } catch (e: Exception) {
-                        Log.w(TAG, "Errore mostrando un pezzo di elenco", e)
+                        Log.w(TAG, "Errore mostrando un pezzo di elenco", Logged.trace(e))
                     }
                 }
                 return

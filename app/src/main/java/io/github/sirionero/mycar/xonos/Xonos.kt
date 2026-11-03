@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable
 import android.os.Process
 import androidx.core.content.ContextCompat
 import io.github.sirionero.mycar.AppSettings
+import io.github.sirionero.mycar.BuildConfig
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.bridge.BridgeDns
 import io.github.sirionero.mycar.bridge.BridgeSocketFactory
@@ -15,6 +16,7 @@ import io.github.sirionero.mycar.bridge.Bridges
 import io.github.sirionero.mycar.media.MediaApp
 import io.github.sirionero.mycar.xonos.data.ArtCache
 import io.github.sirionero.mycar.xonos.data.Library
+import io.github.sirionero.mycar.xonos.data.Logged
 import io.github.sirionero.mycar.xonos.data.MaRepository
 import io.github.sirionero.mycar.xonos.data.Settings
 import io.github.sirionero.mycar.xonos.playback.PlaybackService
@@ -33,6 +35,12 @@ import java.io.File
  * down the car's audio link (see CarLinkOutput) rather than through the phone's speakers.
  */
 object Xonos {
+
+    init {
+        // Before anything else: in the engine's logcat the details (titles, names, addresses, error texts) only in
+        // the debug build, as myCar's rule wants (see data/Logged).
+        Logged.details = BuildConfig.DEBUG
+    }
 
     private lateinit var app: Context
 
