@@ -22,7 +22,8 @@ sealed interface AssistPlan {
          * knows dozens, while its English pipeline understood no Italian at all.
          */
         fun of(pipelines: List<AssistPipeline>, preferred: String?, language: String): AssistPlan {
-            fun speaks(p: AssistPipeline) = p.language.substringBefore('-').equals(language, ignoreCase = true)
+            // "*": a pipeline whose agent is a model (Claude, Gemini, ChatGPT...) speaks every language.
+            fun speaks(p: AssistPipeline) = p.language == "*" || p.language.substringBefore('-').equals(language, ignoreCase = true)
             val speaking = pipelines.filter(::speaks)
             (speaking.firstOrNull { it.id == preferred } ?: speaking.firstOrNull())?.let { return Run(it.id) }
             val main = pipelines.firstOrNull { it.id == preferred } ?: pipelines.firstOrNull()
