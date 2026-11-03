@@ -293,6 +293,16 @@ class LocationKeepAlive : Service() {
                 if (holders > 0 && state == State.FAILED) {
                     MyCarLog.i("location keep-alive: $why, trying again")
                     begin(context.applicationContext)
+                } else if (holders > 0 && state == State.STARTING) {
+                    // A start asked for before this moment, and maybe refused: once Android has said,
+                    // a refusal is tried again now that it lets the service start.
+                    val app = context.applicationContext
+                    waiting += {
+                        if (holders > 0 && state == State.FAILED) {
+                            MyCarLog.i("location keep-alive: $why, trying again")
+                            begin(app)
+                        }
+                    }
                 } else if (holders > 0 && state == State.ON && Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     val app = context.applicationContext
                     runCatching { app.startForegroundService(Intent(app, LocationKeepAlive::class.java)) }
@@ -301,12 +311,37 @@ class LocationKeepAlive : Service() {
             }
         }
 
-        private fun begin(context: Context) {
-            // Approximate location is enough for the service to lend: the map asks for what it needs.
-            val granted = context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED ||
+        /**
+         * A car came up over Bluetooth with myCar's screen already open from before (WirelessAuto)
+         * and the phone locked. That screen isn't created again, so Android gave this service no 10 s:
+         * the start was refused and the map had no position until myCar was opened. A screen of its
+         * own, [LocationStartActivity] (nothing shown, gone at once), is created for it, and with it
+         * the service starts ([retry]). Only with a car map and the permission, the service not
+         * running yet (on Android 12 and 13 always: there a start from the background runs with
+         * nothing to lend), and the phone locked: unlocked, myCar's screen comes to the front and
+         * does it itself (onResume).
+         */
+        fun screenForArrival(context: Context) {
+            val app = context.applicationContext
+            if (state == State.ON && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
+            val locked = runCatching { app.getSystemService(KeyguardManager::class.java)?.isKeyguardLocked }.getOrNull() == true
+            if (!locked || !hasPermission(app) || !carMapInstalled(app)) return
+            MyCarLog.i("location keep-alive: the phone is locked and myCar's screen was open already - a screen of its own for the map's position")
+            runCatching {
+                app.startActivity(
+                    Intent(app, LocationStartActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION),
+                )
+            }.onFailure { MyCarLog.w("location keep-alive: couldn't open that screen (${it.message})") }
+        }
+
+        /** Approximate location is enough for the service to lend: the map asks for what it needs. */
+        private fun hasPermission(context: Context): Boolean =
+            context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
                 context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-            if (!granted) {
+
+        private fun begin(context: Context) {
+            if (!hasPermission(context)) {
                 MyCarLog.w("location keep-alive: no location permission, car maps won't get a fix in the background")
                 refused(NoPosition.NO_PERMISSION)
                 settle(State.FAILED)

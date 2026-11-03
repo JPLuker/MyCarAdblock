@@ -221,6 +221,19 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!--
+          Nothing shown, gone at once: created as a car arrives with myCar's screen already open
+          behind the lock screen, so Android lets the car map's position service start
+          (host/LocationKeepAlive.kt, screenForArrival). Its own task, out of the recents.
+        -->
+        <activity
+            android:name=".host.LocationStartActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.NoDisplay" />
+
+        <!--
           Answers the car's USB connection on MyCarActivity's behalf. Kept apart from the
           activity so Settings can switch off just this (AppSettings.setMyCarEnabled) and leave
           the head unit to Android Auto, without disabling the screen the switch is on.

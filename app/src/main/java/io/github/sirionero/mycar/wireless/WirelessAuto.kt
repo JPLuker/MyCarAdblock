@@ -270,6 +270,9 @@ object WirelessAuto {
                 log.i("auto-connect: on a call - myCar's screen isn't brought up over it")
                 return
             }
+            // The screen open from before isn't created again, and Android starts the car map's
+            // position service with the phone locked only near a screen just created: one of its own.
+            io.github.sirionero.mycar.host.LocationKeepAlive.screenForArrival(context)
             // Brought to the front as before, with nothing to do: Android's questions that wait for
             // myCar on screen (the music's sharing, the "Allow") come up as soon as the phone is
             // unlocked, instead of only once the driver opened myCar.
