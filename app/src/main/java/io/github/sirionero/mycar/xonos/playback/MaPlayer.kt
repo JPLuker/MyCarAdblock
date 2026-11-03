@@ -562,6 +562,19 @@ class MaPlayer(
     }
 
     /**
+     * La voce scelta in auto, mostrata finché Music Assistant la prepara (il segnaposto di Media3): senza copertina.
+     * Media3 1.11 carica la copertina per i controller vecchi (l'auto) e, se il brano che arriva dopo non ne ha una, non
+     * annulla quel caricamento: finito dopo, rimetteva il titolo della voce scelta al posto del brano vero, fino al
+     * brano successivo (anteprima xonos-lyrics: "Preview Album" invece di "Tone 1", e i testi cercati per l'album).
+     */
+    override fun getPlaceholderMediaItemData(mediaItem: MediaItem): MediaItemData {
+        val metadata = mediaItem.mediaMetadata
+        if (metadata.artworkUri == null && metadata.artworkData == null) return super.getPlaceholderMediaItemData(mediaItem)
+        val plain = metadata.buildUpon().setArtworkUri(null).setArtworkData(null, null).build()
+        return super.getPlaceholderMediaItemData(mediaItem.buildUpon().setMediaMetadata(plain).build())
+    }
+
+    /**
      * Mentre un play aspetta Music Assistant, chi guarda (auto, notifica, telefono) vede la rotella: il segnaposto
      * di Media3 cambierebbe solo playWhenReady, cioè "sta suonando" senza suono.
      */
