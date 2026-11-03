@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setup_title">备好 myCar 出海</string>
+    <string name="setup_subtitle_first_run">首航之前，只需点按几下。</string>
+    <string name="setup_subtitle_return">这里是还没备好的事项。你已备好的一切都不会改变。</string>
+    <string name="setup_unofficial">myCar 是非官方应用：请在停车时备好它，开车时请专注路况。</string>
+    <string name="setup_section_connect">登船所需</string>
+    <string name="setup_section_drive">航程所需</string>
+    <string name="setup_status_done">已妥当</string>
+    <string name="setup_status_blocked">已被封锁</string>
+
+    <string name="setup_cert_get">装载证书</string>
+    <string name="setup_cert_getting">正在装载证书…</string>
+    <string name="setup_cert_wrong_file">下载的某个文件不是预期的证书，所以 myCar 没让它上船。请稍后重试。</string>
+    <string name="setup_cert_some_ready">已装载 %1$d 个，共 %2$d 个。%3$s 已就绪；其他证书可以稍后在“舵轮”中获取。</string>
+    <string name="setup_cert_ready_own">可以起航：你自己的证书。</string>
+    <plurals name="setup_cert_ready_spares">
+        <item quantity="other">可以起航：%1$s。备用：%2$s。</item>
+    </plurals>
+    <string name="setup_cert_ready_one">可以起航：%1$s。</string>
+    <string name="setup_cert_ready">可以起航。</string>
+
+    <string name="setup_mycar_on_title">为船开启 myCar</string>
+    <string name="setup_mycar_on_body">它在“舵轮”中已关闭，所以汽车连不上它。</string>
+
+    <string name="setup_aa_title">让 Android Auto 下船</string>
+    <string name="setup_aa_off">Android Auto 已下船。</string>
+    <string name="setup_aa_kept">插上数据线时，你会选 myCar 掌舵。</string>
+    <string name="setup_aa_body">Android Auto 已开启，它可能会抢在 myCar 之前夺走汽车的连接。在打开的页面上，依次点按“停用”和“确定”，然后驶回这里。</string>
+    <string name="setup_aa_keep_body">那就留着它。插上数据线时，Android 会询问要打开哪个应用：选择 myCar，然后点按“始终”，让 myCar 掌舵。如果 Android Auto 自己打开了，说明它被设为始终打开：在它的应用信息中点按“默认打开”，然后点按“清除默认偏好设置”。</string>
+
+    <string name="setup_drive_title">通话、海图和船歌</string>
+    <string name="setup_drive_skipped">已跳过。准备好起航时点按“允许”。</string>
+    <string name="setup_drive_body">汽车会显示来电者和最近通话，并能拨打你的联系人；海图能知道你在哪里；不用蓝牙也能把船歌传到车上。Android 会询问几次：每次都点按“允许”。myCar 只读取信息，并且只在你点按麦克风时才会听。</string>
+
+    <string name="setup_more_later">这些都可以等下一波潮水再设置。</string>
+    <string name="setup_messages_title">漂流瓶</string>
+    <string name="setup_messages_body">汽车会在“漂流瓶”里显示你的消息、朗读消息，并让你回复。在打开的页面中开启 myCar。如果 Android 提示这是受限制的设置：打开 myCar 的应用信息，点按 ⋮，然后点按“允许受限制的设置”，再试一次。</string>
+    <string name="setup_calendar_body">船上屏幕会显示你的下一个日程。myCar 只读取你的日历。</string>
+    <string name="setup_notifications_body">让 myCar 显示它已连接到汽车，在发送手机声音时提供“停止”按钮，并在有新帆时通知你。</string>
+    <string name="setup_audio_title">船上音频</string>
+    <string name="setup_audio_body">船歌如何传到船上。无论哪种方式，通话都通过蓝牙。</string>
+    <string name="setup_usage_title">帮助其他船长</string>
+
+    <plurals name="setup_bar_steps_left">
+        <item quantity="other">首航前还剩 %1$d 步。</item>
+    </plurals>
+    <string name="setup_bar_ready_to_connect">可以登船了。</string>
+    <string name="setup_bar_allow_drive">允许通话、海图和船歌</string>
+    <string name="setup_bar_ready">一切就绪，可以起航。连接汽车；如果 Android 询问，请选择 myCar 并点按“始终”。</string>
+    <string name="setup_bar_finish_later">稍后再备航</string>
+
+    <plurals name="setup_card_steps_left">
+        <item quantity="other">首航前还剩 %1$d 步：%2$s。</item>
+    </plurals>
+    <plurals name="setup_card_extras_left">
+        <item quantity="other">可以登船了。还剩 %1$d 项可选装备。</item>
+    </plurals>
+    <string name="setup_card_all_done">出海准备全部妥当。</string>
+    <string name="setup_card_title">出海准备</string>
+    <string name="setup_card_footer">不会凿沉或重置任何内容。你只会看到还没完成的步骤，已妥当的会打勾。</string>
+    <string name="setup_card_back">返回出海准备</string>
+    <string name="setup_left_title">完成出海准备</string>
+    <string name="setup_left_body">首航前还需：%1$s。</string>
+    <string name="setup_left_continue">继续出海准备</string>
+
+    <string name="setup_guide_optional">由你定</string>
+    <string name="setup_guide_usage_title">帮助其他船长。</string>
+    <string name="setup_guide_safety_body">myCar 是非官方应用。没有任何汽车制造商开发或检查过它，它可能会毫无预兆地出问题。请在出发前备好它，开车时专注路况。</string>
+    <string name="setup_guide_mic_body">myCar 用它把你的船歌发送到车上，并在你提出请求或回复消息时听你说话。你说的话只留在手机上。</string>
+    <string name="setup_guide_location_body">车上的海图和附近搜索都需要它。没有它，瞭望台上不会显示海图。</string>
+    <string name="setup_guide_messages_title">漂流瓶。</string>
+    <string name="setup_guide_messages_body">汽车会在“漂流瓶”里显示你的消息、朗读消息，并让你回复。在打开的列表中开启 myCar。</string>
+    <string name="setup_guide_aa_title">让 Android Auto 下船。</string>
+    <string name="setup_guide_aa_body">Android Auto 仍然安装着，它会像敌船一样和 myCar 争夺汽车的 USB 连接。请在打开的页面中停用或卸载它。</string>
+    <string name="setup_guide_choose_title">选 myCar 掌舵。</string>
+    <string name="setup_guide_choose_body">如果连接汽车时手机询问要打开哪个应用，请选择 myCar 并点按“始终”，让它掌舵。</string>
+    <string name="setup_guide_audio_title">船上音频。</string>
+    <string name="setup_guide_audio_body">选择船歌如何传到船上。无论哪种方式，通话都通过蓝牙。</string>
+    <string name="setup_guide_voice_title">随船鹦鹉。</string>
+    <string name="setup_guide_voice_body">用语音查航线、放船歌或打电话。手机会自己把语音转成文字，你说的话不会离开手机。它需要 %1$d MB，只需下载一次。尽量使用 WLAN。</string>
+    <string name="setup_guide_voice_progress">正在下载，%1$d%%。你可以继续航行，下载不会中断。</string>
+    <string name="setup_guide_voice_ready">语音已上船。</string>
+    <string name="setup_guide_voice_failed">下载中途搁浅了。点按“下载语音”重试。</string>
+    <string name="setup_guide_project_media_title">不再盘问音频。</string>
+    <string name="setup_guide_project_media_body">在手机开启 USB 调试的情况下，从电脑运行这条命令，Android 就会永久信任 myCar 处理你的音频。否则，每次航程你都要点按一次“开始”。</string>
+    <string name="setup_guide_secure_settings_body">音频传到车上时，Android 会隐藏通知的内容，就像你在共享屏幕一样。这项设置让 myCar 在航程中显示通知内容，结束后再隐藏。</string>
+
+    <string name="setup_audio_recommended">船长推荐</string>
+    <string name="setup_audio_automatic_body">汽车能通过蓝牙播放手机船歌时用蓝牙，否则通过 myCar。</string>
+    <string name="setup_audio_bluetooth_body">每次航程无需确认，海图应用的语音也能传到船上。部分汽车通过蓝牙只接收通话。</string>
+    <string name="setup_audio_through_mycar_body">像 Android Auto 一样，通过数据线或 WLAN 传输。每次航程 Android 会请求一次共享音频。</string>
+
+    <string name="intro_start">起航</string>
+    <string name="intro_welcome_to">啊哈，欢迎登上</string>
+    <string name="intro_welcome_tag">alpha · 满帆前进</string>
+    <string name="intro_course">航向我们自己定，绝不向任何王冠低头。</string>
+    <plurals name="intro_bugs_fixed">
+        <item quantity="other">自 0.6 以来揪出 %d 个问题，全都让它们走了跳板</item>
+    </plurals>
+    <string name="intro_music_title">船歌，内置。</string>
+    <string name="intro_music_body">Spotify 和其他服务通过各自的网页播放器在 myCar 中开唱。用你自己的账号在手机上入伙一次：舵轮 > 船歌。在那里藏起手机上的 Spotify 应用：船上只有一个 Spotify，而不是两个。</string>
+    <string name="intro_mini_title">整张海图。</string>
+    <string name="intro_mini_body">关闭海图旁的船歌匣后，海图上会浮现一个小船歌匣，带封面和按钮：按住它，拖到任意位置。海图旁的船歌匣现在最大可到“特大”。</string>
+    <string name="intro_lyrics_title">齐声高唱。</string>
+    <string name="intro_lyrics_body">唱词找到的次数多得多，捞上来的每个结果都会核对，绝不会显示别的船歌的唱词。纯音乐会注明。</string>
+    <string name="intro_location_title">藏在口袋里。</string>
+    <string name="intro_location_body">手机锁屏放在口袋里时，海图也能获得你的位置：车辆一连接，myCar 就会获取位置。如果 Android 仍然拒绝，车辆会在停车时告诉你。</string>
+    <string name="intro_phone_title">在手机上掌舵。</string>
+    <string name="intro_phone_body">船上屏幕的所有选项也都在手机上：舵轮 > 船上屏幕。修改任何一项，船上立即同步，航行途中也一样。海图旁的甲板和从船队中藏起的应用也是如此。</string>
+    <string name="intro_graphene_title">舱门重新封好。</string>
+    <string name="intro_apps_title">好船友。</string>
+    <string name="intro_voice_title">告诉鹦鹉就行。</string>
+    <string name="intro_voice_body">点按麦克风，或按下方向盘上的语音键，然后说话。手机会自己把语音转成文字，你说的话会留在手机上，除非你是在问自己的 Home Assistant。在船上说“%1$s”可查看完整列表。</string>
+    <string name="intro_voice_body_language">点按麦克风，或按下方向盘上的语音键，然后说话。手机会自己把语音转成文字，你说的话会留在手机上，除非你是在问自己的 Home Assistant。它会用 myCar 的语言（%1$s）听你说话并回答。在船上说“%2$s”可查看完整列表。</string>
+    <string name="intro_voice_downloading">正在搬上船，%1$d%%</string>
+    <string name="intro_voice_failed">下载搁浅，点按重试</string>
+
+    <string name="activity_toast_music_pauses_sharing">共享手机屏幕时，手机船歌会暂停</string>
+    <string name="activity_toast_open_for_music">在手机上打开 myCar，即可把手机船歌发送到船上</string>
+    <string name="activity_toast_open_for_sharing">在手机上打开 myCar，即可在船上共享手机屏幕</string>
+    <string name="activity_status_taken_title">汽车被其他应用抢先登船</string>
+    <string name="activity_status_taken_detail">另一个应用抢先夺走了汽车的连接。如果 Android 询问要为汽车打开哪个应用，请选择 myCar。</string>
+</resources>

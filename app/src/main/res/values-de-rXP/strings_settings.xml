@@ -50,7 +50,7 @@
     <string name="settings_plancia_use_app">Konto der Plancia-App an Bord holen</string>
     <string name="settings_plancia_asking">Plancia wird angefunkt…</string>
     <string name="settings_plancia_app_no_account">Plancia hat noch kein Konto zum Teilen: Mach es zuerst in Plancia klar oder gib es unten ein.</string>
-    <string name="settings_plancia_missing_remove">Gib eine Adresse und ein Token ein. Um Plancia aus myCar über Bord zu werfen, tippe auf „Über Bord“.</string>
+    <string name="settings_plancia_missing_remove">Gib eine Adresse und ein Token ein. Um Plancia aus myCar über Bord zu werfen, tippe auf „Entfernen“.</string>
     <string name="settings_plancia_remove_title">Plancia aus myCar über Bord werfen?</string>
     <string name="settings_plancia_remove_text">myCar vergisst die Adressen und das Token. Die Plancia-App ist wieder an Bord, falls sie auf dem Telefon ist.</string>
     <string name="settings_plancia_removed">Plancia ist von Bord gegangen: Die Plancia-App ist wieder an Bord, falls sie auf dem Telefon ist.</string>
