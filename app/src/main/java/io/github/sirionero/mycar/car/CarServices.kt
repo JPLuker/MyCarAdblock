@@ -112,9 +112,17 @@ object CarServices {
     /** When Autoplay began waiting for a Bluetooth output (elapsedRealtime), 0 if it isn't. */
     private var autoplayBluetoothSince = 0L
 
+    /**
+     * Autoplay set by the drive's own pick: it waits for the sound's way to the car (autoplayIfDue).
+     * Its own, not [mediaAutoPicked]: the full-screen player opened on the same app clears that one,
+     * and a change of the sound's way from there then played on the phone's speaker.
+     */
+    private var autoplayAutoPicked = false
+
     /** Autoplay, from now on, unless the driver asks the music for anything first. */
-    private fun armAutoplay(on: Boolean) {
+    private fun armAutoplay(on: Boolean, auto: Boolean) {
         autoplayPending = on
+        autoplayAutoPicked = auto
         // Marked at the first autoplayIfDue, once the app is connected (see there).
         autoplayAsks = -1
         autoplayBluetoothSince = 0L
@@ -307,7 +315,7 @@ object CarServices {
         if (_mediaApp.value?.component == app.component && live) {
             // Already open, and asked to play: it plays, now or once it's connected.
             if (autoplay) {
-                armAutoplay(true)
+                armAutoplay(true, auto)
                 if (phase == CarMedia.Phase.READY) autoplayIfDue()
             }
             return
@@ -329,7 +337,7 @@ object CarServices {
         // The drive's first pick, before its song: myCar's own players say it only once their page or
         // server is up, Autoplay or not; a phone app at once or never, so only when it's told to play.
         if (auto && !_mediaDecided.value && (autoplay || inside(app.component))) expectMusic(true)
-        armAutoplay(autoplay)
+        armAutoplay(autoplay, auto)
         media.connect(app)
         // Not torn down and rebuilt per app: the capture covers whatever the phone plays, so
         // switching media apps never costs the driver another consent dialog.
@@ -413,7 +421,7 @@ object CarServices {
             return
         }
         val bluetoothOut = io.github.sirionero.mycar.audio.CarAudioRoute.bluetoothOut.value
-        if (mediaAutoPicked && autoplayWaits(
+        if (autoplayAutoPicked && autoplayWaits(
                 deciding = io.github.sirionero.mycar.audio.CarAudioRoute.deciding.value,
                 throughMyCar = CarSettings.pipeAudio.value,
                 captureOn = CarAudio.capture.value == CarAudio.Capture.ON,
