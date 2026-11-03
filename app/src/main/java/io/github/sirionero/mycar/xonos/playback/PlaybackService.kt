@@ -191,6 +191,13 @@ class PlaybackService : MediaLibraryService() {
         }
         scope.launch { CarAudio.direct.drop(1).collect { engine.reroute() } }
         player.addListener(object : Player.Listener {
+            // Cosa vede l'auto: la voce scelta (il segnaposto di Media3, finché la scelta non è finita) o un brano della
+            // coda. Senza id né titoli: solo il tipo.
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                val id = mediaItem?.mediaId.orEmpty()
+                Log.i(TAG, "Lettore: " + (if ('|' in id) "voce del menu ${Logged.id(id)}" else "brano della coda") + " (motivo $reason)")
+            }
+
             override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
                 // Un play chiesto (dal guidatore, dall'auto, a fine telefonata): il silenzio dopo lo stacco dell'uscita o
                 // una pausa non arrivata finisce. Non quando lo stato torna "in riproduzione" da solo (una pausa fallita).

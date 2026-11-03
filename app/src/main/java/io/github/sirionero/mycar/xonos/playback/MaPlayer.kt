@@ -732,18 +732,24 @@ class MaPlayer(
         val asked = pauses
         choosing++
         pauseAfterChoice = false
+        // I tempi di una scelta nel registro (senza titoli: solo la forma della voce), per capire dove si aspetta.
+        val chosenAt = SystemClock.elapsedRealtime()
+        val since = { SystemClock.elapsedRealtime() - chosenAt }
+        Log.i(TAG, "Scelta: ${Logged.id(item.mediaId)}${if (before?.playing == true) ", mentre suona" else ""}")
         scope.launch {
             try {
                 awaitReady()
                 request(item)
+                Log.i(TAG, "Scelta: Music Assistant ha risposto dopo ${since()} ms")
                 // Si aspetta che la coda lo mostri, così l'auto non vede un attimo il brano di prima.
-                withTimeoutOrNull(PLAY_SETTLE_MS) {
+                val shown = withTimeoutOrNull(PLAY_SETTLE_MS) {
                     while (true) {
                         val q = queue
                         if (q != null && q.playing && (before == null || q.current?.id != before.current?.id || !before.playing)) break
                         delay(100)
                     }
                 }
+                Log.i(TAG, "Scelta: " + if (shown != null) "coda col brano nuovo dopo ${since()} ms" else "coda senza il brano nuovo dopo ${since()} ms")
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -758,6 +764,7 @@ class MaPlayer(
                     pauseFromSystem()
                 }
                 done.set(null)
+                Log.i(TAG, "Scelta: finita dopo ${since()} ms")
             }
         }
         return done
