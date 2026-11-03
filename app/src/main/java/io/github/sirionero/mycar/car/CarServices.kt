@@ -449,6 +449,12 @@ object CarServices {
             io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the car's Bluetooth music (or a cable), not to play on the phone's speaker")
             return
         }
+        // The assistant up (listening, answering): the drive's pick doesn't start the music over it. It
+        // plays as the assistant closes (AutoplayWhenReady calls again then).
+        if (autoplayAutoPicked && CarAssistant.state.value.phase != CarAssistant.Phase.IDLE) {
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the assistant to close")
+            return
+        }
         autoplayPending = false
         // After a wait for the Bluetooth, the song has its own 20 s from the Play to say itself.
         if (autoplayBluetoothSince != 0L && _musicStarting.value) {
@@ -456,6 +462,16 @@ object CarServices {
             musicWait.postDelayed(musicWaitOver, MUSIC_START_MS)
         }
         if (!media.now.value.playing) media.togglePlay()
+    }
+
+    /**
+     * Cinema opened (CinemaMusic): an Autoplay still waiting doesn't start the music later. When the
+     * car's Bluetooth came back within the minute, it took the speakers from the film.
+     */
+    fun dropAutoplay() {
+        if (!autoplayPending) return
+        autoplayPending = false
+        io.github.sirionero.mycar.MyCarLog.i("media: Autoplay left alone - Cinema opened")
     }
 
     /** How long the drive's Autoplay waits for a Bluetooth output on the Bluetooth way. */
@@ -552,7 +568,11 @@ object CarServices {
         // Xonos's column still kept for its first song: kept for the app's (Xonos gives way 20 s in, as
         // the wait ends: closed and opened again, the map would be lent two more surfaces).
         val waiting = _musicStarting.value
-        openMedia(app, autoplay = CarSettings.autoplay.value || media.now.value.playing, remember = false, auto = mediaAutoPicked)
+        // The drive's own Autoplay, still waiting, stays the drive's: the app's waits for the sound's way
+        // to the car too. Xonos's player (full screen, its tile) clears mediaAutoPicked, and the app then
+        // played at once, on the phone's speaker. The preview on the phone (Settings, no car) plays nothing
+        // by itself, as at autostart: the Autoplay setting started the app there, on the phone's speaker.
+        openMedia(app, autoplay = (CarSettings.autoplay.value && !phonePreview) || media.now.value.playing, remember = false, auto = mediaAutoPicked || (autoplayPending && autoplayAutoPicked))
         if (waiting) expectMusic(true)
     }
 

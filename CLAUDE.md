@@ -332,7 +332,11 @@ Tutti i token in un solo posto, `car/design/`:
   anche a voce, un brano; il segno si prende alla prima `autoplayIfDue`, a READY) lascia stare l'Autoplay; con la
   musica già in `STATE_PLAYING` l'Autoplay è fatto (`AutoplayWhenReady` lo guarda). Due revisioni indipendenti: la
   prima ha trovato sette punti (limite mai applicato, ▶ durante il collegamento, pausa a voce, AUX, pausa nella
-  pagina), tutti corretti.
+  pagina), tutti corretti. Un'altra revisione (scettici) quattro, corretti: l'Autoplay della scelta del viaggio
+  (`autoplayAutoPicked`) non suona sopra l'assistente su (fase non IDLE: aspetta, e `AutoplayWhenReady` lo richiama
+  quando si chiude); Cinema aperto lo lascia stare (`CinemaMusic.opened` → `CarServices.dropAutoplay`); il passaggio
+  all'app Xonos (`xonosAppTakesOver`) lo tiene del viaggio (`autoplayPending && autoplayAutoPicked`: il lettore di
+  Xonos azzera `mediaAutoPicked`) e nell'anteprima sul telefono (`phonePreview`) non fa suonare da solo.
 - **Mini lettore sulla mappa intera** (0.6.9, richiesta dell'utente: "una nuvoletta piccola, spostabile tenendola
   premuta, con la locandina, indietro, pausa e avanti, che non occupi la mappa e si possa nascondere";
   `car/MapMiniPlayer.kt`, regola pura `car/MiniPlace.kt` + `MiniPlaceTest`, chiavi `car_mini_player` e
