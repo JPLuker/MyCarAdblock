@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="xonos_cat_recent">最近唱过</string>
+    <string name="xonos_cat_foryou">为你寻来的宝藏</string>
+    <string name="xonos_cat_playlists">船歌单</string>
+    <string name="xonos_cat_tracks">船歌</string>
+    <string name="xonos_cat_favorites">宝箱里的船歌</string>
+    <string name="xonos_cat_browse">巡览服务</string>
+    <string name="xonos_top_tracks">热门船歌</string>
+    <string name="xonos_all_tracks">全部船歌</string>
+    <string name="xonos_problem_bad_token">令牌未被接受：请在手机上的 myCar 中重新入伙</string>
+
+    <plurals name="xonos_count_tracks">
+        <item quantity="other">%d 首船歌</item>
+    </plurals>
+    <plurals name="xonos_count_playlists">
+        <item quantity="other">%d 个船歌单</item>
+    </plurals>
+</resources>

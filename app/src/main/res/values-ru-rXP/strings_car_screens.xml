@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_settings_open_on_connect">Открывать при абордаже</string>
+    <string name="car_settings_open_home">Гавань</string>
+    <string name="car_settings_size_extra_small">Самый малый</string>
+    <string name="car_settings_size_small">Малый</string>
+    <string name="car_settings_size_extra_large">Самый большой</string>
+    <string name="car_settings_player_size">Размер шарманки рядом с картой</string>
+    <string name="car_settings_mini_player">Мини-шарманка поверх всей карты</string>
+    <string name="car_settings_mini_player_detail">Когда шарманка рядом с картой закрыта, поверх карты появляется маленькая шарманка. Удерживайте её и перетащите, чтобы переместить.</string>
+    <string name="car_settings_hidden_apps">Безбилетники</string>
+    <string name="car_settings_hidden_apps_none">Безбилетников нет. Чтобы спрятать приложение, удерживайте его во флоте и выберите «Убрать из флота».</string>
+    <string name="car_settings_app_theme">Окраска приложения</string>
+    <string name="car_settings_controls_theme">Окраска кнопок</string>
+    <string name="car_settings_autoplay">Заводить шарманку при абордаже</string>
+    <string name="car_settings_car_audio">Звук на борту</string>
+    <string name="car_settings_car_audio_note">«Через myCar» передаёт звук телефона по собственному соединению myCar — кабелю или Wi-Fi, как Android Auto. Android в каждой поездке просит разрешить трансляцию экрана, а некоторые приложения её блокируют. Bluetooth работает как обычно на телефоне, и Android ничего не спрашивает, но некоторые автомобили принимают по нему только звонки. «Автоматически» использует Bluetooth, если автомобиль так принимает песни с телефона, а иначе — соединение myCar.</string>
+    <string name="car_settings_bluetooth_warning">Подавать сигнал, если Bluetooth не подключён</string>
+    <string name="car_settings_location_warning">Подавать сигнал, если геолокация отключена</string>
+    <string name="car_settings_spoken_directions">Подсказки попугая</string>
+    <string name="car_settings_spoken_directions_note">myCar зачитывает каждый поворот через динамики корабля, а песни на это время звучат тише. Выключите, если голос вашего навигатора уже звучит на борту.</string>
+    <string name="car_settings_experimental">Неизведанные воды</string>
+    <string name="car_settings_experimental_hide">Спрятать</string>
+    <string name="car_settings_vehicle_data_note">Добавляет плитку «Бортовые данные»: необработанный поток канала датчиков головного устройства в реальном времени. Названия полей (скорость, обороты, топливо…) добыты в других проектах обратной разработки и не проверены на этом корабле — считайте их догадкой, а не фактом, пока сами не увидите, как значение меняется.</string>
+    <string name="car_settings_connection">Абордаж</string>
+    <string name="car_settings_info_vehicle">Корабль</string>
+    <string name="car_settings_unknown_vehicle">Неизвестный корабль</string>
+    <string name="car_settings_about">Наш флаг</string>
+    <string name="car_settings_whats_new_after_updates">«Свежая добыча» после обновлений</string>
+    <string name="car_settings_whats_new_after_updates_note">Показывать список изменений один раз — при первом абордаже под новыми парусами.</string>
+    <string name="car_settings_whats_new">Свежая добыча</string>
+    <string name="car_settings_web_page_default">DuckDuckGo (по умолчанию) — нажмите, чтобы взять курс на другую страницу</string>
+    <string name="car_settings_web_page_note">Показывается в приложении «Браузер» со следующего открытия, а в браузере на ваших палубах — со следующего плавания.</string>
+    <string name="car_settings_save_for_vehicle">Сохранить для этого корабля</string>
+    <string name="car_settings_no_vehicle_profile">Профиль корабля не найден</string>
+
+    <string name="car_whatsnew_title">Свежая добыча в %1$s</string>
+    <string name="car_whatsnew_got_it">Есть!</string>
+
+    <string name="car_keyboard_hide">Спрятать клавиатуру</string>
+
+    <string name="car_player_previous">Прошлая песня</string>
+    <string name="car_player_play">Завести шарманку</string>
+    <string name="car_player_pause">Штиль</string>
+    <string name="car_player_next">Следующая песня</string>
+    <string name="car_player_like">В сундук</string>
+    <string name="car_player_unlike">Из сундука</string>
+    <string name="car_player_shuffle_on">Тасовать</string>
+    <string name="car_player_shuffle_off">Не тасовать</string>
+    <string name="car_player_repeat">На бис</string>
+    <string name="car_player_lyrics">Куплеты</string>
+    <string name="car_player_close">Закрыть шарманку</string>
+
+    <string name="car_media_tab_now_playing">Сейчас звучит</string>
+    <string name="car_media_tab_browse">Разведка</string>
+    <string name="car_media_tab_queue">Трюм</string>
+    <string name="car_media_nothing_playing">Шарманка молчит</string>
+    <string name="car_media_library_closed">%1$s держит свою медиатеку под замком.</string>
+    <string name="car_media_library_closed_detail">Запустите песни в приложении на телефоне. Воспроизведение, пауза, переключение и перемотка работают прямо со штурвала.</string>
+    <string name="car_media_not_running">Приложение %1$s не спущено на воду.</string>
+    <string name="car_media_not_running_detail">Приложение %1$s играет через собственную шарманку myCar, но только пока оно открыто на телефоне. Откройте его один раз, и песни будут звучать здесь, на борту.</string>
+    <string name="car_media_refused">Приложение %1$s не пустило myCar на разведку.</string>
+    <string name="car_media_refused_detail">Некоторые медиаприложения слушаются только хоста от Google. Откройте его на телефоне, и myCar всё равно сможет включать, ставить на паузу и переключать песни.</string>
+    <string name="car_media_keeps_closing">Приложение %1$s то и дело идёт ко дну на телефоне.</string>
+    <string name="car_media_keeps_closing_detail">Оно дважды за минуту пошло ко дну, поэтому myCar перестал к нему переподключаться.</string>
+    <string name="car_media_list_failed">Не удалось поднять список на борт.</string>
+    <string name="car_media_list_empty">Здесь пусто — никакой добычи.</string>
+    <string name="car_media_queue_empty">Трюм пуст.</string>
+    <string name="car_media_queue_empty_idle">Шарманка молчит — не каждое приложение сообщает myCar, что дальше по курсу.</string>
+    <string name="car_media_queue_empty_playing">Только то, что уже звучит, — не каждое приложение сообщает myCar, что дальше по курсу.</string>
+    <string name="car_media_search_app">Прочесать %1$s</string>
+    <string name="car_media_search_hint">Введите песню, исполнителя, альбом или плейлист.</string>
+    <string name="car_media_search_no_list">Приложение %1$s не показывает находки. Нажмите кнопку поиска, и %1$s выберет, что сыграть.</string>
+    <string name="car_media_search_unsupported">%1$s не поддерживает поиск с борта.</string>
+    <string name="car_media_searching">Прочёсываем %1$s…</string>
+    <string name="car_media_search_nothing">%1$s: по запросу «%2$s» добычи нет.</string>
+    <string name="car_media_search_ask">Велеть %1$s сыграть</string>
+    <string name="car_media_search_running">Прочёсываем %1$s в поисках «%2$s»…</string>
+    <string name="car_media_search_ignored">%1$s: по запросу «%2$s» ничего не зазвучало.</string>
+
+    <string name="car_lyrics_looking">Ищем куплеты…</string>
+    <string name="car_lyrics_nothing_playing">Шарманка молчит.</string>
+    <string name="car_lyrics_none">Для этой песни куплетов пока нет.</string>
+    <string name="car_lyrics_none_detail">Куплеты берутся из LRCLIB, вольного архива, который пополняют слушатели: там пока есть не все песни.</string>
+    <string name="car_lyrics_instrumental_detail">Здесь нечего горланить хором — в этой песне нет слов.</string>
+    <string name="car_lyrics_unreachable">Не удалось добыть куплеты.</string>
+    <string name="car_lyrics_unreachable_detail">Куплеты приходят с lrclib.net: проверьте подключение телефона.</string>
+
+    <string name="car_vehicle_title">Бортовые данные</string>
+    <string name="car_vehicle_intro">Необработанный канал датчиков подключённого головного устройства. Значение полей — лишь догадка бывалого моряка: чтобы проверить, следите за строкой, пока делаете нужное действие (тормоз, движение, фары).</string>
+
+    <string name="car_web_select_title">Выбирайте, кэп</string>
+    <string name="car_player_sound_bluetooth">Звук по Bluetooth. Нажмите, чтобы проложить курс через myCar</string>
+    <string name="car_player_sound_mycar">Звук через myCar. Нажмите, чтобы проложить курс по Bluetooth</string>
+    <string name="car_player_sound_now_mycar">Теперь звук держит курс через myCar, для этого корабля</string>
+    <string name="car_player_sound_now_bluetooth">Теперь звук держит курс по Bluetooth, для этого корабля</string>
+</resources>
