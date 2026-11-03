@@ -1,12 +1,24 @@
-myCar 0.7.2-alpha: Autoplay no longer plays in your pocket.
+myCar 0.7.3-alpha: Xonos inside myCar gets the engine of Xonos 0.1.55.
 
-## Autoplay
-- **Music from the phone's speaker, in the pocket.** In a driver's log the car's Bluetooth music had dropped with a reset of the car. At the reconnection, Autoplay started Spotify on the phone's own speaker until the car left: 27 seconds (54 in a log of 0.6.9). On the Bluetooth way, Autoplay now waits for an output other than the phone itself: the car's Bluetooth music, LE Audio, or a cable to the car's AUX. It waits up to a minute; after that it leaves the music alone, so it never starts by itself much later.
-- Whatever you ask of the music while it waits stays, and Autoplay doesn't undo it: ▶, a pause (spoken too), a song. A ▶ pressed while the music app is still connecting no longer cancels Autoplay with nothing playing. Music already playing, however it started, counts as Autoplay done.
-- Five rounds of independent review went through the change before the release and found eleven things to fix, all fixed: among them, Autoplay also waits while the assistant listens or answers, and leaves the music alone when Cinema opens.
+## Xonos inside myCar
+- **The engine of Xonos 0.1.55**, compared file by file with the Xonos app (Music Assistant, Sendspin, the player) and brought over, keeping what is myCar's own: the music straight into the car's channel, the bridge to the Xonos app, its settings.
+- **Skips.** Next and previous already went straight to the song. Now next does so also right after an album or playlist starts, while the car still shows only that song and repeat is off: until now it used Music Assistant's own next there, which starts a second later. With repeat all, next from the last song goes to the first one. With Music Assistant on the phone, quick taps on a service that plays one stream at a time are gathered for a quarter of a second instead of 0.4.
+- **The car's menu** waits for Music Assistant when the car opens it, instead of showing empty folders that the car doesn't ask for again. An artist opens without loading all its songs first: "All tracks" loads when you open it (with Spotify it cost about three requests per album). Long lists come in parts, and a search asks again each time.
+- **Music Assistant on your phone**, inside the Xonos app: since Xonos 0.1.55 it stops by itself when nothing uses it any more, and stays on while myCar holds the Xonos app's bridge, which myCar does for the whole drive. If it has stopped, the bridge starts it again (6 seconds on a phone, about 12 in the emulator), and meanwhile playing, skipping and picking a song wait up to a minute (the car's menu 45 seconds), instead of saying it isn't connected. If you pause while Play waits, the music doesn't start and no error shows. Starting a long playlist gets 3 minutes with that server, 1 minute with others.
+- **Steadier.** A sound decoder that breaks down is replaced. The sign-in is renewed before it expires (Music Assistant 2.10 makes it last a year). Spotify left busy in Music Assistant by a stream nobody hears any more is freed, when no other player is using it (with an admin account). From away, the home address gets 3 seconds before the remote one is tried (still up to 10 seconds when it goes through the Xonos app's bridge). With Music Assistant 2.10.8 or later Sendspin uses its newer format, and a Music Assistant that turns the player down (one that accepts only encrypted players) is asked again every 5 minutes instead of every few seconds.
 
-## In the log
-- The session report gives the car's own audio route (it read "link" for a car with Bluetooth music) and "Wi-Fi transport" for a wireless session that dropped (it read "USB transport").
+## Fixed after the review of the port
+- With the sound through myCar, a car switched off during a network drop, or during a phone call, no longer makes the music start again from the phone's speaker, in your pocket, when the network comes back or the call ends.
+- A pause pressed while a song you picked in the car is still starting is kept: before, the music started anyway (the same happens in the Xonos app 0.1.55). A call that begins and ends while it is starting no longer leaves the music stopped, and a pause made then doesn't come undone after a network drop.
+- If the Xonos app moved to another Music Assistant, or took its own off the phone, myCar no longer waits for a server that won't start for it, and the Xonos app takes Xonos's place in the car for the drive.
+- **The car stuck on an old title.** After you picked an album or a playlist in the car, the car could keep showing its name (no progress bar, lyrics looked up for the album) instead of the song playing, until the next song; the same could happen with the previous song after two quick skips. It came from Media3 1.11: for older controllers such as the car it loads the artwork of what is shown, and when the next song has no artwork it doesn't cancel that load, which then put the old title back. Now every song has artwork: songs without a cover show Xonos's song icon, as the menu already did.
 
-## If you skipped 0.7.1
-- 0.7.1 fixed the black map: the car map's position is kept between the connections of the same drive, and given when the car connects while myCar is still open on the locked phone. With pirate speak, the voice and phone numbers follow the phone's country again.
+## In Android's logcat
+- The lines of Xonos's engine (tag Xonos) no longer hold song names, artists, searches, user, player or server names, addresses, tokens or the server's error texts: only what kind of thing it was. The test build keeps everything. myCar's own log, the one you share from the phone, is separate: it never had Xonos's lines, and a few of its own (the bridge, the Xonos app taking Xonos's place) still name the server's address.
+
+## Checked
+- Built and unit-tested in CI. On the Android 17 emulator: Xonos inside myCar connects to Music Assistant 2.10.8, browses and plays an album, through the Xonos app's bridge too; with Music Assistant on the phone (Xonos 0.1.55 built from its tag) myCar wakes the Xonos app, gets "still starting" and tries again by itself, and connects through the bridge about 12 seconds later. The release-signed build, left out of a real Tailscale, connects to Home Assistant and Music Assistant through the Plancia and Xonos apps' bridges.
+- Not tried in a car, nor on a phone with Spotify through Soloist.
+
+## If you skipped 0.7.2
+- 0.7.2 made Autoplay wait for the car's Bluetooth music, up to a minute, instead of playing on the phone's speaker in your pocket.

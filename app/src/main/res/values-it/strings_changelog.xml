@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.3-alpha -->
+    <string-array name="changelog_49">
+        <item>Xonos dentro myCar ha ora il motore di Xonos 0.1.55: un artista si apre senza caricare prima tutti i suoi brani (si caricano quando apri «Tutti i brani») e il menu dell\'auto aspetta Music Assistant invece di mostrare cartelle vuote.</item>
+        <item>Con Music Assistant sul telefono, nell\'app Xonos: play, salti e scelta di un brano aspettano fino a un minuto che riparta, invece di dire che non è collegato.</item>
+        <item>Xonos più solido: un decoder audio che si guasta viene sostituito, l\'accesso si rinnova prima che scada, e Spotify, rimasto occupato in Music Assistant da un ascolto che nessuno sente più, si libera se nessun altro lettore lo usa (con un account amministratore).</item>
+        <item>Se l\'auto si spegne mentre manca la rete o durante una chiamata, Xonos non riparte più dall\'altoparlante del telefono quando la rete torna o la chiamata finisce.</item>
+        <item>Dopo aver scelto un album o una playlist in auto, il lettore non mostra più il loro nome al posto del brano che suona. I brani senza copertina ora mostrano l\'icona dei brani di Xonos.</item>
+    </string-array>
+
     <!-- 0.7.2-alpha -->
     <string-array name="changelog_48">
         <item>L\'Autoplay non suona più dall\'altoparlante del telefono, in tasca, quando il Bluetooth della musica dell\'auto non è ancora collegato: lo aspetta fino a un minuto, e una pausa o un brano che scegli nel frattempo restano.</item>

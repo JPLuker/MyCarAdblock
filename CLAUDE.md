@@ -143,8 +143,10 @@ Rispondi sempre in **italiano**.
   (dalla griglia, poi il menu dal ☰ di Home Assistant), `plancia-page/` (pagina pronta a destra
   della mappa), `plancia-side/` (accanto alla mappa).
   Ponte: con gli ingressi `plancia_ref` / `xonos_ref` le app Plancia e Xonos si compilano da quel
-  loro ramo (`.github/build-apps.sh`, build debug, Gradle 8.14.3 scaricato: le app non hanno il
-  wrapper) al posto degli ultimi rilasci, e gli scatti `bridge-plancia`, `bridge-plancia-page`,
+  loro ramo o tag (`.github/build-apps.sh`, build debug, Gradle 8.14.3 scaricato: le app non hanno il
+  wrapper; Xonos dalla 0.1.49 compila proot con talloc da samba.org, che a volte non risponde ai runner:
+  `.github/talloc-curl.sh`, un curl davanti a quello del runner, prova allora altre copie dello stesso file,
+  tenute solo con lo SHA-256 di `proot.sh`) al posto degli ultimi rilasci, e gli scatti `bridge-plancia`, `bridge-plancia-page`,
   `bridge-xonos` aprono Plancia e Xonos dentro myCar con `--ez bridge true` (tutto dal ponte: senza
   Tailscale nell'emulatore), le app configurate da root sugli stessi server; nel log le app scrivono
   "Ponte per <myCar> verso <server>" per ogni connessione. Dopo la compilazione delle app lo script
@@ -183,6 +185,12 @@ Rispondi sempre in **italiano**.
   `ci/release-check-<api>-<net>`. Verificato (0.5.13): in `tailscale-out` l'app Plancia si collega e
   myCar dice che Tailscale la lascia fuori; dentro il tunnel myCar si collega. Anche qui `plancia_ref`
   e `xonos_ref` (app dai loro rami): in `tailscale-out` myCar firmata come la release passa dal ponte.
+  Dalla 0.6 le impostazioni del telefono sono in gruppi: lo script apre Plancia per "Save and test" e Musica per
+  "Use the Xonos app's account". Prima non li trovava ("not found on screen") e il ponte non veniva provato, pur
+  finendo in verde: guardare sempre le righe "At home:" e "Ponte per" nel log del job. Verificato di nuovo (0.7.3,
+  Android 17, `tailscale-out`, Xonos dal tag `v0.1.55`): "Ponte per io.github.sirionero.mycar verso umbrel:8123" e
+  "verso Music Assistant (porta 8095)", "At home: Home Assistant 2026.10.4, 17 entities" e "At home: Music
+  Assistant 2.10.8, playing as myCar".
 - Screenshot del README (`docs/screenshots/`): dagli scatti dell'anteprima di `main` (non di un
   branch: devono mostrare la versione che si rilascia), coprendo il badge DEBUG BUILD in basso a
   destra. Mai scatti con la mappa ancora nera o col segnaposto "Map" del player di debug: del
@@ -458,6 +466,75 @@ Tutti i token in un solo posto, `car/design/`:
   suona; poi myCar sveglia l'app Xonos, che avvia Music Assistant, dice "still starting" e riprova, si collega
   attraverso il ponte dopo circa 14 s e Music Assistant suona sul lettore "myCar". Subito dopo l'emulatore è
   caduto: le immagini dello scatto mancano, il log è in `stream.txt`.
+  **Motore di Xonos portato: v0.1.55** (0.7.3, branch `feature/xonos-0.1.55`; il repository di Xonos ora si
+  chiama anche `SirioNero/MusicAssistantServer-on_Android`, tag `v0.1.55` = commit `568041a`). Confronto file
+  per file di `data/`, `sendspin/`, `playback/` con `app/src/main/java/it/xonos/ma/{data,sendspin,playback}` di
+  Xonos: identici a parte il package Account, ArtCache, MaClient, Model, SkipSender, Menu, AndroidAudio e i nuovi
+  `Logged`, `SkipTrace`, `TokenInfo`, `SoloistUnlock`, `SkipPlan`; portati tenendo le parti di myCar Library
+  (`lyrics(uri, timeoutMs)`), MaRepository (ponte, `locale()`), AudioEngine (`reroute()`), SendspinClient
+  (`start()` riparte se l'audio non è READY), MaPlayer (`pauseWanted`, `heldByCall`, `onUserPause`,
+  `pauseFromSystem(transient)`: le pause del sistema passano da `pause()` con `SystemPause` CALL/OTHER, così una
+  telefonata tiene la ripresa dopo un calo e non conta come pausa del guidatore), PlaybackService (uscita
+  diretta nel canale dell'auto, focus e chiamate, `linkGone`, notifica che apre `MyCarActivity`). Restano in
+  Xonos: AccountProvider, MyCarBridge e ServerKeeper (lato app), PhoneServer e `server/`, Devices, Services,
+  PlaylistRemover, ScreenCache, il rientro con la password su BAD_TOKEN (myCar non ha la password: c'è "Use the
+  Xonos app's account"). Il Sendspin cifrato non c'è nemmeno in Xonos. Quello che conta in myCar:
+  - **Logcat**: `Logged.details = BuildConfig.DEBUG` nell'init di `Xonos`; nella release il motore scrive solo
+    la forma di id, uri ed errori (`Logged.id`, `Logged.error`, `Logged.trace`), mai titoli, ricerche, nomi,
+    indirizzi, token o testi d'errore del server; il JSON rotto di `MaClient` non va nel log.
+  - **Server sul telefono** (`Xonos.onPhoneServer`: indirizzo di casa su 127.0.0.1, `Bridges.onThePhone`): dalla
+    0.1.55 l'app Xonos lo ferma quando nessuno lo usa più (`ServerKeeper`: ogni bisogno lo tiene acceso ancora un
+    po' dopo averlo lasciato, MYCAR 1 minuto dallo stacco del ponte, CAR e ACCOUNT 2, SCREEN 3, PLAYING 8), e lo
+    tiene acceso finché myCar tiene legato il ponte (`MyCarBridge.onCreate` → `keeper.hold(MYCAR)`). myCar lo tiene legato per il
+    viaggio: `CarServices` tiene `repo.acquire()`, ogni tentativo passa dal ponte e rimanda di 5 minuti lo
+    stacco; su NO_ANSWER l'app lo riavvia (`keeper.touch`) e myCar riprova da sola (2-20 s, e
+    `Xonos.wakePhoneServer()` riprova subito, al massimo ogni 2 s). `MaPlayer.wake()` dà vero solo con quel
+    server, l'app Xonos col ponte e nessun rifiuto definitivo: play, salti e scelte aspettano fino a 60 s
+    (`PHONE_READY_TIMEOUT_MS`), il menu dell'auto 45 s (`PHONE_BROWSE_WAIT_MS`), `play_media` 180 s
+    (`Library.playTimeoutMs`, 60 s con gli altri). Una pausa durante l'attesa di un play lo annulla senza errori
+    (`pauses`); un salto o una scelta in attesa partono appena il server risponde e poi si fermano (`pauseAfterSkip`
+    e `pauseAfterChoice` → stop; fino alla 0.7.2 e in Xonos 0.1.55 la pausa durante una scelta si perdeva, perché
+    `pauseFromSystem()` leggeva `playWhenReady` già falso dal segnaposto di Media3). Uno stop durante l'attesa non li
+    ferma, e il suo errore (Music Assistant non collegato) va all'auto (`onFailure`). Col rifiuto già noto
+    (`phoneServerFailed()`) anche le scelte falliscono subito (`awaitReady`), e dopo un tentativo fallito del
+    viaggio l'app Xonos prende il posto di Xonos dentro myCar (`InsideOrApp`, `phoneRefused`). `phoneServerFailed()` = `Xonos.phoneServerRefused()`: un rifiuto che non
+    passa da solo di Music Assistant (token, versione, permessi…) o dell'app Xonos (`AppBridge.refusedForGood`:
+    NOT_MYCAR / NOT_OURS per quell'host, l'app passata a un altro Music Assistant o senza il suo).
+  - **Salti**: `SkipPlan` (avanti senza l'indice di Media3, cioè con la finestra ridotta al brano in corso subito
+    dopo una coda nuova, va con play_index invece di next, che Music Assistant fa partire dopo 1 s, se ripeti è
+    spento; con l'indice avanti e indietro andavano già con play_index nella 0.7.2; con ripeti tutto avanti
+    dall'ultimo brano va al primo, prima al brano current−3); `SkipSender` coi servizi a un flusso alla volta
+    raccoglie i tocchi per 400 ms, 250 col server sul telefono (con gli altri salta subito); righe "Salto:"
+    (`SkipTrace`).
+  - **Correzioni delle revisioni** (due giri: tre revisori indipendenti sulla port, poi tre su correzioni, testi e
+    CI; ogni punto verificato da uno scettico): con l'audio tramite myCar l'auto che se ne va (`CarAudio.linkGone`)
+    chiama anche `forgetDrop()`, come il Bluetooth che si stacca, così un calo di rete visto dopo non fa ripartire la
+    musica dall'altoparlante del telefono al ritorno della rete, e toglie la ripresa a fine telefonata
+    (`resumeAfterInterruption`, col volume della chiamata rimesso: `setDuck(1f)`); i rifiuti NOT_OURS/NOT_MYCAR del
+    ponte non si aspettano più (sopra); la pausa durante una scelta vale (sopra); ogni brano pubblicato ha una copertina,
+    l'icona dei brani di Xonos quando manca (`artwork.uriFor(...) ?: artwork.iconUri("track")` in `PlaybackService`, come
+    il menu in `BrowseTree`): Media3 1.11.1 (`MediaSessionLegacyStub.updateMetadataIfChanged`, verificato nel bytecode)
+    per i controller vecchi come l'auto carica la copertina e annulla il caricamento di prima solo se il brano nuovo ne
+    ha una; col segnaposto di una scelta (con copertina) seguito da un brano senza, l'immagine finita dopo rimetteva i
+    metadati della voce scelta fino al brano dopo ("Preview Album" per oltre 15 s negli scatti `xonos-lyrics` e
+    `bridge-xonos`, 2 volte su 5; il meccanismo c'era già nella 0.7.2: stesso Media3, stesso segnaposto), e lo stesso
+    col brano di prima dopo due "avanti" veloci. Un primo tentativo toglieva la copertina al segnaposto
+    (`getPlaceholderMediaItemData`): copriva solo quella strada, e toglieva la copertina della voce scelta durante la
+    preparazione (con Soloist circa 7 s). Una telefonata cominciata e finita durante una scelta non lascia la musica
+    ferma (`resumeFromSystem` toglie `pauseAfterChoice`); finché una pausa è voluta (`pauseWanted`, non per una
+    telefonata) la musica partita non conta come ascolto recente (`apply`) e un calo di rete non si segna (`onLost`). Righe "Scelta:" (tempi
+    di una scelta) e "Lettore:" (cosa vede l'auto) nel registro. **Da portare in Xonos**: la pausa durante una scelta
+    (`pauseAfterChoice` → stop, `resumeFromSystem`, `apply`/`onLost` con `pauseWanted`), `awaitReady` che non aspetta col
+    server fallito, la copertina per ogni brano (l'icona quando manca: Gearslip è un controller vecchio anche lui), e per il Bluetooth la ripresa a fine telefonata rimandata finché non
+    torna un'uscita esterna (non cancellata: alcune auto staccano l'A2DP durante la chiamata).
+  - Prove: il pacchetto `xonos` compilato contro android-all 17 di Robolectric e Media3 1.11.1 (scratchpad,
+    stub del resto di myCar) e i banchi JVM di Xonos sul motore di myCar (SkipCheck, LoggedCheck, DecoderCheck,
+    SilenceCheck, StartCheck, SlowListCheck) passano; quelli con un Music Assistant vero (MenuCheck, PlayCheck,
+    TokenCheck, HomeCheck) vogliono Docker. Docker nella sessione parte (`dockerd &`, mirror `mirror.gcr.io` in
+    `/etc/docker/daemon.json`): Music Assistant 2.10.8 si costruisce dal sorgente con `tools/ma-test` di Xonos
+    (riporta "0.0.0": per le prove con `modernWire` la versione va scritta nel suo `METADATA`). Lì
+    `harness.ReplayCheckKt` (banco JVM della scratchpad) misura play_media dello stesso album mentre suona: ~100 ms,
+    con e senza `modernWire`.
 
 - **Cinema** (dopo la 0.5.13; `cinema/`, `car/CinemaApp.kt`, `car/CarDriving.kt`, `ui/CinemaSettings.kt`,
   nome scelto dall'utente): l'app video, che in realtà è un browser fatto per il video. In auto i
@@ -1534,8 +1611,9 @@ Tutti i token in un solo posto, `car/design/`:
   e per far suonare l'app Spotify del telefono; l'audio arriva via myCar o Bluetooth. Regole di
   Spotify da febbraio 2026: Premium del proprietario, massimo 5 utenti per Client ID, alcuni
   endpoint tolti. Il motore ufficiale per terze parti (Spotify Soloist, quello di Music
-  Assistant) esiste solo per Linux: non gira sul telefono. librespot non suona con gli account
-  creati da dicembre 2024.
+  Assistant) gira sul telefono sotto proot, dentro il server Music Assistant dell'app Xonos (dalla
+  0.1.49; in modalità Spotify Connect dalla 0.1.54): con Xonos dentro myCar collegato a quel server
+  Spotify suona già così. librespot non suona con gli account creati da dicembre 2024.
 
 ## Note F-Droid
 

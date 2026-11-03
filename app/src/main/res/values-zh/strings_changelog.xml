@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.3-alpha -->
+    <string-array name="changelog_49">
+        <item>myCar 内置的 Xonos 现在使用 Xonos 0.1.55 的引擎：打开艺人时不再先加载其全部歌曲（打开“全部歌曲”时才加载），车上的菜单会等待 Music Assistant，而不是显示空文件夹。</item>
+        <item>当 Music Assistant 在你的手机上（Xonos 应用中）运行时：播放、切歌和选歌会等待它重新启动，最多一分钟，而不是提示未连接。</item>
+        <item>Xonos 更稳定：出故障的音频解码器会被替换，登录会在过期前续期；Spotify 若因一段已无人收听的播放而在 Music Assistant 中被占用，在没有其他播放器使用时会被释放（需管理员账户）。</item>
+        <item>如果在没有网络时或通话期间关闭了车辆，网络恢复或通话结束后 Xonos 不再从手机扬声器开始播放。</item>
+        <item>在车上选择专辑或播放列表后，播放器不再一直显示它们的名称，而会显示正在播放的歌曲。没有封面的歌曲现在显示 Xonos 的歌曲图标。</item>
+    </string-array>
+
     <!-- 0.7.2-alpha -->
     <string-array name="changelog_48">
         <item>当车辆的蓝牙音乐尚未连接时，自动播放不再从你口袋里手机的扬声器播放：它最多等待一分钟，期间你选择的暂停或歌曲会被保留。</item>
