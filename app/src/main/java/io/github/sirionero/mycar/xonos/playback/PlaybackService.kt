@@ -124,7 +124,12 @@ class PlaybackService : MediaLibraryService() {
             settings.playerId,
             app.playerReady,
             engine.outputting,
-            artwork::uriFor,
+            // Ogni brano ha una copertina, anche quelli senza (l'icona dei brani, come nel menu): Media3 1.11.1, per i
+            // controller vecchi come l'auto, annulla il caricamento della copertina di prima solo se il brano nuovo ne
+            // ha una (MediaSessionLegacyStub.updateMetadataIfChanged). Senza, l'immagine di prima finita dopo rimetteva il
+            // suo titolo in auto fino al brano successivo: la voce scelta nel menu ("Preview Album" nell'anteprima) o il
+            // brano di prima dopo due salti.
+            { image, size -> artwork.uriFor(image, size) ?: artwork.iconUri("track") },
             { engine.lateMs },
             { app.onPhoneServer },
             // Un play col Music Assistant dell'app Xonos fermo (nessuno lo usava): il ponte lo fa ripartire, e lo si
