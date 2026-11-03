@@ -354,7 +354,13 @@ class MaPlayer(
     private fun apply(q: QueueState, itemsChanged: Boolean = false) {
         val old = queue
         queue = q
-        if (q.playing) lastPlayingAt = SystemClock.elapsedRealtime() else pauseWanted = false
+        if (q.playing) {
+            // Musica partita mentre una pausa voluta aspetta lo stop dopo l'avvio (una scelta, un salto): non è un ascolto
+            // da riprendere dopo un calo di rete. Una telefonata sì: la ripresa a fine chiamata resta.
+            if (!pauseWanted || heldByCall) lastPlayingAt = SystemClock.elapsedRealtime()
+        } else {
+            pauseWanted = false
+        }
         val jumped = old == null || old.currentIndex != q.currentIndex || old.current?.id != q.current?.id
         setElapsed(q.elapsedSec, fromServer = !jumped)
         val index = q.currentIndex
@@ -440,6 +446,9 @@ class MaPlayer(
 
     /** La rete è caduta: se stava suonando, ci si ricorda dove, per riprendere lì. */
     private fun onLost() {
+        // Una pausa voluta che Music Assistant non ha ancora visto: niente ripresa dopo il calo (se al ritorno la coda
+        // suona ancora, la pausa la rimanda onReady).
+        if (pauseWanted && !heldByCall) return
         val q = queue ?: return
         val now = SystemClock.elapsedRealtime()
         val index = q.currentIndex ?: return
