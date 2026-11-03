@@ -724,7 +724,9 @@ case " ${ONLY:-location-arrival} " in *" location-arrival "*)
     adb shell pm grant $PKG android.permission.BLUETOOTH_CONNECT || true
     adb shell cmd companiondevice associate 0 $PKG $CAR > $d/companion.txt 2>&1
     adb shell cmd companiondevice list 0 >> $d/companion.txt 2>&1
-    id=$(tr -d '\r' < $d/companion.txt | grep -i " $CAR " | awk '{print $NF}' | tail -n 1)
+    # "pkg mac id" before Android 15 or so, "Association{mId=1, ... mDeviceMacAddress=...}" on 17.
+    id=$(tr -d '\r' < $d/companion.txt | grep -i "$CAR" | grep -o 'mId=[0-9]*' | head -n 1 | cut -d= -f2)
+    [ -n "$id" ] || id=$(tr -d '\r' < $d/companion.txt | grep -i " $CAR " | awk '{print $NF}' | tail -n 1)
     echo "location-arrival: association ${id:-none}"
     adb shell am force-stop "$PKG"
     adb logcat -c
@@ -738,9 +740,15 @@ case " ${ONLY:-location-arrival} " in *" location-arrival "*)
     adb shell locksettings set-pin $PIN
     adb shell input keyevent KEYCODE_SLEEP
     sleep 15
+    # Watched by myCar now (mNotifyOnDeviceNearby), then the car's arrival as Android reports it.
+    adb shell cmd companiondevice list 0 >> $d/companion.txt 2>&1
     if [ -n "$id" ]; then
-        adb shell cmd companiondevice simulate-device-appeared "$id" ||
-            adb shell cmd companiondevice simulate-device-event "$id" 0
+        out=$(adb shell cmd companiondevice simulate-device-appeared "$id" 2>&1)
+        echo "simulate-device-appeared: $out" >> $d/companion.txt
+        if grep -qiE "unknown|error|exception|usage" <<< "$out"; then
+            out=$(adb shell cmd companiondevice simulate-device-event "$id" 0 2>&1)
+            echo "simulate-device-event 0: $out" >> $d/companion.txt
+        fi
     fi
     sleep 12
     adb shell dumpsys activity services "$PKG" > $d/dumpsys.txt 2>&1
