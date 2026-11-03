@@ -140,6 +140,8 @@ object AssistantCommands {
         }
         var destination = after(text, NAVIGATE_TRIGGERS) ?: return null
         if (destination.isBlank()) return "Where to?"
+        // "Go to the next song", "go to the previous track": the music's own buttons, not a place.
+        if (text.startsWith("go to ") && TRANSPORT.matches(destination)) return null
 
         val entries = allEntries(context)
         // "go to Spotify" means the app, and "go to settings" the screen; "go to Target" is a place.
