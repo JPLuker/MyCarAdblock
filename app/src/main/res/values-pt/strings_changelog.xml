@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.2-alpha -->
+    <string-array name="changelog_48">
+        <item>A reprodução automática não toca mais pelo alto-falante do telefone, no seu bolso, quando o Bluetooth de música do carro ainda não está conectado: ela espera até um minuto, e uma pausa ou uma música que você escolher nesse meio-tempo é respeitada.</item>
+    </string-array>
+
     <!-- 0.7.1-alpha -->
     <string-array name="changelog_47">
         <item>O mapa não fica mais preto, sem a sua localização, quando o Wi-Fi do carro cai e volta durante a viagem, ou quando o carro se conecta com o myCar deixado aberto no telefone bloqueado.</item>

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_48">
+        <item>L\'Autoplay non intona più le ballate dall\'altoparlante del telefono, giù in tasca, quando il Bluetooth della musica di bordo non è ancora salito: lo aspetta fino a un minuto, e una pausa o un brano che scegli nel frattempo restano.</item>
+    </string-array>
+
     <string-array name="changelog_47">
         <item>La mappa non resta più nera e senza posizione quando il Wi-Fi dell\'auto cade e torna durante la navigazione, o quando sali a bordo con myCar rimasta aperta sul telefono bloccato. Barra dritta!</item>
         <item>Col piratesco, la voce e i numeri di telefono seguono di nuovo il porto di casa del tuo telefono.</item>

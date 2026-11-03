@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.2-alpha -->
+    <string-array name="changelog_48">
+        <item>Autoplay spielt nicht mehr über den Lautsprecher des Telefons in deiner Tasche, wenn die Bluetooth-Musik des Autos noch nicht verbunden ist: Es wartet bis zu einer Minute darauf, und eine Pause oder ein Titel, den du inzwischen wählst, bleibt.</item>
+    </string-array>
+
     <!-- 0.7.1-alpha -->
     <string-array name="changelog_47">
         <item>Die Karte bleibt nicht mehr schwarz und ohne Standort, wenn das WLAN des Autos während der Fahrt abbricht und wiederkommt oder wenn sich das Auto verbindet, während myCar auf dem gesperrten Telefon offen geblieben ist.</item>

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_48">
+        <item>A reprodução automática não toca mais as cantigas pelo alto-falante do telefone, no seu bolso, quando o Bluetooth de música do navio ainda não subiu a bordo: ela espera até um minuto, e uma pausa ou uma música que você escolher nesse meio-tempo é respeitada.</item>
+    </string-array>
+
     <string-array name="changelog_47">
         <item>O mapa não fica mais preto e sem a sua localização quando o Wi-Fi do carro cai e volta em plena travessia, ou quando você sobe a bordo com o myCar deixado aberto no telefone bloqueado. Rumo firme!</item>
         <item>Com a fala de pirata, a voz e os números de telefone voltam a seguir o porto de origem do seu telefone.</item>

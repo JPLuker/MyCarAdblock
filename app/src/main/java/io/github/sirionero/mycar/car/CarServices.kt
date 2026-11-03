@@ -107,6 +107,26 @@ object CarServices {
     /** Whether the map is idle because the driver stopped it, rather than not started yet. */
     val navStoppedByDriver: Boolean get() = navStopped
     private var autoplayPending = false
+    /** The driver's asks of the music when Autoplay was set ([CarMedia.askMark]): anything since, and it's left alone. */
+    private var autoplayAsks = 0
+    /** When Autoplay began waiting for a Bluetooth output (elapsedRealtime), 0 if it isn't. */
+    private var autoplayBluetoothSince = 0L
+
+    /**
+     * Autoplay set by the drive's own pick: it waits for the sound's way to the car (autoplayIfDue).
+     * Its own, not [mediaAutoPicked]: the full-screen player opened on the same app clears that one,
+     * and a change of the sound's way from there then played on the phone's speaker.
+     */
+    private var autoplayAutoPicked = false
+
+    /** Autoplay, from now on, unless the driver asks the music for anything first. */
+    private fun armAutoplay(on: Boolean, auto: Boolean) {
+        autoplayPending = on
+        autoplayAutoPicked = auto
+        // Marked at the first autoplayIfDue, once the app is connected (see there).
+        autoplayAsks = -1
+        autoplayBluetoothSince = 0L
+    }
 
     /**
      * The phone's preview of the car's screen is open (Settings, no car): its car UI picks the music
@@ -295,7 +315,7 @@ object CarServices {
         if (_mediaApp.value?.component == app.component && live) {
             // Already open, and asked to play: it plays, now or once it's connected.
             if (autoplay) {
-                autoplayPending = true
+                armAutoplay(true, auto)
                 if (phase == CarMedia.Phase.READY) autoplayIfDue()
             }
             return
@@ -317,7 +337,7 @@ object CarServices {
         // The drive's first pick, before its song: myCar's own players say it only once their page or
         // server is up, Autoplay or not; a phone app at once or never, so only when it's told to play.
         if (auto && !_mediaDecided.value && (autoplay || inside(app.component))) expectMusic(true)
-        autoplayPending = autoplay
+        armAutoplay(autoplay, auto)
         media.connect(app)
         // Not torn down and rebuilt per app: the capture covers whatever the phone plays, so
         // switching media apps never costs the driver another consent dialog.
@@ -367,19 +387,95 @@ object CarServices {
      */
     fun autoplayIfDue() {
         if (!autoplayPending) return
-        if (mediaAutoPicked && autoplayWaits(
+        // Playing already, whatever started it (its own page, the car's keys, the phone): done. A
+        // pause given in the page afterwards stays, instead of Autoplay starting it again later.
+        if (media.now.value.state == android.media.session.PlaybackState.STATE_PLAYING) {
+            autoplayPending = false
+            return
+        }
+        // The driver played, paused or picked something meanwhile: their choice stays. Counted from
+        // the first call here, which comes once the app is connected: a ▶ pressed while it was still
+        // connecting reached no app, and it cancelled Autoplay with nothing playing.
+        if (autoplayAsks < 0) {
+            autoplayAsks = media.askMark()
+        } else if (media.askedSince(autoplayAsks)) {
+            autoplayPending = false
+            // The music asked for may still be coming (a web page that loads at its first key): the
+            // column kept for it stays, with 20 s from now after a wait for the Bluetooth. Closed here,
+            // the map widened and narrowed again when that music came.
+            if (autoplayBluetoothSince != 0L && _musicStarting.value) {
+                musicWait.removeCallbacks(musicWaitOver)
+                musicWait.postDelayed(musicWaitOver, MUSIC_START_MS)
+            }
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay left alone - the music was asked for something meanwhile")
+            return
+        }
+        // A car that brought no way out for the music within the minute: no music by itself a long
+        // while later. Checked first, whatever the way is now: when the car's Bluetooth music comes
+        // back is the very moment Autoplay would otherwise play.
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (autoplayBluetoothSince != 0L && now - autoplayBluetoothSince > AUTOPLAY_BLUETOOTH_MS) {
+            autoplayPending = false
+            if (_musicStarting.value) expectMusic(false)
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay given up - no way out for the music but the phone's speaker for ${AUTOPLAY_BLUETOOTH_MS / 1000} s")
+            return
+        }
+        val bluetoothOut = io.github.sirionero.mycar.audio.CarAudioRoute.bluetoothOut.value
+        if (autoplayAutoPicked && autoplayWaits(
                 deciding = io.github.sirionero.mycar.audio.CarAudioRoute.deciding.value,
                 throughMyCar = CarSettings.pipeAudio.value,
                 captureOn = CarAudio.capture.value == CarAudio.Capture.ON,
                 straightIn = _mediaApp.value?.component?.let(Xonos::isInside) == true && CarAudio.direct.value,
+                bluetoothOut = bluetoothOut,
             )
         ) {
-            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the sound to have a way to the car")
+            val forBluetooth = !bluetoothOut && !CarSettings.pipeAudio.value &&
+                !io.github.sirionero.mycar.audio.CarAudioRoute.deciding.value
+            if (!forBluetooth) {
+                // Automatic deciding, or Android's question: as before, with no limit.
+                autoplayBluetoothSince = 0L
+                io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the sound to have a way to the car")
+                return
+            }
+            if (autoplayBluetoothSince == 0L) {
+                autoplayBluetoothSince = now
+                // The column kept for the music ("Starting …") lasts as long as this wait may: run out at
+                // 20 s, the map widened and narrowed again once the music came - two new surfaces.
+                if (_musicStarting.value) {
+                    musicWait.removeCallbacks(musicWaitOver)
+                    musicWait.postDelayed(musicWaitOver, AUTOPLAY_BLUETOOTH_MS)
+                }
+            }
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the car's Bluetooth music (or a cable), not to play on the phone's speaker")
+            return
+        }
+        // The assistant up (listening, answering): the drive's pick doesn't start the music over it. It
+        // plays as the assistant closes (AutoplayWhenReady calls again then).
+        if (autoplayAutoPicked && CarAssistant.state.value.phase != CarAssistant.Phase.IDLE) {
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the assistant to close")
             return
         }
         autoplayPending = false
+        // After a wait for the Bluetooth, the song has its own 20 s from the Play to say itself.
+        if (autoplayBluetoothSince != 0L && _musicStarting.value) {
+            musicWait.removeCallbacks(musicWaitOver)
+            musicWait.postDelayed(musicWaitOver, MUSIC_START_MS)
+        }
         if (!media.now.value.playing) media.togglePlay()
     }
+
+    /**
+     * Cinema opened (CinemaMusic): an Autoplay still waiting doesn't start the music later. When the
+     * car's Bluetooth came back within the minute, it took the speakers from the film.
+     */
+    fun dropAutoplay() {
+        if (!autoplayPending) return
+        autoplayPending = false
+        io.github.sirionero.mycar.MyCarLog.i("media: Autoplay left alone - Cinema opened")
+    }
+
+    /** How long the drive's Autoplay waits for a Bluetooth output on the Bluetooth way. */
+    private const val AUTOPLAY_BLUETOOTH_MS = 60_000L
 
     // --- start and stop ------------------------------------------------------------------
 
@@ -472,7 +568,11 @@ object CarServices {
         // Xonos's column still kept for its first song: kept for the app's (Xonos gives way 20 s in, as
         // the wait ends: closed and opened again, the map would be lent two more surfaces).
         val waiting = _musicStarting.value
-        openMedia(app, autoplay = CarSettings.autoplay.value || media.now.value.playing, remember = false, auto = mediaAutoPicked)
+        // The drive's own Autoplay, still waiting, stays the drive's: the app's waits for the sound's way
+        // to the car too. Xonos's player (full screen, its tile) clears mediaAutoPicked, and the app then
+        // played at once, on the phone's speaker. The preview on the phone (Settings, no car) plays nothing
+        // by itself, as at autostart: the Autoplay setting started the app there, on the phone's speaker.
+        openMedia(app, autoplay = (CarSettings.autoplay.value && !phonePreview) || media.now.value.playing, remember = false, auto = mediaAutoPicked || (autoplayPending && autoplayAutoPicked))
         if (waiting) expectMusic(true)
     }
 

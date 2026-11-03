@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_48">
+        <item>当船上的蓝牙音乐还没登船时，自动播放不再从你口袋里手机的扬声器唱起船歌：它最多等待一分钟，期间你选择的暂停或歌曲会被保留。</item>
+    </string-array>
+
     <string-array name="changelog_47">
         <item>航行中车辆的 Wi-Fi 断开又恢复时，或你登船时 myCar 仍在锁定的手机上开着，海图不再一片漆黑、没有你的位置。稳住航向！</item>
         <item>使用海盗腔时，语音和电话号码重新跟随你手机的母港。</item>

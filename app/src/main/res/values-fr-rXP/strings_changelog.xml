@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_48">
+        <item>Chants dès l’appareillage : plus de chants sur le haut-parleur du téléphone, au fond de votre poche, quand la musique en Bluetooth du navire n’est pas encore à bord ; ils l’attendent jusqu’à une minute, et une pause ou un titre que vous choisissez entre-temps est respecté.</item>
+    </string-array>
+
     <string-array name="changelog_47">
         <item>La carte ne reste plus noire et sans votre position quand le Wi-Fi de la voiture tombe puis revient en pleine traversée, ou quand vous montez à bord alors que myCar est resté ouvert sur le téléphone verrouillé. Cap tenu !</item>
         <item>Avec le parler pirate, la voix et les numéros de téléphone suivent de nouveau le port d’attache de votre téléphone.</item>

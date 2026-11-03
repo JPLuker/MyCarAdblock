@@ -323,6 +323,20 @@ Tutti i token in un solo posto, `car/design/`:
   Una scelta nuova per "Accanto alla mappa" riapre la colonna chiusa con la X (`showSidePane`); la X del
   testo riporta il lettore (`showSideControls`).
 - **Autoplay** (chiave `car_autoplay`) acceso di default dalla 0.6.9 (richiesta dell'utente); chi l'ha spento lo trova spento.
+  Dalla 0.7.2 (log del 3 novembre: con la strada Bluetooth salvata per l'auto e il suo A2DP caduto col reset
+  dell'auto, al ricollegamento Spotify Web suonava 27 s dall'altoparlante in tasca) sulla strada Bluetooth aspetta
+  un'uscita che non sia il telefono (`CarAudioRoute.bluetoothOut`: A2DP, LE Audio, cavo, USB, AUX, apparecchi
+  acustici, seguiti con un `AudioDeviceCallback` dall'immagine alla fine del viaggio; vero fuori da un viaggio), al
+  massimo un minuto (`AUTOPLAY_BLUETOOTH_MS`, guardato per primo a ogni chiamata: il ritorno del Bluetooth dopo il
+  minuto non fa suonare). Una richiesta del guidatore alla musica dopo che l'app è collegata (`MusicAsks`: ▶, pausa,
+  anche a voce, un brano; il segno si prende alla prima `autoplayIfDue`, a READY) lascia stare l'Autoplay; con la
+  musica già in `STATE_PLAYING` l'Autoplay è fatto (`AutoplayWhenReady` lo guarda). Due revisioni indipendenti: la
+  prima ha trovato sette punti (limite mai applicato, ▶ durante il collegamento, pausa a voce, AUX, pausa nella
+  pagina), tutti corretti. Un'altra revisione (scettici) quattro, corretti: l'Autoplay della scelta del viaggio
+  (`autoplayAutoPicked`) non suona sopra l'assistente su (fase non IDLE: aspetta, e `AutoplayWhenReady` lo richiama
+  quando si chiude); Cinema aperto lo lascia stare (`CinemaMusic.opened` → `CarServices.dropAutoplay`); il passaggio
+  all'app Xonos (`xonosAppTakesOver`) lo tiene del viaggio (`autoplayPending && autoplayAutoPicked`: il lettore di
+  Xonos azzera `mediaAutoPicked`) e nell'anteprima sul telefono (`phonePreview`) non fa suonare da solo.
 - **Mini lettore sulla mappa intera** (0.6.9, richiesta dell'utente: "una nuvoletta piccola, spostabile tenendola
   premuta, con la locandina, indietro, pausa e avanti, che non occupi la mappa e si possa nascondere";
   `car/MapMiniPlayer.kt`, regola pura `car/MiniPlace.kt` + `MiniPlaceTest`, chiavi `car_mini_player` e
