@@ -903,6 +903,9 @@ class MaPlayer(
     private suspend fun awaitReady() {
         if (ready.value) return
         if (wakePhoneServer()) return awaitPhoneServer()
+        // Il server sul telefono ha rifiutato myCar per un motivo che non passa da solo: non ripartirà, e l'errore arriva
+        // subito come per play e salti, invece che dopo READY_TIMEOUT_MS.
+        if (phoneServer() && phoneServerFailed()) throw notReady()
         withTimeoutOrNull(READY_TIMEOUT_MS) { ready.first { it } } ?: throw notReady()
     }
 

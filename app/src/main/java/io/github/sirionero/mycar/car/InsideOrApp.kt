@@ -90,12 +90,26 @@ internal object InsideOrApp {
             val maOut = !maUp && xonosInside && xonosThere && Tailnet.outOfReach(app, maUrls) &&
                 !Bridges.xonos.available(app)
             // Music Assistant inside the Xonos app (127.0.0.1): the app would play from that same server,
-            // which a woken app takes a few seconds to start. Nothing to take over: Xonos waits for it.
+            // which a woken app takes a few seconds to start. Nothing to take over: Xonos waits for it -
+            // unless the app turned that address down for good (it moved to another Music Assistant, or took
+            // its own off the phone): its server won't start for myCar, and the app plays from where it is
+            // now. Only once this drive's own attempt failed: the bridge remembers refusals of earlier drives.
             val maOnThePhone = maUrls.isNotEmpty() && maUrls.all { url ->
                 runCatching { URI(url).host }.getOrNull()?.let(Bridges::onThePhone) == true
             }
+            val phoneRefused = maOnThePhone && ma is Connection.Failed && maUrls.all { url ->
+                runCatching { URI(url).host }.getOrNull()?.let(Bridges.xonos::refusedForGood) == true
+            }
             if (!Xonos.appTakesOver.value &&
-                xonos.update(now, xonosInside, xonosThere && !maOnThePhone, maUp, online, maOut, (ma as? Connection.Failed)?.problem in MISSET)
+                xonos.update(
+                    now,
+                    xonosInside,
+                    xonosThere && (!maOnThePhone || phoneRefused),
+                    maUp,
+                    online,
+                    maOut,
+                    (ma as? Connection.Failed)?.problem in MISSET || phoneRefused,
+                )
             ) {
                 log.i("the Xonos app takes Xonos's place for this drive ($ma; ${Tailnet.describe(app)})")
                 Xonos.appTakesOver.value = true
