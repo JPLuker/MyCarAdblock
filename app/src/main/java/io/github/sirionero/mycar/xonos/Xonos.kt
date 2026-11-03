@@ -6,6 +6,7 @@ import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Process
+import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import io.github.sirionero.mycar.AppSettings
 import io.github.sirionero.mycar.BuildConfig
@@ -15,9 +16,11 @@ import io.github.sirionero.mycar.bridge.BridgeSocketFactory
 import io.github.sirionero.mycar.bridge.Bridges
 import io.github.sirionero.mycar.media.MediaApp
 import io.github.sirionero.mycar.xonos.data.ArtCache
+import io.github.sirionero.mycar.xonos.data.Connection
 import io.github.sirionero.mycar.xonos.data.Library
 import io.github.sirionero.mycar.xonos.data.Logged
 import io.github.sirionero.mycar.xonos.data.MaRepository
+import io.github.sirionero.mycar.xonos.data.Problem
 import io.github.sirionero.mycar.xonos.data.Settings
 import io.github.sirionero.mycar.xonos.playback.PlaybackService
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -153,6 +156,42 @@ object Xonos {
      */
     private fun playTimeout() = if (onPhoneServer) Library.PHONE_PLAY_TIMEOUT_MS else Library.PLAY_TIMEOUT_MS
 
+    /**
+     * The Music Assistant inside the Xonos app, stopped because nobody used it (or closed by Android), starts again
+     * when myCar opens the bridge, and stays on while myCar keeps it bound: a play, a skip, a choice or the car's
+     * menu waits for it (see MaPlayer and PlaybackService) rather than failing at once. True if it's worth waiting:
+     * the account's server is that one, the Xonos app is there with its bridge, and the server hasn't turned myCar
+     * down for good. The connection then tries again now, not at its next attempt - which after a few failures
+     * comes up to 20 s later.
+     */
+    fun wakePhoneServer(): Boolean {
+        if (!onPhoneServer || !Bridges.xonos.available(app) || phoneServerRefused()) return false
+        val now = SystemClock.elapsedRealtime()
+        if (repo.connection.value is Connection.Failed && now - wokenAt > WAKE_AGAIN_MS) {
+            wokenAt = now
+            repo.reconnect()
+        }
+        return true
+    }
+
+    @Volatile private var wokenAt = 0L
+
+    /**
+     * The Xonos app's Music Assistant answered and turned myCar down for a reason that won't pass by itself (the
+     * token, the version...): no use waiting for it to start (see MaPlayer). How the server's own process is doing
+     * the Xonos app doesn't tell myCar: this is the one sure sign.
+     */
+    fun phoneServerRefused(): Boolean = (repo.connection.value as? Connection.Failed)?.problem in REFUSED_FOR_GOOD
+
+    private val REFUSED_FOR_GOOD = setOf(
+        Problem.BAD_TOKEN,
+        Problem.TOO_OLD,
+        Problem.DENIED,
+        Problem.NOT_MUSIC_ASSISTANT,
+        Problem.SETUP_REQUIRED,
+        Problem.BAD_ADDRESS,
+    )
+
     /** The player, as the car's media screens connect to it. */
     fun component(context: Context) = ComponentName(context, PlaybackService::class.java)
 
@@ -179,4 +218,7 @@ object Xonos {
     private const val ICON_BACKGROUND = 0xFF0E1420.toInt()
     private const val KEY_IMPORT_OFF = "xonos_import_off"
     private const val KEY_ON = "xonos_in_the_car"
+
+    /** How soon a wake ([wakePhoneServer]) may make the connection try again: several asks at once make one try. */
+    private const val WAKE_AGAIN_MS = 2_000L
 }
