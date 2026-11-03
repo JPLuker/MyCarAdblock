@@ -523,6 +523,8 @@ if [ -s previews/browser-select/crash.txt ]; then head -20 previews/browser-sele
 grep -h "change " previews/browser-select/log.txt previews/browser-select/stream.txt 2>/dev/null | head -3 || true
 
 # The app grid over each kind of moving wallpaper: the same screen shot 2.5s apart, to compare.
+EXTRA="--es wallpaper mycar" shoot motion-mycar 1920 720 240 "$GRID_BUTTON;$WAIT;$WAIT"
+EXTRA="--es wallpaper mycar" shoot motion-mycar-800x480 800 480 160 "48,436;$WAIT;$WAIT"
 EXTRA="--es wallpaper waves" shoot motion-waves 1920 720 240 "$GRID_BUTTON;$WAIT;$WAIT"
 EXTRA="--es wallpaper fireflies" shoot motion-fireflies 1920 720 240 "$GRID_BUTTON;$WAIT;$WAIT"
 EXTRA="--es wallpaper lava" shoot motion-lava 1920 720 240 "$GRID_BUTTON;$WAIT;$WAIT"
