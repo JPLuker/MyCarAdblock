@@ -7,14 +7,16 @@
 <resources>
     <!-- 0.7.0-alpha -->
     <string-array name="changelog_46">
-        <item>Fixed a crash that closed myCar and ended the drive: it came after a tap in Plancia\'s page, on a page beside the map, then a turn back to the map or to the app grid.</item>
+        <item>Fixed a crash that closed myCar and ended the drive: it came after a tap in Plancia\'s page, then a turn to the map or the app grid, the Plancia app taking its place, or a change of theme.</item>
+        <item>Pirate speak: in Settings &gt; Language, every text of myCar in pirate terms, in your language. We chart our own course.</item>
+        <item>A new moving wallpaper, myCar · Rebel: the waves, and a pirate ship that rides out every storm with its skull and crossbones.</item>
         <item>If myCar ever closes by itself, the next start writes in the log why Android closed it (a crash, memory, not responding), so it can be fixed.</item>
         <item>The voice models load one at a time, never after the drive is over, and before the first command only with memory to spare.</item>
         <item>Mini player: on small screens it starts clear of the map\'s buttons, let go under them it moves just clear, and the map\'s faded buttons no longer take taps meant for the map.</item>
         <item>Lyrics: every song starts from its first line, and a live version of another song no longer brings its words.</item>
         <item>Spotify and the other music services: \"play …\" waits up to 25 seconds for the page, and a Play still waiting doesn\'t start once you\'ve changed the music.</item>
         <item>Choosing the car\'s radio stops a video or a radio playing in Cinema or the browser, and they don\'t start again by themselves. Autoplay starts the music only once the sound has a way to the car.</item>
-        <item>Assistant: \"next\", \"pause\" or \"stop\" inside a longer question no longer change the song; a \"cancel\" said at the end of a reply\'s countdown is heard; reading a message aloud has a time limit.</item>
+        <item>Assistant: \"next\", \"pause\" or \"stop\" inside a longer question no longer change the song; \"don\'t send\" and \"cancel\" are heard while you answer a message; a pause right before another music command no longer cancels it.</item>
         <item>What\'s new waits for a call to end, and during a call the pages beside the map and their menu stay below the call\'s bar.</item>
         <item>Changing myCar\'s language during a drive changes the car\'s screen at once; on Android 12 and 13, opening myCar during a drive gives the map its position back.</item>
     </string-array>

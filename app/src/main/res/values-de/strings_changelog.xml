@@ -2,14 +2,16 @@
 <resources>
     <!-- 0.7.0-alpha -->
     <string-array name="changelog_46">
-        <item>Ein Absturz ist behoben, der myCar schloss und die Verbindung beendete: Er kam nach einem Tippen in die Plancia-Seite auf einer Seite neben der Karte und dem Wechsel zurück zur Karte oder zur App-Übersicht.</item>
+        <item>Ein Absturz ist behoben, der myCar schloss und die Verbindung beendete: Er kam nach einem Tippen in die Plancia-Seite und dem Wechsel zur Karte oder zur App-Übersicht, wenn die Plancia-App ihren Platz einnahm, oder beim Wechsel des Designs.</item>
+        <item>Piratensprache: unter Einstellungen &gt; Sprache jeder Text von myCar in Piratensprache, in deiner Sprache. Unseren Kurs bestimmen wir selbst.</item>
+        <item>Ein neuer bewegter Hintergrund, myCar · Rebell: die Wellen und ein Segelschiff, das mit seiner Totenkopfflagge jeden Sturm übersteht.</item>
         <item>Schließt sich myCar einmal von selbst, schreibt der nächste Start ins Protokoll, warum Android myCar geschlossen hat (Absturz, Speicher, keine Antwort), damit es behoben werden kann.</item>
         <item>Die Sprachmodelle laden nacheinander, nie nach dem Ende der Fahrt, und vor dem ersten Befehl nur, wenn reichlich Speicher frei ist.</item>
         <item>Mini-Player: Auf kleinen Bildschirmen startet er abseits der Kartentasten, unter ihnen losgelassen rückt er knapp daneben, und die verblassten Tasten der Karte fangen keine Tipps mehr ab, die der Karte gelten.</item>
         <item>Songtexte: Jeder Song beginnt mit seiner ersten Zeile, und die Live-Version eines anderen Songs bringt nicht mehr dessen Text.</item>
         <item>Spotify und die anderen Musikdienste: „Spiele …“ wartet bis zu 25 Sekunden auf die Seite, und ein noch wartendes Play startet nicht, wenn du inzwischen die Musik gewechselt hast.</item>
         <item>Wählst du das Radio des Autos, stoppen ein Video oder ein Radio in Cinema oder im Browser und starten nicht von selbst wieder. Autoplay startet die Musik erst, wenn der Ton einen Weg ins Auto hat.</item>
-        <item>Assistent: „weiter“, „Pause“ oder „Stopp“ in einer längeren Frage wechseln den Song nicht mehr; ein „Abbrechen“ am Ende des Countdowns einer Antwort wird gehört; das Vorlesen einer Nachricht hat ein Zeitlimit.</item>
+        <item>Assistent: „weiter“, „Pause“ oder „Stopp“ in einer längeren Frage wechseln den Song nicht mehr; „nicht senden“ und „Abbrechen“ werden gehört, während du auf eine Nachricht antwortest; eine Pause direkt vor einem anderen Musikbefehl hebt ihn nicht mehr auf.</item>
         <item>Neuigkeiten warten das Ende eines Anrufs ab, und während eines Anrufs bleiben die Seiten neben der Karte und ihr Menü unter der Anrufleiste.</item>
         <item>Änderst du die Sprache von myCar während der Fahrt, ändert sich der Bildschirm des Autos sofort; unter Android 12 und 13 gibt das Öffnen von myCar während der Fahrt der Karte ihre Position zurück.</item>
     </string-array>
