@@ -79,8 +79,4 @@
     <string name="plancia_set_up_text">在手机上的 myCar 中：舵轮 > Plancia，填写你的 Home Assistant 地址和令牌。</string>
     <string name="plancia_connecting">正在向 Home Assistant 靠拢</string>
 
-    <string name="directions_ferry">登上渡轮</string>
-    <string name="directions_destination_ahead">目的港在前方</string>
-    <string name="directions_destination_left">目的港在左侧</string>
-    <string name="directions_destination_right">目的港在右侧</string>
 </resources>

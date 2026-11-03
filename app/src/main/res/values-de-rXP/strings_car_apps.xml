@@ -87,10 +87,4 @@
     <string name="plancia_note_opens_first">Beim Auslaufen</string>
 
 
-    <string name="directions_straight">Geradeaus Kurs halten</string>
-    <string name="directions_straight_onto">Geradeaus Kurs halten auf %1$s</string>
-    <string name="directions_continue">Kurs halten</string>
-    <string name="directions_continue_onto">Kurs halten auf %1$s</string>
-    <string name="directions_ferry">An Bord der Fähre gehen</string>
-    <string name="directions_destination_ahead">Das Ziel liegt voraus</string>
 </resources>

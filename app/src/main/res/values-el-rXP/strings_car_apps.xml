@@ -81,8 +81,4 @@
     <string name="plancia_connecting">Πλεύση προς το Home Assistant</string>
     <string name="plancia_reload">Νέο φόρτωμα του πίνακα</string>
 
-    <string name="directions_ferry">Μπαρκάρετε στο πορθμείο</string>
-    <string name="directions_destination_ahead">Πιάνουμε στεριά: ο προορισμός σας είναι μπροστά</string>
-    <string name="directions_destination_left">Πιάνουμε στεριά: ο προορισμός σας είναι στα αριστερά</string>
-    <string name="directions_destination_right">Πιάνουμε στεριά: ο προορισμός σας είναι στα δεξιά</string>
 </resources>
