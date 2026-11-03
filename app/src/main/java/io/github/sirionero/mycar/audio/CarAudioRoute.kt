@@ -74,9 +74,10 @@ object CarAudioRoute {
     private val _bluetoothOut = MutableStateFlow(true)
 
     /**
-     * The phone has a Bluetooth output for music, the car's or any other (LE Audio too): music started
-     * now doesn't play on the phone's speaker. Watched from the car's picture to the drive's end, for
-     * the drive's own Autoplay (CarServices.autoplayIfDue); true outside a drive, where nothing waits.
+     * The phone has an output for music other than itself (Bluetooth, the car's or any other, LE Audio
+     * too, or a cable to the car's AUX): music started now doesn't play on the phone's speaker. Watched
+     * from the car's picture to the drive's end, for the drive's own Autoplay (CarServices.autoplayIfDue);
+     * true outside a drive, where nothing waits.
      */
     val bluetoothOut: StateFlow<Boolean> = _bluetoothOut.asStateFlow()
     private var outputs: AudioDeviceCallback? = null
@@ -256,9 +257,10 @@ object CarAudioRoute {
     }
 
     /**
-     * Any Bluetooth output for music, not only the car's address and not only A2DP: what matters to
-     * Autoplay is that the music doesn't come out of the phone. Matched to the car (as Automatic does)
-     * it waited for good with an LE Audio car or one that names another address.
+     * Any output for music that isn't the phone itself: Bluetooth (A2DP or LE Audio, the car's or not)
+     * or a cable or USB to the car's AUX. What matters to Autoplay is that the music doesn't come out
+     * of the phone. Matched to the car (as Automatic does) it waited for good with an LE Audio car or
+     * one that names another address; counting Bluetooth only, with a cable to the AUX.
      */
     private fun anyBluetoothOut(): Boolean {
         val manager = audio ?: return true
@@ -266,6 +268,14 @@ object CarAudioRoute {
             AudioDeviceInfo.TYPE_BLUETOOTH_A2DP,
             AudioDeviceInfo.TYPE_BLE_HEADSET,
             AudioDeviceInfo.TYPE_BLE_SPEAKER,
+            AudioDeviceInfo.TYPE_HEARING_AID,
+            AudioDeviceInfo.TYPE_WIRED_HEADSET,
+            AudioDeviceInfo.TYPE_WIRED_HEADPHONES,
+            AudioDeviceInfo.TYPE_LINE_ANALOG,
+            AudioDeviceInfo.TYPE_LINE_DIGITAL,
+            AudioDeviceInfo.TYPE_AUX_LINE,
+            AudioDeviceInfo.TYPE_USB_DEVICE,
+            AudioDeviceInfo.TYPE_USB_HEADSET,
         )
         if (Build.VERSION.SDK_INT >= 33) types += AudioDeviceInfo.TYPE_BLE_BROADCAST
         return manager.getDevices(AudioManager.GET_DEVICES_OUTPUTS).any { it.type in types }

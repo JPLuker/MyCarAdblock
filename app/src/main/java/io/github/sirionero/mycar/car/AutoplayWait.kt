@@ -9,10 +9,10 @@ package io.github.sirionero.mycar.car
  *
  * [deciding]: Automatic hasn't picked the drive's way yet. [throughMyCar]: the sound goes through
  * myCar. [captureOn]: Android's capture runs. [straightIn]: myCar's own player (Xonos inside myCar)
- * plays straight into the car's channel, with no capture. [bluetoothOut]: the phone has a Bluetooth
- * output for music; on the Bluetooth way without one (the car's Bluetooth music not connected yet, or
- * dropped with a reset of the car) the music played on the phone's speaker, in the driver's pocket:
- * 27 s at a reconnection in a driver's log.
+ * plays straight into the car's channel, with no capture. [bluetoothOut]: the phone has an output for
+ * music other than itself (Bluetooth, or a cable to the car's AUX); on the Bluetooth way without one
+ * (the car's Bluetooth music not connected yet, or dropped with a reset of the car) the music played
+ * on the phone's speaker, in the driver's pocket: 27 s at a reconnection in a driver's log.
  */
 internal fun autoplayWaits(
     deciding: Boolean,

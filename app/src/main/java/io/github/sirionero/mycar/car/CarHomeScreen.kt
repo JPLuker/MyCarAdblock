@@ -76,7 +76,7 @@ fun CarHome() {
     val now by CarServices.media.now.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { CarServices.autostart(frame) }
-    AutoplayWhenReady(phase)
+    AutoplayWhenReady(phase, now.state == android.media.session.PlaybackState.STATE_PLAYING)
 
     val navigator = LocalCarNavigator.current
     val panel = navigator.sidePanel

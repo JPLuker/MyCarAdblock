@@ -566,7 +566,11 @@ class CarMedia(private val context: Context) {
      * "pause" is heard the app already looks stopped; a toggle did nothing and the song came back
      * as soon as the microphone let go. A real pause tells the app to stay stopped.
      */
-    fun pause() = controller?.transportControls?.pause()
+    fun pause() {
+        // A pause the driver said: Autoplay waiting for the car's Bluetooth doesn't start the music after it.
+        asks.asked()
+        controller?.transportControls?.pause()
+    }
 
     /**
      * The pause a spoken "pause" sends again once myCar gives the music its focus back

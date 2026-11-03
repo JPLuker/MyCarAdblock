@@ -115,7 +115,8 @@ object CarServices {
     /** Autoplay, from now on, unless the driver asks the music for anything first. */
     private fun armAutoplay(on: Boolean) {
         autoplayPending = on
-        autoplayAsks = media.askMark()
+        // Marked at the first autoplayIfDue, once the app is connected (see there).
+        autoplayAsks = -1
         autoplayBluetoothSince = 0L
     }
 
@@ -378,11 +379,29 @@ object CarServices {
      */
     fun autoplayIfDue() {
         if (!autoplayPending) return
-        // The driver played, paused or picked something meanwhile: their choice stays. Waiting for the
-        // car's Bluetooth, Autoplay could otherwise start the music again a minute after a pause.
-        if (media.askedSince(autoplayAsks)) {
+        // Playing already, whatever started it (its own page, the car's keys, the phone): done. A
+        // pause given in the page afterwards stays, instead of Autoplay starting it again later.
+        if (media.now.value.state == android.media.session.PlaybackState.STATE_PLAYING) {
+            autoplayPending = false
+            return
+        }
+        // The driver played, paused or picked something meanwhile: their choice stays. Counted from
+        // the first call here, which comes once the app is connected: a ▶ pressed while it was still
+        // connecting reached no app, and it cancelled Autoplay with nothing playing.
+        if (autoplayAsks < 0) {
+            autoplayAsks = media.askMark()
+        } else if (media.askedSince(autoplayAsks)) {
             autoplayPending = false
             io.github.sirionero.mycar.MyCarLog.i("media: Autoplay left alone - the music was asked for something meanwhile")
+            return
+        }
+        // A car that brought no way out for the music within the minute: no music by itself a long
+        // while later. Checked first, whatever the way is now: when the car's Bluetooth music comes
+        // back is the very moment Autoplay would otherwise play.
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (autoplayBluetoothSince != 0L && now - autoplayBluetoothSince > AUTOPLAY_BLUETOOTH_MS) {
+            autoplayPending = false
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay given up - no way out for the music but the phone's speaker for ${AUTOPLAY_BLUETOOTH_MS / 1000} s")
             return
         }
         val bluetoothOut = io.github.sirionero.mycar.audio.CarAudioRoute.bluetoothOut.value
@@ -397,18 +416,13 @@ object CarServices {
             val forBluetooth = !bluetoothOut && !CarSettings.pipeAudio.value &&
                 !io.github.sirionero.mycar.audio.CarAudioRoute.deciding.value
             if (!forBluetooth) {
+                // Automatic deciding, or Android's question: as before, with no limit.
+                autoplayBluetoothSince = 0L
                 io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the sound to have a way to the car")
                 return
             }
-            // A car that doesn't bring its Bluetooth music back soon: no music by itself a long while later.
-            val now = android.os.SystemClock.elapsedRealtime()
             if (autoplayBluetoothSince == 0L) autoplayBluetoothSince = now
-            if (now - autoplayBluetoothSince > AUTOPLAY_BLUETOOTH_MS) {
-                autoplayPending = false
-                io.github.sirionero.mycar.MyCarLog.i("media: Autoplay given up - no Bluetooth music connection for ${AUTOPLAY_BLUETOOTH_MS / 1000} s")
-                return
-            }
-            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the phone's Bluetooth music connection, not to play on its speaker")
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the car's Bluetooth music (or a cable), not to play on the phone's speaker")
             return
         }
         autoplayPending = false
