@@ -185,7 +185,9 @@ class PlaybackService : MediaLibraryService() {
     /** Come ci presentiamo a Music Assistant, deciso a ogni connessione (la rete può essere cambiata). */
     private fun identity(): SendspinClient.Identity {
         val settings = app.settings
-        val metered = connectivity.isActiveNetworkMetered
+        // Con il Music Assistant sul telefono stesso la rete non c'entra: il margine è quello del Wi-Fi.
+        val onPhone = app.onPhoneServer
+        val metered = connectivity.isActiveNetworkMetered && !onPhone
         val formats = buildList {
             // Opus pesa un decimo del PCM: in rete mobile fa la differenza. Il PCM resta come riserva.
             if (AndroidAudio.canDecode(MediaFormat.MIMETYPE_AUDIO_OPUS)) add(StreamFormat("opus", RATE, 2, 16))
@@ -204,6 +206,9 @@ class PlaybackService : MediaLibraryService() {
             minBufferMs = if (metered) 400 else 150,
             volume = settings.volume,
             muted = settings.muted,
+            // Senza i campi che la specifica di Sendspin ha tolto: Music Assistant non segna più il telefono come non
+            // conforme. Solo dove si sa che li legge altrove: dalla 2.10.8, e il server dell'app Xonos (2.10.8).
+            modernWire = onPhone || atLeast((app.repo.connection.value as? Connection.Connected)?.server?.version, 2, 10, 8),
         )
     }
 
@@ -535,5 +540,23 @@ class PlaybackService : MediaLibraryService() {
         const val LOCK_TIMEOUT_MS = 6 * 60 * 60 * 1000L
         const val QUEUE_WAIT_MS = 10_000L
         const val QUEUE_POLL_MS = 200L
+
+        /**
+         * Music Assistant è almeno [major].[minor].[patch]. Severo: una versione che non si legge ("?", una build di
+         * sviluppo "0.0.0") non lo è, e nemmeno una di prova della stessa ("2.10.8b1"); "2.11.0b7" sì.
+         */
+        fun atLeast(version: String?, major: Int, minor: Int, patch: Int): Boolean {
+            val match = VERSION.find(version.orEmpty()) ?: return false
+            val (a, b, c, rest) = match.destructured
+            val found = listOf(a.toInt(), b.toInt(), c.toInt())
+            val wanted = listOf(major, minor, patch)
+            for (i in 0..2) {
+                if (found[i] != wanted[i]) return found[i] > wanted[i]
+            }
+            // Uguale: solo se non è una versione di prova (niente dopo il terzo numero).
+            return rest.isBlank()
+        }
+
+        private val VERSION = Regex("^\\s*(\\d{1,4})\\.(\\d{1,4})\\.(\\d{1,6})(.*)$")
     }
 }
