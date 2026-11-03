@@ -79,6 +79,18 @@ enum class AppLanguage(
             return entries.firstOrNull { it.tag == tag }
         }
 
+        /**
+         * The choice as Settings shows it: like [chosen], but with pirate speak on Android 13 and later
+         * the phone's language stays the phone's (null), though Android keeps a language with the XP region.
+         * Before, it read as the language of that moment: turning pirate speak off fixed it, and "the
+         * phone's language" couldn't be picked.
+         */
+        fun saved(context: Context): AppLanguage? {
+            if (Build.VERSION.SDK_INT < 33 || !pirate(context)) return chosen(context)
+            val tag = AppSettings.getString(context, KEY, "")
+            return if (tag.isEmpty()) null else entries.firstOrNull { it.tag == tag } ?: chosen(context)
+        }
+
         /** The language myCar is in now: the chosen one, else the phone's when it's one of these. */
         fun current(context: Context): AppLanguage = chosen(context) ?: of(phoneLocale()) ?: ENGLISH
 
@@ -98,8 +110,8 @@ enum class AppLanguage(
             AppSettings.putString(activity, KEY_PIRATE, if (pirate) "on" else "")
             if (Build.VERSION.SDK_INT >= 33) {
                 // Android keeps one language for myCar: pirate speak with the phone's language is the
-                // pirate way of the language myCar is in now.
-                val spoken = language ?: if (pirate) current(activity) else null
+                // pirate way of the phone's language (the choice stays in KEY, read by [saved]).
+                val spoken = language ?: if (pirate) (of(phoneLocale()) ?: ENGLISH) else null
                 activity.getSystemService(LocaleManager::class.java)?.applicationLocales =
                     if (spoken == null) LocaleList.getEmptyLocaleList() else LocaleList(localeFor(spoken, pirate))
                 return

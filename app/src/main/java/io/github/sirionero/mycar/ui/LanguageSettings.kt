@@ -41,7 +41,7 @@ internal fun LanguageSection() {
     var open by remember { mutableStateOf(false) }
     // Read again when the language changes: Android 13 applies it without starting myCar again.
     val config = LocalConfiguration.current
-    val chosen = remember(open, config) { AppLanguage.chosen(context) }
+    val chosen = remember(open, config) { AppLanguage.saved(context) }
     val phone = AppLanguage.of(AppLanguage.phoneLocale())
     val phoneLabel = stringResource(R.string.language_phone, phone?.label ?: AppLanguage.ENGLISH.label)
     SettingsSection(stringResource(R.string.language_title), footer = stringResource(R.string.language_footer)) {
@@ -51,9 +51,12 @@ internal fun LanguageSection() {
             icon = ImageVector.vectorResource(R.drawable.sym_language),
         )
         // Pirate speak: every text in pirate terms, in the language above (see AppLanguage.PIRATE).
-        val pirate = remember(open, config) { AppLanguage.pirate(context) }
+        // Held here too: on Android 12 during a drive the screen doesn't start again, and the switch
+        // stayed as it was.
+        var pirate by remember(open, config) { mutableStateOf(AppLanguage.pirate(context)) }
         SwitchRow(stringResource(R.string.language_pirate), pirate, stringResource(R.string.language_pirate_detail)) { on ->
             (context as? Activity)?.let { AppLanguage.choose(it, chosen, pirate = on) }
+            pirate = on
         }
     }
     if (open) {
