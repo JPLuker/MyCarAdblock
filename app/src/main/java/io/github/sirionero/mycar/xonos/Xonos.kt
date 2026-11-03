@@ -178,10 +178,13 @@ object Xonos {
 
     /**
      * The Xonos app's Music Assistant answered and turned myCar down for a reason that won't pass by itself (the
-     * token, the version...): no use waiting for it to start (see MaPlayer). How the server's own process is doing
-     * the Xonos app doesn't tell myCar: this is the one sure sign.
+     * token, the version...), or the Xonos app itself did (its server isn't this address any more: it moved to another
+     * Music Assistant or took its own off the phone, and won't start it for myCar): no use waiting for it to start (see
+     * MaPlayer). How the server's own process is doing the Xonos app doesn't tell myCar: these are the sure signs.
      */
-    fun phoneServerRefused(): Boolean = (repo.connection.value as? Connection.Failed)?.problem in REFUSED_FOR_GOOD
+    fun phoneServerRefused(): Boolean =
+        (repo.connection.value as? Connection.Failed)?.problem in REFUSED_FOR_GOOD ||
+            runCatching { URI(settings.load().homeUrl).host }.getOrNull()?.let(Bridges.xonos::refusedForGood) == true
 
     private val REFUSED_FOR_GOOD = setOf(
         Problem.BAD_TOKEN,

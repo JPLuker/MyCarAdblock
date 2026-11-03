@@ -313,7 +313,9 @@ class PlaybackService : MediaLibraryService() {
             // nemmeno se intanto risponde e rifiuta myCar per un motivo che non passa da solo.
             if (!app.wakePhoneServer()) return
             withTimeoutOrNull(PHONE_BROWSE_WAIT_MS) {
-                app.repo.connection.first { it is Connection.Connected || (it is Connection.Failed && it.problem in LASTING) }
+                app.repo.connection.first {
+                    it is Connection.Connected || (it is Connection.Failed && (it.problem in LASTING || app.phoneServerRefused()))
+                }
             } is Connection.Connected
         } else {
             withTimeoutOrNull(BROWSE_WAIT_MS) { app.repo.connection.first { it is Connection.Connected } } != null
