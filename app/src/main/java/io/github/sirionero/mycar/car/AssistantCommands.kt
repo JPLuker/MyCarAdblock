@@ -208,6 +208,13 @@ object AssistantCommands {
         query = query.removePrefix("some ").trim()
         // "Play the next song", "play it again": the music's own buttons, not a search.
         if (query.isEmpty() || query in RESUME_WORDS || TRANSPORT.matches(query)) return null
+        // A phrasebook's "metti", "pon", "mets", "põe" or "put on" that wasn't for a song: "metti in pausa
+        // la musica" is the pause; "metti il riscaldamento a 21 gradi" the house, on to Home Assistant.
+        when (playAsked(query, CarServices.mediaApp.value?.label)) {
+            PlayAsked.PAUSE -> return mediaCommand("pause")
+            PlayAsked.HOUSE -> return null
+            PlayAsked.MUSIC -> Unit
+        }
         val media = CarServices.media
 
         // "play Daft Punk on Metrolist": switch to that app first, if it's one we know.
