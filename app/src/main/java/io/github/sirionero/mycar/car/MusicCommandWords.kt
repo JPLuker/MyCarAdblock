@@ -25,4 +25,14 @@ private val MUSIC_COMMAND_WORDS = setOf(
     "playlist", "radio", "station", "one", "it", "this", "that", "something", "else", "another", "different",
     // The little words around them.
     "the", "a", "my", "some", "to", "last", "please",
+    // "Pause for a second", "skip the ad".
+    "for", "second", "moment", "minute", "ad", "ads",
+    // Said in the driver's language where the phrasebook leaves it as it is: "stop la musica",
+    // "next canzone", "stop a la música", "pause la musique", "stopp die Musik", "pause a música".
+    // Without them those went on to Home Assistant and the music played on.
+    "il", "lo", "la", "le", "al", "alla", "musica", "canzone", "brano", "pezzo", "traccia",
+    "el", "los", "las", "música", "canción", "cancion", "tema",
+    "les", "du", "musique", "chanson", "morceau", "titre",
+    "stopp", "der", "die", "das", "den", "musik", "lied", "titel",
+    "o", "os", "as", "canção", "cancao", "faixa",
 )

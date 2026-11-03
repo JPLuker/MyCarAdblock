@@ -12,7 +12,7 @@ Twink Software LLC. It keeps Gearslip's license (AGPL-3.0) and builds on its wor
 
 ## What's new in 0.7
 
-Everything the 0.6 releases brought, together in 0.7, and **216 bugs found and fixed since 0.6.0**
+Everything the 0.6 releases brought, together in 0.7, and **220 bugs found and fixed since 0.6.0**
 (counted commit by commit; 158 of them had reached a published version), among them the crash that
 closed myCar on the Home pages. We chart our own course: **pirate speak** (Settings > Language >
 Pirate speak) rewrites every text of myCar the pirate way, in each of its languages, and the new

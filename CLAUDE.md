@@ -845,7 +845,7 @@ Tutti i token in un solo posto, `car/design/`:
   puntini dorati fino a una stella (`PirateShip.drawCourse`, 3,25-4,55 s); sotto l'etichetta della 0.7
   una bussola il cui ago gira e si ferma, e «Scegliamo noi le nostre rotte.» parola per parola
   (`ui/IntroCourse.kt`, `WelcomeCourse`, `intro_course` nelle 9 lingue); sotto, il numero dei bug trovati
-  e corretti dalla release prima (`Intro.BUGS_FIXED`, plurale `intro_bugs_fixed`: 216 dalla 0.6.0 alla
+  e corretti dalla release prima (`Intro.BUGS_FIXED`, plurale `intro_bugs_fixed`: 220 dalla 0.6.0 alla
   0.7.0, contati commit per commit, nel dubbio come funzione nuova; elenco in `bugcount.tsv` nella
   scratchpad di quella sessione). La pagina dà al testo lo spazio che serve e alla nave quello che resta
   (su un telefono basso la nave è più piccola). Da aggiornare a ogni intro nuova.
@@ -860,6 +860,18 @@ Tutti i token in un solo posto, `car/design/`:
   richiesto (`VoiceFocus`); assistente del telefono a schermo spento senza blocco (`AssistantUnlock`);
   pipeline di Home Assistant con un modello ("*", `AssistPlan`); lunghezze enormi nel log dei messaggi
   dell'auto (`Protobuf.describe`).
+- **Revisione dell'assistente prima dell'uscita della 0.7.0** (richiesta dell'utente: "vedi se trovi altri
+  bug"): un banco JVM che segue le decisioni di `AssistantCommands.handle` su ~450 frasi nelle 9 lingue,
+  0.6.9 contro la 0.7, ha trovato quattro regressioni, corrette: le parole che contano come comando
+  della musica (`musicCommandOnly`) erano solo inglesi, e «stop la musica», «stopp die Musik», «pause la
+  musique», che i frasari lasciano come detti, andavano a Home Assistant (ora articoli e nomi della musica
+  delle lingue); una frase che finisce col nome di un'app musicale è musica (`endsWithMusicApp`: «metti la
+  luce su Spotify»); una parola che le canzoni condividono con la casa detta da sola («la luce», «the
+  lights», `mayBeASong`) è una canzone se Home Assistant non è collegato; «how long until home», «do you
+  have the time», «change settings» (`WholePhrases`). Una revisione dei crash di tutto il codice nuovo
+  non ne ha trovati; zone grigie da provare in CI: il ☰ di Home Assistant in una parte che apre Plancia a
+  tutto schermo col fuoco nella pagina (scatto da fare, `crash-webfocus-menu`), e il fuoco ripreso dal
+  WebView dopo la manopola (`PlanciaWeb.dropFocus` dice "took it back" ma la parte esce lo stesso).
 - Condivisione schermo (`mirror/`): mentre il telefono è copiato in auto, `TouchRelayService`
   (accessibilità, già usato per i tocchi) aggiunge un pixel trasparente
   `TYPE_ACCESSIBILITY_OVERLAY` con `screenOrientation = LANDSCAPE` (fisso, non sensore) che gira il

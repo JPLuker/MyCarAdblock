@@ -25,6 +25,8 @@ import kotlin.math.sin
 
 /** [Motion.Rebel]: the bands at the back, the ship riding the second, the bands in front over it. */
 internal fun DrawScope.drawRebel(screen: Size, rebel: Motion.Rebel, seconds: Double, fade: Float) {
+    // Nothing to draw on, and the foam's steps along the crest would be 0 wide (a loop for ever).
+    if (screen.width <= 0f || screen.height <= 0f) return
     val shipX = screen.width * SHIP_AT
     // How far into the storm: 0 most of the time, up to 1 as the big wave goes over.
     val u = ((seconds % STORM_S) / STORM_S).toFloat()
