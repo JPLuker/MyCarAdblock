@@ -732,11 +732,14 @@ case " ${ONLY:-location-arrival} " in *" location-arrival "*)
         [ -n "$id" ] || id=$(tr -d '\r' < $d/companion.txt | grep -i " $CAR " | awk '{print $NF}' | tail -n 1)
         echo "location-arrival ($run): association ${id:-none}"
         adb shell am force-stop "$PKG"
+        # files/ doesn't exist yet on a fresh install: made first, or the control had no file.
+        adb shell run-as $PKG mkdir -p files
         if [ $run = without ]; then
             adb shell run-as $PKG touch files/no-arrival-screen
         else
             adb shell run-as $PKG rm -f files/no-arrival-screen
         fi
+        echo "control file: $(adb shell run-as $PKG ls files/no-arrival-screen 2>&1 | tr -d '\r')" >> $d/companion.txt
         adb logcat -c
         timeout 300 "$ADB_BIN" logcat -v time -s myCar ActivityManager > $d/log.txt 2>&1 &
         logpid=$!
