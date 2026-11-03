@@ -709,6 +709,56 @@ case " ${ONLY:-location-locked} " in *" location-locked "*)
     ;;
 esac
 
+# A car arriving over Bluetooth with myCar's screen open from before and the phone locked
+# (LocationKeepAlive.screenForArrival, 0.7.1): the car allowed through an association made by the
+# shell, as Android's "Allow" makes it, and its arrival simulated by Android's companion service.
+# myCar's screen was created well over 10 s before, so only the screen made for the arrival can let
+# the position service start. In the log: the refusal, then "trying again" and "running".
+case " ${ONLY:-location-arrival} " in *" location-arrival "*)
+    d=previews/location-arrival
+    rm -rf $d
+    mkdir -p $d
+    CAR=02:11:22:33:44:55
+    adb shell pm grant $PKG android.permission.ACCESS_FINE_LOCATION || true
+    adb shell pm grant $PKG android.permission.ACCESS_COARSE_LOCATION || true
+    adb shell pm grant $PKG android.permission.BLUETOOTH_CONNECT || true
+    adb shell cmd companiondevice associate 0 $PKG $CAR > $d/companion.txt 2>&1
+    adb shell cmd companiondevice list 0 >> $d/companion.txt 2>&1
+    id=$(tr -d '\r' < $d/companion.txt | grep -i " $CAR " | awk '{print $NF}' | tail -n 1)
+    echo "location-arrival: association ${id:-none}"
+    adb shell am force-stop "$PKG"
+    adb logcat -c
+    timeout 300 "$ADB_BIN" logcat -v time -s myCar ActivityManager > $d/log.txt 2>&1 &
+    logpid=$!
+    # myCar opened as on any day (it watches the cars it may connect to), then left behind.
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity"
+    sleep 8
+    adb shell input keyevent KEYCODE_HOME
+    sleep 2
+    adb shell locksettings set-pin $PIN
+    adb shell input keyevent KEYCODE_SLEEP
+    sleep 15
+    if [ -n "$id" ]; then
+        adb shell cmd companiondevice simulate-device-appeared "$id" ||
+            adb shell cmd companiondevice simulate-device-event "$id" 0
+    fi
+    sleep 12
+    adb shell dumpsys activity services "$PKG" > $d/dumpsys.txt 2>&1
+    if [ -n "$id" ]; then adb shell cmd companiondevice simulate-device-disappeared "$id" || true; fi
+    kill $logpid 2>/dev/null
+    adb logcat -d -b crash > $d/crash.txt 2>&1
+    adb shell am force-stop "$PKG"
+    adb shell cmd companiondevice disassociate 0 $PKG $CAR || true
+    adb shell locksettings clear --old $PIN || true
+    adb shell input keyevent KEYCODE_WAKEUP
+    adb shell wm dismiss-keyguard || true
+    sleep 2
+    echo "--- location-arrival: a car arriving with myCar open behind the lock screen ---"
+    grep -h "auto-connect\|location keep-alive" $d/log.txt | cut -c1-300 | head -30
+    grep -iE "LocationKeepAlive|isForeground|foregroundServiceType|WhileInUse|Wiu" $d/dumpsys.txt | head -20
+    ;;
+esac
+
 # The assistant in another language on the car's screen (--es voiceLang, as with its model on the
 # phone): its help in Italian, in German (the longest words), at 800x480, and an answer in German.
 EXTRA="--es voiceLang it --ez voiceHelp true" shoot voice-it 1920 720 240 "$WAIT"
