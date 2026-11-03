@@ -868,6 +868,14 @@ class MaPlayer(
         pauseWanted = false
         val held = heldByCall
         heldByCall = false
+        // Telefonata (o assistente) cominciata e finita mentre partiva una scelta dall'auto: la sua pausa aspettava la
+        // fine della scelta (pauseAfterChoice → stop) e avrebbe fermato la musica a interruzione finita. play() la toglie:
+        // con una scelta in corso handleSetPlayWhenReady(true) rimette solo pauseAfterChoice a falso. Non dopo una pausa
+        // del guidatore: wantPaused() spegne heldByCall, e lo stop resta.
+        if (held && choosing > 0 && pauseAfterChoice) {
+            play()
+            return
+        }
         val q = queue ?: return
         // La rete è tornata durante la telefonata: si riprende ora da dove la caduta l'aveva fermata.
         if (held && ready.value && resumeAfterDrop()) return
