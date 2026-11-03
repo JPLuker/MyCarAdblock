@@ -817,7 +817,12 @@ Tutti i token in un solo posto, `car/design/`:
   di file; glossari nella scratchpad della sessione): gergo pirata della lingua, ribelle e colorito ma
   mai volgare (in auto ci sono bambini), stesso registro della lingua, etichette brevi, e i testi di
   sicurezza (video in marcia, chiamate, permessi, errori) seri e chiari come prima. Nomi propri e di
-  marchi invariati. Le frasi dell'assistente (codice, non risorse) restano normali.
+  marchi invariati. Le frasi dell'assistente (codice, non risorse) restano normali. Restano normali
+  anche `common_on`/`common_off` (stati degli interruttori), `common_remove`, `common_cancel` e `common_ok`
+  (confermano anche una chiamata, la rimozione o la password di un certificato): un testo pirata che li
+  nomina usa il loro testo normale. Un testo pirata uguale a quello normale non si tiene (copie vecchie
+  quando la lingua cambia). Dopo gli scrittori, un passaggio di coerenza per lingua allinea i nomi citati
+  fra virgolette (es. «Usa myCar a bordo» = `settings_use_mycar`) e i termini.
 - **Sfondo myCar «Ribelle»** (0.7.0, richiesta dell'utente: "il tema myCar, le onde, la barra del menu
   con effetto glass, e tra le onde un veliero con la bandiera col teschio che sopravvive alle
   intemperie: se va sotto un'onda poi rispunta fuori"): `Motion.Rebel` in `Wallpapers.kt`, disegno in
