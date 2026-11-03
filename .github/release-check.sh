@@ -252,6 +252,11 @@ adb shell dumpsys package $PKG | grep -iE "LOCAL_NETWORK|NEARBY_WIFI|BLUETOOTH_C
 tap "Settings"
 sleep 3
 shot 2-settings
+# The settings are in groups (0.6.0; Xonos is in Music from 0.6.6): Plancia's "Save and test" is
+# in its own group. Before, "Save and test" and "Use the Xonos app's account" were never found,
+# and the bridge wasn't tried at all.
+tap "Plancia"
+sleep 3
 tap "Save and test"
 sleep 20
 # The result is written below the button: scrolled to.
@@ -264,6 +269,22 @@ done
 echo "--- Plancia in myCar, Save and test ---"
 grep -E "^(At home|Away|Trying)" "$OUT/3-plancia-test.txt" || echo "(no result line on screen)"
 
+# Back to the groups (the first Back may only close the keyboard), or to Home and Settings again.
+for i in 1 2 3; do
+    adb shell input keyevent KEYCODE_BACK
+    sleep 2
+    ui
+    [ -n "$(centre "Music")" ] && break
+    if [ -n "$(centre "Settings")" ]; then tap "Settings"; sleep 3; break; fi
+done
+# The groups list from its top: Music is near it, and tap only scrolls down.
+ui
+if [ -z "$(centre "Music")" ]; then
+    adb shell input swipe $((W / 2)) $((H / 3)) $((W / 2)) $((H * 3 / 4)) 300; sleep 1
+    adb shell input swipe $((W / 2)) $((H / 3)) $((W / 2)) $((H * 3 / 4)) 300; sleep 1
+fi
+tap "Music"
+sleep 3
 tap "Use the Xonos app's account"
 sleep 20
 # The result is written at the bottom of the Xonos section, below the sign-in: scrolled to.
