@@ -46,7 +46,7 @@
     <string name="settings_plancia_use_app_detail">Sus direcciones y su token suben a bordo, sin escribir nada</string>
     <string name="settings_plancia_asking">Haciendo señales a Plancia…</string>
     <string name="settings_plancia_app_no_account">Plancia aún no tiene una cuenta que compartir: aparéjala primero en Plancia o escríbela abajo.</string>
-    <string name="settings_plancia_missing_remove">Añade una dirección y un token. Para sacar a Plancia de myCar, usa «Por la borda».</string>
+    <string name="settings_plancia_missing_remove">Añade una dirección y un token. Para echar a Plancia de myCar por la borda, usa Quitar.</string>
     <string name="settings_plancia_remove_title">¿Echar a Plancia por la borda?</string>
     <string name="settings_plancia_remove_text">myCar olvida sus direcciones y su token. La app Plancia, si está en el teléfono, vuelve a bordo.</string>
     <string name="settings_plancia_removed">Plancia está desactivada: la app Plancia vuelve a bordo, si está en el teléfono.</string>
@@ -66,6 +66,8 @@
     <string name="settings_cinema_remove_title">¿Echar %1$s por la borda?</string>
     <string name="settings_cinema_remove_site_text">Desembarca de Cinema. Para recuperarlo, hay que volver a escribir su dirección.</string>
     <string name="settings_cinema_remove">Echar %1$s por la borda</string>
+    <string name="settings_cinema_videos_ask">Permite que myCar los muestre a bordo, en «Tesoro del teléfono»</string>
+    <string name="settings_cinema_videos_allowed">Se ven a bordo, en «Tesoro del teléfono»</string>
     <string name="settings_cinema_protected">vídeo protegido, probablemente negro a bordo</string>
     <string name="settings_cinema_tv_footer">Listas IPTV en formato M3U, de tu proveedor, una lista pública o un servidor de TV en casa: cada una es un recuadro en Cinema con sus canales. Se reproducen con el reproductor del propio teléfono; los canales protegidos (DRM) y los multicast se quedan en tierra.</string>
     <string name="settings_cinema_tv_remove_text">Su dirección y sus canales desembarcan de myCar. Para recuperarla, hay que volver a escribir la dirección.</string>

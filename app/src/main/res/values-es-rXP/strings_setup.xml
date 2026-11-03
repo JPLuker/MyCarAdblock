@@ -77,7 +77,7 @@
         <item quantity="other">%d vías de agua halladas y tapadas desde la 0.6</item>
     </plurals>
     <string name="intro_music_title">Tonadas a bordo.</string>
-    <string name="intro_music_body">Spotify y otros servicios suenan dentro de myCar, desde su propio reproductor web. Inicia sesión una vez en el teléfono con tu propia cuenta, en Aparejos &gt; Tonadas. Allí arría la app Spotify del teléfono: un solo Spotify a bordo, no dos.</string>
+    <string name="intro_music_body">Spotify y otros servicios suenan dentro de myCar, desde su propia gramola web. Inicia sesión una vez en el teléfono con tu propia cuenta, en Aparejos &gt; Tonadas. Allí arría la app Spotify del teléfono: un solo Spotify a bordo, no dos.</string>
     <string name="intro_mini_title">Toda la carta.</string>
     <string name="intro_mini_body">Cierra la gramola junto a la carta y una minigramola flota encima, con la portada y sus botones: mantenla pulsada y arrástrala adonde quieras. Junto a la carta, la gramola ahora llega hasta Muy grande.</string>
     <string name="intro_lyrics_title">Canta los versos.</string>

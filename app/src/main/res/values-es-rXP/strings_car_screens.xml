@@ -12,7 +12,7 @@
     <string name="car_settings_map_day_night">La carta día/noche</string>
     <string name="car_settings_autoplay">Que suene al abordar</string>
     <string name="car_settings_car_audio">Sonido a bordo</string>
-    <string name="car_settings_car_audio_note">«A través de myCar» envía el sonido del teléfono por la conexión propia de myCar, el cable o el Wi-Fi, como Android Auto. Android pide compartir la pantalla en cada travesía, y algunas apps lo bloquean. Bluetooth suena como lo haría normalmente el teléfono, y Android no pregunta nunca, pero algunos coches solo admiten llamadas por Bluetooth. «Automático» usa Bluetooth cuando el coche recibe así las tonadas del teléfono, y la conexión de myCar cuando no.</string>
+    <string name="car_settings_car_audio_note">«A través de myCar» envía el sonido del teléfono por la conexión propia de myCar, el cable o el Wi-Fi, como Android Auto. Android pide compartir la pantalla en cada travesía, y algunas apps lo bloquean. Bluetooth suena como lo haría normalmente el teléfono, y Android no pregunta nunca, pero algunos barcos solo admiten llamadas por Bluetooth. «Automático» usa Bluetooth cuando el barco recibe así las tonadas del teléfono, y la conexión de myCar cuando no.</string>
     <string name="car_settings_spoken_directions">Rumbo en voz alta</string>
     <string name="car_settings_spoken_directions_note">myCar canta en voz alta cada giro por los altavoces del barco, y las tonadas bajan mientras habla. Desactívalo si la voz de tu app de mapas ya suena a bordo.</string>
     <string name="car_settings_system_speech">Que el loro use el reconocimiento de voz del teléfono</string>
