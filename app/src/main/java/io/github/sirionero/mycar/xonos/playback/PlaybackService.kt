@@ -186,6 +186,11 @@ class PlaybackService : MediaLibraryService() {
             CarAudio.linkGone.collect {
                 engine.end()
                 player.forgetDrop()
+                // Neanche la ripresa a fine telefonata (l'auto spenta durante una chiamata): senza l'auto la musica
+                // uscirebbe dall'altoparlante del telefono. E il volume azzerato per la chiamata torna su qui, perché a
+                // fine chiamata non ci pensa più nessuno.
+                resumeAfterInterruption = false
+                engine.setDuck(1f)
                 player.pauseFromSystem()
             }
         }
