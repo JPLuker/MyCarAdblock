@@ -381,7 +381,10 @@ object VoiceReply {
     }
 
     private fun begin(state: State): Int {
-        // The words below are said in the driver's language: known before the first of them.
+        // The words below are said in the driver's language: known before the first of them. The one
+        // the assistant listens in, so the question and the answer listened for match (not a language
+        // a Jolly key's command was written in).
+        CarAssistant.forgetWritten()
         CarAssistant.syncLanguage()
         CarAssistant.stopListening()
         CarAssistant.stopSpeaking()

@@ -312,6 +312,7 @@ object CarAssistant {
         syncLanguage()
         // AssistantCommands answers in English; the driver hears and reads it in their language.
         speakReply(AssistantLanguage.answer(english))
+        forgetWritten()
     }
 
     /**
@@ -324,6 +325,16 @@ object CarAssistant {
         if (_pendingCommand.value != heard || _state.value.phase != Phase.THINKING) return
         _pendingCommand.value = null
         speakReply(text)
+        forgetWritten()
+    }
+
+    /**
+     * A written command's language ([runPhrase]) was for its own answer, now on its way: what comes
+     * next - a message read aloud, "do you want to reply?" and the "yes" listened for - is in the one the
+     * assistant listens in. Not set again here: the answer is being said in the written one.
+     */
+    internal fun forgetWritten() {
+        written = null
     }
 
     /** [heard] has gone to Home Assistant (AssistantBrain): the overlay says who it's waiting for. */
