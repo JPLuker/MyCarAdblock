@@ -266,11 +266,14 @@ class CarPreviewActivity : ComponentActivity() {
         val playerOnly = intent.getBooleanExtra("player", false)
         val wallpapersOnly = intent.getBooleanExtra("wallpapers", false)
         val hiddenAppsOnly = intent.getBooleanExtra("hiddenApps", false)
+        // --ez jollySettings true: the car settings' Jolly key alone, below the fold in the car's settings.
+        val jollySettingsOnly = intent.getBooleanExtra("jollySettings", false)
         p.start(imageReader.surface, w, h, dpi) {
             when {
                 playerOnly -> io.github.sirionero.mycar.car.PlayerPreview()
                 wallpapersOnly -> io.github.sirionero.mycar.car.WallpaperPickerPreview()
                 hiddenAppsOnly -> io.github.sirionero.mycar.car.HiddenAppsPreview()
+                jollySettingsOnly -> io.github.sirionero.mycar.car.JollySettingsPreview()
                 else -> CarUi()
             }
         }

@@ -590,7 +590,8 @@ esac
 # The Jolly key (car/Jolly*.kt), in the dock just above the microphone: 296 dp down (184 dp from the
 # bottom), the microphone 70 dp under it. "jolly" in the workflow's shots takes them all.
 # - jolly-800x480: Home with the key and two slots above it (the user's Golf), then a tap: its command
-#   "what time is it" as if said - the assistant shows it and answers.
+#   "what time is it" as if said - the assistant shows it and answers; then held: the chooser, its kinds
+#   in two rows.
 # - jolly-1920x720: nothing chosen yet, so the tap opens the chooser.
 # - jolly-choose: the chooser from a long press ("Assistant command" lit, what the key does now), that
 #   kind's list (the key's own command, then the ready-made ones), "Read my messages" chosen: back
@@ -601,6 +602,10 @@ esac
 #   there's no room for both, and the map keeps its place.
 # - jolly-ai, jolly-apps, jolly-contacts: the lists of assistants, apps and contacts (two contacts written
 #   as root, one with two numbers: tapped, its numbers).
+# - jolly-it-800x480, jolly-de, jolly-en-XP: the chooser in Italian at 800x480, in German, in pirate speak.
+# - jolly-settings: the car settings' rows on their own (--ez jollySettings true).
+# - jolly-phone: on the phone, Settings > Car screen: the section, the kinds, a ready-made command picked
+#   and saved, a place written with the phone's keyboard and saved.
 JOLLY_KEY="72,444"         # at 1920x720
 JOLLY_KEY_800="48,296"
 JOLLY_TILE_CALL="314,222"  # the kinds, one row at 1920x720
@@ -612,9 +617,10 @@ JOLLY_ROW_1="1032,186"     # the lines of a kind's list, 80 dp apart
 JOLLY_ROW_2="1032,306"
 case " ${ONLY:-} " in *" jolly "*)
     ONLY="$ONLY jolly-800x480 jolly-1920x720 jolly-choose jolly-say-it jolly-light jolly-large-800x480 jolly-xl-800x480"
-    ONLY="$ONLY jolly-ai jolly-apps jolly-contacts jolly-home jolly-unlock" ;;
+    ONLY="$ONLY jolly-ai jolly-apps jolly-contacts jolly-home jolly-unlock jolly-it-800x480 jolly-de jolly-en-XP"
+    ONLY="$ONLY jolly-settings jolly-phone" ;;
 esac
-EXTRA="--es jolly say" shoot jolly-800x480 800 480 160 "$WAIT;$JOLLY_KEY_800;$WAIT;$WAIT"
+EXTRA="--es jolly say" shoot jolly-800x480 800 480 160 "$WAIT;$JOLLY_KEY_800;$WAIT;$WAIT;$JOLLY_KEY_800,long;$WAIT"
 shoot jolly-1920x720 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT"
 EXTRA="--es jolly say" shoot jolly-choose 1920 720 240 "$WAIT;$JOLLY_KEY,long;$JOLLY_TILE_SAY;$JOLLY_ROW_2;$WAIT"
 EXTRA="--es jolly say --es jollySay 'che ore sono' --es jollyLang it" shoot jolly-say-it 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT;$WAIT"
@@ -622,6 +628,16 @@ EXTRA="--es jolly say --es carTheme LIGHT" shoot jolly-light 1920 720 240 "$WAIT
 EXTRA="--es jolly say --es carScale 1.25" shoot jolly-large-800x480 800 480 160 "$WAIT"
 EXTRA="--es jolly say --es carScale 1.5" shoot jolly-xl-800x480 800 480 160 "$WAIT"
 shoot jolly-ai 1920 720 240 "$WAIT;$JOLLY_KEY;$JOLLY_TILE_AI;$WAIT"
+EXTRA="--ez jollySettings true --es jolly call" shoot jolly-settings 1920 720 240 "$WAIT"
+jolly_lang() {  # jolly_lang <shot> <locale> <width> <height> <dpi> <the key>: the chooser in that language
+    case " ${ONLY:-$1} " in *" $1 "*) ;; *) return ;; esac
+    BEFORE="adb shell cmd locale set-app-locales $PKG --locales $2" EXTRA="--es jolly say" \
+        shoot "$1" "$3" "$4" "$5" "$WAIT;$6,long;$WAIT"
+    adb shell cmd locale set-app-locales "$PKG" --locales en-US
+}
+jolly_lang jolly-it-800x480 it 800 480 160 "$JOLLY_KEY_800"
+jolly_lang jolly-de de 1920 720 240 "$JOLLY_KEY"
+jolly_lang jolly-en-XP en-XP 1920 720 240 "$JOLLY_KEY"
 shoot jolly-apps 1920 720 240 "$WAIT;$JOLLY_KEY;$JOLLY_TILE_APP;$WAIT"
 case " ${ONLY:-jolly-contacts} " in *" jolly-contacts "*)
     if adb root >/dev/null 2>&1; then
@@ -1067,6 +1083,35 @@ phone_settings() {
     grep -h "FATAL\|AndroidRuntime" $d/crash.txt || echo "phone-settings: no crash"
 }
 phone_settings
+
+# The Jolly key on the phone (ui/JollySettings.kt), in Settings > Car screen: its section, the kinds, a
+# ready-made command picked and saved, a place written with the phone's keyboard and saved. Here, after
+# the helpers above it and before setup-phone, which wipes myCar's data.
+phone_jolly() {
+    case " ${ONLY:-jolly-phone} " in *" jolly-phone "*) ;; *) return ;; esac
+    local d=previews/jolly-phone
+    mkdir -p $d
+    adb shell am force-stop "$PKG"
+    adb logcat -c
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen settings >/dev/null
+    sleep 4
+    tap_text "Car screen"; sleep 3
+    scroll_to "What it does"; sleep 1; adb exec-out screencap -p > $d/01-section.png
+    tap_text "What it does"; sleep 1.5; adb exec-out screencap -p > $d/02-kinds.png
+    tap_text "Assistant command"; sleep 1.5; adb exec-out screencap -p > $d/03-command.png
+    tap_text "Read my messages"; sleep 1; adb exec-out screencap -p > $d/04-command-picked.png
+    tap_text "Save"; sleep 1.5; adb exec-out screencap -p > $d/05-saved.png
+    tap_text "What it does"; sleep 1.5
+    tap_text "Go to a place"; sleep 1.5; adb exec-out screencap -p > $d/06-place.png
+    tap_match 'class="android.widget.EditText"'; sleep 1
+    adb shell input text "Piazza%sdel%sDuomo%s1"; sleep 1; adb exec-out screencap -p > $d/07-place-written.png
+    tap_text "Save"; sleep 1.5; adb exec-out screencap -p > $d/08-place-saved.png
+    adb logcat -d -s myCar > $d/log.txt
+    adb logcat -d -b crash > $d/crash.txt 2>&1
+    echo "--- the Jolly key on the phone ---"
+    grep -h "FATAL\|AndroidRuntime" $d/crash.txt || echo "jolly-phone: no crash"
+}
+phone_jolly
 
 # Music on the phone (ui/MusicSettings.kt): Xonos's switch and settings, Spotify turned on (its
 # sign-in on the phone, the page in myCar's own web engine), "Add a service" with Deezer ticked.
