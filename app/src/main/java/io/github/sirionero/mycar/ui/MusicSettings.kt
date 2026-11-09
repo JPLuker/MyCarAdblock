@@ -32,6 +32,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.car.CarServices
+import io.github.sirionero.mycar.car.VideoCoverSetting
 import io.github.sirionero.mycar.webmusic.WebMusic
 import io.github.sirionero.mycar.webmusic.WebMusicAccounts
 import io.github.sirionero.mycar.webmusic.WebMusicService
@@ -94,6 +95,7 @@ private fun WebMusicPart(service: WebMusicService) {
         ) { WebMusic.setOn(service.id, it) }
         if (isOn) {
             HideAppRow(service)
+            VideoCoverRow(service)
             SettingsDivider()
             SettingsRow(
                 stringResource(R.string.music_sign_in),
@@ -140,6 +142,18 @@ private fun HideAppRow(service: WebMusicService) {
         subtitle = stringResource(R.string.music_hide_app_detail, service.name),
         trailing = { Checkbox(checked = checked, onCheckedChange = null) },
     )
+}
+
+/**
+ * Where the service's songs can have a video cover (Spotify's Canvas): the switch for it in the car's
+ * player beside the map, the same as the button on the cover there.
+ */
+@Composable
+private fun VideoCoverRow(service: WebMusicService) {
+    if (service.videoCovers.isEmpty()) return
+    val on by VideoCoverSetting.on.collectAsState()
+    SettingsDivider()
+    SwitchRow(stringResource(R.string.music_video_cover), on, stringResource(R.string.music_video_cover_detail)) { VideoCoverSetting.setOn(it) }
 }
 
 /** "Add a service": the other services' web players, ticked to put each in the car. */
