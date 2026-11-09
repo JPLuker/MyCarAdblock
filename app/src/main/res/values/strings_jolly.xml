@@ -129,8 +129,8 @@
     <!-- Title of the list of kinds -->
     <string name="settings_jolly_kind">What should the key do?</string>
     <string name="settings_jolly_footer">A call, an assistant, something in Home Assistant, a place, a command or an app, one tap away. Hold the key in the car to change it there.</string>
-    <!-- In the list of contacts, without the permission, over an Allow button -->
-    <string name="settings_jolly_contacts_permission">myCar needs to read your contacts to list them.</string>
+    <!-- In the list of contacts, without the permission, over an Allow button (which asks for both) -->
+    <string name="settings_jolly_contacts_permission">To list your contacts and call them from the car, myCar needs to read your contacts and make calls.</string>
     <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
     <string name="settings_jolly_place">Address or place</string>
     <string name="settings_jolly_place_name">Name in the car (optional)</string>

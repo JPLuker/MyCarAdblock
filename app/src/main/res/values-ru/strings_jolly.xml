@@ -131,8 +131,8 @@
     <!-- Title of the list of kinds -->
     <string name="settings_jolly_kind">Что должна делать кнопка?</string>
     <string name="settings_jolly_footer">Звонок, помощник, что-то в Home Assistant, место, команда или приложение в одно нажатие. В автомобиле удерживайте кнопку, чтобы изменить это и там.</string>
-    <!-- In the list of contacts, without the permission, over an Allow button -->
-    <string name="settings_jolly_contacts_permission">myCar нужен доступ к вашим контактам, чтобы показать их.</string>
+    <!-- In the list of contacts, without the permission, over an Allow button (which asks for both) -->
+    <string name="settings_jolly_contacts_permission">Чтобы показать ваши контакты и звонить им из автомобиля, myCar нужен доступ к контактам и звонкам.</string>
     <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
     <string name="settings_jolly_place">Адрес или место</string>
     <string name="settings_jolly_place_name">Название в автомобиле (необязательно)</string>

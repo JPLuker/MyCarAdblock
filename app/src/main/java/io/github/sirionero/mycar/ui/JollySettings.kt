@@ -148,13 +148,23 @@ private fun DialogNote(text: String) {
 
 /**
  * The phone's contacts, favourites first: a person with one number is chosen at once, one with
- * several lists them. Without the contacts permission, the one tap that asks for it.
+ * several lists them. Without the contacts permission, the one tap that asks for it - and for calls,
+ * which the key needs in the car: asked here, on the phone, rather than there. A number picked without
+ * the second asks for it again, and is kept whatever the answer (the car says what's missing).
  */
 @Composable
 private fun ContactDialog(current: JollyAction?, onPick: (JollyAction) -> Unit, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    var allowed by remember { mutableStateOf(context.checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) }
-    val ask = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { allowed = it }
+    fun granted(permission: String) = context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+    var allowed by remember { mutableStateOf(granted(Manifest.permission.READ_CONTACTS)) }
+    val ask = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        allowed = granted(Manifest.permission.READ_CONTACTS)
+    }
+    val askCalls = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
+    val pick = { chosen: JollyAction ->
+        if (!granted(Manifest.permission.CALL_PHONE)) askCalls.launch(Manifest.permission.CALL_PHONE)
+        onPick(chosen)
+    }
     var person by remember { mutableStateOf<String?>(null) }
     val contacts by produceState<List<Contact>?>(null, allowed) {
         value = if (allowed) withContext(Dispatchers.IO) { loadContacts(context) } else emptyList()
@@ -169,7 +179,9 @@ private fun ContactDialog(current: JollyAction?, onPick: (JollyAction) -> Unit, 
             when {
                 !allowed -> Column {
                     Text(stringResource(R.string.settings_jolly_contacts_permission), style = MaterialTheme.typography.bodyLarge)
-                    TextButton(onClick = { ask.launch(Manifest.permission.READ_CONTACTS) }) { Text(stringResource(R.string.common_allow)) }
+                    TextButton(onClick = { ask.launch(arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.CALL_PHONE)) }) {
+                        Text(stringResource(R.string.common_allow))
+                    }
                 }
                 list == null -> Text(stringResource(R.string.dialer_loading_contacts))
                 list.isEmpty() -> Text(stringResource(R.string.dialer_no_contacts))
@@ -179,7 +191,7 @@ private fun ContactDialog(current: JollyAction?, onPick: (JollyAction) -> Unit, 
                             c.typeLabel ?: shownNumber(c.number),
                             call != null && call.name == c.name && call.number == c.number,
                             subtitle = shownNumber(c.number).takeIf { c.typeLabel != null },
-                        ) { onPick(JollyAction.Call(c.name, c.number, c.typeLabel.orEmpty())) }
+                        ) { pick(JollyAction.Call(c.name, c.number, c.typeLabel.orEmpty())) }
                     }
                 }
                 else -> {
@@ -194,7 +206,7 @@ private fun ContactDialog(current: JollyAction?, onPick: (JollyAction) -> Unit, 
                                 subtitle = if (one != null) listOfNotNull(one.typeLabel, shownNumber(one.number)).joinToString("  ·  ")
                                 else pluralStringResource(R.plurals.jolly_numbers, numbers.size, numbers.size),
                             ) {
-                                if (one != null) onPick(JollyAction.Call(name, one.number, one.typeLabel.orEmpty())) else person = name
+                                if (one != null) pick(JollyAction.Call(name, one.number, one.typeLabel.orEmpty())) else person = name
                             }
                         }
                     }

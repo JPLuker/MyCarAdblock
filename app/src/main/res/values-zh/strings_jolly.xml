@@ -128,8 +128,8 @@
     <!-- Title of the list of kinds -->
     <string name="settings_jolly_kind">这个按钮要做什么？</string>
     <string name="settings_jolly_footer">打电话、唤起助手、Home Assistant 里的操作、前往某地、一条指令或一个应用，一点即达。在车上长按按钮也能更改。</string>
-    <!-- In the list of contacts, without the permission, over an Allow button -->
-    <string name="settings_jolly_contacts_permission">myCar 需要读取你的联系人才能列出它们。</string>
+    <!-- In the list of contacts, without the permission, over an Allow button (which asks for both) -->
+    <string name="settings_jolly_contacts_permission">要列出你的联系人并在车上给他们打电话，myCar 需要读取联系人和拨打电话的权限。</string>
     <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
     <string name="settings_jolly_place">地址或地点</string>
     <string name="settings_jolly_place_name">车上显示的名称（可选）</string>

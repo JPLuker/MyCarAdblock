@@ -129,8 +129,8 @@
     <!-- Title of the list of kinds -->
     <string name="settings_jolly_kind">Τι να κάνει το κουμπί;</string>
     <string name="settings_jolly_footer">Μια κλήση, ένας βοηθός, κάτι στο Home Assistant, ένα μέρος, μια εντολή ή μια εφαρμογή, με ένα πάτημα. Στο αυτοκίνητο, κρατήστε πατημένο το κουμπί για να το αλλάξετε κι εκεί.</string>
-    <!-- In the list of contacts, without the permission, over an Allow button -->
-    <string name="settings_jolly_contacts_permission">Το myCar χρειάζεται να διαβάσει τις επαφές σας για να τις εμφανίσει.</string>
+    <!-- In the list of contacts, without the permission, over an Allow button (which asks for both) -->
+    <string name="settings_jolly_contacts_permission">Για να εμφανίζει τις επαφές σας και να τις καλεί από το αυτοκίνητο, το myCar χρειάζεται να διαβάζει τις επαφές σας και να πραγματοποιεί κλήσεις.</string>
     <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
     <string name="settings_jolly_place">Διεύθυνση ή μέρος</string>
     <string name="settings_jolly_place_name">Όνομα στο αυτοκίνητο (προαιρετικό)</string>

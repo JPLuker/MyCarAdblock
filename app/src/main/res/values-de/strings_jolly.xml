@@ -129,8 +129,8 @@
     <!-- Title of the list of kinds -->
     <string name="settings_jolly_kind">Was soll die Taste machen?</string>
     <string name="settings_jolly_footer">Ein Anruf, ein Assistent, etwas in Home Assistant, ein Ort, ein Befehl oder eine App, nur ein Tippen entfernt. Halte die Taste im Auto gedrückt, um sie auch dort zu ändern.</string>
-    <!-- In the list of contacts, without the permission, over an Allow button -->
-    <string name="settings_jolly_contacts_permission">myCar muss deine Kontakte lesen dürfen, um sie aufzulisten.</string>
+    <!-- In the list of contacts, without the permission, over an Allow button (which asks for both) -->
+    <string name="settings_jolly_contacts_permission">Um deine Kontakte aufzulisten und sie aus dem Auto anzurufen, muss myCar deine Kontakte lesen und Anrufe tätigen dürfen.</string>
     <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
     <string name="settings_jolly_place">Adresse oder Ort</string>
     <string name="settings_jolly_place_name">Name im Auto (optional)</string>
