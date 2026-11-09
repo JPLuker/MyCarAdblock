@@ -6,6 +6,7 @@ import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import io.github.sirionero.mycar.audio.CarAudio
 import io.github.sirionero.mycar.audio.CarSource
+import io.github.sirionero.mycar.audio.PausedForCar
 import io.github.sirionero.mycar.host.CarAppCatalog
 import io.github.sirionero.mycar.host.CarAppConnection
 import io.github.sirionero.mycar.host.KnownApps
