@@ -22,24 +22,21 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
-import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Dp
 import io.github.sirionero.mycar.AppSettings
 import io.github.sirionero.mycar.R
 import kotlinx.coroutines.Job
@@ -265,10 +262,10 @@ fun Modifier.wallpaperBackground(wallpaper: Wallpaper, dim: Float = 0f, wholeScr
 
 /**
  * The wallpaper again, as [wallpaperBackground] draws it behind the panels of a split screen, but
- * over this element's content and only outside [shape]: the corners a rounded panel leaves, painted
- * over whatever inside ignores the panel's clip (see raisedPanel).
+ * over this element's content and only outside its corners rounded by [corner]: the corners a
+ * rounded panel leaves, painted over whatever inside ignores the panel's clip (see raisedPanel).
  */
-fun Modifier.wallpaperOutside(wallpaper: Wallpaper, shape: Shape): Modifier = composed {
+fun Modifier.wallpaperOutside(wallpaper: Wallpaper, corner: Dp): Modifier = composed {
     val view = LocalView.current
     val light = MaterialTheme.colorScheme.background.luminance() > 0.5f
     val lightGround = MaterialTheme.colorScheme.background
@@ -277,9 +274,7 @@ fun Modifier.wallpaperOutside(wallpaper: Wallpaper, shape: Shape): Modifier = co
     val clock = if (wallpaper.motion != null) rememberMotionClock() else null
     onGloballyPositioned { origin = it.positionInRoot() }.drawWithContent {
         drawContent()
-        clipPath(outlinePath(shape.createOutline(size, layoutDirection, this)), ClipOp.Difference) {
-            paintWallpaper(wallpaper, view, origin, clock?.value, light, lightGround, grain, dim = 0f)
-        }
+        paintCorners(corner.toPx()) { paintWallpaper(wallpaper, view, origin, clock?.value, light, lightGround, grain, dim = 0f) }
     }
 }
 
@@ -341,13 +336,6 @@ private fun DrawScope.paintWallpaper(
         val total = 1f - (1f - shade) * (1f - dim)
         if (total > 0f) drawRect(Color.Black.copy(alpha = total))
     }
-}
-
-/** [outline] as a path, to clip by. */
-internal fun outlinePath(outline: Outline): Path = when (outline) {
-    is Outline.Rectangle -> Path().apply { addRect(outline.rect) }
-    is Outline.Rounded -> Path().apply { addRoundRect(outline.roundRect) }
-    is Outline.Generic -> outline.path
 }
 
 /** Where a glow has wandered: a fraction of the screen each way, its size and its brightness. */
