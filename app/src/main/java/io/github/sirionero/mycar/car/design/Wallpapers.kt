@@ -2,6 +2,7 @@ package io.github.sirionero.mycar.car.design
 
 import android.content.Context
 import android.os.SystemClock
+import android.view.View
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.MaterialTheme
@@ -17,17 +18,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.luminance
@@ -250,53 +256,98 @@ fun Modifier.wallpaperBackground(wallpaper: Wallpaper, dim: Float = 0f, wholeScr
     val lightGround = MaterialTheme.colorScheme.background
     var origin by remember { mutableStateOf(Offset.Zero) }
     val grain = rememberGrain()
-    val motion = wallpaper.motion
-    val clock = if (motion != null) rememberMotionClock() else null
+    val clock = if (wallpaper.motion != null) rememberMotionClock() else null
     onGloballyPositioned { origin = it.positionInRoot() }.drawBehind {
         // Read here, the clock only redraws the picture: nothing recomposes as it moves.
-        val seconds = clock?.let { it.value / 1000.0 } ?: 0.0
-        val screen = if (!wholeScreen) size else Size(
-            view.rootView.width.toFloat().takeIf { it > 0f } ?: size.width,
-            view.rootView.height.toFloat().takeIf { it > 0f } ?: size.height,
-        )
-        val shift = if (wholeScreen) origin else Offset.Zero
-        clipRect {
-            translate(-shift.x, -shift.y) {
-                drawRect(if (light) lightGround else wallpaper.ground, size = screen)
-                val longest = max(screen.width, screen.height)
-                // Softer on a light ground, so dark text stays readable over it.
-                val fade = if (light) 0.45f else 1f
-                wallpaper.glows.forEachIndexed { i, glow ->
-                    val drift = if (motion is Motion.Drift) drift(i, seconds, motion) else Drift.NONE
-                    val center = Offset((glow.x + drift.dx) * screen.width, (glow.y + drift.dy) * screen.height)
-                    val radius = glow.radius * longest * drift.grow
-                    val strength = glow.strength * fade * drift.glow
-                    drawCircle(
-                        Brush.radialGradient(
-                            0f to glow.color.copy(alpha = strength),
-                            0.45f to glow.color.copy(alpha = strength * 0.5f),
-                            1f to glow.color.copy(alpha = 0f),
-                            center = center,
-                            radius = radius,
-                        ),
-                        radius = radius,
-                        center = center,
-                    )
-                }
-                when (motion) {
-                    is Motion.Waves -> drawWaves(screen, motion, seconds, fade)
-                    is Motion.Rebel -> drawRebel(screen, motion, seconds, fade)
-                    is Motion.Lights -> drawLights(screen, motion, seconds, fade)
-                    else -> Unit
-                }
-            }
-            drawRect(ShaderBrush(ImageShader(grain, TileMode.Repeated, TileMode.Repeated)), alpha = GRAIN_ALPHA)
-            // A touch darker overall, so white labels stay clear over the brightest glow.
-            val shade = if (light) 0f else BASE_SHADE
-            val total = 1f - (1f - shade) * (1f - dim)
-            if (total > 0f) drawRect(Color.Black.copy(alpha = total))
+        paintWallpaper(wallpaper, view, origin.takeIf { wholeScreen }, clock?.value, light, lightGround, grain, dim)
+    }
+}
+
+/**
+ * The wallpaper again, as [wallpaperBackground] draws it behind the panels of a split screen, but
+ * over this element's content and only outside [shape]: the corners a rounded panel leaves, painted
+ * over whatever inside ignores the panel's clip (see raisedPanel).
+ */
+fun Modifier.wallpaperOutside(wallpaper: Wallpaper, shape: Shape): Modifier = composed {
+    val view = LocalView.current
+    val light = MaterialTheme.colorScheme.background.luminance() > 0.5f
+    val lightGround = MaterialTheme.colorScheme.background
+    var origin by remember { mutableStateOf(Offset.Zero) }
+    val grain = rememberGrain()
+    val clock = if (wallpaper.motion != null) rememberMotionClock() else null
+    onGloballyPositioned { origin = it.positionInRoot() }.drawWithContent {
+        drawContent()
+        clipPath(outlinePath(shape.createOutline(size, layoutDirection, this)), ClipOp.Difference) {
+            paintWallpaper(wallpaper, view, origin, clock?.value, light, lightGround, grain, dim = 0f)
         }
     }
+}
+
+/**
+ * [wallpaper] as the part of the screen this element covers, its top left at [origin] on the
+ * screen; or, with no [origin], the whole of it shrunk to the element (a swatch). [millis] is the
+ * moving ones' clock. The grain is laid against the screen too, so copies side by side match.
+ */
+private fun DrawScope.paintWallpaper(
+    wallpaper: Wallpaper,
+    view: View,
+    origin: Offset?,
+    millis: Long?,
+    light: Boolean,
+    lightGround: Color,
+    grain: ImageBitmap,
+    dim: Float,
+) {
+    val motion = wallpaper.motion
+    val seconds = millis?.let { it / 1000.0 } ?: 0.0
+    val screen = if (origin == null) size else Size(
+        view.rootView.width.toFloat().takeIf { it > 0f } ?: size.width,
+        view.rootView.height.toFloat().takeIf { it > 0f } ?: size.height,
+    )
+    val shift = origin ?: Offset.Zero
+    clipRect {
+        translate(-shift.x, -shift.y) {
+            drawRect(if (light) lightGround else wallpaper.ground, size = screen)
+            val longest = max(screen.width, screen.height)
+            // Softer on a light ground, so dark text stays readable over it.
+            val fade = if (light) 0.45f else 1f
+            wallpaper.glows.forEachIndexed { i, glow ->
+                val drift = if (motion is Motion.Drift) drift(i, seconds, motion) else Drift.NONE
+                val center = Offset((glow.x + drift.dx) * screen.width, (glow.y + drift.dy) * screen.height)
+                val radius = glow.radius * longest * drift.grow
+                val strength = glow.strength * fade * drift.glow
+                drawCircle(
+                    Brush.radialGradient(
+                        0f to glow.color.copy(alpha = strength),
+                        0.45f to glow.color.copy(alpha = strength * 0.5f),
+                        1f to glow.color.copy(alpha = 0f),
+                        center = center,
+                        radius = radius,
+                    ),
+                    radius = radius,
+                    center = center,
+                )
+            }
+            when (motion) {
+                is Motion.Waves -> drawWaves(screen, motion, seconds, fade)
+                is Motion.Rebel -> drawRebel(screen, motion, seconds, fade)
+                is Motion.Lights -> drawLights(screen, motion, seconds, fade)
+                else -> Unit
+            }
+            drawRect(ShaderBrush(ImageShader(grain, TileMode.Repeated, TileMode.Repeated)), size = screen, alpha = GRAIN_ALPHA)
+        }
+        // A touch darker overall, so white labels stay clear over the brightest glow.
+        val shade = if (light) 0f else BASE_SHADE
+        val total = 1f - (1f - shade) * (1f - dim)
+        if (total > 0f) drawRect(Color.Black.copy(alpha = total))
+    }
+}
+
+/** [outline] as a path, to clip by. */
+internal fun outlinePath(outline: Outline): Path = when (outline) {
+    is Outline.Rectangle -> Path().apply { addRect(outline.rect) }
+    is Outline.Rounded -> Path().apply { addRoundRect(outline.roundRect) }
+    is Outline.Generic -> outline.path
 }
 
 /** Where a glow has wandered: a fraction of the screen each way, its size and its brightness. */
