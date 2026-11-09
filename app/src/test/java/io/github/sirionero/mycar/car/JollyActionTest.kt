@@ -143,23 +143,28 @@ class JollyActionTest {
     }
 
     @Test
-    fun theSecondTapComesWithinThreeSeconds() {
-        val tap = SecondTap(3_000)
+    fun theSecondTapComesWithinThreeSecondsButNotAtOnce() {
+        val tap = SecondTap(3_000, 700)
         assertFalse(tap.armed(1_000))
-        assertFalse(tap.tap(1_000))
-        assertTrue(tap.armed(3_900))
-        assertTrue(tap.tap(3_900))
+        assertEquals(SecondTap.Tap.ARMED, tap.tap(1_000))
+        // A double tap, or a finger that bounced: let go, and the question stays.
+        assertEquals(SecondTap.Tap.TOO_SOON, tap.tap(1_150))
+        assertEquals(SecondTap.Tap.TOO_SOON, tap.tap(1_699))
+        assertTrue(tap.armed(1_699))
+        assertEquals(SecondTap.Tap.GO, tap.tap(1_700))
         // Gone ahead: the next tap arms again.
-        assertFalse(tap.armed(4_000))
-        assertFalse(tap.tap(4_000))
+        assertFalse(tap.armed(1_800))
+        assertEquals(SecondTap.Tap.ARMED, tap.tap(1_800))
+        assertEquals(SecondTap.Tap.GO, tap.tap(4_800))
         // Too late: it arms afresh, and the one after goes.
-        assertFalse(tap.armed(7_001))
-        assertFalse(tap.tap(7_001))
-        assertTrue(tap.tap(7_500))
-        assertFalse(tap.tap(8_000))
+        assertEquals(SecondTap.Tap.ARMED, tap.tap(5_000))
+        assertFalse(tap.armed(8_001))
+        assertEquals(SecondTap.Tap.ARMED, tap.tap(8_001))
+        assertEquals(SecondTap.Tap.GO, tap.tap(9_000))
+        assertEquals(SecondTap.Tap.ARMED, tap.tap(9_500))
         tap.disarm()
-        assertFalse(tap.armed(8_100))
-        assertFalse(tap.tap(8_100))
+        assertFalse(tap.armed(9_600))
+        assertEquals(SecondTap.Tap.ARMED, tap.tap(9_600))
     }
 
     /**

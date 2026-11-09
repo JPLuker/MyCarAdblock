@@ -71,7 +71,7 @@ internal object JollySetting {
 internal object Jolly {
     private val main = Handler(Looper.getMainLooper())
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    private val second = SecondTap(CONFIRM_MS)
+    private val second = SecondTap(CONFIRM_MS, CONFIRM_MIN_MS)
     private val armedFlow = MutableStateFlow(false)
 
     /** A lock waits for its second tap: the key is lit meanwhile. */
@@ -188,11 +188,21 @@ internal object Jolly {
         }
     }
 
-    /** The first tap arms, a second within [CONFIRM_MS] goes ahead (see [SecondTap]). */
+    /**
+     * The first tap arms, a second between [CONFIRM_MIN_MS] and [CONFIRM_MS] later goes ahead (see
+     * [SecondTap]); one sooner, a double tap made before the question could be read, does nothing.
+     */
     private fun confirmed(name: String): Boolean {
-        if (second.tap(SystemClock.uptimeMillis())) {
-            armedFlow.value = false
-            return true
+        when (second.tap(SystemClock.uptimeMillis())) {
+            SecondTap.Tap.GO -> {
+                armedFlow.value = false
+                return true
+            }
+            SecondTap.Tap.TOO_SOON -> {
+                MyCarLog.i("jolly: the second tap came too soon - still asking")
+                return false
+            }
+            SecondTap.Tap.ARMED -> Unit
         }
         armedFlow.value = true
         toast(Words.get(R.string.jolly_confirm_unlock, name), CarToast.LENGTH_SHORT)
@@ -301,6 +311,7 @@ internal object Jolly {
     /** What a call under way leaves no room for: another call, an assistant listening, an answer spoken. */
     private val BUSY_ON_A_CALL = setOf(JollyKind.CALL, JollyKind.AI, JollyKind.SAY)
 
-    /** How long a lock waits for its second tap. */
+    /** How long a lock waits for its second tap, and how long at least: time to read the question. */
     private const val CONFIRM_MS = 3_000L
+    private const val CONFIRM_MIN_MS = 700L
 }

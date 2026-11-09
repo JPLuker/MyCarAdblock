@@ -200,20 +200,25 @@ internal object HomeActs {
 
 /**
  * The second tap a command that lets someone in waits for (see [HomeActs.confirms]): the first tap
- * arms it, a second within [windowMs] goes ahead. A tap after that arms it afresh.
+ * arms it, a second between [minMs] and [windowMs] later goes ahead. One sooner is a double tap made
+ * before the question could be read, or a finger that bounced: it's let go, and the question stays.
+ * A tap after the window arms it afresh.
  */
-internal class SecondTap(private val windowMs: Long = 3_000) {
+internal class SecondTap(private val windowMs: Long = 3_000, private val minMs: Long = 700) {
+    enum class Tap { ARMED, TOO_SOON, GO }
+
     private var armedAt: Long? = null
 
-    /** True when this tap at [now] (uptime ms) goes ahead; false when it only arms. */
-    fun tap(now: Long): Boolean {
+    /** What this tap at [now] (uptime ms) does: arms, goes ahead, or nothing (too soon after the first). */
+    fun tap(now: Long): Tap {
         val at = armedAt
-        if (at != null && now - at in 0..windowMs) {
+        if (at != null && now - at in 0 until minMs) return Tap.TOO_SOON
+        if (at != null && now - at in minMs..windowMs) {
             armedAt = null
-            return true
+            return Tap.GO
         }
         armedAt = now
-        return false
+        return Tap.ARMED
     }
 
     /** Whether a tap at [now] would go ahead. */
