@@ -63,7 +63,7 @@ class TouchRelayService : AccessibilityService() {
      * nothing that asks for landscape, which Android puts ahead of the app on screen; removing
      * it lets the phone turn back. Fixed landscape, not the sensor's: turning the phone in its
      * holder mustn't flip the car's picture. Apps that only work upright stay upright, boxed in
-     * the middle as before.
+     * the middle as before. The same window keeps the phone's screen on while the car shows it.
      */
     fun holdLandscape(on: Boolean) {
         val windows = getSystemService(WindowManager::class.java) ?: return
@@ -79,7 +79,8 @@ class TouchRelayService : AccessibilityService() {
         val params = WindowManager.LayoutParams(
             1, 1,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
             PixelFormat.TRANSPARENT,
         ).apply {
             gravity = Gravity.TOP or Gravity.START
