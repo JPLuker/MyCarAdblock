@@ -130,6 +130,8 @@ object WirelessLink {
     @Volatile private var lostNetwork: Network? = null
     /** When [lostNetwork] went (elapsedRealtime). */
     @Volatile private var lostAt = 0L
+    /** The network the drive's socket is bound to; null on the phone's ordinary route. */
+    @Volatile private var driveNetwork: Network? = null
     /** The car network asked for or joined, until Android says it's gone or never came. */
     @Volatile private var activeSsid: String? = null
     /** Bumped on each Wi-Fi join and on stop, so an older run of TCP tries ends instead of racing the new one. */
@@ -374,6 +376,8 @@ object WirelessLink {
                 }
             }
             if (releaseWithChannel && tcp == null) releaseNetwork(context)
+            // During the drive: a car that closes its channel and Wi-Fi together is switching off (the report).
+            if (byCar && tcp != null) io.github.sirionero.mycar.SessionReport.carChannelClosed(channelClosedAt)
             if (tcp != null) return
             // The car's Wi-Fi asked for and not over: some cars close the channel once the phone has
             // joined, before its TCP. The join and the tries go on, and decide (onUnavailable, connectTcp).
@@ -433,8 +437,11 @@ object WirelessLink {
      * flickers comes back within moments, and a car coming back starts them anew anyway.
      */
     fun carGone(context: Context, address: String) {
-        val device = car ?: return
-        if (!device.address.equals(address, ignoreCase = true)) return
+        val device = car?.takeIf { it.address.equals(address, ignoreCase = true) }
+        // Every going said: an adapter restarting, or a car only waking for a moment, was seen only
+        // through its coming back, or 30 s on below.
+        log.i("Bluetooth: ${device?.let { name(it) } ?: "a car myCar knows (…${address.takeLast(5)})"} disconnected")
+        if (device == null) return
         if (listeningQuietly) {
             log.i("Bluetooth: ${name(device)} went - no more listening for it after the drive")
             stop(context)
@@ -1004,6 +1011,8 @@ object WirelessLink {
                 // "Picking it by hand in the Wi-Fi list does this" was said at the end of every drive,
                 // the car switched off: the tries say it where it can be so (the car's Wi-Fi left).
                 log.w("Wi-Fi: lost \"$ssid\" - the car's Wi-Fi went away")
+                // Under the drive: for the session report, which tells a car switching off from a drop.
+                if (tcp != null && driveNetwork == net) io.github.sirionero.mycar.SessionReport.carWifiLost(lostAt)
             }
         }
         // In the foreground for the request (see [run]): the service started with the channel, given
@@ -1256,13 +1265,15 @@ object WirelessLink {
                 }
                 // Once Android has refused a bind - a VPN that apps can't get past, like Tailscale,
                 // refuses one to the main Wi-Fi as well - the ordinary route is the only one left.
-                val socket = when {
-                    bindRefused -> Socket()
-                    viaOther && other != null -> other.socketFactory.createSocket()
-                    lost -> Socket()
-                    else -> net.socketFactory.createSocket()
+                // The network the try is bound to; null: the phone's ordinary route.
+                val via = when {
+                    bindRefused -> null
+                    viaOther && other != null -> other
+                    lost -> null
+                    else -> net
                 }
-                viaCar = !bindRefused && if (viaOther) verdict == CarNetwork.Verdict.CAR else !lost
+                val socket = via?.socketFactory?.createSocket() ?: Socket()
+                viaCar = via != null && (via == net || verdict == CarNetwork.Verdict.CAR)
                 socket.tcpNoDelay = true
                 socket.connect(InetSocketAddress(ip, port), 5_000)
                 // Stopped while it connected (the cable went in meanwhile): handing it on would
@@ -1273,6 +1284,7 @@ object WirelessLink {
                     return
                 }
                 synchronized(ends) {
+                    driveNetwork = via
                     tcp = socket
                     drove = true
                     // The drive takes the service over: the screen stops it when the drive ends.
