@@ -1379,7 +1379,7 @@ Tutti i token in un solo posto, `car/design/`:
   audio; esperienza d'uso: schermo dell'auto, telefono, messaggi di collegamento), ogni punto verificato da
   uno scettico e nel codice, poi una revisione indipendente delle correzioni. Auto: durante una chiamata gli
   schermi (non la mappa) e la scheda dei messaggi stanno sotto la barra della chiamata (`callTop` in
-  `CarUi`, misurata); squillo che chiude assistente e lettura dei messaggi; una scelta nuova per "Accanto
+  `CarUi`, misurata; dalla 0.7.4 la barra è la pillola della chiamata e `callTop` non c'è più); squillo che chiude assistente e lettura dei messaggi; una scelta nuova per "Accanto
   alla mappa" riapre la colonna (`showSidePane`); la X del testo riporta il lettore; il tasto Indietro
   dell'auto risponde alle schede sopra tutto (`car/CardBack.kt`: slot propri, non il `backInterceptor` di
   HomePager); tastiera della pagina web in vista; Novità che non si chiude spegnendo l'interruttore;
@@ -1685,6 +1685,61 @@ Tutti i token in un solo posto, `car/design/`:
   X rossa e niente avvio automatico, ma la tessera la apre ancora; si dimentica al primo handshake accettato o
   con un'altra copia. In auto il rifiuto dice cosa aggiungere (`car_host_modified_refused`). Non provato con una
   Waze vera.
+- **Gearslip 0.3.32 → 0.3.40** (0.7.4, branch `fix/gearslip-0.3.40`): come per il "Motore da Gearslip",
+  riscritte a mano, una per commit, solo cose che non cambiano come si collega un'auto che oggi va. Portate: gli
+  avvisi delle app per auto (`car/CarAlerts.kt`, in alto al centro sopra ogni schermo, anche sopra la pillola
+  della chiamata, fino a due tasti, barra del tempo; scatti `alert*`); icone e `PhoneInfo` nella
+  ServiceDiscoveryRequest solo per le auto 1.0/1.1 (`DiscoveryRequest`, dalla 1.2 byte per byte come prima); la
+  sintesi vocale rifatta dentro il viaggio dopo 30 s senza risposta (`SpeechRestart`); la musica ripartita dopo
+  la fine del viaggio rimessa in pausa 2 s dopo, solo se suonerebbe dal telefono; like dall'icona (`AppButtons`,
+  Metrolist); Capitolo successivo di AntennaPod; alias Bluetooth (`shownName`); "--- Android ended this run" in
+  fondo al log dell'avvio caduto (pid nella prima riga); Clio V in CARS.md. Su richiesta dell'utente anche:
+  **schermo trattenuto** (`HeldScreen`, `HeldScreenCars`: canale della musica chiuso per il Bluetooth e nessuno
+  schermo 5 s dopo la richiesta → il canale si apre, dopo 1 s la stessa richiesta, motivo 1; l'auto è ricordata
+  solo se lo schermo arriva entro 5 s dall'apertura, per due viaggi di fila (`HeldScreen.TIMES` = 2: una volta
+  sola può essere un'auto lenta), e da allora il canale si apre subito); **indirizzo Bluetooth del telefono**
+  scritto a mano (Impostazioni > Connessione, `PhoneAddressRow`, chiave `phone_bluetooth_address`, vuoto di
+  predefinito: un'auto già abbinata riceve canale Bluetooth e PairingRequest con quell'indirizzo, senza
+  abbinamento; mai nel log; GM senza Wi-Fi projection); **tipo di canale Wi-Fi nella VersionResponse**
+  (`WirelessVersion`, solo all'auto che si è fermata dopo la nostra risposta, chiave
+  `channel_type:<indirizzo>`); **musica in pausa nel momento dell'auto**
+  (`AudioLink.onPausedForNow/onGivenBack`, `CarServices.pausePhoneMediaForNow/resumePhoneMedia`, regola
+  `PausedForCar`: con l'audio tramite myCar un LOSS_TRANSIENT sulle casse date alla musica in streaming mette in
+  pausa ciò che suona e il GAIN riprende solo quello ancora in pausa; niente se il guidatore ha chiesto qualcosa
+  o scelto un'altra app, dopo un LOSS o a fine viaggio; in chiamata aspetta la fine, al massimo mezz'ora; se
+  l'auto riprende le casse prima che la musica sia ripartita (un GAIN arrivato durante la chiamata) quello che
+  aspettava resta e riparte col GAIN dopo (`PausedForCar.Memory`); un'auto senza GAIN lascia la musica in pausa
+  finché il guidatore non preme play). Golf e Tayron: collegamento invariato (log: schermo entro 0,51 s, 51
+  VersionResponse seguite da StartRequest). Non provato in auto. Dal backlog va via «mettere in pausa Xonos
+  mentre l'auto tiene le casse per un momento».  ## 7. Per le novità  - Alerts from car apps show on the car
+  screen, such as Waze asking whether a hazard is still there. - When the car needs its speakers for a moment,
+  such as for a call, music playing through myCar pauses and picks up where it left off. - Cars that hold back
+  their screen, or need the phone's Bluetooth address (now under Settings > Connection), get another way to
+  connect. </agent-message>
+- **Pillola della chiamata in corso** (0.7.4, `feature/call-bubble`; richiesta dell'utente: "quando una chiamata
+  è in corso c'è una nuvoletta con la locandina della chiamata e il tasto per interrompere, un po' stile la
+  nuvoletta della musica, ma c'è sempre finché non interrompi la chiamata, qualsiasi schermata aperta ci sia";
+  `car/CallPill.kt`, regola pura `car/CallPillPlace.kt` + `CallPillPlaceTest`, chiave `car_call_pill_at`).
+  Finché la chiamata è in corso (fatta, presa, in attesa; mentre squilla resta la scheda a tutto schermo) una
+  pillola 296×64 dp sta sopra ogni schermo e sotto avvisi, schede e domande. Mostra la foto del contatto o
+  l'iniziale come il Telefono, il nome o il numero ("In chiamata" se non si sa), il tempo in verde
+  (`CallUiState.Active.since`, da quando il telefono va occupato; una chiamata già in corso quando myCar
+  comincia a guardare il telefono non ha tempo) e "Voce sul telefono" in ambra (`rememberCallOnPhone`; col tema
+  chiaro `PositiveOnLight`/`WarningOnLight`). Il tasto rosso chiude (`CarCalls.hangUp`, solo con
+  ANSWER_PHONE_CALLS), il resto apre il Telefono. Si sposta come il mini lettore (`dragAfterHold`, ma con
+  `tapAfterHold = false`: tenuta e lasciata non preme il tasto sotto, un tocco lento non chiude la chiamata). Il
+  posto si salva come frazione dello schermo accanto al dock: mai sotto il dock, sempre dentro i margini. Parte
+  in alto al centro, a destra della scheda della svolta e a sinistra dei tasti della mappa dove c'è posto, più
+  piccola dove non ci sta (`fitScale`, come il mini lettore). Ha preso il posto della barra in alto (`callTop`,
+  `LocalCallTop` tolti): gli schermi non scendono più. Il mini lettore le lascia il posto (`CallPillSpot`,
+  `CallPillPlace.miniApart`: il posto libero più vicino, fuori dai tasti della mappa; finita la chiamata torna
+  dov'era). Una chiamata fatta dall'auto (`placeCall` → `CarCalls.dialing`) ha il suo nome. Anteprima: `--ez
+  fakeCall true` (solo debug, `CallPreview.kt`), `--es fakeCaller`, `--es pillAt`, passi `knob:n`/`knob:ok` di
+  `PreviewScript`; scatti `call-bubble*` e `call-answer` ("call-bubble" li prende tutti). Verificato in CI
+  (0.7.4): pillola su mappa, griglia, Impostazioni, Telefono, 800x480 Normal ed Extra large, tema chiaro;
+  trascinata e salvata; il mini lettore che si sposta e torna; col modem dell'emulatore Rispondi, pillola e
+  tasto rosso che chiude davvero; la manopola che arriva al tasto rosso e lo preme. Non provato in auto, né con
+  la foto di un contatto.
 - Dipendenze approvate dall'utente: OkHttp e androidx.webkit (Plancia integrata), Media3 `session`
   e `common` (Xonos integrato: Apache 2.0, nessuna telemetria).
 - Sfondi "stile umbrelOS" ma **nostri**: le immagini di umbrelOS hanno una licenza non libera.
@@ -1743,9 +1798,9 @@ Tutti i token in un solo posto, `car/design/`:
 - **Comandi rapidi di Home Assistant** come widget nelle pagine (cancello, garage), sul
   collegamento di Plancia integrata (`HomeAssistant`).
 - **Xonos integrato, il resto**: server trovati in rete (mDNS `_mass._tcp`, `NsdFinder` di Xonos)
-  e primo account di un Music Assistant nuovo nelle impostazioni del telefono; mettere in pausa
-  Xonos mentre l'auto tiene le casse per un momento (LOSS_TRANSIENT), invece di perdere quei secondi.
-  Xonos e Plancia restano app a sé per Gearslip.
+  e primo account di un Music Assistant nuovo nelle impostazioni del telefono (la pausa mentre l'auto
+  tiene le casse per un momento c'è dalla 0.7.4: `PausedForCar`). Xonos e Plancia restano app a sé per
+  Gearslip.
 - **Spotify con Client ID personale**: Web API (PKCE) per libreria, salvati e ricerca nell'auto
   e per far suonare l'app Spotify del telefono; l'audio arriva via myCar o Bluetooth. Regole di
   Spotify da febbraio 2026: Premium del proprietario, massimo 5 utenti per Client ID, alcuni
