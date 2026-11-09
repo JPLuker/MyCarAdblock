@@ -179,6 +179,7 @@ fun SettingsScreen(
                     }
                     SettingsPage.VOICE -> {
                         AssistantSection()
+                        PhoneVoiceSection()
                         VoiceModelSection()
                     }
                     SettingsPage.MUSIC -> MusicSettings()

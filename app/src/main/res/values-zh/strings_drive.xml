@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_voice_small_model">手机内存不足：助手只能用小模型听你说话，可能会听错名字。</string>
+    <string name="car_voice_silent">手机的语音没有出声：回答只会显示在屏幕上。请查看手机上 myCar 设置里的“语音”。</string>
+    <string name="phone_voice_missing_title">手机没有%1$s语音</string>
+    <string name="phone_voice_missing_detail">它的文字转语音引擎 %1$s 没有%2$s语音：在车上助手只能显示回答。请为引擎添加这种语音，或安装一个有这种语音的引擎，然后在 Android 的文字转语音设置中选择它。</string>
+    <string name="phone_voice_silent_detail">在车上，它的文字转语音引擎 %1$s 没有开始说话：助手只显示了回答。请在 Android 的文字转语音设置中检查%2$s语音，或在那里选择其他引擎。</string>
+    <string name="phone_voice_no_engine_detail">手机没有文字转语音引擎：在车上助手只能显示回答。请安装一个有%1$s语音的引擎，然后在 Android 的文字转语音设置中选择它。</string>
+    <string name="phone_voice_open_settings">文字转语音设置</string>
+</resources>
