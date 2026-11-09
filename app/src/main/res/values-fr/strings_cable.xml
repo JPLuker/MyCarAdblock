@@ -9,6 +9,6 @@
     <string name="help_step_usb_c">Sous GrapheneOS, laissez passer les données par le port USB-C.</string>
 
     <string name="setup_audio_auto_effect">À chaque trajet, myCar choisit l’une des deux options ci-dessous : le Bluetooth si votre voiture reçoit ainsi la musique du téléphone, sinon via myCar.</string>
-    <string name="setup_audio_bluetooth_effect">Aucune demande d’Android à chaque trajet, et la radio de la voiture continue. La musique du téléphone n’arrive dans la voiture que si celle-ci la reçoit par le Bluetooth : certaines voitures n’acceptent que les appels par ce biais.</string>
-    <string name="setup_audio_mycar_effect">La voiture joue le son du téléphone, par le câble ou le Wi-Fi. À chaque trajet, Android demande de partager l’écran : un appui suffit pour accepter. C’est cette autorisation qui permet à myCar de transmettre le son de vos autres apps.</string>
+    <string name="setup_audio_bluetooth_effect">Aucune demande d’Android à chaque trajet, et la radio de la voiture reste allumée. La musique du téléphone n’arrive dans la voiture que si celle-ci la reçoit par le Bluetooth : certaines voitures n’acceptent que les appels par ce biais.</string>
+    <string name="setup_audio_mycar_effect">La voiture diffuse le son du téléphone, par le câble ou le Wi-Fi. À chaque trajet, Android demande de partager l’écran : un appui suffit pour accepter. C’est cette autorisation qui permet à myCar de transmettre le son de vos autres apps.</string>
 </resources>

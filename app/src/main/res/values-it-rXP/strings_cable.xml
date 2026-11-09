@@ -6,5 +6,5 @@
 
     <string name="setup_audio_auto_effect">A ogni traversata myCar sceglie una delle due qui sotto: il Bluetooth quando la tua nave riceve così le ballate del telefono, altrimenti tramite myCar.</string>
     <string name="setup_audio_bluetooth_effect">Nessuna domanda di Android a ogni traversata, e la radio di bordo resta accesa. Le ballate del telefono arrivano a bordo solo se la nave le riceve dal Bluetooth: alcune navi lo usano solo per le chiamate.</string>
-    <string name="setup_audio_mycar_effect">La nave suona l\'audio del telefono, col cavo o in Wi-Fi. A ogni traversata Android chiede di condividere lo schermo: basta un tocco per accettare. È questo permesso che fa passare a myCar l\'audio delle altre app.</string>
+    <string name="setup_audio_mycar_effect">La nave riproduce l\'audio del telefono, col cavo o in Wi-Fi. A ogni traversata Android chiede di condividere lo schermo: basta un tocco per accettare. È grazie a questo permesso che myCar può passare a bordo l\'audio delle altre app.</string>
 </resources>

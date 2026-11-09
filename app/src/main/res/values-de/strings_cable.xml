@@ -10,5 +10,5 @@
 
     <string name="setup_audio_auto_effect">Bei jeder Fahrt wählt myCar einen der beiden Wege unten: Bluetooth, wenn dein Auto die Musik des Telefons so annimmt, sonst über myCar.</string>
     <string name="setup_audio_bluetooth_effect">Keine Frage von Android bei jeder Fahrt, und das Radio des Autos läuft weiter. Die Musik des Telefons kommt nur im Auto an, wenn das Auto sie über Bluetooth annimmt: Manche Autos nehmen darüber nur Anrufe an.</string>
-    <string name="setup_audio_mycar_effect">Das Auto spielt den Ton des Telefons, per Kabel oder WLAN. Bei jeder Fahrt fragt Android, ob der Bildschirm geteilt werden darf: Ein Tippen genügt. Erst diese Erlaubnis lässt myCar den Ton deiner anderen Apps weitergeben.</string>
+    <string name="setup_audio_mycar_effect">Das Auto gibt den Ton des Telefons wieder, per Kabel oder WLAN. Bei jeder Fahrt fragt Android, ob der Bildschirm geteilt werden darf: Ein Tippen genügt. Erst diese Erlaubnis lässt myCar den Ton deiner anderen Apps weitergeben.</string>
 </resources>

@@ -4,11 +4,11 @@
     <string name="home_no_car_check">Se è collegato all\'auto, controlla:</string>
     <string name="home_no_car_cable">Usa un cavo che trasmette anche i dati: alcuni servono solo a caricare.</string>
     <string name="home_no_car_always">Quando Android chiede quale app aprire, scegli myCar e tocca Sempre.</string>
-    <string name="usb_c_graphene">GrapheneOS può spegnere i dati sulla porta USB-C, e allora l\'auto vede solo un telefono da caricare. In Impostazioni &gt; Sicurezza e privacy &gt; Exploit protection &gt; USB-C port, con Charging-only l\'auto resta fuori; con Charging-only when locked, quella predefinita, sblocca il telefono quando lo colleghi.</string>
+    <string name="usb_c_graphene">GrapheneOS può disattivare i dati della porta USB-C, e allora l\'auto vede solo un telefono da caricare. In Impostazioni &gt; Sicurezza e privacy &gt; Exploit protection &gt; USB-C port, con Charging-only l\'auto resta fuori; con Charging-only when locked, quella predefinita, sblocca il telefono quando lo colleghi.</string>
 
     <string name="help_step_usb_c">Su GrapheneOS, lascia passare i dati dalla porta USB-C.</string>
 
     <string name="setup_audio_auto_effect">A ogni viaggio myCar sceglie una delle due qui sotto: il Bluetooth quando la tua auto riceve così la musica del telefono, altrimenti tramite myCar.</string>
     <string name="setup_audio_bluetooth_effect">Nessuna domanda di Android a ogni viaggio, e la radio dell\'auto resta accesa. La musica del telefono arriva in auto solo se l\'auto la riceve dal Bluetooth: alcune auto lo usano solo per le chiamate.</string>
-    <string name="setup_audio_mycar_effect">L\'auto suona l\'audio del telefono, col cavo o in Wi-Fi. A ogni viaggio Android chiede di condividere lo schermo: basta un tocco per accettare. È questo permesso che fa passare a myCar l\'audio delle altre app.</string>
+    <string name="setup_audio_mycar_effect">L\'auto riproduce l\'audio del telefono, col cavo o in Wi-Fi. A ogni viaggio Android chiede di condividere lo schermo: basta un tocco per accettare. È grazie a questo permesso che myCar può passare all\'auto l\'audio delle altre app.</string>
 </resources>
