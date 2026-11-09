@@ -408,6 +408,8 @@ internal object Jolly {
     /**
      * The same from the phone's settings, on a connection of its own: the drive's isn't there without
      * a car. The address at home first, then the one away; the last one's failure if neither answers.
+     * A token refused isn't tried on the other address: each refusal counts towards Home Assistant
+     * banning the phone (ip_ban), and the token is the same there.
      */
     suspend fun homeChoices(config: HomeAssistant.Config): List<HomeActs.Choice> {
         var failure: Exception? = null
@@ -420,12 +422,16 @@ internal object Jolly {
                 throw e
             } catch (e: Exception) {
                 failure = e
+                if (e is HaException && e.reason in REFUSED) break
             } finally {
                 client.close()
             }
         }
         throw failure ?: IllegalStateException("no Home Assistant address")
     }
+
+    /** Home Assistant saying no to the token or the access: the same at any address. */
+    private val REFUSED = setOf(HaException.Reason.INVALID_TOKEN, HaException.Reason.ACCESS_DENIED)
 
     /** What a call under way leaves no room for: another call, an assistant listening, an answer spoken. */
     private val BUSY_ON_A_CALL = setOf(JollyKind.CALL, JollyKind.AI, JollyKind.SAY)

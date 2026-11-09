@@ -249,25 +249,26 @@ private fun HomeDialog(current: JollyAction?, onPick: (JollyAction) -> Unit, onD
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.jolly_kind_home)) },
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
-                val result = things
-                when {
-                    !config.isComplete -> Text(stringResource(R.string.jolly_home_not_set))
-                    result == null -> Text(stringResource(R.string.jolly_home_loading))
-                    result.isFailure -> Text(
-                        stringResource(R.string.settings_jolly_home_failed, result.exceptionOrNull()?.message.orEmpty()),
-                    )
-                    result.getOrNull().orEmpty().isEmpty() -> Text(stringResource(R.string.jolly_home_none))
-                    else -> {
-                        val list = result.getOrNull().orEmpty()
-                        list.forEach { thing ->
+            val result = things
+            when {
+                !config.isComplete -> Text(stringResource(R.string.jolly_home_not_set))
+                result == null -> Text(stringResource(R.string.jolly_home_loading))
+                result.isFailure -> Text(
+                    stringResource(R.string.settings_jolly_home_failed, result.exceptionOrNull()?.message.orEmpty()),
+                )
+                result.getOrNull().orEmpty().isEmpty() -> Text(stringResource(R.string.jolly_home_none))
+                else -> {
+                    val list = result.getOrNull().orEmpty()
+                    // A list, not a column: a house can have hundreds of things.
+                    LazyColumn {
+                        items(list, key = { "${it.entity}/${it.act.id}" }) { thing ->
                             ChoiceLine(
                                 stringResource(Jolly.homeTitle(thing.entity, thing.act), thing.name),
                                 now != null && now.entity == thing.entity && now.act == thing.act,
                                 subtitle = thing.entity,
                             ) { onPick(JollyAction.Home(thing.entity, thing.act, thing.name)) }
                         }
-                        if (list.any { HomeActs.confirms(it.act) }) DialogNote(stringResource(R.string.jolly_home_unlock_note))
+                        if (list.any { HomeActs.confirms(it.act) }) item { DialogNote(stringResource(R.string.jolly_home_unlock_note)) }
                     }
                 }
             }
