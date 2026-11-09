@@ -194,13 +194,10 @@ if [ -z "${ONLY:-}" ] || [[ " $ONLY " == *" video-cover"* ]]; then
         -f lavfi -i "testsrc2=size=720x1280:rate=30:duration=4" -an -c:v libx264 -pix_fmt yuv420p -movflags +faststart \
         /out/canvas.mp4 || echo "video cover: no test video"
     python3 -m http.server 8003 --bind 127.0.0.1 --directory "$VIDEO_COVER" > /tmp/video-cover.txt 2>&1 &
-    # What Spotify's web player scripts say about a song's Canvas (the runner reaches open.spotify.com, the
-    # cloud session can't): for fitting the page's script (WebMusicScripts, videoCover) when Spotify changes.
-    mkdir -p previews/video-cover-spotify
-    timeout 180 python3 .github/spotify-canvas.py > previews/video-cover-spotify/spotify-canvas.txt 2>&1 || true
-    # In the job's log too: ci/car-preview is the last run's, whichever branch it was.
-    echo "--- Spotify's Canvas in its web player's scripts ---"
-    cut -c1-6000 previews/video-cover-spotify/spotify-canvas.txt | head -150
+    # Whether Spotify's web player still does what the page's script relies on for its Canvas (the runner
+    # reaches open.spotify.com, the cloud session can't): facts in the job's log, for when Spotify changes.
+    echo "--- Spotify's Canvas in its web player today ---"
+    timeout 180 python3 .github/spotify-canvas.py 2>&1 | head -20 || true
 fi
 CANVAS="--ez demoSong true --es videoCover http://10.0.2.2:8003/canvas.mp4"
 EXTRA="$CANVAS" shoot video-cover 1920 720 240 "$WAIT;$WAIT;1405,54;$WAIT;$WAIT;1866,54;$WAIT"

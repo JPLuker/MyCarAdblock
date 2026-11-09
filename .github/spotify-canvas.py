@@ -1,39 +1,28 @@
 #!/usr/bin/env python3
-# Prints what Spotify's web player scripts say about a song's Canvas: the code around "canvas" in the
-# page's scripts and in its chunks for the Now playing view, and wider around the Canvas player and its
-# uses (canvasUrl: the address it gets; its <video> plays through Spotify's own video player).
-import re, sys, urllib.request
+# Checks, in Spotify's web player as it is today, what myCar's page script relies on for a song's Canvas
+# (WebMusicScripts, videoCover): the Canvas player gets the video's address as the canvasUrl prop and
+# plays it by file id through Spotify's own video player (so its <video> has no such address), and its
+# previews of other songs play on hover (playbackType loopOnHover). Prints facts, not Spotify's code.
+import re, urllib.request
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
 def get(url):
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     return urllib.request.urlopen(req, timeout=40).read().decode("utf-8", "replace")
 html = get("https://open.spotify.com/")
 scripts = sorted(set(re.findall(r'<script[^>]+src="([^"]+\.js)"', html)))
-print("page scripts:", scripts)
-texts = {}
+js = ""
 for s in scripts:
     try:
-        texts[s] = get(s)
+        js += get(s)
     except Exception as e:
-        print("not fetched", s, e)
-# Webpack's runtime: how a chunk's address is made, and the chunks of the Now playing view.
-main = next((u for u in texts if "/web-player." in u), None)
-if main:
-    js = texts[main]
-    base = main.rsplit("/", 1)[0] + "/"
-    for m in list(re.finditer(r'\.u=', js))[:3]:
-        print("\n==== runtime at %d: %s" % (m.start(), js[m.start() - 300:m.start() + 1200].replace("\n", " ")[:1500]))
-    names = re.findall(r'(\d+):"([a-z][\w-]*(?:now-playing|npv|nowplaying|canvas|cinema)[\w-]*)"', js)
-    print("\nchunk names:", names[:40])
-    for cid, name in names[:12]:
-        for hm in re.finditer(r'%s:"([0-9a-f]{6,40})"' % cid, js):
-            for url in (base + name + "." + hm.group(1) + ".js", base + hm.group(1) + ".js"):
-                try:
-                    texts[url] = get(url)
-                    print("fetched", url, len(texts[url]))
-                except Exception as e:
-                    print("not fetched", url, e)
-for url, js in texts.items():
-    for m in list(re.finditer(r'canvasUrl:', js))[:6]:
-        print("\n==== canvasUrl: in %s at %d" % (url.rsplit("/", 1)[1], m.start()))
-        print(js[max(0, m.start() - 700):m.start() + 700].replace("\n", " "))
+        print("not fetched:", s.rsplit("/", 1)[-1], e)
+def has(pattern):
+    return len(re.findall(pattern, js))
+print("scripts:", len(scripts), "-", sum(1 for _ in js), "characters")
+print("components given canvasUrl:", has(r'canvasUrl:'))
+print("the Canvas player plays by file id (MANIFEST_ID) near canvasUrl:",
+      bool(re.search(r'canvasUrl:[^;]{0,4000}format:"MANIFEST_ID"|format:"MANIFEST_ID"[^;]{0,4000}canvasUrl', js)))
+print("its playback types: loopOnHover", has(r'"loopOnHover"'), "- loopOnPlayback", has(r'"loopOnPlayback"'))
+print("canvas.url in the songs' metadata:", has(r'"canvas\.url"'), "- the canvas query:", has(r'"canvas","query"'))
+print("canvaz.scdn.co in the scripts:", has(r'canvaz\.scdn\.co'))
+print("Now playing view modes (artwork, canvas…):", bool(re.search(r'\["artwork","canvas","hero","video","lyrics"\]', js)))
