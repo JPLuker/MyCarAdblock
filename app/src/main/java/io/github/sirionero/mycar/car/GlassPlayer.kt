@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -63,6 +64,7 @@ import io.github.sirionero.mycar.car.design.MyCarCarTheme
 import io.github.sirionero.mycar.car.design.MyCarPalette
 import io.github.sirionero.mycar.car.design.MyCarRadius
 import io.github.sirionero.mycar.car.design.glassPanel
+import io.github.sirionero.mycar.car.design.panelsOff
 import io.github.sirionero.mycar.car.theme.GsColors
 import io.github.sirionero.mycar.car.theme.GsIconButton
 import io.github.sirionero.mycar.media.MediaArt
@@ -101,7 +103,7 @@ internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp:
         // ring kept, which MaterialTheme would swap for its plain ripple.
         val ring = LocalIndication.current
         MaterialTheme(colorScheme = scheme) { CompositionLocalProvider(LocalContentColor provides Color.White, LocalIndication provides ring) {
-            Box(modifier.background(ground)) {
+            Box((if ("playerclip" in panelsOff) modifier.clip(RoundedCornerShape(MyCarRadius.Card)) else modifier).background(ground)) {
                 if (cover != null) {
                     Image(cover, null, Modifier.fillMaxSize().clickable { navigator.media() }, contentScale = ContentScale.Crop)
                     Image(

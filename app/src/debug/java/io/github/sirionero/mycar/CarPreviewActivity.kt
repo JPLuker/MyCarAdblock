@@ -224,6 +224,9 @@ class CarPreviewActivity : ComponentActivity() {
         io.github.sirionero.mycar.car.design.WallpaperSetting.set(
             intent.getStringExtra("wallpaper") ?: io.github.sirionero.mycar.car.design.Wallpapers.DEFAULT,
         )
+        // Temporary: --es panelsOff shadow,clip,…: parts of the raised panels left out (car/design/Panels.kt).
+        io.github.sirionero.mycar.car.design.panelsOff =
+            intent.getStringExtra("panelsOff").orEmpty().split(',').filter { it.isNotBlank() }.toSet()
         val w = intent.getIntExtra("w", 800)
         val h = intent.getIntExtra("h", 480)
         val dpi = intent.getIntExtra("dpi", 160)
