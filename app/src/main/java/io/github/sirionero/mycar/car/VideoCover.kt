@@ -42,14 +42,23 @@ import io.github.sirionero.mycar.webmusic.WebMusic
 import io.github.sirionero.mycar.webmusic.WebMusicPlayer
 import io.github.sirionero.mycar.webmusic.WebMusicService
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
+import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
+import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 
@@ -170,13 +179,20 @@ private val ICON = 26.dp
  * while not [running] (its picture stays). Drawn under the still cover, which gives way once
  * [VideoCover.drawn]. Played by Android's own player on a TextureView, as Cinema's videos, from a copy
  * on the phone ([VideoCoverFiles]): nothing until the copy is there, and nothing at all if it won't
- * come or won't play - the still cover stays. Gone with this composable; one at a time.
+ * come or won't play - the still cover stays. Gone with this composable; one at a time. The copy is
+ * fetched only while it would play (the player in sight, the music on): a song skipped or the player
+ * left stops the fetching at once; one that didn't come is tried again after a while.
  */
 @Composable
 internal fun VideoCoverView(video: VideoCover, running: Boolean, modifier: Modifier = Modifier) {
     val context = LocalContext.current.applicationContext
     var file by remember(video) { mutableStateOf<File?>(null) }
-    LaunchedEffect(video) { file = VideoCoverFiles.get(context, video.url) }
+    LaunchedEffect(video, running) {
+        while (running && file == null) {
+            file = VideoCoverFiles.get(context, video.url)
+            if (file == null) delay(VideoCoverFiles.RETRY_SOON_MS)
+        }
+    }
     val ready = file ?: return
     val loop = remember(ready) { VideoLoop(ready, video) }
     DisposableEffect(loop) {
@@ -321,7 +337,8 @@ private class VideoLoop(private val file: File, private val video: VideoCover) {
 /**
  * The video covers' files on the phone, in its cache: each fetched once and the last few kept - a
  * loop plays again and again (from the network it would be fetched again each time round), and the
- * same songs come back. One that won't come, or won't play, isn't asked for again for a while.
+ * same songs come back. One that didn't come for the network (a tunnel) is asked for again soon; one
+ * the server refused, or that won't play, only after a while.
  */
 internal object VideoCoverFiles {
     private val http = OkHttpClient.Builder()
@@ -333,7 +350,7 @@ internal object VideoCoverFiles {
     /** One download at a time: a song skipped while it waits isn't fetched at all. */
     private val one = Mutex()
 
-    /** The addresses that didn't come or didn't play, and when (on the elapsed clock). */
+    /** The addresses that didn't come or didn't play, and when they may be tried again (elapsed clock). */
     private val failed = mutableMapOf<String, Long>()
 
     /** [url]'s file on the phone, fetched now if need be; null if it won't come, or didn't a moment ago. */
@@ -341,40 +358,74 @@ internal object VideoCoverFiles {
         if (failedLately(url)) return null
         val dir = File(context.cacheDir, DIR)
         return one.withLock {
-            withContext(Dispatchers.IO) {
-                try {
-                    fetch(dir, url)
-                } catch (e: Exception) {
-                    // Not its address in the log, but in debug builds: it says which song it is.
-                    MyCarLog.w("video cover: not fetched - ${e.javaClass.simpleName}" + if (BuildConfig.DEBUG) " ($url)" else "")
-                    null
-                }
+            try {
+                fetch(dir, url)
+            } catch (e: IOException) {
+                // A song skipped meanwhile isn't a failure. No signal (a tunnel): soon again.
+                currentCoroutineContext().ensureActive()
+                notFetched(url, e)
+                markFailed(url, RETRY_SOON_MS)
+                null
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                notFetched(url, e)
+                markFailed(url, RETRY_AFTER_MS)
+                null
             }
-        }.also { if (it == null) markFailed(url) }
+        }
     }
 
     /** [file], fetched from [url], didn't play: it goes, and isn't fetched again for a while. */
     fun bad(url: String, file: File) {
         file.delete()
-        markFailed(url)
+        markFailed(url, RETRY_AFTER_MS)
     }
 
-    private fun fetch(dir: File, url: String): File? {
+    // Not its address in the log, but in debug builds: it says which song it is.
+    private fun notFetched(url: String, e: Exception) =
+        MyCarLog.w("video cover: not fetched - ${e.javaClass.simpleName}" + if (BuildConfig.DEBUG) " ($url)" else "")
+
+    private suspend fun fetch(dir: File, url: String): File? {
         val file = File(dir, name(url))
         if (file.length() > 0) {
             file.setLastModified(System.currentTimeMillis())
             return file
         }
+        val call = http.newCall(Request.Builder().url(url).build())
+        return coroutineScope {
+            // Cancelled (a song skipped, the player left): the call ends at once, and its read with it.
+            val canceller = launch {
+                try {
+                    awaitCancellation()
+                } finally {
+                    call.cancel()
+                }
+            }
+            try {
+                runInterruptible(Dispatchers.IO) { download(call, dir, file, url) }
+            } finally {
+                canceller.cancel()
+            }
+        }
+    }
+
+    /** What [call] brings, written beside [file] and then put in its place; null if it isn't a cover to keep. */
+    private fun download(call: Call, dir: File, file: File, url: String): File? {
         dir.mkdirs()
         val part = File(dir, file.name + PART)
         try {
-            http.newCall(Request.Builder().url(url).build()).execute().use { response ->
+            call.execute().use { response ->
                 if (!response.isSuccessful) {
                     MyCarLog.w("video cover: not fetched - HTTP ${response.code}")
+                    markFailed(url, RETRY_AFTER_MS)
                     return null
                 }
                 val body = response.body
-                if (body.contentLength() > MAX_BYTES) return null
+                if (body.contentLength() > MAX_BYTES) {
+                    markFailed(url, RETRY_AFTER_MS)
+                    return null
+                }
                 part.outputStream().use { out ->
                     val input = body.byteStream()
                     val buffer = ByteArray(BUFFER)
@@ -383,7 +434,10 @@ internal object VideoCoverFiles {
                         val read = input.read(buffer)
                         if (read < 0) break
                         total += read
-                        if (total > MAX_BYTES) return null
+                        if (total > MAX_BYTES) {
+                            markFailed(url, RETRY_AFTER_MS)
+                            return null
+                        }
                         out.write(buffer, 0, read)
                     }
                 }
@@ -408,14 +462,14 @@ internal object VideoCoverFiles {
         MessageDigest.getInstance("SHA-256").digest(url.toByteArray()).take(16).joinToString("") { "%02x".format(it) } + EXT
 
     private fun failedLately(url: String): Boolean = synchronized(failed) {
-        val at = failed[url] ?: return false
-        SystemClock.elapsedRealtime() - at < RETRY_AFTER_MS
+        val again = failed[url] ?: return false
+        SystemClock.elapsedRealtime() < again
     }
 
-    private fun markFailed(url: String) {
+    private fun markFailed(url: String, wait: Long) {
         synchronized(failed) {
             if (failed.size > MAX_FAILED) failed.clear()
-            failed[url] = SystemClock.elapsedRealtime()
+            failed[url] = SystemClock.elapsedRealtime() + wait
         }
     }
 
@@ -427,6 +481,9 @@ internal object VideoCoverFiles {
 
     /** Spotify's loops are a few megabytes; anything much bigger isn't a cover. */
     private const val MAX_BYTES = 20L * 1024 * 1024
+
+    /** A cover that didn't come for the network is tried again this soon; one refused or broken, this late. */
+    const val RETRY_SOON_MS = 30_000L
     private const val RETRY_AFTER_MS = 10 * 60_000L
     private const val STALE_PART_MS = 60 * 60_000L
     private const val MAX_FAILED = 100
