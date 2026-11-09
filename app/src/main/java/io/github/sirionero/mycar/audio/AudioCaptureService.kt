@@ -20,7 +20,10 @@ import android.os.Process
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.Words
+import io.github.sirionero.mycar.car.CarServices
 import io.github.sirionero.mycar.mirror.MirrorService
+import io.github.sirionero.mycar.webmusic.WebMusic
+import io.github.sirionero.mycar.xonos.Xonos
 import kotlin.math.abs
 
 /**
@@ -189,9 +192,7 @@ class AudioCaptureService : Service() {
             val buffer = ByteArray(CHUNK_BYTES)
             var peak = 0
             var heardAt = System.currentTimeMillis()
-            val startedAt = heardAt
-            var everHeard = false
-            var warnedSilent = false
+            val silent = SilentCapture(startedAt = heardAt)
             try {
                 record.startRecording()
                 MyCarLog.i("audio: capturing media playback at ${rate}Hz x$channels")
@@ -203,11 +204,12 @@ class AudioCaptureService : Service() {
                         MyCarLog.e("audio: AudioRecord.read returned $n - capture has stopped")
                         break
                     }
+                    var piecePeak = 0
                     for (i in 0 until n - 1 step 2) {
                         val sample = (buffer[i].toInt() and 0xFF) or (buffer[i + 1].toInt() shl 8)
-                        peak = maxOf(peak, abs(sample.toShort().toInt()))
+                        piecePeak = maxOf(piecePeak, abs(sample.toShort().toInt()))
                     }
-                    if (peak > 0) everHeard = true
+                    peak = maxOf(peak, piecePeak)
                     val now = System.currentTimeMillis()
                     val level = peak / 32768f
                     if (now - heardAt >= LEVEL_LOG_MS) {
@@ -216,13 +218,13 @@ class AudioCaptureService : Service() {
                         peak = 0
                     }
                     // Capture never fails for an app that opts out; it just hands back digital
-                    // silence. Say so, because the symptom is identical to a broken car link.
-                    if (!everHeard && !warnedSilent && now - startedAt >= SILENCE_MS) {
-                        warnedSilent = true
+                    // silence. Say so, because the symptom is identical to a broken car link - but
+                    // only once the car's music says it plays (SilentCapture): before, every start
+                    // said it, while the music's page was still loading.
+                    if (silent.piece(now, sound = piecePeak > 0, playing = carMusicPlays())) {
                         MyCarLog.w(
-                            "audio: ${SILENCE_MS / 1000}s of capture and every sample is zero. " +
-                                "Either nothing is playing, or the app does not allow its audio " +
-                                "to be captured.",
+                            "audio: ${carMusicName()} has said it plays for ${SilentCapture.HOLD_MS / 1000} s, and every " +
+                                "captured sample is zero: the app may not allow its audio to be captured.",
                         )
                     }
                     CarAudio.deliver(buffer, n, level)
@@ -255,6 +257,24 @@ class AudioCaptureService : Service() {
                 }
             }
         }, "mycar-audio").apply { isDaemon = true; start() }
+    }
+
+    /**
+     * The car's music says it plays, and it's another app's, which the capture should hear: not
+     * myCar's own (Xonos inside myCar), which goes straight to the car while the capture reads zeros.
+     * Read on the capture's thread.
+     */
+    private fun carMusicPlays(): Boolean {
+        val app = CarServices.mediaApp.value ?: return false
+        if (CarServices.mediaOrNull()?.now?.value?.playing != true) return false
+        return !Xonos.isInside(app.component) && !CarAudio.ownMusicFeeding
+    }
+
+    /** The car's music for the log: a service's page in myCar, or an app on the phone (by package, no titles). */
+    private fun carMusicName(): String {
+        val app = CarServices.mediaApp.value ?: return "The car's music"
+        val web = WebMusic.serviceFor(app.component)
+        return if (web != null) "${web.name} in myCar's web player" else "${app.label} (the phone's app ${app.component.packageName})"
     }
 
     override fun onDestroy() {
@@ -302,7 +322,6 @@ class AudioCaptureService : Service() {
         /** About half a second: room to wait out a slow ack from the car without losing sound. */
         private const val BUFFER_CHUNKS = 24
         private const val LEVEL_LOG_MS = 3_000L
-        private const val SILENCE_MS = 5_000L
 
         private var appContext: Context? = null
 
