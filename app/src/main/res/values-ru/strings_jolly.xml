@@ -104,6 +104,9 @@
     <string name="jolly_no_map">На телефоне нет приложения карт.</string>
     <!-- %1$s: the app's name -->
     <string name="jolly_app_gone">%1$s больше нет на телефоне. Удерживайте кнопку, чтобы выбрать другое.</string>
+    <!-- The contact's number chosen for the key isn't theirs in the contacts any more: the chooser opens.
+         %1$s: the contact's name -->
+    <string name="jolly_call_gone">%1$s: этого номера больше нет в контактах. Выберите заново.</string>
     <!-- A call, an assistant or a command while on a call -->
     <string name="jolly_after_call">Это подождёт до конца звонка.</string>
 

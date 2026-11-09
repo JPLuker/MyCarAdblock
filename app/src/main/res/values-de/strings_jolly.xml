@@ -102,6 +102,9 @@
     <string name="jolly_no_map">Auf dem Telefon ist keine Karten-App.</string>
     <!-- %1$s: the app's name -->
     <string name="jolly_app_gone">%1$s ist nicht mehr auf dem Telefon. Halte die Taste gedrückt, um etwas anderes zu wählen.</string>
+    <!-- The contact's number chosen for the key isn't theirs in the contacts any more: the chooser opens.
+         %1$s: the contact's name -->
+    <string name="jolly_call_gone">%1$s hat diese Nummer nicht mehr in den Kontakten: wähle neu.</string>
     <!-- A call, an assistant or a command while on a call -->
     <string name="jolly_after_call">Das muss warten, bis der Anruf vorbei ist.</string>
 

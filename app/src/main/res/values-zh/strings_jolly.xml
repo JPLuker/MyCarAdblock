@@ -101,6 +101,9 @@
     <string name="jolly_no_map">手机上没有地图应用。</string>
     <!-- %1$s: the app's name -->
     <string name="jolly_app_gone">手机上已经没有%1$s了。长按按钮可以另选一个。</string>
+    <!-- The contact's number chosen for the key isn't theirs in the contacts any more: the chooser opens.
+         %1$s: the contact's name -->
+    <string name="jolly_call_gone">通讯录里%1$s已经没有这个号码了，请重新选择。</string>
     <!-- A call, an assistant or a command while on a call -->
     <string name="jolly_after_call">要等通话结束后才能进行。</string>
 

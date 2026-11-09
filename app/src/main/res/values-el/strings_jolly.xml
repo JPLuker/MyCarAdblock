@@ -102,6 +102,9 @@
     <string name="jolly_no_map">Δεν υπάρχει εφαρμογή χαρτών στο τηλέφωνο.</string>
     <!-- %1$s: the app's name -->
     <string name="jolly_app_gone">Το %1$s δεν υπάρχει πια στο τηλέφωνο. Κρατήστε πατημένο το κουμπί για να επιλέξετε κάτι άλλο.</string>
+    <!-- The contact's number chosen for the key isn't theirs in the contacts any more: the chooser opens.
+         %1$s: the contact's name -->
+    <string name="jolly_call_gone">%1$s: αυτός ο αριθμός δεν υπάρχει πια στις επαφές. Επιλέξτε ξανά.</string>
     <!-- A call, an assistant or a command while on a call -->
     <string name="jolly_after_call">Αυτό θα περιμένει να τελειώσει η κλήση.</string>
 

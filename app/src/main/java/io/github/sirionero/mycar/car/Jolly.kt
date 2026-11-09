@@ -3,9 +3,11 @@ package io.github.sirionero.mycar.car
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.provider.ContactsContract
 import androidx.annotation.StringRes
 import androidx.car.app.CarToast
 import io.github.sirionero.mycar.AppSettings
@@ -114,7 +116,7 @@ internal object Jolly {
         // the car's display, which Android doesn't let it draw on.
         val app = context.applicationContext
         when (action) {
-            is JollyAction.Call -> call(app, action)
+            is JollyAction.Call -> call(app, navigator, action)
             is JollyAction.Assistant -> talk(app, action.app)
             is JollyAction.Home -> home(action)
             is JollyAction.Navigate -> navigate(app, navigator, entries, frame, action)
@@ -130,13 +132,39 @@ internal object Jolly {
         relight()
     }
 
-    /** Through Telecom, as the dialer calls: the call's own card comes up on the car. */
-    private fun call(context: Context, action: JollyAction.Call) {
+    /**
+     * Through Telecom, as the dialer calls: the call's own card comes up on the car. The number as the
+     * contacts have it now: changed or gone there, the key asks again rather than call an old one.
+     */
+    private fun call(context: Context, navigator: CarNavigator, action: JollyAction.Call) {
         if (context.checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             toast(Words.get(R.string.dialer_permissions))
             return
         }
-        placeCall(context, action.number)
+        scope.launch {
+            if (withContext(Dispatchers.IO) { stillInContacts(context, action.name, action.number) } == false) {
+                MyCarLog.i("jolly: the number chosen isn't in the contacts any more - asking again")
+                toast(Words.get(R.string.jolly_call_gone, action.name))
+                navigator.jolly()
+                return@launch
+            }
+            placeCall(context, action.number)
+        }
+    }
+
+    /** Whether [number] is still [name]'s in the contacts; null where that can't be told (no permission). */
+    private fun stillInContacts(context: Context, name: String, number: String): Boolean? {
+        if (context.checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) return null
+        return runCatching {
+            context.contentResolver.query(
+                Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number)),
+                arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME), null, null, null,
+            )?.use { cursor ->
+                var found = false
+                while (!found && cursor.moveToNext()) found = cursor.getString(0) == name
+                found
+            }
+        }.getOrNull()
     }
 
     /**
