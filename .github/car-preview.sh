@@ -1036,7 +1036,9 @@ charging_no_car() {
     adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen home --ez graphene true >/dev/null
     sleep 5; adb exec-out screencap -p > $d/01-plugged.png
     sleep 20; adb exec-out screencap -p > $d/02-after-20s.png
-    adb shell input swipe 160 520 160 220 400; sleep 1.5; adb exec-out screencap -p > $d/03-card.png
+    # Home scrolls only above its bottom card (What's new, How to connect): the swipe starts on the
+    # status card, inside the part that scrolls.
+    adb shell input swipe 160 420 160 120 400; sleep 1.5; adb exec-out screencap -p > $d/03-card.png
     adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1
     adb shell cat /sdcard/ui.xml | grep -qF "The phone is charging" && echo "charging-no-car: card shown" || echo "charging-no-car: no card"
     adb shell dumpsys battery set usb 0
