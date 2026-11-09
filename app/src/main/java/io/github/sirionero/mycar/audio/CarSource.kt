@@ -20,7 +20,7 @@ internal object CarSource {
     /** How long the phone's music stays away after the LOSS for the drive to count as ended on the radio. */
     private const val SETTLE_MS = 60_000L
 
-    private var app: Context? = null
+    @Volatile private var app: Context? = null
     private val main = Handler(Looper.getMainLooper())
 
     /** The car whose LOSS waits out [SETTLE_MS]; null when none does. */

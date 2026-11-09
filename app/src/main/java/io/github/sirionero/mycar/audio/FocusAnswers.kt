@@ -11,8 +11,9 @@ import io.github.sirionero.mycar.MyCarLog
  * Not porting this before (Gearslip dc61607) was because an answer meant for the directions could
  * reach the music late and start it. That is closed on both sides: a grant the music never asked for
  * starts nothing ([AudioLink.onFocus]), and two answers no longer go the wrong way here:
- * - a GAIN while the music waits for its own is the music's: the car answers the directions'
- *   GAIN_TRANSIENT_MAY_DUCK with GAIN_TRANSIENT, and the music, which asked meanwhile, waits for GAIN;
+ * - a GAIN while the music waits for its own is the music's: it answers a GAIN, the directions
+ *   having asked for the speakers only for a moment (a car that answers them with GAIN too, while the
+ *   music waits, lets them speak after their half second anyway);
  * - a LOSS soon after the directions gave the speakers back, with the music asking or starting since,
  *   is the car's late answer to that RELEASE: it would stop the music and pause the phone.
  */
