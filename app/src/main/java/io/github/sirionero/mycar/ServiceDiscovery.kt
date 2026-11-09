@@ -29,6 +29,8 @@ object ServiceDiscovery {
         val density: Int,
         val widthMargin: Int = 0,
         val heightMargin: Int = 0,
+        /** VideoConfiguration field 10, the codec, for a unit that says it per configuration rather than for the service; 0 when it doesn't. */
+        val codecType: Int = 0,
     ) {
         val resolutionName: String get() = RESOLUTIONS[resolution] ?: "unknown($resolution)"
         val frameRateName: String get() = if (frameRate == 1) "60fps" else "30fps"
@@ -54,6 +56,12 @@ object ServiceDiscovery {
     /** [displayId] is MediaSinkService field 6: 0, the default, is the main screen. */
     class VideoService(val serviceId: Int, val codecType: Int, val configs: List<VideoConfig>, val displayId: Int = 0) {
         val codecName: String get() = CODECS[codecType] ?: "unknown($codecType)"
+
+        /** The codecs the configurations name (field 10), each once, for the log; empty when none does. */
+        val configCodecNames: List<String> get() = configs.map { it.codecType }.filter { it != 0 }.distinct().map { CODECS[it] ?: "unknown($it)" }
+
+        /** The service or any of its configurations says H.264 Baseline, what myCar sends. */
+        val saysH264Bp: Boolean get() = codecType == CODEC_H264_BP || configs.any { it.codecType == CODEC_H264_BP }
     }
 
     class AudioConfig(val sampleRate: Int, val bits: Int, val channels: Int)
@@ -192,6 +200,8 @@ object ServiceDiscovery {
     const val CODEC_PCM = 1
     const val CODEC_AAC_LC = 2
     const val CODEC_AAC_LC_ADTS = 4
+    /** The video myCar sends (MyCarRunner's Setup). */
+    const val CODEC_H264_BP = 3
 
     private val STREAMS = mapOf(0 to "NONE", 1 to "GUIDANCE", 2 to "SYSTEM_AUDIO", 3 to "MEDIA", 4 to "TELEPHONY")
 
@@ -305,6 +315,7 @@ object ServiceDiscovery {
                     density = Wire.varint(f, 5)?.toInt() ?: 0,
                     widthMargin = Wire.varint(f, 3)?.toInt() ?: 0,
                     heightMargin = Wire.varint(f, 4)?.toInt() ?: 0,
+                    codecType = Wire.varint(f, 10)?.toInt() ?: 0,
                 )
             }
             add(VideoService(id, codecType, configs, Wire.varint(sinkFields, 6)?.toInt() ?: 0))

@@ -1,5 +1,6 @@
 package io.github.sirionero.mycar.home
 
+import io.github.sirionero.mycar.MyCarLog
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
@@ -24,11 +25,47 @@ object Assist {
     suspend fun ask(text: String, language: String, conversationId: String?): Answer {
         val client = HomeAssistant.live ?: throw HaException("Not connected to Home Assistant", HaException.Reason.CLOSED)
         val known = pipelines(client)
-        return when (val plan = if (known != null) AssistPlan.of(known.first, known.second, language) else AssistPlan.Process(null, language)) {
+        val agents = if (known != null) agents(client) else null
+        if (known != null && agents != null && leftOutSaid !== client) {
+            leftOutSaid = client
+            val left = known.first.size - AssistPlan.usable(known.first, agents).size
+            if (left > 0) MyCarLog.w("assistant: $left of Home Assistant's ${known.first.size} voice assistants name a conversation agent it doesn't have - left out")
+        }
+        return when (val plan = if (known != null) AssistPlan.of(known.first, known.second, language, agents) else AssistPlan.Process(null, language)) {
             is AssistPlan.Run -> run(client, plan.pipeline, text, conversationId)
             is AssistPlan.Process -> process(client, plan, text, conversationId)
         }
     }
+
+    /**
+     * Home Assistant's voice assistant can't find its conversation agent: "Intent recognition engine
+     * … is not found" (the agent's integration removed, renamed or not loaded), or the agent of a
+     * conversation going on gone. Something to set again in Home Assistant, not a network that didn't
+     * answer. Home Assistant (2026.11) says it as the error result of assist_pipeline/run, when it
+     * checks the voice assistant before running it, not as an "error" event.
+     */
+    fun agentMissing(e: Throwable): Boolean = e is HaException && e.code?.let { it in AGENT_MISSING } == true
+
+    /** The conversation agents Home Assistant has, read once per connection; null when it doesn't say. */
+    private suspend fun agents(client: HaClient): Set<String>? {
+        agentCache?.takeIf { it.first === client }?.let { return it.second }
+        val result = try {
+            client.command("conversation/agent/list") as? JSONObject
+        } catch (e: HaException) {
+            null
+        }
+        // Read or not, not asked again on this connection: a command that doesn't answer waits 20 s.
+        val ids = result?.optJSONArray("agents")?.let { array ->
+            (0 until array.length()).mapNotNull { i -> array.optJSONObject(i)?.str("id") }.toSet()
+        }
+        agentCache = client to ids
+        return ids
+    }
+
+    @Volatile private var agentCache: Pair<HaClient, Set<String>?>? = null
+
+    /** The connection the left-out voice assistants were last said for: once per connection. */
+    @Volatile private var leftOutSaid: HaClient? = null
 
     /** The pipelines, read once per connection: they change when the driver edits them at home. */
     private suspend fun pipelines(client: HaClient): Pair<List<AssistPipeline>, String?>? {
@@ -61,7 +98,7 @@ object Assist {
                 val data = event.optJSONObject("data")
                 when (event.optString("type")) {
                     "intent-end" -> answer.complete(parse(data?.optJSONObject("intent_output")))
-                    "error" -> answer.completeExceptionally(HaException(data?.str("message") ?: "Assist stopped"))
+                    "error" -> answer.completeExceptionally(HaException(data?.str("message") ?: "Assist stopped", code = data?.str("code")))
                     "run-end" -> answer.completeExceptionally(HaException("Assist ended without an answer"))
                 }
             },
@@ -100,4 +137,7 @@ object Assist {
 
     /** Long enough for a large model at home to think; the car shows "One moment…" meanwhile. */
     private const val TIMEOUT_S = 40
+
+    /** Assist's codes for a conversation agent that isn't there (see [agentMissing]). */
+    private val AGENT_MISSING = setOf("intent-not-supported", "intent-agent-not-found")
 }

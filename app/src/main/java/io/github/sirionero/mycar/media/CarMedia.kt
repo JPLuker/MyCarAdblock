@@ -597,13 +597,23 @@ class CarMedia(private val context: Context) {
 
     fun next() {
         asks.asked()
+        skippedAt = SystemClock.elapsedRealtime()
         controller?.transportControls?.skipToNext()
     }
 
     fun previous() {
         asks.asked()
+        skippedAt = SystemClock.elapsedRealtime()
         controller?.transportControls?.skipToPrevious()
     }
+
+    /**
+     * When the driver last skipped a song (next or previous: the wheel, the player, the voice), on
+     * the elapsed clock: the car isn't told "paused" for the moment the app stops between two songs
+     * (CarMediaStatus). Read from its thread.
+     */
+    @Volatile var skippedAt = 0L
+        private set
 
     fun seek(ms: Long) = controller?.transportControls?.seekTo(ms)
     fun custom(action: CustomAction) = controller?.transportControls?.sendCustomAction(action.id, action.extras)

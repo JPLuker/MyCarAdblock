@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_voice_small_model">El teléfono tiene poca memoria: el asistente te escucha solo con el modelo pequeño y puede equivocarse con los nombres.</string>
+    <string name="car_voice_silent">La voz del teléfono no habla: las respuestas solo se muestran. Mira Voz en los ajustes de myCar en el teléfono.</string>
+    <string name="phone_voice_missing_title">El teléfono no tiene voz en %1$s</string>
+    <string name="phone_voice_missing_detail">Su motor de texto a voz, %1$s, no tiene voz en %2$s: en el coche el asistente solo muestra sus respuestas. Añade esa voz al motor, o instala un motor que la tenga, y luego elígelo en los ajustes de texto a voz de Android.</string>
+    <string name="phone_voice_silent_detail">En el coche, su motor de texto a voz, %1$s, no empezó a hablar: el asistente solo mostró sus respuestas. Revisa la voz en %2$s en los ajustes de texto a voz de Android, o elige allí otro motor.</string>
+    <string name="phone_voice_no_engine_detail">El teléfono no tiene un motor de texto a voz: en el coche el asistente solo muestra sus respuestas. Instala uno con voz en %1$s y luego elígelo en los ajustes de texto a voz de Android.</string>
+    <string name="phone_voice_open_settings">Ajustes de texto a voz</string>
+</resources>

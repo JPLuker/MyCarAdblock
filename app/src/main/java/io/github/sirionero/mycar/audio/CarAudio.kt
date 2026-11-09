@@ -189,6 +189,9 @@ object CarAudio {
         _direct.value = wanted && link != null
     }
 
+    /** myCar's own music reaching the car now, or a moment ago (see DirectFeed.feeding): the capture hears none of it. */
+    internal val ownMusicFeeding: Boolean get() = feed?.feeding == true
+
     private fun ask() {
         _capture.value = Capture.ASKING
         val request = onConsentRequested

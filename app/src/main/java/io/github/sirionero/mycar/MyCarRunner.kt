@@ -570,8 +570,11 @@ class MyCarRunner(
         video.configs.forEachIndexed { index, config ->
             log.i("  config[$index] = $config")
         }
-        if (video.codecType != CODEC_H264_BP) {
-            log.w("head unit wants ${video.codecName}, not H264_BP - Phase B must match this")
+        // Some units say the codec in each configuration (field 10) and not for the service.
+        val configCodecs = video.configCodecNames
+        if (configCodecs.isNotEmpty()) log.i("video: the configurations' codec: ${configCodecs.joinToString()}")
+        if (!video.saysH264Bp) {
+            log.w("head unit names ${video.codecName}${if (configCodecs.isNotEmpty()) " (configurations: ${configCodecs.joinToString()})" else ""}, not H264_BP - myCar sends H264_BP")
         }
 
         openChannel(video.serviceId)

@@ -237,12 +237,13 @@ class CarAppConnection(private val context: Context) {
     private fun disconnect(keepLocation: Boolean) {
         main.removeCallbacks(handshakeTimeout)
         clearToasts()
-        lent?.let { sendSurfaceDestroyed(it) }
+        // The app is let go of right after: its library may turn these down, its session closing.
+        lent?.let { sendSurfaceDestroyed(it, leaving = true) }
         lent = null
         val carApp = this.carApp
         if (carApp != null) {
-            runCatching { carApp.onAppPause(noop("onAppPause")) }
-            runCatching { carApp.onAppStop(noop("onAppStop")) }
+            runCatching { carApp.onAppPause(noop("onAppPause", leaving = true)) }
+            runCatching { carApp.onAppStop(noop("onAppStop", leaving = true)) }
         }
         if (holdsLocation && !keepLocation) {
             holdsLocation = false
@@ -622,14 +623,14 @@ class CarAppConnection(private val context: Context) {
         update { it.copy(surfaceAttached = true) }
     }
 
-    private fun sendSurfaceDestroyed(surface: Lent) {
+    private fun sendSurfaceDestroyed(surface: Lent, leaving: Boolean = false) {
         val callback = surfaceCallback ?: return
         val container = runCatching {
             Bundleable.create(
                 SurfaceContainer(surface.surface, surface.width, surface.height, surface.dpi)
             )
         }.getOrNull() ?: return
-        runCatching { callback.onSurfaceDestroyed(container, noop("onSurfaceDestroyed")) }
+        runCatching { callback.onSurfaceDestroyed(container, noop("onSurfaceDestroyed", leaving)) }
         MyCarLog.i("host: took the surface back")
     }
 
@@ -872,9 +873,14 @@ class CarAppConnection(private val context: Context) {
             .onFailure { fail(Phase.REJECTED, Words.get(R.string.car_host_threw, name, it.javaClass.simpleName, "${it.message}")) }
     }
 
-    private fun noop(name: String) = object : IOnDoneCallback.Stub() {
+    /**
+     * An answer nothing waits for. [leaving]: sent as the app is let go of (the drive or the app
+     * ending), when the app's library turning it down is expected - not a warning then.
+     */
+    private fun noop(name: String, leaving: Boolean = false) = object : IOnDoneCallback.Stub() {
         override fun onSuccess(response: Bundleable?) = Unit
-        override fun onFailure(response: Bundleable?) = MyCarLog.w("host: $name failed")
+        override fun onFailure(response: Bundleable?) =
+            if (leaving) MyCarLog.i("host: $name failed - the app was being let go") else MyCarLog.w("host: $name failed")
     }
 
     /**

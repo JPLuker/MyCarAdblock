@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import io.github.sirionero.mycar.MyCarActivity
+import io.github.sirionero.mycar.MyCarLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -46,7 +47,8 @@ abstract class WebMusicMediaService(private val serviceId: String) : MediaLibrar
     override fun onCreate() {
         super.onCreate()
         val service = checkNotNull(WebMusic.byId(serviceId))
-        player = WebPlayer(mainLooper, service)
+        // Who sent the request being handled: myCar's player, or the car's radio over Bluetooth.
+        player = WebPlayer(mainLooper, service) { if (::session.isInitialized) session.controllerForCurrentRequest?.packageName else null }
         val openMyCar = PendingIntent.getActivity(
             this,
             0,
@@ -162,9 +164,18 @@ internal fun serviceClass(id: String): Class<out WebMusicMediaService> = when (i
  * for a computer's media keys - the song from its start, or the one before.
  */
 @OptIn(UnstableApi::class)
-internal class WebPlayer(looper: Looper, private val service: WebMusicService) : SimpleBasePlayer(looper) {
+internal class WebPlayer(
+    looper: Looper,
+    private val service: WebMusicService,
+    /** The app whose request is being handled now (Media3's controller for it), for the log. */
+    private val asker: () -> String? = { null },
+) : SimpleBasePlayer(looper) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val page = WebMusicPlayer.state(service.id)
+
+    /** The last "play", "pause" or "stop" and who asked it, and when (elapsed clock): see [asked]. */
+    private var lastAsk = ""
+    private var lastAskAt = 0L
 
     /** The page's word the player shows, to tell a jump in its position (a seek on the page). */
     private var shown: WebPlayerState? = null
@@ -198,10 +209,30 @@ internal class WebPlayer(looper: Looper, private val service: WebMusicService) :
         return builder.build()
     }
 
-    override fun handleSetPlayWhenReady(playWhenReady: Boolean): ListenableFuture<*> =
-        if (playWhenReady) WebMusicPlayer.act(service, "play") { it.playing } else WebMusicPlayer.act(service, "pause") { !it.playing }
+    override fun handleSetPlayWhenReady(playWhenReady: Boolean): ListenableFuture<*> {
+        asked(if (playWhenReady) "play" else "pause")
+        return if (playWhenReady) WebMusicPlayer.act(service, "play") { it.playing } else WebMusicPlayer.act(service, "pause") { !it.playing }
+    }
 
-    override fun handleStop(): ListenableFuture<*> = WebMusicPlayer.act(service, "pause") { !it.playing }
+    override fun handleStop(): ListenableFuture<*> {
+        asked("stop")
+        return WebMusicPlayer.act(service, "pause") { !it.playing }
+    }
+
+    /**
+     * Who asks the page to play, pause or stop: myCar itself, or another app - a car's radio sends
+     * play and pause over Bluetooth to the phone's music, here the page. Once a burst: the same ask
+     * from the same app within [BURST_MS] of the one before says nothing more.
+     */
+    private fun asked(what: String) {
+        // Only for the log: whatever happens finding out who, the button still goes to the page.
+        val who = runCatching { asker() }.getOrNull() ?: "an unknown app"
+        val key = "$what $who"
+        val now = SystemClock.elapsedRealtime()
+        if (key != lastAsk || now - lastAskAt > BURST_MS) MyCarLog.i("music: ${service.id} $what asked by $who")
+        lastAsk = key
+        lastAskAt = now
+    }
 
     /** Only a search comes here ("play X"): the page searches and plays what it finds first. */
     override fun handleSetMediaItems(mediaItems: List<MediaItem>, startIndex: Int, startPositionMs: Long): ListenableFuture<*> {
@@ -265,5 +296,11 @@ internal class WebPlayer(looper: Looper, private val service: WebMusicService) :
 
         /** Before this far into a song, "previous" is taken as done once it's there. */
         const val RESTART_MS = 3_000L
+
+        /**
+         * The same ask from the same app this soon after the one before is the same burst, said once
+         * (a car's radio asked Play about every 8 s for minutes).
+         */
+        const val BURST_MS = 15_000L
     }
 }
