@@ -534,6 +534,7 @@ internal object GreekPhrases : Phrasebook() {
         Said.SOMETHING_WRONG to t("Κάτι πήγε στραβά. Δοκιμάστε ξανά."),
         Said.DONE to t("Έγινε."),
         Said.HOME_ASSISTANT_SILENT to t("Το Home Assistant δεν απάντησε."),
+        Said.HOME_ASSISTANT_NO_AGENT to t("Ο φωνητικός βοηθός του Home Assistant δεν βρίσκει τον πράκτορα συνομιλίας του. Επιλέξτε τον ξανά στο Home Assistant, στις Ρυθμίσεις, Φωνητικοί βοηθοί."),
         Said.NEEDS_MIC to t("Χρειάζεται η άδεια για το μικρόφωνο."),
         Said.AFTER_CALL to t("Οι φωνητικές εντολές λειτουργούν όταν τελειώσει η κλήση."),
         Said.DIDNT_CATCH to t("Δεν το κατάλαβα."),

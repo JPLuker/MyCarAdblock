@@ -225,6 +225,7 @@ internal object ItalianPhrases : Phrasebook() {
         Said.SOMETHING_WRONG to t("Qualcosa è andato storto. Riprova."),
         Said.DONE to t("Fatto."),
         Said.HOME_ASSISTANT_SILENT to t("Home Assistant non ha risposto."),
+        Said.HOME_ASSISTANT_NO_AGENT to t("L'assistente vocale di Home Assistant non trova il suo agente di conversazione. Sceglilo di nuovo in Home Assistant, in Impostazioni, Assistenti vocali."),
         Said.NEEDS_MIC to t("Serve il permesso del microfono."),
         Said.AFTER_CALL to t("I comandi vocali funzionano quando finisce la chiamata."),
         Said.DIDNT_CATCH to t("Non ho capito."),

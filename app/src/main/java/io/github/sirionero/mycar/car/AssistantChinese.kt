@@ -430,6 +430,7 @@ internal object ChinesePhrases : Phrasebook() {
         Said.SOMETHING_WRONG to t("出了点问题，请再试一次。"),
         Said.DONE to t("已完成。"),
         Said.HOME_ASSISTANT_SILENT to t("Home Assistant没有回应。"),
+        Said.HOME_ASSISTANT_NO_AGENT to t("Home Assistant的语音助手找不到它的对话代理。请在Home Assistant的设置、语音助手中重新选择。"),
         Said.NEEDS_MIC to t("需要麦克风权限。"),
         Said.AFTER_CALL to t("通话结束后才能使用语音指令。"),
         Said.DIDNT_CATCH to t("抱歉，没听清。"),

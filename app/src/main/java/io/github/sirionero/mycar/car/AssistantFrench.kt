@@ -240,6 +240,7 @@ internal object FrenchPhrases : Phrasebook() {
         Said.SOMETHING_WRONG to t("Un problème est survenu. Réessayez."),
         Said.DONE to t("C'est fait."),
         Said.HOME_ASSISTANT_SILENT to t("Home Assistant n'a pas répondu."),
+        Said.HOME_ASSISTANT_NO_AGENT to t("L'assistant vocal de Home Assistant ne trouve pas son agent de conversation. Choisissez-le à nouveau dans Home Assistant, sous Paramètres, Assistants vocaux."),
         Said.NEEDS_MIC to t("Il faut l'autorisation du micro."),
         Said.AFTER_CALL to t("Les commandes vocales fonctionnent une fois l'appel terminé."),
         Said.DIDNT_CATCH to t("Je n'ai pas compris."),

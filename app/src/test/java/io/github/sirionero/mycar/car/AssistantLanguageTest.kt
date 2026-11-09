@@ -330,6 +330,7 @@ internal fun saidSample(said: Said): String = when (said) {
     Said.SOMETHING_WRONG -> "Something went wrong. Try again."
     Said.DONE -> "Done."
     Said.HOME_ASSISTANT_SILENT -> "Home Assistant didn't answer."
+    Said.HOME_ASSISTANT_NO_AGENT -> "Home Assistant's voice assistant can't find its conversation agent. Choose it again in Home Assistant, under Settings, Voice assistants."
     Said.NEEDS_MIC -> "Needs the microphone permission."
     Said.AFTER_CALL -> "Voice commands work once the call ends."
     Said.DIDNT_CATCH -> "Didn't catch that."

@@ -258,6 +258,7 @@ internal object PortuguesePhrases : Phrasebook() {
         Said.SOMETHING_WRONG to { _ -> pt("Algo correu mal. Tente de novo.", "Algo deu errado. Tente de novo.") },
         Said.DONE to t("Feito."),
         Said.HOME_ASSISTANT_SILENT to t("O Home Assistant não respondeu."),
+        Said.HOME_ASSISTANT_NO_AGENT to { _ -> "O assistente de voz do Home Assistant não encontra o seu agente de conversação. Escolha-o de novo no Home Assistant, em " + pt("Configuração", "Configurações") + ", Assistentes de voz." },
         Said.NEEDS_MIC to t("É preciso a permissão do microfone."),
         Said.AFTER_CALL to t("Os comandos de voz funcionam quando a chamada terminar."),
         Said.DIDNT_CATCH to t("Não entendi."),

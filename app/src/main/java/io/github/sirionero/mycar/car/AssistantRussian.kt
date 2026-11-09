@@ -758,6 +758,7 @@ internal object RussianPhrases : Phrasebook() {
         Said.SOMETHING_WRONG to t("Что-то пошло не так. Попробуйте ещё раз."),
         Said.DONE to t("Готово."),
         Said.HOME_ASSISTANT_SILENT to t("Home Assistant не ответил."),
+        Said.HOME_ASSISTANT_NO_AGENT to t("Голосовой ассистент Home Assistant не находит свою диалоговую систему. Выберите её заново в Home Assistant: Настройки, Голосовые ассистенты."),
         Said.NEEDS_MIC to t("Нужно разрешение на доступ к микрофону."),
         Said.AFTER_CALL to t("Голосовые команды заработают, когда закончится звонок."),
         Said.DIDNT_CATCH to t("Не удалось расслышать."),
