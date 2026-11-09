@@ -57,7 +57,8 @@ object MyCarLog {
         val dir = context.getExternalFilesDir(null) ?: return
         val name = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())
         file = File(dir, "mycar-$name.log")
-        i("log file: ${file?.absolutePath}")
+        // The process, so LastExit can tell this run's log from the others if Android ends it (endPastRun).
+        i("log file: ${file?.absolutePath} (process ${android.os.Process.myPid()})")
         // One file a session, and none was ever removed: months of drives filled the phone with
         // them. The newest few are kept, for sharing after a drive. Queued behind the line above,
         // so the new file already exists and counts among them.
@@ -87,7 +88,7 @@ object MyCarLog {
             runCatching {
                 f.useLines { lines ->
                     lines.forEach { line ->
-                        if ("FATAL uncaught" in line) crashed = true
+                        if ("FATAL uncaught" in line || ENDED in line) crashed = true
                         carName.find(line)?.let { car = it.groupValues[1] }
                     }
                 }
@@ -100,6 +101,34 @@ object MyCarLog {
             )
         }
     }
+
+    /** How the line starts that LastExit adds at the end of a run's log when Android ended that run. */
+    const val ENDED = "--- Android ended this run:"
+
+    /**
+     * [line] at the end of the log of the process [pid] that Android ended at [endedAt] (wall clock):
+     * the newest earlier log started by then whose first lines name that process (see [init]). The
+     * one a driver shares after a drive that went wrong said nothing of why it stopped; a process
+     * that had no log of its own (started for a service) finds none and marks none.
+     */
+    fun endPastRun(pid: Int, endedAt: Long, line: String) {
+        val current = file ?: return
+        val dir = current.parentFile ?: return
+        io.execute {
+            runCatching {
+                val parse = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US)
+                val process = "(process $pid)"
+                val run = logFiles(dir).filter { it != current }.firstOrNull { f ->
+                    val started = runCatching { parse.parse(f.name.removePrefix("mycar-").removeSuffix(".log")) }.getOrNull()
+                    started != null && started.time <= endedAt && f.useLines { lines -> lines.take(HEADER_LINES).any { process in it } }
+                }
+                run?.appendText(line + "\n")
+            }
+        }
+    }
+
+    /** How far down a log's start the line naming its process is looked for. */
+    private const val HEADER_LINES = 10
 
     /** An earlier launch's log, copied to the cache dir for sharing like [shareableFile]. */
     fun shareableFile(context: Context, past: File): android.net.Uri {
