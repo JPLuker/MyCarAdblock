@@ -81,16 +81,14 @@ class AudioLinkFocusTest {
         }
     }
 
-    /** The directions asking for the speakers on their own thread, as they do, until [answered] says the car replied. */
-    private fun asking(guidance: AudioLink, answered: () -> Unit): Long {
+    /** The directions asking for the speakers on their own thread, as they do, while [answered] gives the car's reply. */
+    private fun asking(guidance: AudioLink, answered: () -> Unit) {
         var asked = false
-        val began = System.nanoTime()
         val thread = Thread { asked = guidance.askForSpeakers() }.apply { start() }
         while (sent.none { it == "focus:$MAY_DUCK" }) Thread.sleep(1)
         answered()
         thread.join(2_000)
         assertTrue(asked)
-        return (System.nanoTime() - began) / 1_000_000
     }
 
     @Test
@@ -275,8 +273,11 @@ class AudioLinkFocusTest {
     fun `the car's answers inside the directions' window go to the directions`() {
         val media = link()
         val guidance = guidance(media)
-        val took = asking(guidance) { FocusAnswers.route(GAIN_TRANSIENT, media, guidance) }
-        assertTrue("the directions waited ${took}ms for an answer they had", took < 400)
+        asking(guidance) {
+            FocusAnswers.route(GAIN_TRANSIENT, media, guidance)
+            // Theirs: their wait is over.
+            assertFalse(guidance.expectsFocusAnswer())
+        }
         guidance.handBackSpeakers()
         FocusAnswers.route(LOSS, media, guidance)
         assertEquals(listOf("focus:$MAY_DUCK", "focus:$RELEASE"), sent)
@@ -309,11 +310,11 @@ class AudioLinkFocusTest {
         media.play(400, loud = true)
         FocusAnswers.route(GAIN, media, guidance)
         assertTrue(sent.contains("start"))
-        // The directions' own answer is still theirs.
-        assertTrue(thread.isAlive)
+        // The directions still wait for their own answer, which is theirs.
+        assertTrue(guidance.expectsFocusAnswer())
         FocusAnswers.route(GAIN_TRANSIENT, media, guidance)
+        assertFalse(guidance.expectsFocusAnswer())
         thread.join(1_000)
-        assertFalse(thread.isAlive)
     }
 
     @Test
