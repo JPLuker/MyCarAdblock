@@ -6,6 +6,7 @@ import io.github.sirionero.mycar.audio.AudioRoute
 import io.github.sirionero.mycar.audio.CarAudio
 import io.github.sirionero.mycar.audio.CarAudioRoute
 import io.github.sirionero.mycar.audio.CarRoutes
+import io.github.sirionero.mycar.audio.CarSource
 import io.github.sirionero.mycar.car.theme.GsTheme
 import io.github.sirionero.mycar.car.theme.GsThemes
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +42,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
     private const val KEY_LAST_NAV = "car_last_nav"
     private const val KEY_LAST_MEDIA = "car_last_media"
     private const val KEY_AUTOPLAY = "car_autoplay"
+    private const val KEY_RADIO_FIRST = "car_radio_first"
     private const val KEY_PLAYER_TITLE = "car_player_title"
     private const val KEY_THEME = "car_app_theme"
     private const val KEY_UI_THEME = "car_ui_theme"
@@ -82,6 +84,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
     private val lastNavFlow = MutableStateFlow<String?>(null)
     private val lastMediaFlow = MutableStateFlow<String?>(null)
     private val autoplayFlow = MutableStateFlow(true)
+    private val radioFirstFlow = MutableStateFlow(false)
     private val playerTitleFlow = MutableStateFlow(false)
     private val themeFlow = MutableStateFlow(AppTheme.DARK)
     val appTheme: StateFlow<AppTheme> = themeFlow
@@ -157,6 +160,13 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
 
     /** Whether the media app starts playing by itself when the car connects. */
     val autoplay: StateFlow<Boolean> = autoplayFlow
+
+    /**
+     * With the sound through myCar, the car keeps its radio (or whatever source it's on) until a
+     * player plays on the phone, instead of switching to myCar as the drive starts and getting the
+     * phone's silence. Off by default: then myCar takes the speakers at once, as it always has.
+     */
+    val radioFirst: StateFlow<Boolean> = radioFirstFlow
 
     /**
      * The nav bar's player keeps the song title up, with play/pause and the dock button, instead of
@@ -248,8 +258,10 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
         uiThemeFlow.value = AppSettings.getString(app, KEY_UI_THEME, GsThemes.default.id)
         // On unless the driver turned it off (0.6.9: the music starts with the drive by default).
         autoplayFlow.value = AppSettings.getString(app, KEY_AUTOPLAY, "true") == "true"
+        radioFirstFlow.value = AppSettings.getString(app, KEY_RADIO_FIRST, "false") == "true"
         playerTitleFlow.value = AppSettings.getString(app, KEY_PLAYER_TITLE, "false") == "true"
         CarRoutes.init(app)
+        CarSource.init(app)
         // The drive's car may have a route of its own (see carIdentified).
         audioRouteFlow.value = carRoute ?: savedRoute()
         // Automatic's pick belongs to the drive, so a second init mid-drive leaves it be.
@@ -343,6 +355,12 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
     fun setAutoplay(on: Boolean) {
         autoplayFlow.value = on
         AppSettings.putString(app, KEY_AUTOPLAY, on.toString())
+    }
+
+    /** From the next time the sound starts going through myCar (a drive, the capture starting again). */
+    fun setRadioFirst(on: Boolean) {
+        radioFirstFlow.value = on
+        AppSettings.putString(app, KEY_RADIO_FIRST, on.toString())
     }
 
     /**

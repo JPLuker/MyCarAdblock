@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The car's own radio kept until the phone plays (CarSettings.radioFirst), with the sound through myCar.
+-->
+<resources>
+    <!-- Title of the setting: a choice on the car's Settings screen, a switch on the phone (Settings > Connection > Car audio). -->
+    <string name="car_settings_radio_first">Lascia la radio della nave finché il telefono non intona</string>
+    <!-- On the car's Settings screen, under that choice. -->
+    <string name="car_settings_radio_first_note">Con l\'audio tramite myCar, la radio della nave, o quello che stava suonando, continua a navigare finché sul telefono non suona qualcosa. Spento, la nave passa a myCar, e resta in silenzio, appena si va all\'abbordaggio.</string>
+    <!-- On the phone, under the switch in Settings > Connection > Car audio. -->
+    <string name="settings_radio_first_detail">Con l\'audio tramite myCar, la radio della nave continua finché non intoni una ballata sul telefono, invece di tacere appena si va all\'abbordaggio</string>
+</resources>

@@ -5,6 +5,7 @@ import android.content.Context
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import io.github.sirionero.mycar.audio.CarAudio
+import io.github.sirionero.mycar.audio.CarSource
 import io.github.sirionero.mycar.host.CarAppCatalog
 import io.github.sirionero.mycar.host.CarAppConnection
 import io.github.sirionero.mycar.host.KnownApps
@@ -168,6 +169,8 @@ object CarServices {
         Xonos.init(appContext)
         if (Xonos.enabled.value) XonosAccount.adoptIfUnset(appContext)
         CarAudio.consentWaits = ::xonosIsTheMusic
+        // Only a player's sound takes the car's speakers from its radio, not a map's voice or a page.
+        CarAudio.playerPlaying = ::aPlayerPlays
         // Connected through the drive too, like Plancia: ready when it's opened, and known to reach
         // Music Assistant or not before the drive's music is picked.
         xonosHeld = Xonos.enabled.value
@@ -449,6 +452,18 @@ object CarServices {
             io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the car's Bluetooth music (or a cable), not to play on the phone's speaker")
             return
         }
+        // The car's last drive ended on its own source - the driver picked its radio and stayed there
+        // (see CarSource) - its music goes through myCar now, and the driver keeps the car's radio until
+        // the phone plays (radioFirst): the radio stays on, as a car radio comes back on the source it
+        // was left on. Without that choice the car is switched to myCar as the capture starts anyway, so
+        // leaving the music off only left it quiet, radio gone too. Over Bluetooth the car picks its
+        // source itself, as before.
+        if (autoplayAutoPicked && CarSettings.pipeAudio.value && CarSettings.radioFirst.value && CarSource.lastDriveOnCarSource()) {
+            autoplayPending = false
+            if (_musicStarting.value) expectMusic(false)
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay: last drive ended on the car's own source - it stays on")
+            return
+        }
         // The assistant up (listening, answering): the drive's pick doesn't start the music over it. It
         // plays as the assistant closes (AutoplayWhenReady calls again then).
         if (autoplayAutoPicked && CarAssistant.state.value.phase != CarAssistant.Phase.IDLE) {
@@ -476,6 +491,45 @@ object CarServices {
 
     /** How long the drive's Autoplay waits for a Bluetooth output on the Bluetooth way. */
     private const val AUTOPLAY_BLUETOOTH_MS = 60_000L
+
+    /**
+     * A player really playing on the phone, whose sound takes the car's speakers from its radio (see
+     * [CarAudio.playerPlaying]): the car's music app, Cinema's film, a site open in Cinema or the
+     * browser open full screen, or any app's media session, read with the notification access the
+     * music asks for anyway. Not a map's voice, a page in a part of the Home or the assistant, which
+     * have no player. From the capture's thread: the sessions, a call to Android, are asked at most
+     * every half second.
+     */
+    private fun aPlayerPlays(): Boolean {
+        if (mediaOrNull()?.now?.value?.state == PlaybackState.STATE_PLAYING) return true
+        // Cinema's own player says whether its film plays. A site open in Cinema, or the browser full
+        // screen, has no player to ask: the driver opened it on the car's screen, so its sound - a video,
+        // a web radio - is theirs. Left out, it stayed silent after the radio for the rest of the drive:
+        // the phone muted by the capture, the car on its radio, its own GAIN starting nothing.
+        val film = CinemaNow.playing
+        if (film != null) {
+            if (film()) return true
+        } else if (CinemaNow.pause != null) {
+            return true
+        }
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - sessionsAskedAt < SESSIONS_EVERY_MS) return sessionsPlaying
+        sessionsAskedAt = now
+        val ctx = context ?: return false
+        sessionsPlaying = try {
+            ctx.getSystemService(MediaSessionManager::class.java)
+                .getActiveSessions(ComponentName(ctx, MyCarNotificationListener::class.java))
+                .any { it.playbackState?.state == PlaybackState.STATE_PLAYING }
+        } catch (e: SecurityException) {
+            // No notification access: the car's music app and Cinema are what myCar sees.
+            false
+        }
+        return sessionsPlaying
+    }
+
+    @Volatile private var sessionsAskedAt = 0L
+    @Volatile private var sessionsPlaying = false
+    private const val SESSIONS_EVERY_MS = 500L
 
     // --- start and stop ------------------------------------------------------------------
 

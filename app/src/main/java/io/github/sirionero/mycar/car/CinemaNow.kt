@@ -13,6 +13,12 @@ import android.webkit.WebView
 internal object CinemaNow {
     @Volatile var pause: (() -> Unit)? = null
 
+    /**
+     * Whether Cinema's own player plays a film now, with no media session to say so: a player, whose
+     * sound takes the car's speakers from its radio (see CarAudio.playerPlaying). Null with none open.
+     */
+    @Volatile var playing: (() -> Boolean)? = null
+
     /** When the car last took its speakers back for good ([pauseForCar]), on elapsedRealtime: for [CinemaMusic]. */
     @Volatile var takenBackAt = 0L
         private set
