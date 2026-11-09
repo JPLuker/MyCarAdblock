@@ -12,6 +12,7 @@ import android.net.MacAddress
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.net.wifi.WifiInfo
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Handler
 import android.os.Looper
@@ -86,6 +87,8 @@ object WirelessLink {
     private const val TCP_TRIES = 12
     /** ...and for at least this long: a car's projection listener can start well after its Wi-Fi. */
     private const val TCP_WINDOW_MS = 60_000L
+    /** How long the first try waits for another Wi-Fi's name, when one is in the car's address range. */
+    private const val WIFI_DETAILS_WAIT_MS = 400L
     private const val WIFI_WAIT_MS = 60_000
     /** While the phone's service waits for the car, the car's own is called this often (see [waitForCar]). */
     private const val KNOCK_MS = 8_000L
@@ -853,7 +856,7 @@ object WirelessLink {
                 }.onFailure { log.w("Bluetooth: couldn't report the Wi-Fi join (${it.message})") }
                 val run = ++tcpRun
                 val cb = this
-                Thread({ connectTcp(context, output, name, net, ip, port, run, mine, cb) }, "mycar-wireless-tcp").start()
+                Thread({ connectTcp(context, output, name, net, ip, port, run, mine, cb, ssid, bssid) }, "mycar-wireless-tcp").start()
             }
 
             override fun onUnavailable() {
@@ -965,19 +968,84 @@ object WirelessLink {
         else -> "unknown"
     }
 
-    /** Another network the phone has with an address in the car's /24, or null. */
-    private fun mainOnCarNetwork(context: Context, ip: String, except: Network): Network? {
+    /**
+     * Another Wi-Fi network the phone has with an address in the car's /24, or null: only a Wi-Fi
+     * can be the car's, joined by hand. Whether it is, [judgeOther] says.
+     */
+    private fun otherOnCarSubnet(context: Context, ip: String, except: Network): Network? {
         val manager = context.getSystemService(ConnectivityManager::class.java) ?: return null
         val prefix = ip.substringBeforeLast('.') + "."
         return manager.allNetworks.firstOrNull { candidate ->
-            candidate != except && manager.getLinkProperties(candidate)?.linkAddresses
-                ?.any { it.address is java.net.Inet4Address && it.address.hostAddress?.startsWith(prefix) == true } == true
+            if (candidate == except) return@firstOrNull false
+            val caps = manager.getNetworkCapabilities(candidate) ?: return@firstOrNull false
+            caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) && !caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN) &&
+                manager.getLinkProperties(candidate)?.linkAddresses
+                    ?.any { it.address is java.net.Inet4Address && it.address.hostAddress?.startsWith(prefix) == true } == true
         }
+    }
+
+    /**
+     * Whether [other], a Wi-Fi of the phone in the car's address range, is the car's own network
+     * ([CarNetwork]), said once in the log. Its name only as the car's or another: the driver's home
+     * Wi-Fi has no place in logs that get shared.
+     */
+    private fun judgeOther(context: Context, other: Network, carSsid: String, carBssid: String): CarNetwork.Verdict {
+        val manager = context.getSystemService(ConnectivityManager::class.java)
+        val validated = runCatching {
+            manager?.getNetworkCapabilities(other)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+        }.getOrNull()
+        val wifi = manager?.let { wifiDetails(it, other) }
+        val name = CarNetwork.name(wifi?.ssid, wifi?.bssid, carSsid, carBssid)
+        val verdict = CarNetwork.judge(validated, name)
+        val internet = when (validated) {
+            true -> "reaches the Internet"
+            false -> "no Internet"
+            null -> "Internet unknown"
+        }
+        val named = when (name) {
+            CarNetwork.Name.SAME -> "the car's name"
+            CarNetwork.Name.OTHER -> "another name"
+            CarNetwork.Name.UNKNOWN -> "name hidden from myCar"
+        }
+        log.i(
+            "TCP: the phone has another Wi-Fi in the car's address range ($internet, $named) - " + when (verdict) {
+                CarNetwork.Verdict.CAR -> "it's the car's, joined by hand: the tries start on it"
+                CarNetwork.Verdict.MAYBE -> "maybe the car's: tried every other time, after the car's own network"
+                CarNetwork.Verdict.NOT_CAR -> "not the car's: the tries go over the car's own network only"
+            },
+        )
+        return verdict
+    }
+
+    /**
+     * [network]'s Wi-Fi details as Android shows them to myCar: through a listening request that
+     * asks for them (FLAG_INCLUDE_LOCATION_INFO), whose answers for the networks already up come
+     * within moments. Name and address are hidden without precise location for myCar or with
+     * location off; null if nothing came in time.
+     */
+    private fun wifiDetails(manager: ConnectivityManager, network: Network): WifiInfo? {
+        val found = java.util.concurrent.atomic.AtomicReference<WifiInfo?>(null)
+        val came = java.util.concurrent.CountDownLatch(1)
+        val listen = object : ConnectivityManager.NetworkCallback(ConnectivityManager.NetworkCallback.FLAG_INCLUDE_LOCATION_INFO) {
+            override fun onCapabilitiesChanged(net: Network, caps: NetworkCapabilities) {
+                if (net != network) return
+                found.set(caps.transportInfo as? WifiInfo)
+                came.countDown()
+            }
+        }
+        val request = NetworkRequest.Builder()
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+        if (runCatching { manager.registerNetworkCallback(request, listen) }.isFailure) return null
+        runCatching { came.await(WIFI_DETAILS_WAIT_MS, java.util.concurrent.TimeUnit.MILLISECONDS) }
+        runCatching { manager.unregisterNetworkCallback(listen) }
+        return found.get()
     }
 
     private fun connectTcp(
         context: Context, output: OutputStream, name: String, net: Network, ip: String, port: Int, run: Int, mine: Int,
-        cb: ConnectivityManager.NetworkCallback,
+        cb: ConnectivityManager.NetworkCallback, carSsid: String, carBssid: String,
     ) {
         SessionStatus.connecting(R.string.wireless_link_wifi_reaching, name)
         lostNetwork = null
@@ -985,6 +1053,8 @@ object WirelessLink {
         // Set once Android refuses to bind to the car's network, which a VPN causes. Plain sockets
         // then go through the VPN, and VPNs that let local traffic past still reach the car.
         var bindRefused = false
+        // The phone's other Wi-Fi networks in the car's address range met so far, and whether each is the car's.
+        val judged = HashMap<Network, CarNetwork.Verdict>()
         // For about a minute, not only twelve tries: a port no one listens on yet is refused at
         // once, so the tries a second apart were over in some 12 s, and the car, listening moments
         // later, found no one - Disconnect and Connect then worked at once.
@@ -998,19 +1068,24 @@ object WirelessLink {
             try {
                 // A network Android has dropped refuses every bind (EPERM). If the driver joined the
                 // car's Wi-Fi by hand, the phone's ordinary route reaches it, so use that instead.
-                // The phone's main Wi-Fi on the car's network wins: that is how Android Auto itself
-                // connects, and a Pixel 6 passed pings but no TCP over the side connection Android
-                // opens for myCar's request.
-                val main = mainOnCarNetwork(context, ip, net)
-                if (main != null && attempt == 0) log.i("TCP: the phone's main Wi-Fi is on the car's network, using it")
+                // The phone's own Wi-Fi on the car's network wins when it is the car's (CarNetwork):
+                // that is how Android Auto itself connects, and a Pixel 6 passed pings but no TCP over
+                // the side connection Android opens for myCar's request. One that may be the car's is
+                // tried every other time, after the car's own network; a home or office Wi-Fi with
+                // addresses like the car's (both 192.168.1.x) never: the first try went there, and an
+                // adapter that wants the phone within moments of its Wi-Fi had closed it by the second.
+                val other = otherOnCarSubnet(context, ip, net)
+                val verdict = other?.let { judged.getOrPut(it) { judgeOther(context, it, carSsid, carBssid) } }
+                val viaOther = when (verdict) {
+                    CarNetwork.Verdict.CAR -> attempt % 2 == 0
+                    CarNetwork.Verdict.MAYBE -> attempt % 2 == 1
+                    else -> false
+                }
                 // Once Android has refused a bind - a VPN that apps can't get past, like Tailscale,
                 // refuses one to the main Wi-Fi as well - the ordinary route is the only one left.
-                // Every other try goes over the car's own network all the same: a home Wi-Fi with
-                // addresses like the car's (both 192.168.1.x) looked like the car's to the test above,
-                // and every try went there.
                 val socket = when {
                     lostNetwork == net || bindRefused -> Socket()
-                    main != null && attempt % 2 == 0 -> main.socketFactory.createSocket()
+                    viaOther && other != null -> other.socketFactory.createSocket()
                     else -> net.socketFactory.createSocket()
                 }
                 socket.tcpNoDelay = true
