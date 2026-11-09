@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="car_voice_small_model">O telefone está com pouca memória: o assistente ouve você só com o modelo pequeno e pode errar os nomes.</string>
+    <string name="car_voice_silent">A voz do telefone não está falando: as respostas só aparecem na tela. Veja Voz nas configurações do myCar no telefone.</string>
+    <string name="phone_voice_missing_title">O telefone não tem voz em %1$s</string>
+    <string name="phone_voice_missing_detail">O mecanismo de conversão de texto em voz dele, %1$s, não tem voz em %2$s: no carro o assistente só mostra as respostas. Adicione essa voz ao mecanismo, ou instale um mecanismo que a tenha, e escolha-o nas configurações de conversão de texto em voz do Android.</string>
+    <string name="phone_voice_silent_detail">No carro, o mecanismo de conversão de texto em voz dele, %1$s, não começou a falar: o assistente só mostrou as respostas. Confira a voz em %2$s nas configurações de conversão de texto em voz do Android, ou escolha outro mecanismo lá.</string>
+    <string name="phone_voice_no_engine_detail">O telefone não tem um mecanismo de conversão de texto em voz: no carro o assistente só mostra as respostas. Instale um com voz em %1$s e escolha-o nas configurações de conversão de texto em voz do Android.</string>
+    <string name="phone_voice_open_settings">Configurações de conversão de texto em voz</string>
 </resources>

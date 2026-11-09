@@ -19,6 +19,7 @@ import io.github.sirionero.mycar.Words
 import io.github.sirionero.mycar.mirror.PhoneMirror
 import io.github.sirionero.mycar.call.CallUiState
 import io.github.sirionero.mycar.call.CarCalls
+import io.github.sirionero.mycar.speech.PhoneVoice
 import io.github.sirionero.mycar.speech.SpeechEngine
 import io.github.sirionero.mycar.speech.SpeechModels
 import io.github.sirionero.mycar.speech.VoiceFocus
@@ -71,6 +72,10 @@ object CarAssistant {
     @Volatile private var ttsFailed = false
     /** The language the voice was last set to, so it's set again only when that changes. */
     private var voiceIn: VoiceLanguage? = null
+    /** The engine the voice was set on (its package), the locale's tag, and whether it said it had no voice for it. */
+    @Volatile private var voiceEngine: String? = null
+    @Volatile private var voiceLocale = ""
+    @Volatile private var voiceMissing = false
 
     /**
      * The phone's language for the assistant, once a model hears it (VoiceLanguages.effective):
@@ -86,13 +91,34 @@ object CarAssistant {
         voiceIn = language
         val locale = VoiceLanguages.speakingLocale(language)
         val result = runCatching { engine.setLanguage(locale) }.getOrDefault(TextToSpeech.LANG_NOT_SUPPORTED)
-        if (result < TextToSpeech.LANG_AVAILABLE) MyCarLog.w("assistant: the phone's speech engine has no voice for $locale ($result)")
+        // Which engine speaks, with which voice, and what it said of the language: once per engine and
+        // language. Without a voice for it the engine goes on with the one it has, and may still speak
+        // (see DirectionsVoice): only a voice that doesn't start counts as none (watchStart).
+        val installed = runCatching { engine.engines }.getOrNull().orEmpty()
+        val pkg = runCatching { engine.defaultEngine }.getOrNull()
+        val label = installed.firstOrNull { it.name == pkg }?.label
+        val voice = runCatching { engine.voice }.getOrNull()
+        voiceEngine = pkg
+        voiceLocale = locale.toLanguageTag()
+        voiceMissing = result < TextToSpeech.LANG_AVAILABLE
+        val line = "assistant: speech engine ${pkg ?: "none"} (${label ?: "?"}; installed: ${installed.joinToString { it.name }.ifEmpty { "none" }}), " +
+            "voice ${voice?.name ?: "?"} - $locale: ${languageResult(result)}"
+        if (voiceMissing) MyCarLog.w(line) else MyCarLog.i(line)
+    }
+
+    /** What setLanguage answered, for the log. */
+    private fun languageResult(result: Int): String = when (result) {
+        TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE, TextToSpeech.LANG_COUNTRY_AVAILABLE, TextToSpeech.LANG_AVAILABLE -> "available ($result)"
+        TextToSpeech.LANG_MISSING_DATA -> "its voice data is missing ($result)"
+        TextToSpeech.LANG_NOT_SUPPORTED -> "no voice for it ($result)"
+        else -> "$result"
     }
 
     fun init(context: Context) {
         appContext = context.applicationContext
-        // Said on the car once per drive (see smallModelOnce).
+        // Said on the car once per drive (see smallModelOnce, silentOnce).
         smallModelSaid = false
+        silentSaid = false
         // Started again, at the next drive, after a start that failed or an engine that went away
         // (updated in the background, Android never binds it again), as DirectionsVoice does:
         // otherwise answers and messages stayed silent until myCar's process went.
@@ -388,13 +414,14 @@ object CarAssistant {
             return
         }
         VoiceFocus.acquire(context)
-        val id = speak(engine, text) { _, _ ->
+        val id = speak(engine, text) { _, refused ->
             VoiceFocus.release()
             // Always, stopped part way too: a turn that cut a message read out on the car's channel
             // for spoken prompts (DirectionsVoice) left the reply waiting for good. Whoever stopped
             // it on purpose (Cancel, the microphone) has moved VoiceReply on, whose callbacks only
-            // act for the run they were made in.
-            mainHandler.post(onDone)
+            // act for the run they were made in. Not said (refused, or a voice that never started):
+            // its card stays long enough to read, as an answer does, the music back meanwhile.
+            if (refused) mainHandler.postDelayed(onDone, SILENT_REPLY_MS) else mainHandler.post(onDone)
         }
         // The assistant's watchdog doesn't see a message read aloud (its phase stays idle): an engine
         // that never says it finished (updated in the background mid-message) kept the music paused and
@@ -429,7 +456,11 @@ object CarAssistant {
      * given back while it still spoke, and its caller was told it had finished.
      */
     private val progress = object : UtteranceProgressListener() {
-        override fun onStart(utteranceId: String?) {}
+        override fun onStart(utteranceId: String?) {
+            startedUtterance = utteranceId
+            // The phone's voice speaks: its settings stop saying it didn't.
+            appContext?.let(PhoneVoice::spoke)
+        }
         override fun onDone(utteranceId: String?) = end(utteranceId, stopped = false)
         @Deprecated("Deprecated in Java, no replacement on this API level")
         override fun onError(utteranceId: String?) = end(utteranceId, stopped = false)
@@ -473,8 +504,45 @@ object CarAssistant {
                 MyCarLog.w("assistant: too long to speak (${text.length} characters)")
             }
             end(id, stopped = false, refused = true)
+        } else {
+            watchStart(id, text)
         }
         return id
+    }
+
+    /** The last utterance the engine said it started (on its own thread). */
+    @Volatile private var startedUtterance: String? = null
+
+    /**
+     * An engine with no voice for the language may never start at all, nor say it finished: the music
+     * stayed paused 11-20 s for an answer nobody heard. Not started in a few seconds (a little more for
+     * a long text, which some engines make whole before they start), it's taken as no voice: the text
+     * stays on the car's screen, as without an engine, and the music comes back.
+     */
+    private fun watchStart(id: String, text: String) {
+        val wait = (NO_START_MS + text.length * NO_START_PER_CHAR_MS).coerceAtMost(NO_START_MAX_MS)
+        mainHandler.postDelayed({
+            if (!endings.containsKey(id) || startedUtterance == id) return@postDelayed
+            MyCarLog.w("assistant: the phone's voice didn't start in ${wait / 1000.0} s - shown on the car instead")
+            val context = appContext
+            val engine = voiceEngine
+            if (context != null && engine != null) PhoneVoice.silent(context, engine, voiceLocale, voiceMissing)
+            end(id, stopped = false, refused = true)
+            // Not left to start later, over the music given back.
+            tts?.stop()
+            // Once the answer has had its time on the screen: under it, the line wasn't seen.
+            mainHandler.postDelayed(::silentOnce, SILENT_REPLY_MS)
+        }, wait)
+    }
+
+    /** Whether this drive's car was told the phone's voice doesn't speak. */
+    private var silentSaid = false
+
+    /** Said on the car once per drive: the phone's voice doesn't speak, and where to see about it. */
+    private fun silentOnce() {
+        if (silentSaid) return
+        silentSaid = true
+        CarToasts.show(this, Words.get(R.string.car_voice_silent), androidx.car.app.CarToast.LENGTH_LONG)
     }
 
     fun stopSpeaking() { stopVoice() }
@@ -644,6 +712,11 @@ object CarAssistant {
 
 /** An answer with no voice to say it stays on screen this long. */
 private const val SILENT_REPLY_MS = 5_000L
+
+/** How long the phone's voice gets to start saying something, and a little more per letter, up to the most. */
+private const val NO_START_MS = 3_000L
+private const val NO_START_PER_CHAR_MS = 10L
+private const val NO_START_MAX_MS = 8_000L
 
 /** How often the overlay is checked for being stuck. */
 private const val WATCH_MS = 1_000L

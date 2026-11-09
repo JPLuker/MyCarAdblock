@@ -7,4 +7,16 @@
 <resources>
     <!-- Car toast, once per drive (car/CarAssistant.kt): the phone is short of memory for the big voice model, so the small one (English only) hears the command alone -->
     <string name="car_voice_small_model">The phone is short of memory: the assistant hears you with its small model only, and may get names wrong.</string>
+    <!-- Car toast, once per drive (car/CarAssistant.kt): the phone's text-to-speech didn't start speaking an answer or a message, so they are only shown; "Voice" is settings_group_voice -->
+    <string name="car_voice_silent">The phone\'s voice isn\'t speaking: answers are only shown. See Voice in myCar\'s settings on the phone.</string>
+    <!-- Phone, Settings > Voice (ui/PhoneVoiceRow.kt): a row when the phone's text-to-speech has no voice for the assistant's language, or didn't speak in the car. %1$s: the language's name (Italian, italiano...) -->
+    <string name="phone_voice_missing_title">The phone has no voice for %1$s</string>
+    <!-- Under phone_voice_missing_title, when the engine has no voice for the language. %1$s: the engine's name (an app's, e.g. eSpeak NG); %2$s: the language's name -->
+    <string name="phone_voice_missing_detail">Its text-to-speech engine, %1$s, has no voice for %2$s: in the car the assistant only shows its answers. Add that voice to the engine, or install an engine that has it, then choose it in Android\'s text-to-speech settings.</string>
+    <!-- Under phone_voice_missing_title, when the engine has the language but didn't start speaking in the car. %1$s: the engine's name; %2$s: the language's name -->
+    <string name="phone_voice_silent_detail">In the car, its text-to-speech engine, %1$s, didn\'t start speaking: the assistant only showed its answers. Check the voice for %2$s in Android\'s text-to-speech settings, or choose another engine there.</string>
+    <!-- Under phone_voice_missing_title, when the phone has no text-to-speech engine at all. %1$s: the language's name -->
+    <string name="phone_voice_no_engine_detail">The phone has no text-to-speech engine: in the car the assistant only shows its answers. Install one with a voice for %1$s, then choose it in Android\'s text-to-speech settings.</string>
+    <!-- The row's button: opens Android's text-to-speech settings -->
+    <string name="phone_voice_open_settings">Text-to-speech settings</string>
 </resources>
