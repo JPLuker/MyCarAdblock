@@ -203,6 +203,9 @@ private class VideoLoop(private val file: File, private val video: VideoCover) {
     private var wanted = false
     private var released = false
 
+    /** It stopped on an error: in that state Android's player answers every start with another one. */
+    private var failed = false
+
     var videoWidth by mutableIntStateOf(0)
         private set
     var videoHeight by mutableIntStateOf(0)
@@ -229,6 +232,7 @@ private class VideoLoop(private val file: File, private val video: VideoCover) {
         }
         player.setOnErrorListener { _, what, extra ->
             MyCarLog.w("video cover: didn't play - error $what/$extra")
+            failed = true
             video.drawn = false
             VideoCoverFiles.bad(video.url, file)
             true
@@ -252,12 +256,12 @@ private class VideoLoop(private val file: File, private val video: VideoCover) {
     }
 
     private fun start() {
-        if (released || !prepared || !wanted || surface == null) return
+        if (released || failed || !prepared || !wanted || surface == null) return
         runCatching { if (!player.isPlaying) player.start() }
     }
 
     private fun pause() {
-        if (released || !prepared) return
+        if (released || failed || !prepared) return
         runCatching { if (player.isPlaying) player.pause() }
     }
 
