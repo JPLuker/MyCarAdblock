@@ -183,7 +183,8 @@ private fun copy(input: InputStream, output: OutputStream) {
     }
 }
 
-/** For the log: a connection through [bridge] failed, and why. */
+/** For the log: a connection through [bridge] failed, and why - unless the bridge already said it ([BridgeException.quiet]). */
 internal fun logRefused(bridge: AppBridge, host: String, port: Int, e: Exception) {
+    if ((e as? BridgeException)?.quiet == true) return
     log.w("through ${bridge.packageName} to $host:$port: ${e.message}")
 }

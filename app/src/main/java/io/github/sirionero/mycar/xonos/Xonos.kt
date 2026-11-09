@@ -10,6 +10,7 @@ import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import io.github.sirionero.mycar.AppSettings
 import io.github.sirionero.mycar.BuildConfig
+import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.bridge.BridgeDns
 import io.github.sirionero.mycar.bridge.BridgeSocketFactory
@@ -23,9 +24,15 @@ import io.github.sirionero.mycar.xonos.data.MaRepository
 import io.github.sirionero.mycar.xonos.data.Problem
 import io.github.sirionero.mycar.xonos.data.Settings
 import io.github.sirionero.mycar.xonos.playback.PlaybackService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.io.File
 import java.net.URI
 
@@ -91,6 +98,31 @@ object Xonos {
         MaRepository(settings) {
             dns(BridgeDns(Bridges.xonos))
             socketFactory(BridgeSocketFactory(Bridges.xonos))
+        }.also { watchConnection(it) }
+    }
+
+    /**
+     * myCar's log says whether and when the connection to Music Assistant is made, and after how many
+     * tries (see ConnectWatch): the engine's own lines go to logcat only, and a drive's log showed the
+     * bridge's refusals while the server on the phone started, and then nothing.
+     */
+    private fun watchConnection(repo: MaRepository) {
+        val watch = ConnectWatch()
+        CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate).launch {
+            repo.connection.collectLatest { connection ->
+                val now = SystemClock.elapsedRealtime()
+                when (connection) {
+                    is Connection.Connected -> watch.connected(now)?.let { MyCarLog.i("xonos: $it") }
+                    is Connection.Failed -> watch.failed(now, connection.problem.name)
+                    // An empty address: let go, nobody uses it now (the drive ended).
+                    is Connection.Connecting -> if (connection.url.isEmpty()) watch.idle() else watch.trying(now)
+                    Connection.NotConfigured -> watch.idle()
+                }
+                // Cancelled by the next state, which waits again for what's left of the minute.
+                val wait = watch.slowIn(now) ?: return@collectLatest
+                delay(wait)
+                watch.slow(SystemClock.elapsedRealtime())?.let { MyCarLog.w("xonos: $it") }
+            }
         }
     }
     val library: Library by lazy { Library(repo).also { it.playTimeoutMs = playTimeout() } }
