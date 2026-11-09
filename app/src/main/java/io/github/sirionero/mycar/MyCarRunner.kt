@@ -654,6 +654,9 @@ class MyCarRunner(
                 io.github.sirionero.mycar.car.CinemaNow.pauseForCar()
                 CarSource.takenBack()
             },
+            // The car's own moment on its speakers (a call on the car, its voice): the music waits for it.
+            onPausedForNow = { CarServices.pausePhoneMediaForNow() },
+            onGivenBack = { CarServices.resumePhoneMedia() },
             onClose = {
                 CarAudio.detach(it)
                 CarSource.driveEnded()

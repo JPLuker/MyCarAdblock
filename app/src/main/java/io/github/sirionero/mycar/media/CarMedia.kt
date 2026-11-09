@@ -638,6 +638,14 @@ class CarMedia(private val context: Context) {
         controller?.transportControls?.play()
     }
 
+    /**
+     * Pause and play for the car's own moment on its speakers (CarServices.pausePhoneMediaForNow),
+     * not the driver's: not counted as asked ([askMark]), so the driver's own asks still show.
+     */
+    fun pauseForCar() = controller?.transportControls?.pause()
+
+    fun playForCar() = controller?.transportControls?.play()
+
     fun next() {
         asks.asked()
         skippedAt = SystemClock.elapsedRealtime()
