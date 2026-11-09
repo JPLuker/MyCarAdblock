@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_host_modified_refused">Esta cópia de %1$s está modificada, mas não aceita o myCar. No Morphe, patch “Allow Gearslip”, opção “Accepted hosts”: adicione no fim um “;” e %2$s, e depois faça de novo o patch de %1$s.</string>
+</resources>
