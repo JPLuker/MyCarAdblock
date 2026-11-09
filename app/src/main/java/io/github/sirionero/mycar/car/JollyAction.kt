@@ -178,7 +178,11 @@ internal object HomeActs {
         }
     }
 
-    /** Opening a lock waits for a second tap on the key: the one thing here that lets someone in. */
+    /**
+     * Opening a lock waits for a second tap on the key. A gate or a garage door (a cover, toggled) lets
+     * someone in too, and opens with one tap on purpose: that's what the driver arriving home has the
+     * key for.
+     */
     fun confirms(act: HomeAct): Boolean = act == HomeAct.UNLOCK
 
     /** One line of the Jolly's list of Home Assistant's things. */
