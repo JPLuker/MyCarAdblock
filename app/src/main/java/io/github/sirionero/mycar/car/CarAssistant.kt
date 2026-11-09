@@ -80,6 +80,11 @@ object CarAssistant {
     @Volatile private var voiceEngine: String? = null
     @Volatile private var voiceLocale = ""
     @Volatile private var voiceMissing = false
+    /**
+     * The language of a command written for the Jolly key ([runPhrase]): what the assistant reads it and
+     * answers in, whatever model the phone has to listen. Until the microphone listens again.
+     */
+    @Volatile private var written: VoiceLanguage? = null
 
     /**
      * The phone's language for the assistant, once a model hears it (VoiceLanguages.effective):
@@ -88,7 +93,7 @@ object CarAssistant {
      */
     internal fun syncLanguage() {
         val context = appContext ?: return
-        val language = VoiceLanguages.effective(context, phoneListens(context))
+        val language = written ?: VoiceLanguages.effective(context, phoneListens(context))
         AssistantLanguage.language = language
         val engine = tts ?: return
         if (!ttsReady || voiceIn == language) return
@@ -152,10 +157,49 @@ object CarAssistant {
      * rather than asking every caller to remember to.
      */
     fun start() {
-        if (Looper.myLooper() == Looper.getMainLooper()) startOnMainThread() else mainHandler.post(::startOnMainThread)
+        if (Looper.myLooper() == Looper.getMainLooper()) startOnMainThread() else mainHandler.post { startOnMainThread() }
     }
 
-    private fun startOnMainThread() {
+    /**
+     * myCar's own listens, whichever assistant the microphone wakes: for the Jolly key's assistant with
+     * the phone locked and Home Assistant there to answer, or one that wouldn't start.
+     */
+    fun listenHere() {
+        if (Looper.myLooper() == Looper.getMainLooper()) startOnMainThread(own = true) else mainHandler.post { startOnMainThread(own = true) }
+    }
+
+    /**
+     * [text] as if the driver had said it - the Jolly key's command, written on the phone or picked in
+     * the car - in [language], the one it was written in: understood, shown and answered as the
+     * microphone's words are, without listening. Not while a call rings: its card has the screen.
+     */
+    fun runPhrase(text: String, language: VoiceLanguage) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            mainHandler.post { runPhrase(text, language) }
+            return
+        }
+        if (appContext == null || CarCalls.state.value is CallUiState.Ringing) return
+        // Listening or answering still: this goes first, as a new press of the microphone does.
+        releaseRecognizer()
+        stopVoice()
+        replyGivesWay()
+        written = language
+        syncLanguage()
+        MyCarLog.i("assistant: a written command, in ${language.code}")
+        heard(text)
+    }
+
+    /**
+     * A message being read or answered gives way to the assistant, as for the microphone: a reply
+     * counting down goes now, one still read back is dropped (see [startOnMainThread]).
+     */
+    internal fun replyGivesWay() {
+        if (!VoiceReply.active) return
+        val reply = VoiceReply.state.value
+        if (reply.phase == VoiceReply.Phase.CONFIRMING && reply.until > 0L) VoiceReply.sendNow() else VoiceReply.cancel()
+    }
+
+    private fun startOnMainThread(own: Boolean = false) {
         val context = appContext ?: return
         // A ringing call has the screen: nothing to listen for, and the ringtone would be heard as words.
         if (CarCalls.state.value is CallUiState.Ringing) {
@@ -171,6 +215,7 @@ object CarAssistant {
             _pendingCommand.value = null
             _state.value = State(Phase.IDLE)
         }
+        written = null
         syncLanguage()
         // A message being read or answered gives way: the driver asked for the assistant instead,
         // and the reply left waiting would keep the car's voice key for itself. A reply counting
@@ -182,7 +227,7 @@ object CarAssistant {
             if (reply.phase == VoiceReply.Phase.CONFIRMING && reply.until > 0L) VoiceReply.sendNow() else VoiceReply.cancel()
         }
         // The driver may have picked another assistant, which then takes the button instead.
-        if (AssistantChoice.startOther(context)) return
+        if (!own && AssistantChoice.startOther(context)) return
         // While the phone's screen is shared there's no car screen to show the assistant or act on
         // the words: the sharing ends, and the car's screen, back in a moment, takes it from here.
         if (PhoneMirror.active.value) {
@@ -225,6 +270,7 @@ object CarAssistant {
     fun cancel() {
         releaseRecognizer()
         stopVoice()
+        written = null
         _pendingCommand.value = null
         _state.value = State(Phase.IDLE)
     }
@@ -257,7 +303,7 @@ object CarAssistant {
         if (_pendingCommand.value == heard && _state.value.phase == Phase.THINKING) _state.value = _state.value.copy(brain = true)
     }
 
-    /** As if the driver had said [text]: for the car preview, where no speech model runs. */
+    /** As if the driver had said [text]: a written command ([runPhrase]), and the car preview, where no speech model runs. */
     internal fun heard(text: String) {
         _state.value = State(Phase.THINKING, heard = text)
         _pendingCommand.value = text
