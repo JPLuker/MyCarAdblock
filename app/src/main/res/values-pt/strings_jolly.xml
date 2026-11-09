@@ -109,6 +109,9 @@
     <!-- The contact's number chosen for the key isn't theirs in the contacts any more: the chooser opens.
          %1$s: the contact's name -->
     <string name="jolly_call_gone">%1$s não tem mais esse número nos contatos: escolha de novo.</string>
+    <!-- A tap on the key in the car's preview in the phone's settings, with no drive: what it would do there,
+         rather than doing it. %1$s: one of the jolly_title_* above -->
+    <string name="jolly_preview_only">No carro, este botão faz: %1$s</string>
     <!-- A call, an assistant or a command while on a call -->
     <string name="jolly_after_call">Isso precisa esperar o fim da chamada.</string>
 

@@ -13,6 +13,7 @@ import androidx.car.app.CarToast
 import io.github.sirionero.mycar.AppSettings
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.SessionService
 import io.github.sirionero.mycar.Words
 import io.github.sirionero.mycar.call.CallUiState
 import io.github.sirionero.mycar.call.CarCalls
@@ -101,6 +102,12 @@ internal object Jolly {
         val action = JollySetting.action.value
         if (action == null) {
             navigator.jolly()
+            return
+        }
+        // The car's preview in the phone's settings, with no drive: what the key does, not the call
+        // made or the garage door opened.
+        if (CarServices.phonePreview && !SessionService.running) {
+            toast(Words.get(R.string.jolly_preview_only, title(context, action)))
             return
         }
         // A ringing call has the screen. One under way has the line and the microphone: another call,
