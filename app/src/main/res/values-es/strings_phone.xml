@@ -35,7 +35,7 @@
     <string name="help_step_screening_detail">Configura myCar como tu app de identificación de llamadas y spam. Sin esto, el coche sigue mostrando todas las llamadas, y las contestas o rechazas desde allí.</string>
     <string name="help_set_up">Configurar</string>
     <string name="help_step_audio_prompt">Evita la pregunta del audio en cada viaje.</string>
-    <string name="help_step_audio_prompt_detail">Conecta el teléfono a un ordenador con la depuración por USB activada y ejecuta esto una vez. Si no lo haces, tocarás Empezar cada vez que salgas.</string>
+    <string name="help_step_audio_prompt_detail">Conecta el teléfono a un ordenador con la depuración por USB activada y ejecuta esto una vez. Si no lo haces, aceptarás la pregunta de Android con un toque cada vez que salgas.</string>
     <string name="help_step_notifications">Mantén las notificaciones legibles.</string>
     <string name="help_step_notifications_detail">Android oculta lo que dicen las notificaciones mientras comparte el audio. Ejecuta también esto, y myCar lo quita solo mientras la música va al coche.</string>
     <string name="help_tap_to_copy">Toca para copiar</string>

@@ -35,7 +35,7 @@
     <string name="help_step_screening_detail">把 myCar 设为“来电显示和骚扰电话应用”。如果不设置，汽车仍会显示每个来电，你可以在车上接听或拒接。</string>
     <string name="help_set_up">设置</string>
     <string name="help_step_audio_prompt">不再每次行车都询问音频。</string>
-    <string name="help_step_audio_prompt_detail">在手机上开启 USB 调试，连接到电脑，然后运行一次这条命令。如果跳过，每次出发时都要点按“开始”。</string>
+    <string name="help_step_audio_prompt_detail">在手机上开启 USB 调试，连接到电脑，然后运行一次这条命令。如果跳过，每次出发时都要点按一下，接受 Android 的询问。</string>
     <string name="help_step_notifications">让通知内容保持可读。</string>
     <string name="help_step_notifications_detail">共享音频时，Android 会隐藏通知的内容。同时运行这条命令后，myCar 只会在音乐传到车上时解除隐藏。</string>
     <string name="help_tap_to_copy">点按即可复制</string>

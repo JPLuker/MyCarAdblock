@@ -35,7 +35,7 @@
     <string name="help_step_screening_detail">Lege myCar als deine Anrufer-ID- und Spam-App fest. Ohne das zeigt das Auto trotzdem jeden Anruf, und du nimmst ihn dort an oder lehnst ihn ab.</string>
     <string name="help_set_up">Einrichten</string>
     <string name="help_step_audio_prompt">Die Audiofrage bei jeder Fahrt abschalten.</string>
-    <string name="help_step_audio_prompt_detail">Verbinde das Telefon mit einem Computer mit aktiviertem USB-Debugging und führe das hier einmal aus. Ohne das tippst du bei jeder Abfahrt auf „Starten“.</string>
+    <string name="help_step_audio_prompt_detail">Verbinde das Telefon mit einem Computer mit aktiviertem USB-Debugging und führe das hier einmal aus. Ohne das bestätigst du bei jeder Abfahrt die Frage von Android mit einem Tippen.</string>
     <string name="help_step_notifications">Benachrichtigungen lesbar halten.</string>
     <string name="help_step_notifications_detail">Android blendet den Inhalt von Benachrichtigungen aus, während es Ton teilt. Führe auch das aus, dann hebt myCar das nur auf, solange Musik ins Auto geht.</string>
     <string name="help_tap_to_copy">Zum Kopieren tippen</string>

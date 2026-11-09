@@ -25,7 +25,7 @@
     <string name="help_step_screening_detail">Choisissez myCar comme appli d’identification de l’appelant et de spam. Sans cela, l’écran de bord affiche quand même chaque appel, et vous pouvez y répondre ou le refuser.</string>
     <string name="help_set_up">Gréer</string>
     <string name="help_step_audio_prompt">Évitez la demande audio à chaque traversée.</string>
-    <string name="help_step_audio_prompt_detail">Branchez le téléphone à un ordinateur avec le débogage USB activé, et lancez ceci une fois. Sinon, vous appuyez sur Commencer chaque fois que vous appareillez.</string>
+    <string name="help_step_audio_prompt_detail">Branchez le téléphone à un ordinateur avec le débogage USB activé, et lancez ceci une fois. Sinon, vous acceptez la demande d\'Android d\'un toucher chaque fois que vous appareillez.</string>
     <string name="help_step_notifications">Gardez les notifications lisibles à bord.</string>
     <string name="help_step_notifications_detail">Android masque le contenu des notifications pendant qu’il partage l’audio. Lancez aussi ceci, et myCar ne lève ce masquage que pendant que la musique passe à bord.</string>
 

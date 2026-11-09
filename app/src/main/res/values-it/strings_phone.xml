@@ -35,7 +35,7 @@
     <string name="help_step_screening_detail">Imposta myCar come app ID chiamante e spam. Senza, l\'auto mostra comunque ogni chiamata, e lì rispondi o rifiuti.</string>
     <string name="help_set_up">Configura</string>
     <string name="help_step_audio_prompt">Niente più domanda per l\'audio a ogni viaggio.</string>
-    <string name="help_step_audio_prompt_detail">Collega il telefono a un computer con il debug USB attivo ed esegui questo comando una volta. Se lo salti, tocchi Avvia ogni volta che parti.</string>
+    <string name="help_step_audio_prompt_detail">Collega il telefono a un computer con il debug USB attivo ed esegui questo comando una volta. Se lo salti, accetti con un tocco la domanda di Android ogni volta che parti.</string>
     <string name="help_step_notifications">Notifiche sempre leggibili.</string>
     <string name="help_step_notifications_detail">Android nasconde il testo delle notifiche mentre condivide l\'audio. Esegui anche questo comando, e myCar toglie quel limite solo mentre la musica va all\'auto.</string>
     <string name="help_tap_to_copy">Tocca per copiare</string>

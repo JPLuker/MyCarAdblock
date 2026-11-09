@@ -59,8 +59,8 @@
     <string name="help_set_up">Set up</string>
     <!-- A command to run from a computer follows these two steps -->
     <string name="help_step_audio_prompt">Stop the audio prompt each drive.</string>
-    <!-- "Start" is the button of Android's own question before audio is shared -->
-    <string name="help_step_audio_prompt_detail">Connect the phone to a computer with USB debugging on, and run this once. Skip it and you tap Start each time you set off.</string>
+    <!-- Android's question before audio is shared: its button is "Share screen" from Android 15, "Start" before, so no name -->
+    <string name="help_step_audio_prompt_detail">Connect the phone to a computer with USB debugging on, and run this once. Skip it and you accept Android\'s question with one tap each time you set off.</string>
     <string name="help_step_notifications">Keep notifications readable.</string>
     <string name="help_step_notifications_detail">Android hides what notifications say while it shares audio. Run this too, and myCar lifts that only while music goes to the car.</string>
     <!-- Under a command to copy, and the toast once it's copied -->
