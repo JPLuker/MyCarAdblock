@@ -167,6 +167,23 @@ class JollyActionTest {
         assertEquals(SecondTap.Tap.ARMED, tap.tap(9_600))
     }
 
+    @Test
+    fun aHomeAssistantCommandDoesntRunTwiceAtOnce() {
+        val guard = RepeatGuard(1_000)
+        assertTrue(guard.start("cover.garage/toggle", 1_000))
+        // Tapped again while it runs, and just after: the same press twice.
+        assertFalse(guard.start("cover.garage/toggle", 1_200))
+        assertTrue(guard.busy("cover.garage/toggle", 9_000))
+        guard.end("cover.garage/toggle", 9_000)
+        assertFalse(guard.start("cover.garage/toggle", 9_500))
+        assertFalse(guard.start("cover.garage/toggle", 9_999))
+        assertTrue(guard.start("cover.garage/toggle", 10_000))
+        guard.end("cover.garage/toggle", 10_100)
+        // Another command isn't held up by it.
+        assertTrue(guard.start("script.gate/run", 10_200))
+        assertFalse(guard.busy("cover.garage/toggle", 11_100))
+    }
+
     /**
      * The ready-made commands the car's chooser offers (strings_jolly.xml, in every language): each
      * one is a phrase myCar's assistant takes for the command it stands for.

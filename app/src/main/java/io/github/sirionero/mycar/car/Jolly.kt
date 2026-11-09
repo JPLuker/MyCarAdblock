@@ -72,6 +72,7 @@ internal object Jolly {
     private val main = Handler(Looper.getMainLooper())
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val second = SecondTap(CONFIRM_MS, CONFIRM_MIN_MS)
+    private val repeats = RepeatGuard(REPEAT_QUIET_MS)
     private val armedFlow = MutableStateFlow(false)
 
     /** A lock waits for its second tap: the key is lit meanwhile. */
@@ -168,7 +169,14 @@ internal object Jolly {
             toast(Words.get(R.string.jolly_home_offline))
             return
         }
+        // The same command again while it runs, or a moment after: the same press twice, let go.
+        val key = "${action.entity}/${action.act.id}"
+        if (repeats.busy(key, SystemClock.uptimeMillis())) {
+            MyCarLog.i("jolly: $domain.$service still running - the tap let go")
+            return
+        }
         if (HomeActs.confirms(action.act) && !confirmed(action.name)) return
+        if (!repeats.start(key, SystemClock.uptimeMillis())) return
         scope.launch {
             try {
                 client.command("call_service") {
@@ -184,6 +192,8 @@ internal object Jolly {
                 // Not its words in the log: they may name the house's things.
                 MyCarLog.w("jolly: Home Assistant didn't run $domain.$service (${e.javaClass.simpleName})")
                 toast(Words.get(R.string.jolly_home_failed, action.name, e.message.orEmpty()))
+            } finally {
+                repeats.end(key, SystemClock.uptimeMillis())
             }
         }
     }
@@ -314,4 +324,7 @@ internal object Jolly {
     /** How long a lock waits for its second tap, and how long at least: time to read the question. */
     private const val CONFIRM_MS = 3_000L
     private const val CONFIRM_MIN_MS = 700L
+
+    /** How long after a Home Assistant command a tap on the key is still that same press. */
+    private const val REPEAT_QUIET_MS = 1_000L
 }

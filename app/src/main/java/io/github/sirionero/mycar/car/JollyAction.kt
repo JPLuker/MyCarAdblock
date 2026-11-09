@@ -228,3 +228,31 @@ internal class SecondTap(private val windowMs: Long = 3_000, private val minMs: 
         armedAt = null
     }
 }
+
+/**
+ * One Home Assistant command of the Jolly key's at a time, and not again at once: a tap while it runs,
+ * or within [quietMs] after, is the same press made twice (a garage door toggled twice opens and then
+ * stops halfway). Keyed by what the command does, so another one isn't held up.
+ */
+internal class RepeatGuard(private val quietMs: Long = 1_000) {
+    private var running: String? = null
+    private var last: String? = null
+    private var endedAt = 0L
+
+    /** Whether a tap at [now] (uptime ms) for [key] is that same press again. */
+    fun busy(key: String, now: Long): Boolean = running == key || (last == key && now - endedAt in 0 until quietMs)
+
+    /** [key] starts at [now], unless [busy]: then false. */
+    fun start(key: String, now: Long): Boolean {
+        if (busy(key, now)) return false
+        running = key
+        return true
+    }
+
+    /** [key] has finished at [now]: quiet for a moment more. */
+    fun end(key: String, now: Long) {
+        if (running == key) running = null
+        last = key
+        endedAt = now
+    }
+}
