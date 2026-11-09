@@ -650,7 +650,7 @@ class MyCarRunner(
             // as Android Auto does, instead of letting it play on to no one. Remembered for the
             // car's next drive, if it stays so (CarSource).
             onTakenBack = {
-                CarServices.pausePhoneMedia("the car switched to another source")
+                CarServices.pausePhoneMedia("the car switched to another source", again = CarServices.noMusicAskedFromNow())
                 io.github.sirionero.mycar.car.CinemaNow.pauseForCar()
                 CarSource.takenBack()
             },

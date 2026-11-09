@@ -680,7 +680,11 @@ object CarServices {
      */
     private val SOUNDING = setOf(PlaybackState.STATE_PLAYING, PlaybackState.STATE_BUFFERING)
 
-    fun pausePhoneMedia(why: String = "the car left", keep: String? = null) {
+    /**
+     * [again]: a second look [REPAUSE_MS] later, while it says yes (see [pauseAgainLater]). For the
+     * car leaving and the car taking its own source; not for screen sharing, which keeps an app.
+     */
+    fun pausePhoneMedia(why: String = "the car left", keep: String? = null, again: (() -> Boolean)? = null) {
         val ctx = context ?: return
         val manager = ctx.getSystemService(MediaSessionManager::class.java)
         val listener = ComponentName(ctx, MyCarNotificationListener::class.java)
@@ -699,7 +703,45 @@ object CarServices {
         playing.forEach { runCatching { it.transportControls.pause() } }
         if (playing.isNotEmpty()) {
             io.github.sirionero.mycar.MyCarLog.i("media: paused ${playing.joinToString { it.packageName }}: $why")
+            if (again != null) pauseAgainLater(playing, why, again)
         }
+    }
+
+    /**
+     * An app paused as the car left can start again by itself a moment later, out of the phone's
+     * speaker: Deezer did, after the car was switched off (Gearslip issue #39). Those of [paused]
+     * sounding again [REPAUSE_MS] later are paused once more - while [still] says so.
+     */
+    private fun pauseAgainLater(paused: List<android.media.session.MediaController>, why: String, still: () -> Boolean) {
+        repause.postDelayed({
+            // Only out of the phone's own speaker. With the car's Bluetooth music (or a cable) still
+            // there the car itself may have asked for it, and when that goes Android pauses the apps.
+            if (!still() || io.github.sirionero.mycar.audio.CarAudioRoute.musicOutsideThePhone()) return@postDelayed
+            val again = paused.filter { it.playbackState?.state in SOUNDING }
+            if (again.isEmpty()) return@postDelayed
+            again.forEach { runCatching { it.transportControls.pause() } }
+            io.github.sirionero.mycar.MyCarLog.i("media: paused ${again.joinToString { it.packageName }} again: it started by itself after $why")
+        }, REPAUSE_MS)
+    }
+
+    private val repause = android.os.Handler(android.os.Looper.getMainLooper())
+
+    /** How long after pausing for the car to look again for an app that started by itself. */
+    private const val REPAUSE_MS = 2_000L
+
+    /** For the second look after the car left: none once a new drive is under way (its own Autoplay decides). */
+    fun noDriveUnderWay(): Boolean = io.github.sirionero.mycar.SessionStatus.state.value.phase.let {
+        it != io.github.sirionero.mycar.SessionStatus.Phase.CONNECTING && it != io.github.sirionero.mycar.SessionStatus.Phase.PROJECTING
+    }
+
+    /**
+     * For the second look while the car is on its own source: none if the driver asks the music for
+     * anything meanwhile (▶ on the car's screen or wheel, by voice), counted from now.
+     */
+    fun noMusicAskedFromNow(): () -> Boolean {
+        val media = mediaOrNull() ?: return { true }
+        val mark = media.askMark()
+        return { !media.askedSince(mark) }
     }
 
     /** The car went away: nothing should keep running for a screen that no longer exists. */
