@@ -1,5 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 0.7.4-alpha -->
+    <string-array name="changelog_50">
+        <item>Nuovo tasto Jolly nel dock, sopra il microfono: un tocco fa quello che scegli tu: chiamare un contatto, parlare con un\'IA, avviare qualcosa in Home Assistant (una scena, una luce, il cancello), andare in un posto, dare un comando all\'assistente o aprire un\'app. Tienilo premuto per cambiarlo, in auto o sul telefono in Impostazioni &gt; Schermo dell\'auto. Non ti serve? Spegnilo lì e il dock torna com\'era.</item>
+        <item>Una chiamata in corso ora è una piccola bolla sopra ogni schermata finché non finisce, con la foto della persona con cui parli, da quanto dura e un tasto rosso per riattaccare. Toccala per aprire il Telefono; tienila premuta e trascinala dove vuoi: resta lì anche per le prossime chiamate.</item>
+        <item>Copertina video: i brani con un breve video in loop (i Canvas di Spotify) possono mostrarlo nel lettore accanto alla mappa al posto della copertina fissa. Il tasto sulla copertina lo accende e lo spegne, e resta come lo lasci.</item>
+        <item>Gli schermi divisi (mappa e musica, un\'app accanto alla mappa, le pagine) ora sono pannelli morbidi e arrotondati, sollevati sopra lo sfondo.</item>
+        <item>Avvio senza fili: un Wi-Fi di casa con indirizzi come quelli dell\'auto non lo fa più aspettare per minuti, myCar ricomincia subito quando l\'adattatore senza fili dell\'auto si riavvia, e richiama l\'adattatore pochi secondi dopo che il suo Bluetooth si è collegato.</item>
+        <item>Nuova opzione «Lascia la radio dell\'auto finché il telefono non suona»: con l\'audio tramite myCar, l\'auto resta sulla sua radio (DAB+, FM) finché sul telefono non suona qualcosa.</item>
+        <item>Quando passi alla radio dell\'auto, la voce di una mappa, una pagina web o l\'assistente non te la tolgono più, e le indicazioni vocali, le risposte e il bip dell\'ascolto abbassano la radio e poi la lasciano tornare, come fa Android Auto.</item>
+        <item>Con l\'audio tramite myCar, quando l\'auto prende le casse per un momento (la sua voce, un annuncio), la musica del telefono va in pausa e poi riparte, invece di suonare senza che nessuno la senta.</item>
+        <item>Spotify Web parte da solo all\'inizio del viaggio, anche quando l\'autoradio preme di nuovo Play mentre la pagina si sta ancora caricando.</item>
+        <item>Quando la voce del telefono non riesce a parlare, myCar mostra la risposta e fa tornare la musica in pochi secondi, e Voce nelle impostazioni di myCar sul telefono ti dice quale voce manca. Il modello vocale grande si carica solo nei viaggi più lunghi, e solo se il telefono ha la memoria che serve.</item>
+        <item>Se l\'assistente vocale di Home Assistant ha perso il suo agente di conversazione, myCar fa la domanda a uno che esiste ancora, o ti dice cosa sistemare.</item>
+        <item>La condivisione schermo tiene acceso lo schermo del telefono, gira il telefono nel verso dell\'immagine dell\'auto, fa continuare la musica in auto e ti dice come tornare a myCar.</item>
+        <item>Col cavo: la Home di myCar ti dice cosa controllare quando il telefono si carica ma nessuna auto risponde (su GrapheneOS, l\'impostazione USB-C port), e la prima configurazione spiega cosa vuol dire ogni scelta dell\'audio in auto.</item>
+        <item>Un\'auto con lo schermo verticale riceve un\'immagine verticale quando ne offre una, e Adattamento schermo non dice più «Nessun profilo per questo veicolo».</item>
+        <item>Una Waze modificata con Morphe che non accetta myCar ha una X rossa, e l\'auto ti dice cosa aggiungere alla patch.</item>
+        <item>Da Gearslip: gli avvisi delle app per auto sullo schermo dell\'auto (Waze chiede se un pericolo c\'è ancora), le Hyundai meno recenti che si fermavano all\'avvio, le indicazioni vocali che tornano quando la voce non era partita, la musica che riparte da sola dopo il viaggio, rimessa in pausa, i tasti Mi piace di Metrolist e Capitolo successivo di AntennaPod, e il nome che hai dato all\'auto nel Bluetooth.</item>
+        <item>Le auto che tenevano lo schermo nero con la musica in Bluetooth (come la Mitsubishi Mirage 2024) ricevono l\'immagine dopo 5 secondi, e subito quando myCar le conosce; le autoradio Toyota che si fermavano prima di un avvio senza fili ricevono la risposta che aspettano; e per le auto che ne hanno bisogno, l\'indirizzo Bluetooth del telefono si può scrivere in Impostazioni &gt; Connessione.</item>
+        <item>Il resoconto della sessione dice se l\'auto si è spenta, ha smesso di rispondere o ha perso il suo Wi-Fi in marcia.</item>
+    </string-array>
+
     <!-- 0.7.3-alpha -->
     <string-array name="changelog_49">
         <item>Xonos dentro myCar ha ora il motore di Xonos 0.1.55: un artista si apre senza caricare prima tutti i suoi brani (si caricano quando apri «Tutti i brani») e il menu dell\'auto aspetta Music Assistant invece di mostrare cartelle vuote.</item>

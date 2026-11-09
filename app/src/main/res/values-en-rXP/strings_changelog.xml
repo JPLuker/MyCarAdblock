@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_50">
+        <item>New Jolly Roger flag on the mast, above the ship\'s parrot: one tap does what ye choose: hail a mate, parley with an AI, run something in Home Assistant (a scene, a light, the gate), set a course for a port, give the parrot an order or board an app. Hold it to change it, aboard or on the phone in Rigging &gt; Helm. Don\'t need it? Strike it there and the mast is as it was.</item>
+        <item>A call under way is now a wee bubble bobbing over every screen until it ends, with the photo of who ye\'re talking to, how long it has lasted and a red button to hang up. Tap it for the Phone; hold it and drag it anywhere, and it drops anchor there for the next calls too.</item>
+        <item>Video cover: shanties with a short looping video (Spotify\'s Canvas) can show it in the shanty box beside the chart in place of the cover lying still at anchor. The button on the cover hoists and strikes it, and it stays as ye leave it.</item>
+        <item>The split screens (chart and shanties, an app beside the chart, the decks) are now soft rounded panels riding above the wallpaper.</item>
+        <item>Boarding wirelessly: a home Wi-Fi with addresses like the ship\'s no longer holds it in port for minutes, myCar starts over at once when the ship\'s wireless adapter restarts, and it hails the adapter again a few seconds after its Bluetooth comes aboard.</item>
+        <item>New \"Keep the ship\'s radio till the phone strikes up\": with the sound through myCar, the ship stays on its own radio (DAB+, FM) until something plays on the phone.</item>
+        <item>After ye switch to the ship\'s radio, a chart\'s voice, a web page or the parrot no longer make off with it, and spoken turns, answers and the parrot\'s listening beep lower the radio and hand it back, as Android Auto does.</item>
+        <item>With the sound through myCar, when the ship takes the speakers for a moment (its own voice, an announcement), the phone\'s shanties pause and strike up again afterwards instead of playing to nobody aboard.</item>
+        <item>Spotify Web sets sail by itself at the start of a voyage, even when the ship\'s radio presses Play again while the page is still loading.</item>
+        <item>When the phone\'s voice can\'t speak, myCar shows the answer and brings the shanties back within seconds, and on the phone myCar\'s Rigging &gt; Parrot tells ye which voice is missing. The big voice model comes aboard only on longer voyages, and only when the phone has the memory to hold it.</item>
+        <item>If Home Assistant\'s voice assistant has lost its conversation agent, myCar asks one that\'s still afloat, or tells ye what to patch up.</item>
+        <item>Screen sharing keeps the phone\'s screen lit, turns the phone the way the ship\'s picture is, keeps the shanties playing aboard, and tells ye how to get back aboard myCar.</item>
+        <item>On the cable: Home tells ye what to check when the phone charges but no ship answers the hail (on GrapheneOS, the USB-C port setting), and the first fit-out explains what each Sound aboard choice means.</item>
+        <item>A ship with an upright screen gets an upright picture when it offers one, and Screen trim no longer says \"No vessel profile matched\".</item>
+        <item>A Waze modified with Morphe that won\'t let myCar aboard gets a red X, and the ship tells ye what to add to the patch.</item>
+        <item>From Gearslip: alerts from ship\'s apps on the ship\'s screen (Waze asks whether a hazard is still there), older Hyundais that ran aground at the start, spoken turns that come back when the voice didn\'t start, shanties that strike up again by themselves after the voyage, paused again, Metrolist\'s Treasure button, AntennaPod\'s Next chapter o\' the yarn, and the name ye gave yer ship in Bluetooth.</item>
+        <item>Ships that kept their screen black with the shanties on Bluetooth (such as the Mitsubishi Mirage 2024) get it after 5 seconds, and at once when myCar knows them; Toyota head units that stalled before a wireless boarding get the answer they wait for; and for ships that need it, the phone\'s Bluetooth address can be written in Rigging &gt; Boarding.</item>
+        <item>The voyage report says whether the ship switched off, went silent or lost its Wi-Fi under way.</item>
+    </string-array>
+
     <string-array name="changelog_49">
         <item>Xonos inside myCar now sails with the engine of Xonos 0.1.55: an artist opens without hauling all its songs aboard first (they come aboard when ye open \"Every shanty\"), and the ship\'s menu waits for Music Assistant instead of showing empty holds.</item>
         <item>With Music Assistant on yer phone, in the Xonos app: playing, skipping and picking a song wait up to a minute while it hoists sail again, instead of crying it ain\'t connected.</item>

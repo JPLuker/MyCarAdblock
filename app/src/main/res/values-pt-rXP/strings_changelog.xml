@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="changelog_50">
+        <item>Nova bandeira Jolly Roger no mastro, acima do papagaio de bordo: um toque faz o que você escolher: chamar um marujo, parlamentar com uma IA, acionar algo no Home Assistant (uma cena, uma luz, o portão), traçar rumo a um porto, dar uma ordem ao papagaio ou abordar um app. Mantenha-a pressionada para mudar, a bordo ou no telefone em Leme &gt; Tela de bordo. Não precisa dela? Arrie-a lá e o mastro fica como antes.</item>
+        <item>Uma chamada em andamento agora é uma pequena bolha que flutua sobre todas as telas até terminar, com a foto da pessoa com quem você fala, a duração e um botão vermelho para desligar. Toque nela para abrir o Telefone; mantenha-a pressionada e arraste para onde quiser: ela lança âncora lá também nas próximas chamadas.</item>
+        <item>Capa em vídeo: as cantigas com um vídeo curto em loop (os Canvas do Spotify) podem mostrá-lo na vitrola ao lado do mapa no lugar da capa fixa, de âncora lançada. O botão na capa iça e arria o vídeo, e tudo fica como você deixar.</item>
+        <item>As telas divididas (mapa e cantigas, um app ao lado do mapa, os conveses) agora são painéis suaves e arredondados que flutuam acima do horizonte.</item>
+        <item>Abordagem sem fio: um Wi-Fi de casa com endereços parecidos com os do navio não a deixa mais parada no porto por minutos, o myCar recomeça na hora quando o adaptador sem fio do navio reinicia, e chama o adaptador de novo alguns segundos depois que o Bluetooth dele sobe a bordo.</item>
+        <item>Nova opção «Manter o rádio do navio até tocar algo no telefone»: com o som pelo myCar, o navio fica no próprio rádio (DAB+, FM) até que algo toque no telefone.</item>
+        <item>Depois que você muda para o rádio de bordo, a voz de um mapa, uma página web ou o papagaio não o tiram mais, e as indicações faladas, as respostas e o bipe do papagaio ouvindo abaixam o rádio e depois o deixam voltar, como faz o Android Auto.</item>
+        <item>Com o som pelo myCar, quando o navio pega os alto-falantes por um momento (a própria voz, um aviso), as cantigas do telefone pausam e voltam a tocar depois, em vez de tocar para ninguém a bordo.</item>
+        <item>O Spotify Web zarpa sozinho no início da travessia, mesmo quando o rádio de bordo aperta Play de novo enquanto a página ainda está carregando.</item>
+        <item>Quando a voz do telefone não consegue falar, o myCar mostra a resposta e traz as cantigas de volta em poucos segundos, e no telefone, em Leme &gt; Papagaio, o myCar diz qual voz está faltando. O modelo de voz grande só sobe a bordo em travessias mais longas, e só quando o telefone tem memória suficiente.</item>
+        <item>Se o assistente de voz do Home Assistant perdeu o agente de conversação dele, o myCar pergunta a um que ainda está à tona, ou diz o que corrigir.</item>
+        <item>O compartilhamento de tela mantém a tela do telefone ligada, gira o telefone do mesmo jeito que a imagem do navio, mantém as cantigas tocando a bordo e diz como voltar a bordo do myCar.</item>
+        <item>Com o cabo: a tela inicial do myCar diz o que conferir quando o telefone carrega mas nenhum navio responde (no GrapheneOS, a configuração USB-C port), e a configuração inicial explica o que significa cada opção de som a bordo.</item>
+        <item>Um navio com tela vertical recebe uma imagem vertical quando oferece uma, e Ajuste da tela não diz mais «Nenhum perfil de navio correspondente».</item>
+        <item>Um Waze modificado com o Morphe que não deixa o myCar subir a bordo ganha um X vermelho, e o navio diz o que adicionar ao patch.</item>
+        <item>Do Gearslip: alertas dos apps de bordo na tela do navio (o Waze pergunta se um perigo ainda está lá), os Hyundai mais antigos que encalhavam no início, indicações faladas que voltam quando a voz não tinha começado, cantigas que voltam a tocar sozinhas depois da travessia, pausadas de novo, os botões «Ao baú» do Metrolist e «Rumo ao próximo capítulo» do AntennaPod, e o nome que você deu ao seu navio no Bluetooth.</item>
+        <item>Navios que deixavam a tela preta com as cantigas no Bluetooth (como o Mitsubishi Mirage 2024) recebem a imagem depois de 5 segundos, e na hora quando o myCar já os conhece; centrais multimídia da Toyota que paravam antes de uma abordagem sem fio recebem a resposta que esperam; e, para os navios que precisam, o endereço Bluetooth do telefone pode ser escrito em Leme &gt; Abordagem.</item>
+        <item>O relatório da travessia diz se o navio desligou, parou de responder ou perdeu o Wi-Fi dele em plena travessia.</item>
+    </string-array>
+
     <string-array name="changelog_49">
         <item>O Xonos dentro do myCar agora navega com o motor do Xonos 0.1.55: um artista abre sem embarcar antes todas as músicas dele (elas sobem a bordo quando você abre «Todas as cantigas») e o menu de bordo espera o Music Assistant em vez de mostrar porões vazios.</item>
         <item>Com o Music Assistant no seu telefone, no app Xonos: tocar, pular e escolher uma música esperam até um minuto que ele volte a içar as velas, em vez de gritar que não está conectado.</item>

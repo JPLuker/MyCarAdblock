@@ -5,6 +5,28 @@
   "Settings >" are the app's own: translate them as the app's screens say them.
 -->
 <resources>
+    <!-- 0.7.4-alpha -->
+    <string-array name="changelog_50">
+        <item>New Jolly key in the dock, above the microphone: one tap does what you choose: call a contact, talk to an AI, run something in Home Assistant (a scene, a light, the gate), go to a place, give the assistant a command or open an app. Hold it to change it, in the car or on the phone in Settings &gt; Car screen. Don\'t need it? Turn it off there and the dock is as before.</item>
+        <item>A call under way is now a small bubble over every screen until it ends, with the photo of who you\'re talking to, how long it has lasted and a red button to hang up. Tap it for the Phone; hold it and drag it anywhere, and it stays there for the next calls too.</item>
+        <item>Video cover: songs with a short looping video (Spotify\'s Canvas) can show it in the player beside the map in place of the still cover. The button on the cover switches it on and off, and it stays as you leave it.</item>
+        <item>The split screens (map and music, an app beside the map, the pages) are now soft rounded panels raised above the wallpaper.</item>
+        <item>Wireless start-up: a home Wi-Fi with addresses like the car\'s no longer holds it up for minutes, myCar starts over at once when the car\'s wireless adapter restarts, and it calls the adapter again a few seconds after its Bluetooth comes up.</item>
+        <item>New \"Keep the car\'s radio until the phone plays\": with the sound through myCar, the car stays on its own radio (DAB+, FM) until something plays on the phone.</item>
+        <item>After you switch to the car\'s radio, a map\'s voice, a web page or the assistant no longer take it away, and spoken turns, answers and the listening beep lower the radio and give it back, as Android Auto does.</item>
+        <item>With the sound through myCar, when the car takes the speakers for a moment (its own voice, an announcement), the phone\'s music pauses and starts again afterwards instead of playing unheard.</item>
+        <item>Spotify Web starts by itself at the start of a drive, even when the car\'s radio presses Play again while the page is still loading.</item>
+        <item>When the phone\'s voice can\'t speak, myCar shows the answer and brings the music back within seconds, and Voice in myCar\'s settings on the phone tells you which voice is missing. The big voice model loads only on longer drives, and only when the phone has the memory for it.</item>
+        <item>If Home Assistant\'s voice assistant has lost its conversation agent, myCar asks one that still exists, or tells you what to fix.</item>
+        <item>Screen sharing keeps the phone\'s screen on, turns the phone the way the car\'s picture is, keeps the music playing in the car, and tells you how to get back to myCar.</item>
+        <item>On the cable: Home tells you what to check when the phone charges but no car answers (on GrapheneOS, the USB-C port setting), and the first setup explains what each car audio choice means.</item>
+        <item>A car with an upright screen gets an upright picture when it offers one, and Screen fit no longer says \"No vehicle profile matched\".</item>
+        <item>A Waze modified with Morphe that doesn\'t accept myCar gets a red X, and the car tells you what to add to the patch.</item>
+        <item>From Gearslip: alerts from car apps on the car\'s screen (Waze asks whether a hazard is still there), older Hyundai cars that stopped at the start, spoken turns that come back when the voice didn\'t start, music that starts again by itself after the drive paused again, Metrolist\'s like button, AntennaPod\'s Next chapter, and the name you gave your car in Bluetooth.</item>
+        <item>Cars that kept their screen black with the music on Bluetooth (such as the Mitsubishi Mirage 2024) get it after 5 seconds, and at once when myCar knows them; Toyota head units that stopped before a wireless start get the answer they wait for; and for cars that need it, the phone\'s Bluetooth address can be written in Settings &gt; Connection.</item>
+        <item>The session report says whether the car switched off, went silent or dropped its Wi-Fi while driving.</item>
+    </string-array>
+
     <!-- 0.7.3-alpha -->
     <string-array name="changelog_49">
         <item>Xonos inside myCar now has the engine of Xonos 0.1.55: an artist opens without loading all its songs first (they load when you open \"All tracks\"), and the car\'s menu waits for Music Assistant instead of showing empty folders.</item>
