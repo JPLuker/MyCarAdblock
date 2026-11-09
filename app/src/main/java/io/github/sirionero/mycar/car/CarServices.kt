@@ -168,6 +168,8 @@ object CarServices {
         Xonos.init(appContext)
         if (Xonos.enabled.value) XonosAccount.adoptIfUnset(appContext)
         CarAudio.consentWaits = ::xonosIsTheMusic
+        // Only a player's sound takes the car's speakers from its radio, not a map's voice or a page.
+        CarAudio.playerPlaying = ::aPlayerPlays
         // Connected through the drive too, like Plancia: ready when it's opened, and known to reach
         // Music Assistant or not before the drive's music is picked.
         xonosHeld = Xonos.enabled.value
@@ -476,6 +478,35 @@ object CarServices {
 
     /** How long the drive's Autoplay waits for a Bluetooth output on the Bluetooth way. */
     private const val AUTOPLAY_BLUETOOTH_MS = 60_000L
+
+    /**
+     * A player really playing on the phone, whose sound takes the car's speakers from its radio (see
+     * [CarAudio.playerPlaying]): the car's music app, Cinema's film, or any app's media session, read
+     * with the notification access the music asks for anyway. Not a map's voice, a web page or the
+     * assistant, which have no player. From the capture's thread: the sessions, a call to Android, are
+     * asked at most every half second.
+     */
+    private fun aPlayerPlays(): Boolean {
+        if (mediaOrNull()?.now?.value?.state == PlaybackState.STATE_PLAYING) return true
+        if (CinemaNow.playing?.invoke() == true) return true
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - sessionsAskedAt < SESSIONS_EVERY_MS) return sessionsPlaying
+        sessionsAskedAt = now
+        val ctx = context ?: return false
+        sessionsPlaying = try {
+            ctx.getSystemService(MediaSessionManager::class.java)
+                .getActiveSessions(ComponentName(ctx, MyCarNotificationListener::class.java))
+                .any { it.playbackState?.state == PlaybackState.STATE_PLAYING }
+        } catch (e: SecurityException) {
+            // No notification access: the car's music app and Cinema are what myCar sees.
+            false
+        }
+        return sessionsPlaying
+    }
+
+    @Volatile private var sessionsAskedAt = 0L
+    @Volatile private var sessionsPlaying = false
+    private const val SESSIONS_EVERY_MS = 500L
 
     // --- start and stop ------------------------------------------------------------------
 

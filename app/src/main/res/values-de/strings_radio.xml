@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The car's own radio kept until the phone plays (CarSettings.radioFirst), with the sound through myCar.
+-->
+<resources>
+    <!-- Title of the setting: a choice on the car's Settings screen, a switch on the phone (Settings > Connection > Car audio). -->
+    <string name="car_settings_radio_first">Radio des Autos behalten, bis das Telefon spielt</string>
+    <!-- On the car's Settings screen, under that choice. -->
+    <string name="car_settings_radio_first_note">Mit dem Ton über myCar läuft das Radio des Autos, oder was gerade lief, weiter, bis auf dem Telefon etwas spielt. Aus wechselt das Auto zu myCar und wird still, sobald es sich verbindet.</string>
+    <!-- On the phone, under the switch in Settings > Connection > Car audio. -->
+    <string name="settings_radio_first_detail">Mit dem Ton über myCar läuft das Radio des Autos weiter, bis du auf dem Telefon etwas abspielst, statt still zu werden, sobald sich das Auto verbindet</string>
+</resources>

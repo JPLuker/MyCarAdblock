@@ -2,18 +2,22 @@ package io.github.sirionero.mycar.audio
 
 import io.github.sirionero.mycar.Protobuf
 import io.github.sirionero.mycar.ServiceDiscovery
+import java.util.Collections
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
  * How the media sink follows the car's audio focus. A car that takes the speakers for a call, or
  * for the phone's assistant over Bluetooth, gives them back with GAIN; myCar used to let go of its
- * focus there, and the music never came back for the rest of the drive.
+ * focus there, and the music never came back for the rest of the drive. The car's radio, kept until
+ * the phone plays, is left alone by anything but a player.
  */
 class AudioLinkFocusTest {
     /** What myCar sent, in order: "start", "stop" and "data" on the sink, "focus:<type>" to the car. */
-    private val sent = mutableListOf<String>()
+    private val sent: MutableList<String> = Collections.synchronizedList(mutableListOf())
     private var takenBack = 0
+    /** A player playing on the phone, as CarServices would say. */
+    private var playing = true
 
     private fun link(): AudioLink = AudioLink(
         ServiceDiscovery.AudioService(
@@ -25,6 +29,7 @@ class AudioLinkFocusTest {
         onReady = {},
         onClose = {},
         onTakenBack = { takenBack++ },
+        playerPlaying = { playing },
     ).apply {
         onMessage(CHANNEL_OPEN_RESPONSE, Protobuf.varintField(1, 0))
         onMessage(CONFIG, Protobuf.varintField(1, READY) + Protobuf.varintField(2, 4) + Protobuf.varintField(3, 0))
@@ -126,6 +131,46 @@ class AudioLinkFocusTest {
         sent.clear()
         link.play(3_000, loud = true)
         assertEquals(emptyList<String>(), sent)
+    }
+
+    @Test
+    fun `the capture starting takes the speakers at once, unless the radio is kept`() {
+        val link = link()
+        link.captureOn(radioFirst = false)
+        assertEquals(listOf("focus:$GAIN_REQUEST", "start"), sent)
+        sent.clear()
+        val kept = link()
+        kept.captureOn(radioFirst = true)
+        kept.play(5_000, loud = false)
+        assertEquals(emptyList<String>(), sent)
+    }
+
+    @Test
+    fun `with the radio kept, a player's first sound takes the speakers with the moment before it`() {
+        val link = link()
+        link.captureOn(radioFirst = true)
+        link.play(2_000, loud = false)
+        link.play(200, loud = true)
+        assertEquals(emptyList<String>(), sent)
+        link.play(100, loud = true)
+        // Asked and started at once, then the 300 ms heard before (57,600 bytes, in 4096-byte pieces).
+        assertEquals(listOf("focus:$GAIN_REQUEST", "start"), sent.take(2))
+        assertEquals(List(15) { "data" }, sent.drop(2))
+        sent.clear()
+        link.play(10, loud = true)
+        assertEquals(listOf("data"), sent)
+    }
+
+    @Test
+    fun `with the radio kept, sound that isn't a player's - a map's voice, a page - takes nothing`() {
+        val link = link()
+        link.captureOn(radioFirst = true)
+        playing = false
+        link.play(5_000, loud = true)
+        assertEquals(emptyList<String>(), sent)
+        playing = true
+        link.play(100, loud = true)
+        assertEquals(listOf("focus:$GAIN_REQUEST", "start"), sent.take(2))
     }
 
     private companion object {

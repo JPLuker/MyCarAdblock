@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The car's own radio kept until the phone plays (CarSettings.radioFirst), with the sound through myCar.
+-->
+<resources>
+    <!-- Title of the setting: a choice on the car's Settings screen, a switch on the phone (Settings > Connection > Car audio). -->
+    <string name="car_settings_radio_first">在手机开唱前保留船上的收音机</string>
+    <!-- On the car's Settings screen, under that choice. -->
+    <string name="car_settings_radio_first_note">声音通过 myCar 传输时，船上的收音机（或正在播放的其他音源）会一直播放，直到手机开始播放内容。关闭时，船一登上就会切换到 myCar 并变得安静。</string>
+    <!-- On the phone, under the switch in Settings > Connection > Car audio. -->
+    <string name="settings_radio_first_detail">声音通过 myCar 传输时，船上的收音机会一直播放，直到你在手机上唱起船歌，而不是一登船就变得安静</string>
+</resources>

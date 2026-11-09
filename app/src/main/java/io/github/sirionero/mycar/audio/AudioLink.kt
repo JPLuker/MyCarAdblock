@@ -31,6 +31,12 @@ class AudioLink(
     private val onClose: (AudioLink) -> Unit = { CarAudio.detach(it) },
     /** The car took the sound back after giving it, as when the driver switches to the radio. */
     private val onTakenBack: () -> Unit = {},
+    /**
+     * Whether a player is really playing on the phone - not a map's voice, a web page or the
+     * assistant, which have none: only a player's sound takes the car's speakers from its own
+     * source ([listenForPlayback]).
+     */
+    private val playerPlaying: () -> Boolean = { CarAudio.playerPlaying() },
 ) : CarAudio.Link {
 
     private var configIndex = 0
@@ -47,6 +53,12 @@ class AudioLink(
     private var quietBytes = 0L
     private var soundBytes = 0L
     private var armed = false
+    /** The car keeps its radio until the phone plays ([captureOn]): a player's first sound starts the stream. */
+    @Volatile private var awaitingFirstSound = false
+    /** While [awaitingFirstSound]: the last [PREROLL_MS] heard, a ring sent right after Start (see [firstSound]). */
+    private var preroll: ByteArray? = null
+    private var prerollEnd = 0
+    private var prerollFull = false
     @Volatile private var inFlight = 0
     // The Uconnect asks for 4 on its video channel; assume the same until its Config says otherwise.
     @Volatile private var maxUnacked = 4
@@ -79,6 +91,21 @@ class AudioLink(
     override val channels get() = config?.channels ?: 2
 
     val channelId get() = service.serviceId
+
+    /**
+     * The capture is on, with the phone's sound to send: the speakers are asked for at once
+     * ([start]), as before - unless [radioFirst], the driver's choice to keep the car's radio until
+     * the phone plays. Then a player's first sound asks for them ([listenForPlayback]).
+     */
+    override fun captureOn(radioFirst: Boolean) {
+        when {
+            radioFirst && !started && !focusRequested && !heldBack -> {
+                if (!awaitingFirstSound) MyCarLog.i("$tag: the car keeps its own source until the phone plays")
+                awaitingFirstSound = true
+            }
+            else -> start()
+        }
+    }
 
     fun opened(status: Int) {
         MyCarLog.i("$tag: <- ChannelOpenResponse: status=$status")
@@ -287,6 +314,8 @@ class AudioLink(
         }
         started = true
         armed = false
+        // The car's speakers are the phone's again.
+        awaitingFirstSound = false
         MyCarLog.i("$tag: -> Start(session=$sessionId, config=$configIndex) - streaming ${sampleRate}Hz x$channels")
     }
 
@@ -337,6 +366,7 @@ class AudioLink(
             if (asksFocus && ready) listenForPlayback(pcm, size)
             return
         }
+        if (preroll != null) dropPreroll()
         // The car ran dry: the silence it earned goes ahead of this chunk (see [onUnderflow]).
         val pad = pendingPadMs
         if (pad > 0) {
@@ -427,8 +457,13 @@ class AudioLink(
      * music came back after the call - so ask the car for the speakers, as Android Auto does when
      * a media app starts. A car still busy says so, and the next ask waits for the next quiet
      * spell and the sound after it. Timed by the audio itself, which the capture delivers as it plays.
+     *
+     * With the car keeping its radio until the phone plays ([awaitingFirstSound]), a player's first
+     * sound asks and starts at once ([firstSound]); a map's voice, a web page or the assistant's
+     * answer, also captured, doesn't.
      */
     private fun listenForPlayback(pcm: ByteArray, size: Int) {
+        if (awaitingFirstSound) keepPreroll(pcm, size) else if (preroll != null) dropPreroll()
         if (!heard(pcm, size)) {
             soundBytes = 0
             quietBytes += size
@@ -447,12 +482,72 @@ class AudioLink(
             MyCarLog.i("$tag: no GAIN ${HELD_SOUND_MS / 1000}s after the car took the speakers, the phone still playing - -> AudioFocusRequest(GAIN)")
             return
         }
-        if (!armed || millis(soundBytes) < SOUND_MS) return
+        if (millis(soundBytes) < SOUND_MS) return
+        if (awaitingFirstSound) {
+            if (aPlayerPlays()) firstSound()
+            return
+        }
+        if (!armed) return
         armed = false
         focusRequested = true
         runCatching { sendControl(MSG_FOCUS_REQUEST, Protobuf.varintField(1, FOCUS_GAIN.toLong())) }
         MyCarLog.i("$tag: the phone is playing again - -> AudioFocusRequest(GAIN)")
     }
+
+    /**
+     * The car kept its radio until the phone played, and a player plays now: the speakers asked
+     * for and the stream started at once, as for a car that never answers. The moment heard before
+     * goes first, so the start of the song isn't lost while the car switches over.
+     */
+    private fun firstSound() {
+        // Once: a stream that doesn't start (an AAC car without an encoder) isn't tried again at
+        // every chunk, but as before, when the car answers or after a quiet spell.
+        awaitingFirstSound = false
+        val before = takePreroll()
+        MyCarLog.i("$tag: the phone plays - asking the car for its speakers")
+        start()
+        if (!started || before == null) return
+        var offset = 0
+        while (offset < before.size && started) {
+            val n = minOf(PREROLL_PIECE, before.size - offset)
+            writeNow(before.copyOfRange(offset, offset + n), n)
+            offset += n
+        }
+    }
+
+    /** Keeps the last [PREROLL_MS] heard, in a ring of whole frames. */
+    private fun keepPreroll(pcm: ByteArray, size: Int) {
+        val ring = preroll ?: ByteArray(sampleRate * PREROLL_MS / 1000 * channels * 2).also { preroll = it }
+        var offset = 0
+        while (offset < size) {
+            val n = minOf(size - offset, ring.size - prerollEnd)
+            System.arraycopy(pcm, offset, ring, prerollEnd, n)
+            offset += n
+            prerollEnd += n
+            if (prerollEnd == ring.size) {
+                prerollEnd = 0
+                prerollFull = true
+            }
+        }
+    }
+
+    /** What [keepPreroll] kept, oldest first and in whole frames; the ring is let go. */
+    private fun takePreroll(): ByteArray? {
+        val ring = preroll ?: return null
+        val kept = if (prerollFull) ring.copyOfRange(prerollEnd, ring.size) + ring.copyOfRange(0, prerollEnd) else ring.copyOf(prerollEnd)
+        dropPreroll()
+        val frame = channels * 2
+        return kept.copyOfRange(kept.size % frame, kept.size).takeIf { it.isNotEmpty() }
+    }
+
+    private fun dropPreroll() {
+        preroll = null
+        prerollEnd = 0
+        prerollFull = false
+    }
+
+    /** [playerPlaying], which a failure doesn't turn into music held back for good: as before, sound counts then. */
+    private fun aPlayerPlays(): Boolean = runCatching { playerPlaying() }.getOrDefault(true)
 
     /** Anything above a whisper in this 16-bit PCM: a paused player hands the capture zeros. */
     private fun heard(pcm: ByteArray, size: Int): Boolean {
@@ -506,6 +601,9 @@ class AudioLink(
         private const val SOUND_MS = 300L
         /** Sound held back this long, with no GAIN from the car, asks for the speakers again. */
         private const val HELD_SOUND_MS = 20_000L
+        /** What a player's first sound sends ahead of itself once the car is asked ([firstSound]), and in what pieces. */
+        private const val PREROLL_MS = 300
+        private const val PREROLL_PIECE = 4_096
         /** About -54 dB: below it, a sample is silence or noise. */
         private const val WHISPER = 64
         private const val SESSION_ID = 2

@@ -32,6 +32,12 @@ object CarAudio {
         fun start()
         fun stop()
         fun write(pcm: ByteArray, size: Int)
+
+        /**
+         * The capture is on: the speakers asked for now ([start]), unless the car keeps its own
+         * source until a player plays (see AudioLink.captureOn).
+         */
+        fun captureOn(radioFirst: Boolean) = start()
     }
 
     enum class Capture { OFF, ASKING, ON, DENIED }
@@ -92,11 +98,21 @@ object CarAudio {
     val sampleRate get() = link?.sampleRate ?: 48_000
     val channels get() = link?.channels ?: 2
 
+    /**
+     * Whether a player is really playing on the phone - not a map's voice, a web page or the
+     * assistant: only its sound takes the car's speakers from the radio (see AudioLink). Set by the
+     * car session; any sound counts until then, as it always did.
+     */
+    @Volatile var playerPlaying: () -> Boolean = { true }
+
+    /** The driver keeps the car's radio until the phone plays (see AudioLink.captureOn). */
+    private fun radioFirst() = io.github.sirionero.mycar.car.CarSettings.radioFirst.value
+
     fun attach(link: Link) {
         this.link = link
         MyCarLog.i("audio: the car offered a sink at ${link.sampleRate}Hz x${link.channels}")
         when {
-            _capture.value == Capture.ON -> link.start()
+            _capture.value == Capture.ON -> link.captureOn(radioFirst())
             wanted && consentWaits() -> MyCarLog.i("audio: the car's music is myCar's own - Android isn't asked for now")
             // Not again while the question is up, nor after a "no" this drive.
             wanted && _capture.value == Capture.OFF -> ask()
@@ -253,7 +269,7 @@ object CarAudio {
 
     internal fun captureStarted() {
         _capture.value = Capture.ON
-        link?.start()
+        link?.captureOn(radioFirst())
     }
 
     internal fun captureStopped() {

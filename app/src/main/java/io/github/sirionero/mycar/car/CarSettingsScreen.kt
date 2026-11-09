@@ -69,6 +69,7 @@ fun CarSettingsScreen() {
     val bluetoothWarning by CarSettings.bluetoothWarning.collectAsState()
     val locationWarning by CarSettings.locationWarning.collectAsState()
     val autoplay by CarSettings.autoplay.collectAsState()
+    val radioFirst by CarSettings.radioFirst.collectAsState()
     val playerSize by CarSettings.playerSize.collectAsState()
     val miniPlayer by MiniPlayerSetting.on.collectAsState()
     val theme by CarSettings.appTheme.collectAsState()
@@ -188,6 +189,16 @@ fun CarSettingsScreen() {
         ) { CarSettings.setAudioRoute(it) }
         Text(
             stringResource(R.string.car_settings_car_audio_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        ChoiceRow(
+            stringResource(R.string.car_settings_radio_first),
+            listOf(false to stringResource(R.string.common_off), true to stringResource(R.string.common_on)),
+            radioFirst,
+        ) { CarSettings.setRadioFirst(it) }
+        Text(
+            stringResource(R.string.car_settings_radio_first_note),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
