@@ -12,8 +12,8 @@ import org.junit.Test
 /** The VersionResponse on a car's Bluetooth channel, with and without the Wi-Fi channel type. */
 class WirelessVersionTest {
 
-    /** A car's request as the user's two cars send it: version 1.3, channel type 0. */
-    private val request = Protobuf.varintField(1, 1) + Protobuf.varintField(2, 3) + Protobuf.varintField(3, 0)
+    /** A car's request as a wireless adapter sends it: version 1.0, channel type 0, and its field 4. */
+    private val request = Protobuf.varintField(1, 1) + Protobuf.varintField(2, 0) + Protobuf.varintField(3, 0) + Protobuf.varintField(4, 36)
 
     /** The reply as myCar built it before (WirelessLink up to 0.7.3). */
     private fun before(request: ByteArray, serial: String, session: String): ByteArray {
@@ -40,7 +40,7 @@ class WirelessVersionTest {
         assertEquals(1L, Wire.varint(fields, 1))
         assertEquals(6L, Wire.varint(fields, 2))
         assertEquals("abc123", String(Wire.bytes(fields, 3)!!))
-        // The user's cars ask for type 0: it would go back as 0.
+        // The cars seen so far ask for type 0: it would go back as 0.
         assertEquals(0L, Wire.varint(Wire.fields(WirelessVersion.reply(request, "abc123", "s-1", channelType = true)), 5))
     }
 
