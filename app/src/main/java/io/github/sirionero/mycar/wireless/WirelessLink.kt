@@ -165,6 +165,15 @@ object WirelessLink {
     @Volatile private var joined = false
     /** The current start-up's failure is said already (the phone's Wi-Fi off): its channel's end says nothing more. */
     @Volatile private var saidWhy = false
+    /** The current start-up's channel: when it opened, whether a quick call opened it ([KnockPlan]), and the car's Wi-Fi details came on it. */
+    @Volatile private var channelOpenedAt = 0L
+    @Volatile private var quickChannel = false
+    @Volatile private var wifiDetails = false
+    /**
+     * The car closed a channel at its first contact in this start-up or a start-over of it: the calls
+     * to its service keep the usual step from then on (see [KnockPlan]).
+     */
+    @Volatile private var slowKnocks = false
 
     /**
      * Keeps the phone awake while a start-up waits for the car, until the car shows myCar (the
@@ -248,10 +257,16 @@ object WirelessLink {
         this.quiet = quiet
         // The listening after a drive too: a car that called and then failed at the Wi-Fi was left there.
         autoStart = byItself
-        if (!again) retriesLeft = AUTO_RETRIES
+        if (!again) {
+            retriesLeft = AUTO_RETRIES
+            slowKnocks = false
+        }
         pictured = false
         joined = false
         saidWhy = false
+        channelOpenedAt = 0L
+        quickChannel = false
+        wifiDetails = false
         goneAddress = null
         synchronized(ends) {
             channelOver = false
@@ -336,11 +351,28 @@ object WirelessLink {
      * The Bluetooth channel is over. If the car had ended the session on Wi-Fi first, the request
      * for its network goes now: it stayed until the next tap, with Android looking for the car.
      */
-    private fun channelEnded(context: Context, mine: Int) {
+    private fun channelEnded(context: Context, mine: Int, byCar: Boolean) {
         synchronized(ends) {
             if (mine != startRun) return
             channelOver = true
             channelClosedAt = SystemClock.elapsedRealtime()
+            // Closed by the car within moments of opening, before its Wi-Fi details: an adapter does
+            // that to a channel opened right after its Bluetooth came. The calls to its service keep
+            // the usual step for the rest of the start-up, and a channel a quick call opened (maybe
+            // too soon) costs no start-over: those cost the start-overs a car has.
+            if (byCar && channelOpenedAt != 0L && KnockPlan.closedEarly(channelOpenedAt, channelClosedAt, wifiDetails)) {
+                if (!slowKnocks && !quiet) {
+                    log.i(
+                        "Bluetooth: the car closed the channel ${(channelClosedAt - channelOpenedAt) / 100 / 10.0}s after it opened, " +
+                            "before its Wi-Fi details - calling its service every ${KNOCK_MS / 1000}s from now on",
+                    )
+                }
+                slowKnocks = true
+                if (quickChannel && retryFor != mine && retriesLeft < AUTO_RETRIES) {
+                    retriesLeft++
+                    log.i("auto-connect: a quick call opened that channel - its start-over isn't counted")
+                }
+            }
             if (releaseWithChannel && tcp == null) releaseNetwork(context)
             if (tcp != null) return
             // The car's Wi-Fi asked for and not over: some cars close the channel once the phone has
@@ -431,7 +463,12 @@ object WirelessLink {
     fun carHere(address: String) {
         arrivals[address.uppercase(java.util.Locale.ROOT)] = SystemClock.elapsedRealtime()
         if (goneAddress.equals(address, ignoreCase = true)) goneAddress = null
+        // A start-up waiting for this car calls its service a few seconds on (KnockPlan), not at its next step.
+        synchronized(knockWake) { knockWake.notifyAll() }
     }
+
+    /** Wakes the calls to a car's service ([waitForCar]) when its Bluetooth comes. */
+    private val knockWake = Object()
 
     /**
      * When each car's Bluetooth last came (Android's companion watch, every arrival, during a drive
@@ -547,6 +584,9 @@ object WirelessLink {
         // seconds to fail - long enough for the car to look, find nothing, and give up.
         val callsUs = WirelessAuto.callsPhone(context, device.address)
         var inbound = callsUs
+        // A quick call to the car's service opened the channel (KnockPlan).
+        var quick = false
+        val firstCallAt = SystemClock.elapsedRealtime()
         val socket = if (callsUs) {
             log.i("Bluetooth: $name called the phone last time - waiting for it at once")
             val accepted = waitForCar(context, device, name, mine, listenMs)
@@ -577,8 +617,11 @@ object WirelessLink {
             log.i("Bluetooth: $name has no Android Auto service to call (${e.message}); waiting for it to call us")
             // Replaced while its connect hung: the newer start-up does the waiting.
             if (mine != startRun) return
-            val got = waitForCar(context, device, name, mine, listenMs) ?: return
+            // Failed at once: the car's Bluetooth is there, its service not yet. Without the car it takes ~5 s.
+            val carThere = SystemClock.elapsedRealtime() - firstCallAt < KnockPlan.FAST_FAIL_MS
+            val got = waitForCar(context, device, name, mine, listenMs, carThere) ?: return
             inbound = got.inbound
+            quick = got.quick
             got.socket
         }
         if (mine != startRun) {
@@ -598,6 +641,8 @@ object WirelessLink {
             return
         }
         log.i("Bluetooth: channel open")
+        channelOpenedAt = SystemClock.elapsedRealtime()
+        quickChannel = quick
         if (mine == startRun) SessionStatus.connecting(R.string.wireless_link_bt_talking, name)
         // A car whose Android Auto isn't ready yet can take the channel and say nothing: the start-up
         // stayed on "talking to the car" for good, holding the drive's service, and every arrival of
@@ -614,6 +659,8 @@ object WirelessLink {
         var target: Pair<String, Int>? = null
         // Wi-Fi details that came before the address, joined once the StartRequest brings it.
         var waitingJoin: ((String, Int) -> Unit)? = null
+        // The car closed the channel (not myCar).
+        var byCar = false
         try {
             while (!Thread.currentThread().isInterrupted) {
                 val length = input.readUnsignedShort()
@@ -656,6 +703,7 @@ object WirelessLink {
                         }
                     }
                     MSG_INFO_RESPONSE -> {
+                        wifiDetails = true
                         val f = Wire.fields(body)
                         fun text(n: Int) = f.firstOrNull { it.number == n && it.wireType == 2 }?.bytes?.decodeToString().orEmpty()
                         val ssid = text(1)
@@ -700,14 +748,17 @@ object WirelessLink {
                 }
             }
         } catch (e: IOException) {
-            if (rfcomm != null) log.w("Bluetooth: channel closed (${e.message})")
+            if (rfcomm != null) {
+                log.w("Bluetooth: channel closed (${e.message})")
+                byCar = true
+            }
         } finally {
-            channelEnded(context, mine)
+            channelEnded(context, mine, byCar)
         }
     }
 
-    /** The car's Bluetooth channel, and whether the car opened it ([inbound]) or the phone did. */
-    private class Channel(val socket: BluetoothSocket, val inbound: Boolean)
+    /** The car's Bluetooth channel, whether the car opened it ([inbound]) or the phone did, and with a quick call ([KnockPlan]). */
+    private class Channel(val socket: BluetoothSocket, val inbound: Boolean, val quick: Boolean = false)
 
     /** A wait that has ended: a channel the phone's call gets after it is closed, not left open. */
     private object WaitOver
@@ -720,10 +771,12 @@ object WirelessLink {
      * Meanwhile the car's own service is called every [KNOCK_MS]. A car still booting has none yet
      * when its Bluetooth comes up, so the first call failed and the phone only waited, for a car
      * that waits to be called: nothing happened until Disconnect and Connect, which then worked at
-     * once. Not while listening after a drive ([quiet]), with the car maybe gone.
+     * once. Not while listening after a drive ([quiet]), with the car maybe gone. With the car's
+     * Bluetooth there ([carThere]: the first call failed at once) or coming during the wait, quicker
+     * at first ([KnockPlan]).
      */
     @SuppressLint("MissingPermission")
-    private fun waitForCar(context: Context, device: BluetoothDevice, name: String, mine: Int, listenMs: Int): Channel? {
+    private fun waitForCar(context: Context, device: BluetoothDevice, name: String, mine: Int, listenMs: Int, carThere: Boolean = false): Channel? {
         val adapter = context.getSystemService(BluetoothManager::class.java)?.adapter ?: return null
         if (mine != startRun) return null
         val server = try {
@@ -745,25 +798,65 @@ object WirelessLink {
         // The first channel either way wins; the other is closed. [WaitOver] once the wait has ended.
         val won = java.util.concurrent.atomic.AtomicReference<Any?>(null)
         val knockEvery = if (quiet) QUIET_KNOCK_MS else KNOCK_MS
+        // Quick calls only for a car that waits to be called, not after a drive (the usual 15 s), and
+        // not once the car closed a channel at its first contact in this start-up.
+        val quickOk = !quiet && !slowKnocks && !WirelessAuto.callsPhone(context, device.address)
         val knocker = Thread({
             var knocks = 0
-            while (mine == startRun && listener === server && won.get() == null) {
+            var lastEnd = SystemClock.elapsedRealtime()
+            // The latest arrival of the car's Bluetooth seen, and the one the quick calls count from:
+            // null while the car's Bluetooth isn't known to be there.
+            var seen = arrivalOf(device.address)
+            var arrival = if (carThere) seen else null
+            while (true) {
                 try {
-                    Thread.sleep(knockEvery)
+                    synchronized(knockWake) {
+                        while (true) {
+                            if (mine != startRun || listener !== server || won.get() != null) return@Thread
+                            // The car's Bluetooth came (again) during the wait (carHere): from it.
+                            val latest = arrivalOf(device.address)
+                            if (latest != null && latest != seen) {
+                                seen = latest
+                                if (quickOk) {
+                                    arrival = latest
+                                    log.i("Bluetooth: $name's Bluetooth came - calling its service ${KnockPlan.AFTER_ARRIVAL_MS / 1000}s after")
+                                }
+                            }
+                            val wait = KnockPlan.next(lastEnd, arrival, quickOk, knockEvery).at - SystemClock.elapsedRealtime()
+                            if (wait <= 0) break
+                            knockWake.wait(wait)
+                        }
+                    }
                 } catch (e: InterruptedException) {
                     return@Thread
                 }
-                if (mine != startRun || listener !== server || won.get() != null) return@Thread
+                val quickCall = KnockPlan.next(lastEnd, arrival, quickOk, knockEvery).quick
                 knocks++
-                val socket = runCatching { device.createRfcommSocketToServiceRecord(AA_UUID) }.getOrNull() ?: continue
+                val socket = runCatching { device.createRfcommSocketToServiceRecord(AA_UUID) }.getOrNull()
+                if (socket == null) {
+                    lastEnd = SystemClock.elapsedRealtime()
+                    continue
+                }
+                val calledAt = SystemClock.elapsedRealtime()
                 try {
                     socket.connect()
                 } catch (e: IOException) {
                     runCatching { socket.close() }
-                    if (knocks == 1) log.i("Bluetooth: $name's own service doesn't answer yet (${e.message}) - calling it again every ${knockEvery / 1000}s")
+                    lastEnd = SystemClock.elapsedRealtime()
+                    // Slow to fail: the car's Bluetooth isn't there (any more), and quick calls would
+                    // only page for it - the usual step until it comes again.
+                    if (lastEnd - calledAt >= KnockPlan.FAST_FAIL_MS) arrival = null
+                    if (knocks == 1) {
+                        val again = if (KnockPlan.next(lastEnd, arrival, quickOk, knockEvery).quick) {
+                            "every ${KnockPlan.QUICK_EVERY_MS / 1000}s until ${KnockPlan.QUICK_FOR_MS / 1000}s after its Bluetooth came, then every ${knockEvery / 1000}s"
+                        } else {
+                            "every ${knockEvery / 1000}s"
+                        }
+                        log.i("Bluetooth: $name's own service doesn't answer yet (${e.message}) - calling it again $again")
+                    }
                     continue
                 }
-                if (won.compareAndSet(null, Channel(socket, inbound = false))) {
+                if (won.compareAndSet(null, Channel(socket, inbound = false, quick = quickCall))) {
                     log.i("Bluetooth: $name's own Android Auto service answered (call ${knocks + 1})")
                     // Ends the wait below.
                     runCatching { server.close() }
