@@ -57,4 +57,14 @@ internal object KnockPlan {
      */
     fun startOversLeft(left: Int, quickChannel: Boolean, startsOver: Boolean, overPending: Boolean): Int =
         if (quickChannel && startsOver && !overPending) left + 1 else left
+
+    /**
+     * The car's Bluetooth arrival the quick calls count from as the wait begins: [latest] if the first
+     * call found the car's Bluetooth there ([carThere]: it failed fast) or the car's Bluetooth came
+     * while that call ran ([before]: the latest arrival when it began); null otherwise. An adapter back
+     * from a restart arrived while a call that found no car took its 5 s, and the wait took that
+     * arrival for one seen already: its calls stayed at the usual step.
+     */
+    fun firstArrival(carThere: Boolean, before: Long?, latest: Long?): Long? =
+        if (carThere || latest != before) latest else null
 }

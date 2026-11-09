@@ -594,6 +594,8 @@ object WirelessLink {
         var inbound = callsUs
         // A quick call to the car's service opened the channel (KnockPlan).
         var quick = false
+        // The car's Bluetooth arrival known before the first call: one while it runs is new to the wait.
+        val arrivedBefore = arrivalOf(device.address)
         val firstCallAt = SystemClock.elapsedRealtime()
         val socket = if (callsUs) {
             log.i("Bluetooth: $name called the phone last time - waiting for it at once")
@@ -627,7 +629,7 @@ object WirelessLink {
             if (mine != startRun) return
             // Failed at once: the car's Bluetooth is there, its service not yet. Without the car it takes ~5 s.
             val carThere = SystemClock.elapsedRealtime() - firstCallAt < KnockPlan.FAST_FAIL_MS
-            val got = waitForCar(context, device, name, mine, listenMs, carThere) ?: return
+            val got = waitForCar(context, device, name, mine, listenMs, carThere, arrivedBefore) ?: return
             inbound = got.inbound
             quick = got.quick
             got.socket
@@ -780,11 +782,14 @@ object WirelessLink {
      * when its Bluetooth comes up, so the first call failed and the phone only waited, for a car
      * that waits to be called: nothing happened until Disconnect and Connect, which then worked at
      * once. Not while listening after a drive ([quiet]), with the car maybe gone. With the car's
-     * Bluetooth there ([carThere]: the first call failed at once) or coming during the wait, quicker
-     * at first ([KnockPlan]).
+     * Bluetooth there ([carThere]: the first call failed at once), coming while the first call ran
+     * (after [arrivedBefore]) or coming during the wait, quicker at first ([KnockPlan]).
      */
     @SuppressLint("MissingPermission")
-    private fun waitForCar(context: Context, device: BluetoothDevice, name: String, mine: Int, listenMs: Int, carThere: Boolean = false): Channel? {
+    private fun waitForCar(
+        context: Context, device: BluetoothDevice, name: String, mine: Int, listenMs: Int,
+        carThere: Boolean = false, arrivedBefore: Long? = arrivalOf(device.address),
+    ): Channel? {
         val adapter = context.getSystemService(BluetoothManager::class.java)?.adapter ?: return null
         if (mine != startRun) return null
         val server = try {
@@ -815,7 +820,10 @@ object WirelessLink {
             // The latest arrival of the car's Bluetooth seen, and the one the quick calls count from:
             // null while the car's Bluetooth isn't known to be there.
             var seen = arrivalOf(device.address)
-            var arrival = if (carThere) seen else null
+            var arrival = KnockPlan.firstArrival(carThere, arrivedBefore, seen)
+            if (!carThere && arrival != null && quickOk) {
+                log.i("Bluetooth: $name's Bluetooth came during the first call - calling its service ${KnockPlan.AFTER_ARRIVAL_MS / 1000}s after")
+            }
             while (true) {
                 try {
                     synchronized(knockWake) {

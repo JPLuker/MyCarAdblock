@@ -2,6 +2,7 @@ package io.github.sirionero.mycar.wireless
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -79,5 +80,20 @@ class KnockPlanTest {
         // A tap doesn't start over by itself; a start-over already on its way isn't taken twice.
         assertEquals(3, KnockPlan.startOversLeft(left = 3, quickChannel = true, startsOver = false, overPending = false))
         assertEquals(2, KnockPlan.startOversLeft(left = 2, quickChannel = true, startsOver = true, overPending = true))
+    }
+
+    @Test
+    fun `the arrival the quick calls count from as the wait begins`() {
+        // The first call failed fast: the car's Bluetooth is there, from its latest arrival.
+        assertEquals(10_000L, KnockPlan.firstArrival(carThere = true, before = 10_000, latest = 10_000))
+        // As in a drive's log: a start-over at 14.0 s, the adapter back from its restart at 19.1 s
+        // while the first call (no car at its start) took until 19.3 s - that arrival counts.
+        assertEquals(19_078L, KnockPlan.firstArrival(carThere = false, before = 5_000, latest = 19_078))
+        assertEquals(19_078L, KnockPlan.firstArrival(carThere = false, before = null, latest = 19_078))
+        // Nothing came while it ran: the usual step until the car's Bluetooth comes.
+        assertNull(KnockPlan.firstArrival(carThere = false, before = 5_000, latest = 5_000))
+        assertNull(KnockPlan.firstArrival(carThere = false, before = null, latest = null))
+        // From there, the first quick call 3 s after that arrival.
+        assertEquals(22_078L, KnockPlan.next(lastEnd = 19_300, arrival = 19_078, quick = true, step = step).at)
     }
 }
