@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Changes ported from Gearslip 0.3.32-0.3.40 -->
+<resources>
+    <!-- In the car, a button of AntennaPod in the full-screen player (media/CarMedia.kt,
+         withNextChapter): goes to the podcast episode's next chapter. Short: it is also
+         the button's description, and its text when AntennaPod's icon can't be shown -->
+    <string name="car_player_next_chapter">Kurs aufs nächste Kapitel</string>
+</resources>

@@ -21,6 +21,8 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import io.github.sirionero.mycar.MyCarLog
+import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.Words
 import io.github.sirionero.mycar.host.KnownApps
 import io.github.sirionero.mycar.notify.MyCarNotificationListener
 import io.github.sirionero.mycar.webmusic.WebMusic
@@ -435,10 +437,12 @@ class CarMedia(private val context: Context) {
             speed = state?.playbackSpeed ?: 1f,
             updatedAt = state?.lastPositionUpdateTime ?: 0,
             actions = state?.actions ?: 0,
-            custom = state?.customActions.orEmpty().map {
-                val iconName = iconName(it.icon)
-                CustomAction(it.action, it.name.toString(), it.extras, it.icon, iconName, hasOutline(it.icon, iconName))
-            },
+            custom = withNextChapter(
+                state?.customActions.orEmpty().map {
+                    val iconName = iconName(it.icon)
+                    CustomAction(it.action, it.name.toString(), it.extras, it.icon, iconName, hasOutline(it.icon, iconName))
+                },
+            ),
             error = state?.errorMessage?.toString(),
             activeQueueItemId = state?.activeQueueItemId ?: MediaSession.QueueItem.UNKNOWN_ID.toLong(),
             heart = if (controller?.ratingType == Rating.RATING_HEART) {
@@ -468,6 +472,19 @@ class CarMedia(private val context: Context) {
         val pkg = controller?.packageName ?: return ""
         val res = resourcesOf(pkg) ?: return ""
         return runCatching { res.getResourceEntryName(icon) }.getOrDefault("")
+    }
+
+    /**
+     * AntennaPod takes a Next chapter command whenever it plays, but offers the button only when it's
+     * turned on in its own notification settings: myCar offers it either way, with AntennaPod's icon,
+     * second among its buttons (AppButtons.secondPlace). An episode without chapters does nothing with it.
+     */
+    private fun withNextChapter(actions: List<CustomAction>): List<CustomAction> {
+        if (controller?.packageName != ANTENNAPOD || actions.any { it.id in ANTENNAPOD_NEXT_CHAPTER }) return actions
+        val icon = resourcesOf(ANTENNAPOD)?.let { res ->
+            runCatching { res.getIdentifier("ic_notification_next_chapter", "drawable", ANTENNAPOD) }.getOrDefault(0)
+        } ?: 0
+        return AppButtons.secondPlace(actions, CustomAction(NEXT_CHAPTER, Words.get(R.string.car_player_next_chapter), null, icon))
     }
 
     /** Whether each icon has an outline in the app, by icon id: looked up once, the state changes often. */
@@ -642,7 +659,13 @@ class CarMedia(private val context: Context) {
         private set
 
     fun seek(ms: Long) = controller?.transportControls?.seekTo(ms)
-    fun custom(action: CustomAction) = controller?.transportControls?.sendCustomAction(action.id, action.extras)
+    fun custom(action: CustomAction) {
+        val controls = controller?.transportControls ?: return
+        // myCar's own Next chapter for AntennaPod (withNextChapter): its Media3 service and its
+        // older one each know only their own name for it.
+        if (action.id == NEXT_CHAPTER) ANTENNAPOD_NEXT_CHAPTER.forEach { controls.sendCustomAction(it, null) }
+        else controls.sendCustomAction(action.id, action.extras)
+    }
 
     fun playQueueItem(track: QueueTrack) {
         asks.asked()
@@ -940,3 +963,11 @@ class CarMedia(private val context: Context) {
         const val RELINK_GAP_MS = 60_000L
     }
 }
+
+private const val ANTENNAPOD = "de.danoeh.antennapod"
+
+/** AntennaPod's names for Next chapter: its Media3 service's, then its older one's. */
+private val ANTENNAPOD_NEXT_CHAPTER = listOf("next_chapter", "action.de.danoeh.antennapod.core.service.next_chapter")
+
+/** The id of myCar's own Next chapter button for AntennaPod, sent as both of its names (CarMedia.custom). */
+private const val NEXT_CHAPTER = "mycar.next_chapter"

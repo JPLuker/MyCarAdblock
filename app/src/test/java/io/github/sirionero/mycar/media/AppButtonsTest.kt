@@ -35,4 +35,14 @@ class AppButtonsTest {
         assertEquals(emptyList<String>(), AppButtons.outlineNames("ic_favorite_border"))
         assertEquals(emptyList<String>(), AppButtons.outlineNames("ic_star_empty"))
     }
+
+    @Test fun `AntennaPod's Next chapter goes second, where the player shows it`() {
+        // The full-screen player shows an app's first two buttons: Rewind stays, Fast-forward goes third.
+        assertEquals(
+            listOf("rewind", "next chapter", "fast forward", "speed"),
+            AppButtons.secondPlace(listOf("rewind", "fast forward", "speed"), "next chapter"),
+        )
+        assertEquals(listOf("rewind", "next chapter"), AppButtons.secondPlace(listOf("rewind"), "next chapter"))
+        assertEquals(listOf("next chapter"), AppButtons.secondPlace(emptyList(), "next chapter"))
+    }
 }
