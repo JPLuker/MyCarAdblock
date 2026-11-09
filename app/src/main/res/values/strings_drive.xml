@@ -5,7 +5,7 @@
   assistant's language. Car toasts are read at a glance; the phone's texts explain the steps.
 -->
 <resources>
-    <!-- Car toast, once per drive (car/CarAssistant.kt): the phone is short of memory for the big voice model, so the small one (English only) hears the command alone -->
+    <!-- On the car, once per drive, over the assistant's "Listening…" (two lines at most) or as a toast (car/CarAssistant.kt): the phone is short of memory for the big voice model, so the small one hears the command alone -->
     <string name="car_voice_small_model">The phone is short of memory: the assistant hears you with its small model only, and may get names wrong.</string>
     <!-- Car toast, once per drive (car/CarAssistant.kt): the phone's text-to-speech didn't start speaking an answer or a message, so they are only shown; "Voice" is settings_group_voice -->
     <string name="car_voice_silent">The phone\'s voice isn\'t speaking: answers are only shown. See Voice in myCar\'s settings on the phone.</string>

@@ -614,12 +614,20 @@ object CarAssistant {
 
     /**
      * The phone hasn't the memory for the model that rereads the phrase (SpeechEngine): the small one
-     * hears alone, and may get names and places wrong. Said on the car once per drive.
+     * hears alone, and may get names and places wrong. Said on the car once per drive: over
+     * "Listening…", where the driver looks while talking (a toast there would be under the assistant),
+     * or as a toast when that line says something else already, or for a reply being dictated.
      */
     private fun smallModelOnce() {
         if (smallModelSaid) return
         smallModelSaid = true
-        CarToasts.show(this, Words.get(R.string.car_voice_small_model), androidx.car.app.CarToast.LENGTH_LONG)
+        val text = Words.get(R.string.car_voice_small_model)
+        val now = _state.value
+        if (now.phase == Phase.LISTENING && now.hint.isBlank()) {
+            _state.value = now.copy(hint = text)
+        } else {
+            CarToasts.show(this, text, androidx.car.app.CarToast.LENGTH_LONG)
+        }
     }
 
     private fun systemListen(
