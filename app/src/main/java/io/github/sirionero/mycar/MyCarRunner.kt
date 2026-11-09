@@ -1328,7 +1328,7 @@ class MyCarRunner(
             try {
                 Thread.sleep(HeldScreen.WAIT_MS)
                 val open = CarAudio.openSink
-                if (!held.openNow(running && !stopped, videoStarted, open != null) || open == null) return@Thread
+                if (!held.openNow(running && !stopped, videoStarted, open != null, SystemClock.elapsedRealtime()) || open == null) return@Thread
                 log.w("no screen from the car after ${HeldScreen.WAIT_MS / 1000}s - opening the music channel and asking again")
                 open()
                 Thread.sleep(HeldScreen.ASK_AGAIN_MS)
@@ -1357,7 +1357,7 @@ class MyCarRunner(
             if (!projected) return
             videoStarted = true
             CarFocus.request = ::requestNativeFocus
-            if (heldScreen?.rememberCar() == true) {
+            if (heldScreen?.rememberCar(SystemClock.elapsedRealtime()) == true) {
                 io.github.sirionero.mycar.audio.HeldScreenCars.remember()
                 log.i("the screen came once the media channel was open - remembered: this car's next drive opens it at once")
             }
