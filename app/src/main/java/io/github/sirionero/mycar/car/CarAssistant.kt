@@ -185,6 +185,8 @@ object CarAssistant {
      * rather than asking every caller to remember to.
      */
     fun start() {
+        // The microphone: a Jolly key's assistant still waiting for the unlock gives way to it.
+        AssistantUnlock.dropJolly()
         if (Looper.myLooper() == Looper.getMainLooper()) startOnMainThread() else mainHandler.post { startOnMainThread() }
     }
 
