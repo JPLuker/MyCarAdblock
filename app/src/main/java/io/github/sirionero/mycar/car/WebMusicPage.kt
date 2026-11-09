@@ -260,8 +260,10 @@ internal class WebMusicPage(
         // The same Play again while the one that waited for the page is still tried - the service's
         // player not there yet, or not playing yet - from the car or its Bluetooth, as the page loads.
         // It used to end those tries for one of its own, which the page took and then didn't play:
-        // the drive started without music until the driver pressed Play. They go on instead.
-        if (action == "play" && !unreachable.value && playStillTried()) {
+        // the drive started without music until the driver pressed Play. They go on instead. Not while
+        // a new page loads (Spotify loads twice): the tries' last call may have gone with the old one,
+        // never to answer, so this Play waits for the new page, patient, as it always did.
+        if (action == "play" && heard && !unreachable.value && playStillTried()) {
             MyCarLog.i("music: ${service.id} play: the Play before is still being tried")
             return
         }
