@@ -1763,7 +1763,7 @@ Tutti i token in un solo posto, `car/design/`:
   comando non riparte mentre gira e per 1 s dopo, `RepeatGuard`; regole in `HomeChecks` + test; un Home
   Assistant senza `entity_ids` riceve solo il comando, come prima); andare a un posto scritto sul telefono
   (`CarServices.connectNav`, come il «portami a» dell'assistente); un comando dell'assistente come se fosse
-  detto (`CarAssistant.runPhrase` → `heard()`, nella lingua in cui è scritto, `written`, fino al microfono dopo;
+  detto (`CarAssistant.runPhrase` → `heard()`, nella lingua in cui è scritto, `written`, solo per la sua risposta;
   quattro pronti per lingua, che `JollyActionTest` fa capire ai frasari); aprire un'app della griglia. In auto
   non si scrive niente. Nell'anteprima dell'auto sul telefono, senza viaggio, il tasto dice solo cosa farebbe.
   Al tocco "Chiama" ricontrolla con `PhoneLookup` che il numero sia ancora di un contatto con quel nome, se no
@@ -1796,26 +1796,36 @@ Tutti i token in un solo posto, `car/design/`:
   lettore, solo con Spotify Web acceso) e sul telefono (Musica → Spotify, "Video cover"). Nessuna regola di
   marcia (decisione dell'utente). Accesa, un brano con la sua Canvas la mostra al posto della copertina:
   `MediaPlayer` su `TextureView` come Cinema, muto, in loop, tagliato dal centro come la copertina (`CoverCrop`
-  + test), da una copia nella cache (`VideoCoverFiles`: scaricata una volta, le ultime 12, un indirizzo che non
-  va non si riprova per 10 minuti), sotto la copertina ferma che sfuma al primo fotogramma; in pausa con la
-  musica e fuori vista (`LocalPlayerInView`), via quando non si vede, una alla volta. Vetro dei tasti, mini
-  lettore e dock tengono la copertina ferma. Il lettore a tutto schermo di Spotify Web è la sua pagina
+  + test), da una copia nella cache (`VideoCoverFiles`: scaricata una volta, solo col lettore in vista, la
+  musica accesa e la copertina video accesa; un brano saltato o il lettore fuori vista interrompono il download,
+  `runInterruptible`; le ultime 12, massimo 20 MB; un errore di rete si riprova dopo 30 s, un errore HTTP o un
+  file che non si riproduce dopo 10 minuti), sotto la copertina ferma che sfuma al primo fotogramma; in pausa
+  con la musica e fuori vista (`LocalPlayerInView`), via quando non si vede, una alla volta. Vetro dei tasti,
+  mini lettore e dock tengono la copertina ferma. Il lettore a tutto schermo di Spotify Web è la sua pagina
   (`WebMusicScreen`): lì la Canvas è quella di Spotify, `MediaScreen` non c'entra. Da dove viene: lo script
-  della pagina (`WebMusicScripts.videoCover`) manda l'indirizzo con lo stato (`WebPlayerState.videoUrl`, solo da
-  `https://canvaz.scdn.co/`). Il lettore web di Spotify (letto dal runner, novembre 2026;
-  `.github/spotify-canvas.py` nello scatto `video-cover-spotify` ne scrive i fatti nel log del job, mai pezzi
-  del codice di Spotify) suona la Canvas col suo lettore video per id del file (`<video>` su `blob:`), e il
-  componente riceve l'indirizzo come prop `canvasUrl`: lo script lo legge da React, dal `<video>` su fino al
-  componente e, fuori vista se il video non è caricato, cercando in tutto l'albero al massimo ogni 5 s e su al
-  massimo 60.000 nodi; tiene il più in vista e mai un'anteprima (`playbackType` `loopOnHover`). `SongVideo` +
-  test: il video che la pagina mostra ancora dal brano prima non conta (salvo se comparso meno di 2 s prima del
-  cambio). Nel Now playing view di Spotify la Canvas c'è solo nella vista "Canvas"
-  (artwork/canvas/hero/video/lyrics): va scelta una volta nella pagina. Se Spotify cambia questi interni resta
-  la copertina ferma, senza errori. Nel log "with a video cover" e "video cover: playing, WxH"; l'indirizzo solo
-  nella build di prova. Anteprima: `--es videoCover`, `--ez videoCoverOn` (solo debug), scatti `video-cover`,
-  `video-cover-800x480`, `video-cover-moving`, `video-cover-spotify` (Canvas finta di ffmpeg a `10.0.2.2:8003`).
-  Verificato in CI: tasto, dissolvenza, loop, taglio, angoli, mini lettore fermo, in marcia. Non provato con un
-  account Spotify né in auto.
+  della pagina (`WebMusicScripts.videoCover`, che cerca solo con `window.__mycarVideoCovers` acceso:
+  `WebMusicPage` lo mette all'inizio di ogni pagina e quando cambia l'impostazione) manda l'indirizzo con lo
+  stato (`WebPlayerState.videoUrl`, solo da `https://canvaz.scdn.co/`). Il lettore web di Spotify (letto dal
+  runner, novembre 2026; `.github/spotify-canvas.py` nello scatto `video-cover-spotify` ne scrive i fatti nel
+  log del job, mai pezzi del codice di Spotify) suona la Canvas col suo lettore video per id del file (`<video>`
+  su `blob:`), e il componente riceve l'indirizzo come prop `canvasUrl`: lo script lo legge da React, dal
+  `<video>` su fino al componente e, fuori vista se il video non è caricato, cercando in tutto l'albero al
+  massimo ogni 5 s e su al massimo 60.000 nodi; tiene il più in vista e mai un'anteprima (`playbackType`
+  `loopOnHover`). Al cambio di brano l'albero si rilegge subito, poi ogni secondo per 10 s. `SongVideo` + test:
+  il video che la pagina mostra ancora dal brano prima non conta (salvo se la pagina lo mostrava da meno di 2 s
+  prima del cambio), ricorda il suo brano (Avanti→Indietro lo ridà) e dopo 10 s non conta più come vecchio. Dopo
+  un errore il video non si riavvia (`onError` ferma `start()`). Mentre c'è l'avviso «Music isn't reaching the
+  car» (accanto alla X, come prima) il tasto video non compare. Nel Now playing view di Spotify la Canvas c'è
+  solo nella vista "Canvas" (artwork/canvas/hero/video/lyrics): va scelta una volta nella pagina. Se Spotify
+  cambia questi interni resta la copertina ferma, senza errori. Nel log "with a video cover" e "video cover:
+  playing, WxH"; l'indirizzo solo nella build di prova. Anteprima: `--es videoCover`, `--ez videoCoverOn` (solo
+  debug), `--ez musicNotReaching true` (l'avviso della musica che non arriva), scatti `video-cover`,
+  `video-cover-800x480`, `video-cover-moving`, `video-cover-not-reaching` (Extra large), `video-cover-spotify`
+  (Canvas finta di ffmpeg a `10.0.2.2:8003`). Verificato in CI: tasto, dissolvenza, loop, taglio, angoli, mini
+  lettore fermo, in marcia. Una revisione indipendente ha trovato 7 punti: 6 corretti nel codice; il settimo
+  erano estratti degli script di Spotify pubblicati per sbaglio dalle prime sonde su `ci/car-preview`, ancora
+  serviti da 4 commit non più raggiungibili (solo il supporto di GitHub può toglierli: l'utente decide dopo il
+  rilascio). Non provato con un account Spotify né in auto.
 - Dipendenze approvate dall'utente: OkHttp e androidx.webkit (Plancia integrata), Media3 `session`
   e `common` (Xonos integrato: Apache 2.0, nessuna telemetria).
 - Sfondi "stile umbrelOS" ma **nostri**: le immagini di umbrelOS hanno una licenza non libera.
