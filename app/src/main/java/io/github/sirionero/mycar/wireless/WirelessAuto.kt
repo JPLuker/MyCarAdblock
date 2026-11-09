@@ -180,7 +180,7 @@ object WirelessAuto {
         val adapter = context.getSystemService(BluetoothManager::class.java)?.adapter
         val named = context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
         return addresses.map { address ->
-            (if (named) adapter?.let { runCatching { it.getRemoteDevice(address.uppercase(java.util.Locale.ROOT)).name }.getOrNull() } else null) ?: address
+            (if (named) adapter?.let { runCatching { WirelessLink.shownName(it.getRemoteDevice(address.uppercase(java.util.Locale.ROOT))) }.getOrNull() } else null) ?: address
         }
     }
 
