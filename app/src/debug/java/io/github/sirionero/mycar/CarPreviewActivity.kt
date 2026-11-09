@@ -305,7 +305,8 @@ class CarPreviewActivity : ComponentActivity() {
         // word, idle, can come after it.
         if (intent.getBooleanExtra("fakeCall", false)) {
             val name = (intent.getStringExtra("fakeCaller") ?: "Giulia Bianchi").ifBlank { null }
-            val since = android.os.SystemClock.elapsedRealtime() - 83_000
+            // On an emulator up for less than that, as soon as it started: a time before boot is "not known".
+            val since = (android.os.SystemClock.elapsedRealtime() - 83_000).coerceAtLeast(1)
             var tries = 0
             fun tryCall() {
                 if (io.github.sirionero.mycar.car.showFakeCall(name, "3471112233", since)) {
