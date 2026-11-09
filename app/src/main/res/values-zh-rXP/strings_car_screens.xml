@@ -34,7 +34,7 @@
     <string name="car_settings_saved_to">已存进 %1$s 的船舱</string>
     <string name="car_settings_save_failed">存不进舱</string>
     <string name="car_settings_save_for_vehicle">为这艘船存进舱</string>
-    <string name="car_settings_no_vehicle_profile">没有匹配这艘船的配置</string>
+    <string name="car_settings_no_vehicle_profile">舱里没存配置：myCar 按这艘船给的尺寸航行</string>
 
     <string name="car_whatsnew_title">%1$s 版新战利品</string>
     <string name="car_whatsnew_show_after_updates">换帆后显示</string>

@@ -67,7 +67,7 @@
     <string name="car_settings_saved_to">Gespeichert für %1$s</string>
     <string name="car_settings_save_failed">Speichern fehlgeschlagen</string>
     <string name="car_settings_save_for_vehicle">Für dieses Fahrzeug speichern</string>
-    <string name="car_settings_no_vehicle_profile">Kein passendes Fahrzeugprofil</string>
+    <string name="car_settings_no_vehicle_profile">Ohne Profil: myCar nutzt die Maße des Autos</string>
 
     <string name="car_whatsnew_title">Neu in %1$s</string>
     <string name="car_whatsnew_show_after_updates">Nach Updates zeigen</string>
