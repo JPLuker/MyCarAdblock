@@ -38,9 +38,8 @@ import androidx.compose.ui.node.requireDensity
  * the panel. Short on purpose, as wide soft gradients turn to bands on the way to the car; and only
  * outside, so a see-through panel (the widgets' glass) isn't darkened from below.
  *
- * Nothing here clips to the outside of a rounded shape (ClipOp.Difference): drawn with one, the
- * emulator's graphics went down with the first split screen, twice out of two. Pieces cut with
- * Path.combine, rectangle clips and small layers cleared inside a circle do the same.
+ * Nothing here clips to the outside of a rounded shape: pieces cut with Path.combine, rectangle clips
+ * and small layers cleared inside a circle do the same with plainer drawing.
  */
 
 /** A panel's outline: [MyCarRadius.Panel] at every corner. */
@@ -151,7 +150,8 @@ internal fun panelShadow(size: Size, radius: Float, spread: Float, drop: Float, 
     val strength = if (dark) MyCarLift.SHADOW_DARK else MyCarLift.SHADOW_LIGHT
     val full = Color.Black.copy(alpha = strength)
     val fade = SHADOW_FADE.map { (at, alpha) -> at to Color.Black.copy(alpha = alpha * strength) }.toTypedArray()
-    // Round a corner the fade starts at the corner's circle, r from its centre, and ends spread further.
+    // Round a corner the fade starts at the corner's circle, r from its centre, and ends spread further:
+    // four stops at most, as glassFinish has (five or more brought the emulator's graphics down).
     val inner = r / (r + spread)
     val ring = (listOf(0f to full) + SHADOW_FADE.map { (at, alpha) -> inner + at * (1f - inner) to Color.Black.copy(alpha = alpha * strength) }).toTypedArray()
     val top = drop
@@ -201,8 +201,12 @@ internal fun DrawScope.drawPanelRim(radius: Float, dark: Boolean) {
     )
 }
 
-/** How the shadow fades, from the panel's edge (0) to the end of its spread (1): soft, nearly gone halfway. */
-private val SHADOW_FADE = listOf(0f to 1f, 0.25f to 0.6f, 0.5f to 0.28f, 0.75f to 0.09f, 1f to 0f)
+/**
+ * How the shadow fades, from the panel's edge (0) to the end of its spread (1): soft, a third left at
+ * 40%. Three stops: gradients of five or more stops made the emulator of the Car preview go down at
+ * the first frame with a panel, every time (the same shadow with three looks the same).
+ */
+private val SHADOW_FADE = listOf(0f to 1f, 0.4f to 0.35f, 1f to 0f)
 
 /** The rim's light at the top, a third of the way down and at the foot: on a dark screen, and on a light one. */
 private val RIM_DARK = Triple(0.3f, 0.08f, 0.05f)
