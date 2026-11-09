@@ -43,6 +43,8 @@ class AudioLink(
      * source ([listenForPlayback]).
      */
     private val playerPlaying: () -> Boolean = { CarAudio.playerPlaying() },
+    /** The phone's music reached the car: a player's sound heard on the stream, once a stream. */
+    private val onMusic: () -> Unit = {},
     /** For directions: whether the media sink has the car's speakers, or has asked for them. */
     private val musicHasSpeakers: () -> Boolean = { CarAudio.speakersAsked },
     /** Milliseconds, on a clock that only goes forward. */
@@ -74,6 +76,8 @@ class AudioLink(
     private var preroll: ByteArray? = null
     private var prerollEnd = 0
     private var prerollFull = false
+    /** The phone's music has been heard on this stream ([onMusic] told). */
+    @Volatile private var musicHeard = false
     /** When the media sink last asked for the speakers or started its stream, on [clock]: see [FocusAnswers]. */
     @Volatile internal var askedAt = NEVER
         private set
@@ -436,6 +440,7 @@ class AudioLink(
         // The car's speakers are the phone's again.
         awaitingFirstSound = false
         carSource = false
+        musicHeard = false
         if (asksFocus) askedAt = clock()
         MyCarLog.i("$tag: -> Start(session=$sessionId, config=$configIndex) - streaming ${sampleRate}Hz x$channels")
     }
@@ -488,6 +493,10 @@ class AudioLink(
             return
         }
         if (preroll != null) dropPreroll()
+        if (asksFocus && !musicHeard && heard(pcm, size) && aPlayerPlays()) {
+            musicHeard = true
+            runCatching { onMusic() }
+        }
         // The car ran dry: the silence it earned goes ahead of this chunk (see [onUnderflow]).
         val pad = pendingPadMs
         if (pad > 0) {

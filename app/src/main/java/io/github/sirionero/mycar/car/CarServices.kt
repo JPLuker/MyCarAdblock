@@ -5,6 +5,7 @@ import android.content.Context
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import io.github.sirionero.mycar.audio.CarAudio
+import io.github.sirionero.mycar.audio.CarSource
 import io.github.sirionero.mycar.host.CarAppCatalog
 import io.github.sirionero.mycar.host.CarAppConnection
 import io.github.sirionero.mycar.host.KnownApps
@@ -449,6 +450,16 @@ object CarServices {
                 }
             }
             io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the car's Bluetooth music (or a cable), not to play on the phone's speaker")
+            return
+        }
+        // The car's last drive ended on its own source - the driver picked its radio and stayed there
+        // (see CarSource) - and its music goes through myCar now: the radio stays on, as a car radio
+        // comes back on the source it was left on, until the phone plays. Over Bluetooth the car picks
+        // its source itself, as before.
+        if (autoplayAutoPicked && CarSettings.pipeAudio.value && CarSource.lastDriveOnCarSource()) {
+            autoplayPending = false
+            if (_musicStarting.value) expectMusic(false)
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay: last drive ended on the car's own source - it stays on")
             return
         }
         // The assistant up (listening, answering): the drive's pick doesn't start the music over it. It

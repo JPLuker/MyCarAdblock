@@ -6,6 +6,7 @@ import io.github.sirionero.mycar.audio.AudioRoute
 import io.github.sirionero.mycar.audio.CarAudio
 import io.github.sirionero.mycar.audio.CarAudioRoute
 import io.github.sirionero.mycar.audio.CarRoutes
+import io.github.sirionero.mycar.audio.CarSource
 import io.github.sirionero.mycar.car.theme.GsTheme
 import io.github.sirionero.mycar.car.theme.GsThemes
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -260,6 +261,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
         radioFirstFlow.value = AppSettings.getString(app, KEY_RADIO_FIRST, "false") == "true"
         playerTitleFlow.value = AppSettings.getString(app, KEY_PLAYER_TITLE, "false") == "true"
         CarRoutes.init(app)
+        CarSource.init(app)
         // The drive's car may have a route of its own (see carIdentified).
         audioRouteFlow.value = carRoute ?: savedRoute()
         // Automatic's pick belongs to the drive, so a second init mid-drive leaves it be.

@@ -18,6 +18,7 @@ class AudioLinkFocusTest {
     /** What myCar sent, in order: "start", "stop" and "data" on the sink, "focus:<type>" to the car. */
     private val sent: MutableList<String> = Collections.synchronizedList(mutableListOf())
     private var takenBack = 0
+    private var musicTold = 0
     /** A player playing on the phone, as CarServices would say. */
     private var playing = true
     /** The links' clock, in milliseconds: moved on by the capture as it plays, and by hand. */
@@ -34,6 +35,7 @@ class AudioLinkFocusTest {
         onClose = {},
         onTakenBack = { takenBack++ },
         playerPlaying = { playing },
+        onMusic = { musicTold++ },
         clock = { now },
     ).apply {
         onMessage(CHANNEL_OPEN_RESPONSE, Protobuf.varintField(1, 0))
@@ -354,6 +356,22 @@ class AudioLinkFocusTest {
         media.start()
         guidance.handBackSpeakers()
         assertEquals(listOf("focus:$MAY_DUCK", "focus:$GAIN_REQUEST", "start"), sent)
+    }
+
+    @Test
+    fun `the phone's music on the stream is told once a stream`() {
+        val link = streaming()
+        link.play(500, loud = false)
+        playing = false
+        link.play(500, loud = true)
+        assertEquals(0, musicTold)
+        playing = true
+        link.play(500, loud = true)
+        assertEquals(1, musicTold)
+        link.onFocus(LOSS_TRANSIENT)
+        link.onFocus(GAIN)
+        link.play(100, loud = true)
+        assertEquals(2, musicTold)
     }
 
     private companion object {

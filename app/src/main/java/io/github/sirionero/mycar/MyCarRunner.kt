@@ -6,6 +6,7 @@ import io.github.sirionero.mycar.audio.AudioLink
 import io.github.sirionero.mycar.audio.CarAudio
 import io.github.sirionero.mycar.audio.CarAudioRoute
 import io.github.sirionero.mycar.audio.CarMic
+import io.github.sirionero.mycar.audio.CarSource
 import io.github.sirionero.mycar.audio.FocusAnswers
 import io.github.sirionero.mycar.media.CarMediaStatus
 import io.github.sirionero.mycar.car.BluetoothAudioCheck
@@ -627,11 +628,18 @@ class MyCarRunner(
             sendOnChannel = { id, body -> send(id, body, encrypted = true, channel = media.serviceId) },
             sendControl = { id, body -> send(id, body, encrypted = true) },
             // The driver picked the radio or another source on the car: pause the phone's music
-            // as Android Auto does, instead of letting it play on to no one.
+            // as Android Auto does, instead of letting it play on to no one. Remembered for the
+            // car's next drive, if it stays so (CarSource).
             onTakenBack = {
                 CarServices.pausePhoneMedia("the car switched to another source")
                 io.github.sirionero.mycar.car.CinemaNow.pauseForCar()
+                CarSource.takenBack()
             },
+            onClose = {
+                CarAudio.detach(it)
+                CarSource.driveEnded()
+            },
+            onMusic = { CarSource.musicBack() },
         )
         if (CarSettings.pipeAudio.value) {
             openChannel(media.serviceId)
