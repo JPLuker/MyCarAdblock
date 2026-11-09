@@ -5,4 +5,13 @@
          withNextChapter): goes to the podcast episode's next chapter. Short: it is also
          the button's description, and its text when AntennaPod's icon can't be shown -->
     <string name="car_player_next_chapter">Следующая глава</string>
+    <!-- Phone, Settings > Connection (ui/PhoneAddressRow.kt): the phone's own Bluetooth address,
+         written by hand (Android hides it from apps), sent to a car already paired with the phone.
+         The row's title, the line under it when none is written, the line under the field in its
+         dialog (where Android shows it: use the names Android gives these pages in your language),
+         and the error when what's written isn't an address -->
+    <string name="settings_phone_bt_address">Адрес Bluetooth телефона</string>
+    <string name="settings_phone_bt_address_off">Не задан. Только для автомобиля, который отключает Bluetooth телефона или разрывает связь, когда подключается myCar.</string>
+    <string name="settings_phone_bt_address_hint">В настройках Android &gt; О телефоне (на некоторых телефонах в разделе «Общая информация»): Адрес Bluetooth. myCar сообщает его автомобилю, уже сопряжённому с телефоном, чтобы автомобиль знал, что это тот же телефон.</string>
+    <string name="settings_phone_bt_address_invalid">Это не адрес Bluetooth. Он выглядит так: 12:34:56:78:9A:BC.</string>
 </resources>

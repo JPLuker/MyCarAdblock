@@ -5,4 +5,12 @@
          withNextChapter): goes to the podcast episode's next chapter. Short: it is also
          the button's description, and its text when AntennaPod's icon can't be shown -->
     <string name="car_player_next_chapter">Kurs aufs nächste Kapitel</string>
+    <!-- Phone, Settings > Connection (ui/PhoneAddressRow.kt): the phone's own Bluetooth address,
+         written by hand (Android hides it from apps), sent to a car already paired with the phone.
+         The row's title, the line under it when none is written, the line under the field in its
+         dialog (where Android shows it: use the names Android gives these pages in your language),
+         and the error when what's written isn't an address -->
+    <string name="settings_phone_bt_address">Bluetooth-Adresse deines Telefons</string>
+    <string name="settings_phone_bt_address_off">Nicht festgelegt. Nur für ein Schiff, das dem Telefon das Bluetooth kappt oder die Leinen loswirft, wenn myCar es entert.</string>
+    <string name="settings_phone_bt_address_hint">In den Android-Einstellungen &gt; Über das Telefon (bei manchen Telefonen unter Status): Bluetooth-Adresse. myCar sagt sie einem Schiff, das schon mit dem Telefon gekoppelt ist, damit es weiß: dasselbe alte Telefon.</string>
 </resources>

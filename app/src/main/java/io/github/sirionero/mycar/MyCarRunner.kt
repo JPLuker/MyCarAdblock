@@ -752,6 +752,13 @@ class MyCarRunner(
         vendorChannelId = gm.serviceId
         log.i("-> ChannelOpenRequest on GM's channel ${gm.serviceId}")
         openChannel(gm.serviceId)
+        // Gearslip 0.3.40 also opened a GM car's Bluetooth and Wi-Fi projection channels (the Bolt;
+        // what let it on was the phone's address). Here the Bluetooth one opens as for any car already
+        // paired, with the address written in Settings (CarBluetooth); the Wi-Fi projection one stays
+        // closed, only noted.
+        ServiceDiscovery.findWifiProjectionService(serviceDiscoveryResponse)?.let {
+            log.i("GM car: it also offers a Wi-Fi projection channel ($it) - left closed")
+        }
     }
 
     private fun onVendorMessage(messageId: Int, body: ByteArray) {
