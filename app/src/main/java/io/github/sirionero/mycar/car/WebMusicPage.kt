@@ -150,6 +150,12 @@ internal class WebMusicPage(
     }
     /** The car's presses so far: a newer one ends the tries of one that waited for the page. */
     private var acts = 0
+    /**
+     * A Play still being tried ([send], patient): its press ([acts] then, [NO_TRIES] with none) and
+     * when its tries last moved on. A Play pressed again meanwhile leaves them going (see [act]).
+     */
+    private var playTries = NO_TRIES
+    private var playTriedAt = 0L
     /** When the page last started loading: a press that waited for it is tried until [BOOT_MS] after. */
     private var startedAt = 0L
     private var wasPlaying = false
@@ -251,6 +257,14 @@ internal class WebMusicPage(
         // A voice search plays what it finds: the Play sent with it isn't for the song before. A
         // search whose page never comes doesn't hold the car's Play for long.
         if (searching && action == "play" && SystemClock.uptimeMillis() - searchedAt < SEARCH_HOLD_MS) return
+        // The same Play again while the one that waited for the page is still tried - the service's
+        // player not there yet, or not playing yet - from the car or its Bluetooth, as the page loads.
+        // It used to end those tries for one of its own, which the page took and then didn't play:
+        // the drive started without music until the driver pressed Play. They go on instead.
+        if (action == "play" && !unreachable.value && playStillTried()) {
+            MyCarLog.i("music: ${service.id} play: the Play before is still being tried")
+            return
+        }
         // Made without network (a garage, off screen for the wheel's Play): nothing reloaded it, and
         // the buttons went to the error page. Loaded again now, and the button sent once it's there.
         acts++
@@ -332,30 +346,54 @@ internal class WebMusicPage(
             return
         }
         if (!ours(w.url)) return
+        // A patient Play's tries, followed so that a Play pressed again meanwhile leaves them going (act).
+        val tracked = patient && action == "play"
+        if (tracked) {
+            playTries = gen
+            playTriedAt = SystemClock.uptimeMillis()
+        }
         val arg = seconds?.let { ", $it" } ?: ""
         w.evaluateJavascript("window.__mycarMusicAct ? window.__mycarMusicAct('$action'$arg) : 'no script'") { how ->
             // Still this press, on this page, for the car's music: another press, another page or
             // another music app chosen meanwhile ends the tries.
             fun current() = gen == acts && web === w && (action != "play" || isTheCarsMusic())
             val trying = patient && current() && SystemClock.uptimeMillis() - startedAt < BOOT_MS
+            if (tracked && trying) playTriedAt = SystemClock.uptimeMillis()
             // "wait": the service's bar has just come, and whether it plays on another device isn't
             // known yet - a click now could pause it there. A press on a page that has spoken waits too,
             // a little.
             val waiting = how == "\"wait\""
             when {
                 trying && (how == "\"none\"" || how == "\"no script\"" || waiting) ->
-                    main.postDelayed({ if (current()) send(action, seconds, patient, gen) }, RETRY_MS)
+                    main.postDelayed({ if (current()) send(action, seconds, patient, gen) else triesOver(gen) }, RETRY_MS)
                 !patient && waiting && waits > 0 && current() ->
                     main.postDelayed({ if (current()) send(action, seconds, patient, gen, waits - 1) }, RETRY_MS)
                 trying && action == "play" && how == "\"page\"" -> main.postDelayed({
                     if (gen == acts && web === w && !WebMusicPlayer.state(service.id).value.playing && isTheCarsMusic()) {
                         MyCarLog.i("music: ${service.id} play: not playing yet - again")
                         send(action, seconds, patient, gen)
+                    } else {
+                        triesOver(gen)
                     }
                 }, PLAY_CHECK_MS)
-                else -> MyCarLog.i("music: ${service.id} $action ($how)")
+                else -> {
+                    triesOver(gen)
+                    MyCarLog.i("music: ${service.id} $action ($how)")
+                }
             }
         }
+    }
+
+    /**
+     * A Play is still tried as the page loads ([send], patient), with nothing else pressed since, and
+     * its tries moved on lately: never stuck on one whose page went without a word.
+     */
+    private fun playStillTried(): Boolean =
+        playTries == acts && web != null && SystemClock.uptimeMillis() - playTriedAt < TRIES_GAP_MS
+
+    /** The tries of the press [gen] are over: played, given up, or another press came. */
+    private fun triesOver(gen: Int) {
+        if (playTries == gen) playTries = NO_TRIES
     }
 
     private fun isTheCarsMusic(): Boolean =
@@ -633,6 +671,8 @@ internal class WebMusicPage(
                 widthScript = null
                 heard = false
                 searching = false
+                // The old page's tries end with it, answered or not.
+                playTries = NO_TRIES
                 forgetElsewhere()
                 fullScreen.value = null
                 field.value = null
@@ -672,6 +712,13 @@ internal class WebMusicPage(
         const val BOOT_MS = 45_000L
         /** After the page's player took a Play: playing by then, or the Play goes again. */
         const val PLAY_CHECK_MS = 4_000L
+        /** No Play being tried ([playTries]). */
+        const val NO_TRIES = -1
+        /**
+         * The longest a Play's tries go without a step, [PLAY_CHECK_MS] and a page slow to answer: a
+         * Play pressed again that much later is a press of its own.
+         */
+        const val TRIES_GAP_MS = PLAY_CHECK_MS + 4_000L
 
         /** Narrower than this, these players fold away their parts: the page is drawn smaller instead. */
         const val MIN_WIDTH = 800
