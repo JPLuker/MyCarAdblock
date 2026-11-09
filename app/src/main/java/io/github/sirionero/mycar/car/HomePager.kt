@@ -302,7 +302,7 @@ internal class WebTile(val onHold: () -> Unit, val keyboard: MutableState<(@Comp
 
 /** One of the driver's pages: its parts, and under them, the page's whole width, the browser's keyboard. */
 @Composable
-private fun DriverPage(page: HomePage, inView: Boolean, editing: Boolean, onEdit: () -> Unit, onChoose: (Int) -> Unit, modifier: Modifier = Modifier) {
+private fun DriverPage(page: HomePage, inView: Boolean, editing: Boolean, onEdit: () -> Unit, onChoose: (Int) -> Unit) {
     val entries = rememberAllEntries()
     val keyboard = remember { mutableStateOf<(@Composable () -> Unit)?>(null) }
     // A page runs one car app, in the first part that holds one; the list of choices keeps it so.
@@ -310,7 +310,7 @@ private fun DriverPage(page: HomePage, inView: Boolean, editing: Boolean, onEdit
     val part: @Composable (Int, Modifier) -> Unit = { slot, modifier ->
         PagePart(page.slots[slot], entries, inView, inView && slot == runner, editing, onEdit, { onChoose(slot) }, keyboard, modifier)
     }
-    Column(modifier.fillMaxSize()) {
+    Column(Modifier.fillMaxSize()) {
         Box(Modifier.weight(1f).fillMaxWidth()) {
             when (page.layout) {
                 PageLayout.HALVES -> Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(PageGap)) {
