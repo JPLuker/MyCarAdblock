@@ -86,6 +86,17 @@
     <string name="jolly_home_done">%1$s: готово</string>
     <!-- %1$s: the thing's name in Home Assistant, %2$s: why, in Home Assistant's own words -->
     <string name="jolly_home_failed">%1$s: не получилось (%2$s)</string>
+    <!-- Home Assistant doesn't have the thing (any more): nothing was sent. %1$s: its name there -->
+    <string name="jolly_home_missing">%1$s: этого нет в Home Assistant. Удерживайте кнопку, чтобы выбрать другое.</string>
+    <!-- Home Assistant can't reach the thing now (its state is "unavailable"): nothing was sent -->
+    <string name="jolly_home_unavailable">%1$s: сейчас недоступно в Home Assistant.</string>
+    <!-- A lock, after the key's command: it says it's stuck -->
+    <string name="jolly_lock_jammed">%1$s: замок заклинило.</string>
+    <!-- A lock still as it was 10 seconds after being told to open, or to close -->
+    <string name="jolly_lock_still_locked">%1$s: замок всё ещё заперт.</string>
+    <string name="jolly_lock_still_unlocked">%1$s: замок всё ещё открыт.</string>
+    <!-- A lock still on its way, or silent, 10 seconds after the command -->
+    <string name="jolly_lock_no_news">%1$s: пока неизвестно, получилось ли.</string>
     <!-- A lock, at the first tap. %1$s: its name in Home Assistant -->
     <string name="jolly_confirm_unlock">Отпереть: %1$s? Нажмите кнопку ещё раз в течение 3 секунд.</string>
     <!-- %1$s: the place's name or the place, %2$s: the map app -->

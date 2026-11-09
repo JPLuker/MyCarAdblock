@@ -84,6 +84,17 @@
     <string name="jolly_home_done">%1$s: feito</string>
     <!-- %1$s: the thing's name in Home Assistant, %2$s: why, in Home Assistant's own words -->
     <string name="jolly_home_failed">%1$s não funcionou: %2$s</string>
+    <!-- Home Assistant doesn't have the thing (any more): nothing was sent. %1$s: its name there -->
+    <string name="jolly_home_missing">%1$s não está no Home Assistant. Mantenha o botão pressionado para escolher outra coisa.</string>
+    <!-- Home Assistant can't reach the thing now (its state is "unavailable"): nothing was sent -->
+    <string name="jolly_home_unavailable">%1$s não está disponível no Home Assistant agora.</string>
+    <!-- A lock, after the key's command: it says it's stuck -->
+    <string name="jolly_lock_jammed">%1$s: a fechadura está emperrada.</string>
+    <!-- A lock still as it was 10 seconds after being told to open, or to close -->
+    <string name="jolly_lock_still_locked">%1$s: a fechadura continua trancada.</string>
+    <string name="jolly_lock_still_unlocked">%1$s: a fechadura continua destrancada.</string>
+    <!-- A lock still on its way, or silent, 10 seconds after the command -->
+    <string name="jolly_lock_no_news">%1$s ainda não disse se funcionou.</string>
     <!-- A lock, at the first tap. %1$s: its name in Home Assistant -->
     <string name="jolly_confirm_unlock">Destrancar %1$s? Toque no botão de novo em até 3 segundos.</string>
     <!-- %1$s: the place's name or the place, %2$s: the map app -->

@@ -199,6 +199,44 @@ internal object HomeActs {
 }
 
 /**
+ * What Home Assistant's word on a thing means for the Jolly key: before its command, and after a lock's.
+ * Home Assistant answers "done" to a command even for a thing it doesn't have or can't reach (it skips
+ * it without a word), so the key looks at the thing's state rather than at that answer.
+ */
+internal object HomeChecks {
+    enum class Before { GO, MISSING, UNAVAILABLE }
+
+    /**
+     * [state] before the command; null where Home Assistant doesn't have the thing. "unavailable": the
+     * device can't be reached, and the command would be skipped. "unknown" goes ahead: a scene or a
+     * button never used yet, or a gate without a sensor, which still do what they're told.
+     */
+    fun before(state: String?): Before = when (state) {
+        null -> Before.MISSING
+        "unavailable" -> Before.UNAVAILABLE
+        else -> Before.GO
+    }
+
+    enum class After { DONE, JAMMED, STILL_LOCKED, STILL_UNLOCKED, NO_NEWS }
+
+    /** A lock's [state] after [act]: done, jammed, still as it was, or not there yet (on its way, or silent). */
+    fun after(act: HomeAct, state: String?): After = when {
+        state == "jammed" -> After.JAMMED
+        act == HomeAct.UNLOCK && state in OPEN -> After.DONE
+        act == HomeAct.LOCK && state == "locked" -> After.DONE
+        act == HomeAct.UNLOCK && state == "locked" -> After.STILL_LOCKED
+        act == HomeAct.LOCK && state in OPEN -> After.STILL_UNLOCKED
+        else -> After.NO_NEWS
+    }
+
+    /** Whether the wait for a lock is over: it did it, or it's jammed. */
+    fun settled(act: HomeAct, state: String?): Boolean = after(act, state).let { it == After.DONE || it == After.JAMMED }
+
+    /** A lock that's open: unlocked, or with its latch open too where it can. */
+    private val OPEN = setOf("unlocked", "open")
+}
+
+/**
  * The second tap a command that lets someone in waits for (see [HomeActs.confirms]): the first tap
  * arms it, a second between [minMs] and [windowMs] later goes ahead. One sooner is a double tap made
  * before the question could be read, or a finger that bounced: it's let go, and the question stays.

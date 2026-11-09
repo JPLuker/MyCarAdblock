@@ -436,17 +436,17 @@ private fun DockAssistant() {
 
 /**
  * The Jolly key: the one command the driver picked for it (see [Jolly]), a tap away; held, the chooser,
- * which a tap opens too while nothing is picked. Lit while the chooser is up, or while a lock waits
- * for its second tap.
+ * which a tap opens too while nothing is picked. Lit while the chooser is up, while a lock waits
+ * for its second tap, and while a Home Assistant command runs.
  */
 @Composable
 private fun DockJolly(navigator: CarNavigator, entries: List<Entry>, running: Map<String, RunningSlot>, frame: CarEnvironment.Frame) {
     val action by JollySetting.action.collectAsState()
-    val armed by Jolly.armed.collectAsState()
+    val lit by Jolly.lit.collectAsState()
     val context = LocalContext.current
     val name = stringResource(R.string.jolly_name)
     DockItem(
-        selected = armed || navigator.current == CarScreen.Jolly,
+        selected = lit || navigator.current == CarScreen.Jolly,
         onClick = { Jolly.tap(context, navigator, entries, running, frame) },
         description = action?.let { stringResource(R.string.jolly_does, name, Jolly.title(context, it)) } ?: name,
         onLongClick = {

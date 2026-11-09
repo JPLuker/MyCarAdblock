@@ -15,7 +15,11 @@ import io.github.sirionero.mycar.Words
 import io.github.sirionero.mycar.call.CallUiState
 import io.github.sirionero.mycar.call.CarCalls
 import io.github.sirionero.mycar.home.HaClient
+import io.github.sirionero.mycar.home.HaException
 import io.github.sirionero.mycar.home.HomeAssistant
+import io.github.sirionero.mycar.home.Seen
+import io.github.sirionero.mycar.home.stateOrNull
+import io.github.sirionero.mycar.home.watchEntity
 import io.github.sirionero.mycar.speech.VoiceLanguage
 import io.github.sirionero.mycar.speech.VoiceLanguages
 import kotlinx.coroutines.CancellationException
@@ -25,8 +29,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -73,10 +79,17 @@ internal object Jolly {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val second = SecondTap(CONFIRM_MS, CONFIRM_MIN_MS)
     private val repeats = RepeatGuard(REPEAT_QUIET_MS)
-    private val armedFlow = MutableStateFlow(false)
+    /** A lock waits for its second tap, a Home Assistant command runs (a lock until it says it's done). */
+    private var asking = false
+    private var working = false
+    private val litFlow = MutableStateFlow(false)
 
-    /** A lock waits for its second tap: the key is lit meanwhile. */
-    val armed: StateFlow<Boolean> = armedFlow.asStateFlow()
+    /** Lit while a lock waits for its second tap, and while a Home Assistant command runs. */
+    val lit: StateFlow<Boolean> = litFlow.asStateFlow()
+
+    private fun relight() {
+        litFlow.value = asking || working
+    }
 
     /**
      * The key tapped (on the main thread): the command runs, or with none picked yet the chooser
@@ -113,7 +126,8 @@ internal object Jolly {
     /** The second tap a lock waited for isn't coming: a new choice, or the chooser opened. */
     fun disarm() {
         second.disarm()
-        armedFlow.value = false
+        asking = false
+        relight()
     }
 
     /** Through Telecom, as the dialer calls: the call's own card comes up on the car. */
@@ -157,7 +171,12 @@ internal object Jolly {
         )
     }
 
-    /** On the drive's connection to Home Assistant (Plancia inside myCar), with what came of it as a toast. */
+    /**
+     * On the drive's connection to Home Assistant (Plancia inside myCar), with what came of it as a toast.
+     * Home Assistant answers "done" even for a thing it doesn't have or can't reach, so the thing's state
+     * is asked first (missing or unavailable: nothing is sent), and a lock is watched until it says it did
+     * it (or, after [LOCK_WAIT_MS], how it was left).
+     */
     private fun home(action: JollyAction.Home) {
         if (!HomeAssistant.config.value.isComplete) {
             toast(Words.get(R.string.jolly_home_not_set))
@@ -177,15 +196,18 @@ internal object Jolly {
         }
         if (HomeActs.confirms(action.act) && !confirmed(action.name)) return
         if (!repeats.start(key, SystemClock.uptimeMillis())) return
+        working = true
+        relight()
         scope.launch {
             try {
-                client.command("call_service") {
-                    put("domain", domain)
-                    put("service", service)
-                    put("target", JSONObject().put("entity_id", action.entity))
-                }
-                MyCarLog.i("jolly: Home Assistant ran $domain.$service")
-                toast(Words.get(R.string.jolly_home_done, action.name))
+                val outcome = client.watchEntity(action.entity) { seen -> runWatched(client, action, domain, service, seen) }
+                    // A Home Assistant too old to say one thing's state: the command alone, as before.
+                    ?: run {
+                        callService(client, domain, service, action.entity)
+                        HomeOutcome.DONE
+                    }
+                MyCarLog.i("jolly: Home Assistant $domain.$service - ${outcome.name.lowercase()}")
+                toast(Words.get(outcome.text, action.name))
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -194,7 +216,49 @@ internal object Jolly {
                 toast(Words.get(R.string.jolly_home_failed, action.name, e.message.orEmpty()))
             } finally {
                 repeats.end(key, SystemClock.uptimeMillis())
+                working = false
+                relight()
             }
+        }
+    }
+
+    /** What came of a Home Assistant command, as the car says it (each text takes the thing's name). */
+    private enum class HomeOutcome(@StringRes val text: Int) {
+        DONE(R.string.jolly_home_done),
+        MISSING(R.string.jolly_home_missing),
+        UNAVAILABLE(R.string.jolly_home_unavailable),
+        JAMMED(R.string.jolly_lock_jammed),
+        STILL_LOCKED(R.string.jolly_lock_still_locked),
+        STILL_UNLOCKED(R.string.jolly_lock_still_unlocked),
+        NO_NEWS(R.string.jolly_lock_no_news),
+    }
+
+    /** The command, sent only to a thing that's there and reachable; a lock then watched (see [HomeChecks]). */
+    private suspend fun runWatched(client: HaClient, action: JollyAction.Home, domain: String, service: String, seen: StateFlow<Seen>): HomeOutcome {
+        val first = withTimeoutOrNull(STATE_MS) { seen.first { it != Seen.Waiting } }
+            ?: throw HaException(Words.get(R.string.ha_not_answering), HaException.Reason.NO_RESPONSE)
+        when (HomeChecks.before(first.stateOrNull)) {
+            HomeChecks.Before.MISSING -> return HomeOutcome.MISSING
+            HomeChecks.Before.UNAVAILABLE -> return HomeOutcome.UNAVAILABLE
+            HomeChecks.Before.GO -> Unit
+        }
+        callService(client, domain, service, action.entity)
+        if (action.act != HomeAct.LOCK && action.act != HomeAct.UNLOCK) return HomeOutcome.DONE
+        val last = withTimeoutOrNull(LOCK_WAIT_MS) { seen.first { HomeChecks.settled(action.act, it.stateOrNull) } } ?: seen.value
+        return when (HomeChecks.after(action.act, last.stateOrNull)) {
+            HomeChecks.After.DONE -> HomeOutcome.DONE
+            HomeChecks.After.JAMMED -> HomeOutcome.JAMMED
+            HomeChecks.After.STILL_LOCKED -> HomeOutcome.STILL_LOCKED
+            HomeChecks.After.STILL_UNLOCKED -> HomeOutcome.STILL_UNLOCKED
+            HomeChecks.After.NO_NEWS -> HomeOutcome.NO_NEWS
+        }
+    }
+
+    private suspend fun callService(client: HaClient, domain: String, service: String, entity: String) {
+        client.command("call_service") {
+            put("domain", domain)
+            put("service", service)
+            put("target", JSONObject().put("entity_id", entity))
         }
     }
 
@@ -205,7 +269,8 @@ internal object Jolly {
     private fun confirmed(name: String): Boolean {
         when (second.tap(SystemClock.uptimeMillis())) {
             SecondTap.Tap.GO -> {
-                armedFlow.value = false
+                asking = false
+                relight()
                 return true
             }
             SecondTap.Tap.TOO_SOON -> {
@@ -214,9 +279,15 @@ internal object Jolly {
             }
             SecondTap.Tap.ARMED -> Unit
         }
-        armedFlow.value = true
+        asking = true
+        relight()
         toast(Words.get(R.string.jolly_confirm_unlock, name), CarToast.LENGTH_SHORT)
-        main.postDelayed({ if (!second.armed(SystemClock.uptimeMillis())) armedFlow.value = false }, CONFIRM_MS + 100)
+        main.postDelayed({
+            if (!second.armed(SystemClock.uptimeMillis())) {
+                asking = false
+                relight()
+            }
+        }, CONFIRM_MS + 100)
         return false
     }
 
@@ -327,4 +398,8 @@ internal object Jolly {
 
     /** How long after a Home Assistant command a tap on the key is still that same press. */
     private const val REPEAT_QUIET_MS = 1_000L
+
+    /** How long Home Assistant has to say a thing's state, and a lock to say it did what it was told. */
+    private const val STATE_MS = 5_000L
+    private const val LOCK_WAIT_MS = 10_000L
 }

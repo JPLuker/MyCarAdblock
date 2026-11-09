@@ -184,6 +184,40 @@ class JollyActionTest {
         assertFalse(guard.busy("cover.garage/toggle", 11_100))
     }
 
+    @Test
+    fun homeAssistantsWordOnAThingBeforeItsCommand() {
+        assertEquals(HomeChecks.Before.MISSING, HomeChecks.before(null))
+        assertEquals(HomeChecks.Before.UNAVAILABLE, HomeChecks.before("unavailable"))
+        assertEquals(HomeChecks.Before.GO, HomeChecks.before("off"))
+        assertEquals(HomeChecks.Before.GO, HomeChecks.before("locked"))
+        // A scene or a button never used yet, a gate without a sensor: they still work.
+        assertEquals(HomeChecks.Before.GO, HomeChecks.before("unknown"))
+        assertEquals(HomeChecks.Before.GO, HomeChecks.before("2026-11-09T19:35:55+00:00"))
+    }
+
+    @Test
+    fun aLockSaysWhetherItDidIt() {
+        val open = HomeAct.UNLOCK
+        val close = HomeAct.LOCK
+        assertEquals(HomeChecks.After.DONE, HomeChecks.after(open, "unlocked"))
+        assertEquals(HomeChecks.After.DONE, HomeChecks.after(open, "open"))
+        assertEquals(HomeChecks.After.STILL_LOCKED, HomeChecks.after(open, "locked"))
+        assertEquals(HomeChecks.After.NO_NEWS, HomeChecks.after(open, "unlocking"))
+        assertEquals(HomeChecks.After.JAMMED, HomeChecks.after(open, "jammed"))
+        assertEquals(HomeChecks.After.DONE, HomeChecks.after(close, "locked"))
+        assertEquals(HomeChecks.After.STILL_UNLOCKED, HomeChecks.after(close, "unlocked"))
+        assertEquals(HomeChecks.After.NO_NEWS, HomeChecks.after(close, "locking"))
+        assertEquals(HomeChecks.After.JAMMED, HomeChecks.after(close, "jammed"))
+        assertEquals(HomeChecks.After.NO_NEWS, HomeChecks.after(close, "unavailable"))
+        assertEquals(HomeChecks.After.NO_NEWS, HomeChecks.after(close, null))
+        // The wait ends when it did it or got stuck, not while it's on its way.
+        assertTrue(HomeChecks.settled(open, "unlocked"))
+        assertTrue(HomeChecks.settled(open, "jammed"))
+        assertFalse(HomeChecks.settled(open, "locked"))
+        assertFalse(HomeChecks.settled(open, "unlocking"))
+        assertFalse(HomeChecks.settled(close, "unlocked"))
+    }
+
     /**
      * The ready-made commands the car's chooser offers (strings_jolly.xml, in every language): each
      * one is a phrase myCar's assistant takes for the command it stands for.
