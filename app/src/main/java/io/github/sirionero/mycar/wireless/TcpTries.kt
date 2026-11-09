@@ -5,8 +5,9 @@ package io.github.sirionero.mycar.wireless
  * here: TcpTriesTest.
  *
  * The tries go on for a minute because a car can open its port well after its Wi-Fi comes, with its
- * Bluetooth channel open. Not once nothing they try can reach the car: then the start-up starts over
- * at once, with a new channel, a new StartRequest and a new network.
+ * Bluetooth channel open. Once nothing they try can lead to the car any more - its network gone, or
+ * the port it gave gone with a restart - the start-up starts over at once, with a new channel, a new
+ * StartRequest and a new network.
  */
 internal object TcpTries {
 
