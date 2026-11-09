@@ -2,6 +2,7 @@ package io.github.sirionero.mycar.car
 
 import android.content.Context
 import android.os.Bundle
+import android.os.SystemClock
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import androidx.annotation.PluralsRes
@@ -45,9 +46,12 @@ object DirectionsVoice {
     private enum class Stage { FAR, PREPARED, DONE }
 
     private var appContext: Context? = null
-    private var tts: TextToSpeech? = null
+    @Volatile private var tts: TextToSpeech? = null
     @Volatile private var ttsReady = false
     @Volatile private var ttsFailed = false
+    /** When the engine was last made (elapsed clock), and which one it is: an older one's answer counts for nothing. */
+    @Volatile private var ttsStartedAt = 0L
+    private var engineNumber = 0
     /** The language the voice was last set to, so it's set again only when myCar's changes. */
     @Volatile private var voiceIn: Locale? = null
     private val pending = ConcurrentHashMap<String, CountDownLatch>()
@@ -64,15 +68,28 @@ object DirectionsVoice {
 
     fun init(context: Context) {
         // Started again, at the next drive, after a start that failed (no engine on the phone yet,
-        // or the engine updating just then): otherwise no turn was spoken until myCar's process went.
-        if (tts != null && !ttsFailed) return
+        // or the engine updating just then) or never answered: otherwise no turn was spoken until
+        // myCar's process went. Inside a drive, the turns do it ([restartIfDue]).
+        if (tts != null && !SpeechRestart.due(ttsReady, ttsFailed, ttsStartedAt, SystemClock.elapsedRealtime())) return
+        appContext = context.applicationContext
+        start()
+    }
+
+    /** Makes the phone's engine, the first time or anew; on the main thread. */
+    private fun start() {
         tts?.shutdown()
         voiceIn = null
-        appContext = context.applicationContext
+        ttsReady = false
+        ttsFailed = false
+        ttsStartedAt = SystemClock.elapsedRealtime()
+        val mine = ++engineNumber
         tts = TextToSpeech(appContext) { status ->
-            ttsReady = status == TextToSpeech.SUCCESS
-            ttsFailed = !ttsReady
-            if (ttsFailed) MyCarLog.w("guidance: text-to-speech didn't start (status $status) - trying again next drive")
+            // An engine made again meanwhile: what this one says is no news of it.
+            if (mine == engineNumber) {
+                ttsReady = status == TextToSpeech.SUCCESS
+                ttsFailed = !ttsReady
+                if (ttsFailed) MyCarLog.w("guidance: text-to-speech didn't start (status $status) - trying again later")
+            }
         }.apply {
             setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) {}
@@ -242,7 +259,7 @@ object DirectionsVoice {
         val engine = tts ?: return
         val context = appContext ?: return
         val sink = link ?: return
-        if (!ttsReady) {
+        if (restartIfDue() || !ttsReady) {
             MyCarLog.w("guidance: text-to-speech isn't ready, $what went unspoken")
             return
         }
@@ -261,9 +278,10 @@ object DirectionsVoice {
             pending.remove(utterance)
             refusedNow = true
             // The engine went away mid-drive (updated in the background: Android never binds it
-            // again): made anew at the next drive. Not for a text too long for any engine.
+            // again): made anew at a later turn ([restartIfDue]) or the next drive. Not for a text
+            // too long for any engine.
             if (text.length < TextToSpeech.getMaxSpeechInputLength()) {
-                MyCarLog.w("guidance: text-to-speech refused to speak - starting it again next drive")
+                MyCarLog.w("guidance: text-to-speech refused to speak - it will be started again")
                 ttsFailed = true
             }
             return
@@ -383,6 +401,22 @@ object DirectionsVoice {
             repeat(channels) { out.putShort(s) }
         }
         return out.array()
+    }
+
+    /**
+     * The engine made again when it can't speak and its last start has had its time ([SpeechRestart]):
+     * a start that never answered or said no, an engine that refused (updated in the background).
+     * On the speaker's thread; the engine is made on the main one. True while it's being made: this
+     * turn goes unspoken, the next ones not.
+     */
+    private fun restartIfDue(): Boolean {
+        if (!SpeechRestart.due(ttsReady, ttsFailed, ttsStartedAt, SystemClock.elapsedRealtime())) return false
+        // Marked here, at once: the next turn neither starts it a second time nor speaks with the one going.
+        ttsStartedAt = SystemClock.elapsedRealtime()
+        ttsReady = false
+        MyCarLog.i("guidance: starting text-to-speech again")
+        main.post(::start)
+        return true
     }
 
     /** The last text [play] gave the engine was refused (read on the speaker's thread, right after). */

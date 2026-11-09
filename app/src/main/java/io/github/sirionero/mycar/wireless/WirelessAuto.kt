@@ -39,6 +39,8 @@ object WirelessAuto {
     private const val ANSWERED = "answered:"
     /** Cars that called the phone's Android Auto service, rather than publishing one of their own. */
     private const val CALLS = "calls:"
+    /** A car that wants the Wi-Fi channel type back in the VersionResponse (WirelessVersion), by address. */
+    private const val CHANNEL_TYPE = "channel_type:"
     /** A car whose Bluetooth comes and goes opens myCar once, not at every flicker. */
     private const val SETTLE_MS = 15_000L
     /** A dialog that never showed (myCar wasn't on screen) gets no answer: asked again after this. */
@@ -180,7 +182,7 @@ object WirelessAuto {
         val adapter = context.getSystemService(BluetoothManager::class.java)?.adapter
         val named = context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
         return addresses.map { address ->
-            (if (named) adapter?.let { runCatching { it.getRemoteDevice(address.uppercase(java.util.Locale.ROOT)).name }.getOrNull() } else null) ?: address
+            (if (named) adapter?.let { runCatching { WirelessLink.shownName(it.getRemoteDevice(address.uppercase(java.util.Locale.ROOT))) }.getOrNull() } else null) ?: address
         }
     }
 
@@ -203,6 +205,17 @@ object WirelessAuto {
 
     fun rememberCalls(context: Context, address: String, calls: Boolean) {
         prefs(context).edit().putBoolean(CALLS + address.uppercase(java.util.Locale.ROOT), calls).apply()
+    }
+
+    /**
+     * Whether the car at [address] went quiet after a VersionResponse without the Wi-Fi channel type
+     * in it (WirelessVersion): from then on its replies have it.
+     */
+    fun wantsChannelType(context: Context, address: String): Boolean =
+        prefs(context).getBoolean(CHANNEL_TYPE + address.uppercase(java.util.Locale.ROOT), false)
+
+    fun rememberWantsChannelType(context: Context, address: String) {
+        prefs(context).edit().putBoolean(CHANNEL_TYPE + address.uppercase(java.util.Locale.ROOT), true).apply()
     }
 
     /** The driver allowed it in Android's dialog. */

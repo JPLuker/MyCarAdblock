@@ -38,6 +38,13 @@ class AudioLink(
     /** The car took the sound back after giving it, as when the driver switches to the radio. */
     private val onTakenBack: () -> Unit = {},
     /**
+     * The car takes its speakers for a moment (a call on the car, its own voice or announcements)
+     * while the phone's music streams: the music, which would play on unheard, is paused; and the
+     * car gives them back ([onGivenBack]): what was paused plays again.
+     */
+    private val onPausedForNow: () -> Unit = {},
+    private val onGivenBack: () -> Unit = {},
+    /**
      * Whether a player is really playing on the phone - not a map's voice, a web page or the
      * assistant, which have none: only a player's sound takes the car's speakers from its own
      * source ([listenForPlayback]).
@@ -61,6 +68,8 @@ class AudioLink(
      * Bluetooth - and will give them back: the stream waits, the focus still asked for.
      */
     @Volatile private var heldBack = false
+    /** Held back while streaming, and the phone's music paused for it ([onPausedForNow]) until the car's GAIN. */
+    @Volatile private var pausedForNow = false
     /** While the car isn't taking the sound: how much quiet, then sound, the capture has had (see [listenForPlayback]). */
     private var quietBytes = 0L
     private var soundBytes = 0L
@@ -338,11 +347,27 @@ class AudioLink(
                 focusGranted = true
                 heldBack = false
                 startStream()
+                // The car's moment is over: the music paused for it plays again.
+                if (pausedForNow) {
+                    pausedForNow = false
+                    MyCarLog.i("$tag: the car gave the speakers back - playing again what was paused")
+                    onGivenBack()
+                }
             }
             FOCUS_STATE_LOSS_TRANSIENT_CAN_DUCK -> Unit
             FOCUS_STATE_LOSS_TRANSIENT, FOCUS_STATE_GAIN_TRANSIENT_GUIDANCE_ONLY -> {
+                // The car takes back for a moment speakers it had given the music, streaming - not its
+                // answer to the music's question, nor a second word for the same moment.
+                val had = focusGranted && started
                 focusGranted = false
                 hold()
+                // The phone's music would go on unheard, its seconds lost (a podcast's words with them):
+                // paused until the car gives the speakers back.
+                if (state == FOCUS_STATE_LOSS_TRANSIENT && had && heldBack) {
+                    pausedForNow = true
+                    MyCarLog.i("$tag: the car has the speakers for a moment - pausing what plays on the phone")
+                    onPausedForNow()
+                }
             }
             else -> {
                 val had = started || focusRequested || heldBack
@@ -455,6 +480,8 @@ class AudioLink(
         if (!streaming && !focusRequested) return
         started = false
         heldBack = false
+        // No GAIN comes after this: nothing paused for the car's moment plays again by itself.
+        pausedForNow = false
         synchronized(ackLock) { ackLock.notifyAll() }
         runCatching {
             if (streaming) sendOnChannel(MSG_STOP, Protobuf.varintField(1, sessionId.toLong()))

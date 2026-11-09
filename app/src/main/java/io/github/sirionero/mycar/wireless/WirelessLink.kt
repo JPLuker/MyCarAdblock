@@ -237,15 +237,23 @@ object WirelessLink {
     /** The car ended the session on Wi-Fi with the channel still open: the car's network goes with the channel. */
     private var releaseWithChannel = false
 
-    /** Paired Bluetooth devices, cars or not: the driver picks theirs. Needs BLUETOOTH_CONNECT. */
+    /** Paired Bluetooth devices, cars or not: the driver picks theirs, by the name shown. Needs BLUETOOTH_CONNECT. */
     @SuppressLint("MissingPermission")
     fun pairedDevices(context: Context): List<BluetoothDevice> =
         context.getSystemService(BluetoothManager::class.java)?.adapter?.bondedDevices
-            ?.sortedBy { it.name ?: it.address }
+            ?.sortedBy { shownName(it) }
             .orEmpty()
 
+    /** The device's own name, for the log: an alias the driver gave it may hold a person's name. */
     @SuppressLint("MissingPermission")
     fun name(device: BluetoothDevice): String = device.name ?: device.address
+
+    /**
+     * The name the driver knows the device by, for the screen: the one given in Android's Bluetooth
+     * settings (its alias), else its own. Never in the log ([name] is).
+     */
+    @SuppressLint("MissingPermission")
+    fun shownName(device: BluetoothDevice): String = device.alias ?: device.name ?: device.address
 
     /**
      * [byItself]: the car came up over Bluetooth and myCar connects with no tap (see [WirelessAuto]).
@@ -398,7 +406,7 @@ object WirelessLink {
                     // Only for a start that never reached a session: one on the car's Wi-Fi has said
                     // its own reason already (MyCarRunner: the certificate, the car's date), and this
                     // took its place, blaming the car's Bluetooth.
-                    car?.let { SessionStatus.failed(R.string.wireless_link_bt_no_car, R.string.wireless_link_bt_no_car_detail, name(it)) }
+                    car?.let { SessionStatus.failed(R.string.wireless_link_bt_no_car, R.string.wireless_link_bt_no_car_detail, shownName(it)) }
                 }
             }
         }
@@ -579,9 +587,11 @@ object WirelessLink {
     @SuppressLint("MissingPermission")
     private fun run(context: Context, device: BluetoothDevice, mine: Int, byItself: Boolean) {
         val name = name(device)
+        // On the phone's screen, the car's name as the driver knows it.
+        val shown = shownName(device)
         // The car's Bluetooth address only in the debug build: logs get shared, in public too.
         log.i("--- wireless start-up with $name (${if (BuildConfig.DEBUG) device.address else "…" + device.address.takeLast(5)}) ---")
-        if (!quiet) SessionStatus.connecting(R.string.wireless_link_bt_reaching, name)
+        if (!quiet) SessionStatus.connecting(R.string.wireless_link_bt_reaching, shown)
         val listenMs = when {
             quiet -> AGAIN_LISTEN_MS
             byItself -> AUTO_LISTEN_MS
@@ -618,7 +628,7 @@ object WirelessLink {
             SessionStatus.failed(
                 R.string.wireless_link_bt_permission,
                 R.string.wireless_link_bt_permission_detail,
-                name,
+                shown,
             )
             return
         } catch (e: IOException) {
@@ -653,7 +663,7 @@ object WirelessLink {
         log.i("Bluetooth: channel open")
         channelOpenedAt = SystemClock.elapsedRealtime()
         quickChannel = quick
-        if (mine == startRun) SessionStatus.connecting(R.string.wireless_link_bt_talking, name)
+        if (mine == startRun) SessionStatus.connecting(R.string.wireless_link_bt_talking, shown)
         // A car whose Android Auto isn't ready yet can take the channel and say nothing: the start-up
         // stayed on "talking to the car" for good, holding the drive's service, and every arrival of
         // the car after it was taken for a drive under way. Closed, it starts over (channelEnded).
@@ -671,6 +681,11 @@ object WirelessLink {
         var waitingJoin: ((String, Int) -> Unit)? = null
         // The car closed the channel (not myCar).
         var byCar = false
+        // The car's VersionRequest answered, whether with the Wi-Fi channel type, and whether the car went
+        // on after it (its StartRequest or Wi-Fi details): one that didn't may want the type (WirelessVersion).
+        var answered = false
+        var gaveChannelType = false
+        var wentOn = false
         try {
             while (!Thread.currentThread().isInterrupted) {
                 val length = input.readUnsignedShort()
@@ -680,24 +695,23 @@ object WirelessLink {
                     MSG_VERSION_REQUEST -> {
                         log.i("<- VersionRequest")
                         log.hex("   version", body)
-                        // Laid out the way a real phone's reply is (aa-proxy-rs and LIVI both
-                        // parse it from real phones): 1 and 2 the version, echoing the car's;
-                        // 3 a serial; 4 the status; 6 the device's ids.
                         val f = Wire.fields(body)
-                        val serial = deviceId(context)
-                        val ids = Protobuf.stringField(1, serial) + Protobuf.stringField(2, UUID.randomUUID().toString())
-                        val reply = Protobuf.varintField(1, Wire.varint(f, 1) ?: 1) +
-                            Protobuf.varintField(2, Wire.varint(f, 2) ?: 0) +
-                            Protobuf.stringField(3, serial) +
-                            Protobuf.varintField(4, STATUS_SUCCESS) +
-                            Protobuf.varint(((6 shl 3) or 2).toLong()) + Protobuf.varint(ids.size.toLong()) + ids
+                        // The Wi-Fi channel type back only to a car that went quiet without it (WirelessVersion).
+                        val withType = WirelessAuto.wantsChannelType(context, device.address) && Wire.varint(f, 3) != null
+                        val reply = WirelessVersion.reply(body, deviceId(context), UUID.randomUUID().toString(), withType)
                         send(output, MSG_VERSION_RESPONSE, reply)
+                        answered = true
+                        gaveChannelType = withType
                         log.i("-> VersionResponse")
                         // With the phone's id (its serial, twice) only in the debug build: logs get shared.
                         if (BuildConfig.DEBUG) log.hex("   reply", reply)
-                        else log.i("   reply: version ${Wire.varint(f, 1) ?: 1}.${Wire.varint(f, 2) ?: 0}, status $STATUS_SUCCESS (the phone's id left out)")
+                        else log.i(
+                            "   reply: version ${Wire.varint(f, 1) ?: 1}.${Wire.varint(f, 2) ?: 0}, status $STATUS_SUCCESS" +
+                                (if (withType) ", Wi-Fi channel type ${Wire.varint(f, 3)}" else "") + " (the phone's id left out)",
+                        )
                     }
                     MSG_START_REQUEST -> {
+                        wentOn = true
                         val f = Wire.fields(body)
                         val ip = f.firstOrNull { it.number == 1 && it.wireType == 2 }?.bytes?.decodeToString().orEmpty()
                         val port = Wire.varint(f, 2)?.toInt() ?: 0
@@ -714,6 +728,7 @@ object WirelessLink {
                     }
                     MSG_INFO_RESPONSE -> {
                         wifiDetails = true
+                        wentOn = true
                         val f = Wire.fields(body)
                         fun text(n: Int) = f.firstOrNull { it.number == n && it.wireType == 2 }?.bytes?.decodeToString().orEmpty()
                         val ssid = text(1)
@@ -737,7 +752,7 @@ object WirelessLink {
                             log.i("InfoResponse again for \"$ssid\", which the drive is on - ignoring it")
                             continue
                         }
-                        val join = { ip: String, port: Int -> joinWifi(context, output, name, ssid, password, bssid, ip, port, mine) }
+                        val join = { ip: String, port: Int -> joinWifi(context, output, shown, ssid, password, bssid, ip, port, mine) }
                         val known = target
                         if (known != null) {
                             join(known.first, known.second)
@@ -763,6 +778,12 @@ object WirelessLink {
                 byCar = true
             }
         } finally {
+            // Nothing more from the car after the VersionResponse: a strict car (Gearslip: Toyota's) may
+            // wait for the Wi-Fi channel type in it. It gets it from the next try on, a start-over too.
+            if (mine == startRun && WirelessVersion.wantsChannelType(answered, wentOn, byCar, gaveChannelType, afterDrive = quiet)) {
+                WirelessAuto.rememberWantsChannelType(context, device.address)
+                log.i("Bluetooth: $name said nothing more after the VersionResponse - from now on it gets the Wi-Fi channel type in it")
+            }
             channelEnded(context, mine, byCar)
         }
     }
@@ -806,7 +827,7 @@ object WirelessLink {
             if (listener === server) listener = null
             return null
         }
-        if (!quiet) SessionStatus.connecting(R.string.wireless_link_bt_waiting, name)
+        if (!quiet) SessionStatus.connecting(R.string.wireless_link_bt_waiting, shownName(device))
         log.i("Bluetooth: Android Auto service published, waiting ${listenMs / 1000}s for $name")
         // The first channel either way wins; the other is closed. [WaitOver] once the wait has ended.
         val won = java.util.concurrent.atomic.AtomicReference<Any?>(null)
@@ -905,7 +926,7 @@ object WirelessLink {
             SessionStatus.failed(
                 R.string.wireless_link_bt_no_car,
                 R.string.wireless_link_bt_no_car_detail,
-                name,
+                shownName(device),
             )
             null
         } finally {

@@ -1,0 +1,34 @@
+package io.github.sirionero.mycar
+
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import java.io.ByteArrayOutputStream
+
+/**
+ * myCar's icon as the PNGs a phone hands the car in its ServiceDiscoveryRequest, at the 32, 64 and
+ * 128 px a phone with Android Auto sends. Only cars on protocol 1.0 and 1.1 get them (see
+ * [DiscoveryRequest]): they wait for them before answering at all.
+ */
+object PhoneIcons {
+
+    private val SIZES = intArrayOf(32, 64, 128)
+
+    @Volatile private var cached: List<ByteArray>? = null
+
+    /** The three PNGs, smallest first; empty if the icon can't be drawn. */
+    fun pngs(context: Context): List<ByteArray> = cached ?: runCatching {
+        val icon = context.packageManager.getApplicationIcon(context.applicationInfo).mutate()
+        SIZES.map { size ->
+            val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+            icon.setBounds(0, 0, size, size)
+            icon.draw(Canvas(bitmap))
+            val png = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, png)
+            bitmap.recycle()
+            png.toByteArray()
+        }
+    }.onFailure { MyCarLog.w("phone icons: couldn't draw them (${it.javaClass.simpleName})") }
+        .getOrDefault(emptyList())
+        .also { if (it.isNotEmpty()) cached = it }
+}

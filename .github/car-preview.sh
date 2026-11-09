@@ -55,7 +55,7 @@ WAIT="-100,-100"       # a tap off the screen: only gives an app time before the
 
 # shoot <name> <width> <height> <dpi> <taps "x,y;x,y" in screen pixels> [command, run 5s in]
 # EXTRA adds intent extras for the preview activity; BEFORE is a command run just before it starts;
-# LOGTAGS, more log tags to keep besides myCar's.
+# LOGTAGS, more log tags to keep besides myCar's; KEEP_FILES keeps the shot before's files (its log).
 # ONLY (the workflow's "shots" input) names the shots to take, all of them when empty.
 shoot() {
     case " ${ONLY:-$1} " in *" $1 "*) ;; *) return ;; esac
@@ -65,7 +65,7 @@ shoot() {
     fi
     adb shell am force-stop "$PKG"
     for p in $VELA $PLANCIA $XONOS; do adb shell am force-stop "$p"; done
-    adb shell rm -rf "$FILES" 2>/dev/null
+    [ -n "${KEEP_FILES:-}" ] || adb shell rm -rf "$FILES" 2>/dev/null
     adb logcat -c
     # The log as it comes, kept only if the emulator is gone by the end of the shot.
     mkdir -p "previews/$1"
@@ -123,10 +123,13 @@ alive() {
 # ended - the signal, the crashing thread's frames - as a drive's log would after a crash.
 EXTRA="--ei crashAfterMs 5000" shoot last-exit-crash 800 480 160 "$WAIT;$WAIT;$WAIT"
 alive last-exit-crash
-shoot last-exit 800 480 160 "$WAIT"
+# The crashed shot's log stays (its pictures go): the new run also writes how it ended at its foot.
+KEEP_FILES=1 BEFORE="adb shell 'rm -f $FILES/preview-*.png'" shoot last-exit 800 480 160 "$WAIT"
 case " ${ONLY:-last-exit} " in *" last-exit "*)
     echo "--- last-exit: how the shot before ended, in myCar's log ---"
-    grep -h "last exit" previews/last-exit/log.txt 2>/dev/null | cut -c1-250 | head -50 || echo "last-exit: nothing" ;;
+    grep -h "last exit" previews/last-exit/log.txt 2>/dev/null | cut -c1-250 | head -50 || echo "last-exit: nothing"
+    echo "--- last-exit: the same at the foot of the crashed run's own log ---"
+    grep -h "Android ended this run" previews/last-exit/mycar-*.log 2>/dev/null | cut -c1-250 | head -5 || true ;;
 esac
 
 # The hunt for "LayoutNode should be attached to an owner": scripted shots, only when named (crash-*).
@@ -559,6 +562,18 @@ EXTRA="--ez wallpapers true" shoot wallpapers 1920 720 240 "$WAIT;$WAIT"
 # The player docked beside the map, playing a made-up song (the emulator has none of its own).
 EXTRA="--ez player true" shoot player 1920 720 240 "$WAIT"
 EXTRA="--ez player true" shoot player-800x480 800 480 160 "$WAIT"
+
+# An app's alert across the top of the car's screen (CarAlerts; --ez alert true puts up one like
+# Waze's question about a hazard, 12 s long, with a blue button and a neutral one). At 1920x720
+# "Still there" is tapped, at 800x480 its time runs out, and once with the light theme. The log
+# says what the app was told.
+EXTRA="--ez alert true" shoot alert 1920 720 240 "$WAIT;800,200;$WAIT"
+EXTRA="--ez alert true" shoot alert-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez alert true --es carTheme LIGHT" shoot alert-light 1920 720 240 "$WAIT"
+case " ${ONLY:-alert} " in *" alert "*|*" alert-800x480 "*)
+    echo "--- alert: the button tapped and the time run out, as the app was told ---"
+    grep -h "alert" previews/alert/log.txt previews/alert-800x480/log.txt 2>/dev/null | cut -c1-200 | head -20 || echo "alert: nothing" ;;
+esac
 
 # An incoming call from an unknown number, rung on the emulator's modem once the car UI is up.
 shoot call 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT" "adb emu gsm call 3331234567"

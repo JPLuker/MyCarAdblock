@@ -23,6 +23,9 @@ class AudioLinkFocusTest {
     private val sent: MutableList<String> = Collections.synchronizedList(mutableListOf())
     private var takenBack = 0
     private var musicTold = 0
+    /** The phone's music paused for the car's moment on its speakers, and played again after it. */
+    private var pausedForNow = 0
+    private var givenBack = 0
     /** A player playing on the phone, as CarServices would say. */
     private var playing = true
     /** The links' clock, in milliseconds: moved on by the capture as it plays, and by hand. */
@@ -38,6 +41,8 @@ class AudioLinkFocusTest {
         onReady = {},
         onClose = {},
         onTakenBack = { takenBack++ },
+        onPausedForNow = { pausedForNow++ },
+        onGivenBack = { givenBack++ },
         playerPlaying = { playing },
         onMusic = { musicTold++ },
         clock = { now },
@@ -103,6 +108,91 @@ class AudioLinkFocusTest {
         link.onFocus(GAIN)
         assertEquals(listOf("stop", "start"), sent)
         assertEquals(0, takenBack)
+    }
+
+    @Test
+    fun `the car's moment on its speakers pauses the phone's music once, and its GAIN plays it again`() {
+        val link = streaming()
+        link.onFocus(LOSS_TRANSIENT)
+        assertEquals(1, pausedForNow)
+        // The car saying it again (a call after its voice): still once.
+        link.onFocus(LOSS_TRANSIENT)
+        assertEquals(1, pausedForNow)
+        assertEquals(0, givenBack)
+        link.onFocus(GAIN)
+        assertEquals(listOf("stop", "start"), sent)
+        assertEquals(1, givenBack)
+        // A GAIN again plays nothing more, and the radio was never picked.
+        link.onFocus(GAIN)
+        assertEquals(1, givenBack)
+        assertEquals(0, takenBack)
+    }
+
+    @Test
+    fun `the car taking its speakers again after its GAIN is a moment of its own, given back by the next GAIN`() {
+        // A call: the car takes the speakers to ring, gives them back, takes them for the call, and
+        // gives them back at its end. CarServices keeps what the first moment paused for the last GAIN
+        // (PausedForCar.Memory: PausedForCarTest).
+        val link = streaming()
+        link.onFocus(LOSS_TRANSIENT)
+        link.onFocus(GAIN)
+        link.onFocus(LOSS_TRANSIENT)
+        link.onFocus(GAIN)
+        assertEquals(2, pausedForNow)
+        assertEquals(2, givenBack)
+        assertEquals(listOf("stop", "start", "stop", "start"), sent)
+    }
+
+    @Test
+    fun `ducking and a guidance-only moment pause nothing`() {
+        val link = streaming()
+        link.onFocus(LOSS_TRANSIENT_CAN_DUCK)
+        link.onFocus(GAIN)
+        val held = streaming()
+        held.onFocus(GAIN_TRANSIENT_GUIDANCE_ONLY)
+        held.onFocus(GAIN)
+        assertEquals(0, pausedForNow)
+        assertEquals(0, givenBack)
+    }
+
+    @Test
+    fun `the radio picked during the car's moment leaves the music paused, as a LOSS does`() {
+        val link = streaming()
+        link.onFocus(LOSS_TRANSIENT)
+        link.onFocus(LOSS)
+        assertEquals(1, takenBack)
+        // A GAIN after it is no answer to the music, which let go: nothing plays.
+        link.onFocus(GAIN)
+        assertEquals(0, givenBack)
+    }
+
+    @Test
+    fun `a capture ended during the car's moment plays nothing again at the next start's GAIN`() {
+        val link = streaming()
+        link.onFocus(LOSS_TRANSIENT)
+        link.stop()
+        link.start()
+        link.onFocus(GAIN)
+        assertEquals(1, pausedForNow)
+        assertEquals(0, givenBack)
+        assertTrue(link.streaming)
+    }
+
+    @Test
+    fun `speakers the car never gave the music - the radio kept, a question still unanswered - pause nothing`() {
+        // The radio kept until the phone plays: the car takes and gives back speakers the music never had.
+        val kept = link()
+        kept.captureOn(radioFirst = true)
+        kept.onFocus(LOSS_TRANSIENT)
+        kept.onFocus(GAIN)
+        // Asked for and started at once, as for cars that never answer: the car answers with its moment.
+        val asking = link()
+        asking.start()
+        asking.onFocus(LOSS_TRANSIENT)
+        asking.onFocus(GAIN)
+        assertEquals(0, pausedForNow)
+        assertEquals(0, givenBack)
+        assertTrue(asking.streaming)
     }
 
     @Test
@@ -426,6 +516,7 @@ class AudioLinkFocusTest {
         const val LOSS = 3
         const val LOSS_TRANSIENT_CAN_DUCK = 4
         const val LOSS_TRANSIENT = 5
+        const val GAIN_TRANSIENT_GUIDANCE_ONLY = 7
         const val GAIN_REQUEST = 1
         const val MAY_DUCK = 3
         const val RELEASE = 4

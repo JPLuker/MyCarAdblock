@@ -294,6 +294,9 @@ class CarPreviewActivity : ComponentActivity() {
             }
             main.post(::tryDemo)
         }
+        // --ez alert true: an app's alert across the top of the car's screen, as Waze asks whether a
+        // hazard is still there (see showDemoAlert), once the car UI is up.
+        if (intent.getBooleanExtra("alert", false)) main.postDelayed({ io.github.sirionero.mycar.car.showDemoAlert() }, 1_000)
         // --es voiceLang it: the assistant in that language, as with its model on the phone (no model
         // runs here: the speech library is arm64 only). --ez voiceHelp true opens its help, --es
         // voiceReply "Around 14:30." shows one of its answers. Set every run, so other shots are in English.

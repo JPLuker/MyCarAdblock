@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Changes ported from Gearslip 0.3.32-0.3.40 -->
+<resources>
+    <!-- In the car, a button of AntennaPod in the full-screen player (media/CarMedia.kt,
+         withNextChapter): goes to the podcast episode's next chapter. Short: it is also
+         the button's description, and its text when AntennaPod's icon can't be shown -->
+    <string name="car_player_next_chapter">Capitolo successivo</string>
+    <!-- Phone, Settings > Connection (ui/PhoneAddressRow.kt): the phone's own Bluetooth address,
+         written by hand (Android hides it from apps), sent to a car already paired with the phone.
+         The row's title, the line under it when none is written, the line under the field in its
+         dialog (where Android shows it: use the names Android gives these pages in your language),
+         and the error when what's written isn't an address -->
+    <string name="settings_phone_bt_address">Indirizzo Bluetooth del telefono</string>
+    <string name="settings_phone_bt_address_off">Non impostato. Solo per un\'auto che toglie il Bluetooth al telefono, o si scollega, quando myCar si collega.</string>
+    <string name="settings_phone_bt_address_hint">Nelle Impostazioni di Android &gt; Informazioni sul telefono (su alcuni telefoni sotto Stato): Indirizzo Bluetooth. myCar lo dice a un\'auto già accoppiata al telefono, così l\'auto sa che è lo stesso telefono.</string>
+    <string name="settings_phone_bt_address_invalid">Non è un indirizzo Bluetooth. Ha questa forma: 12:34:56:78:9A:BC.</string>
+</resources>

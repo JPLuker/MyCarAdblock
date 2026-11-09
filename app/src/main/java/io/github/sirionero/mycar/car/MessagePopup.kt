@@ -176,7 +176,7 @@ private fun PopupCard(until: Long, span: Long, modifier: Modifier, held: Float =
  * second, recomposed and measured the bar for frames the car never got.
  */
 @Composable
-private fun rememberTimeLeft(until: Long, span: Long) = produceState(fractionLeft(until, span), until, span) {
+internal fun rememberTimeLeft(until: Long, span: Long) = produceState(fractionLeft(until, span), until, span) {
     // The state outlives a change of deadline, so start from the new one rather than the old value.
     value = fractionLeft(until, span)
     while (value > 0f) {
