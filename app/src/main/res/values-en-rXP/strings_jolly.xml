@@ -9,7 +9,7 @@
          it as a placeholder, so a new name is one line per language. -->
     <string name="jolly_name">Jolly Roger</string>
     <!-- Car, the chooser (the key held, or tapped with nothing chosen): under the tiles of the kinds. %1$s: jolly_name -->
-    <string name="jolly_choose_intro">A tap on the flag does what you pick here; holding it brings you back aboard this deck. On the phone too: Rigging > Helm > %1$s.</string>
+    <string name="jolly_choose_intro">A tap on the flag does what you pick here; holding it brings you back. On the phone too: Rigging > Helm > %1$s.</string>
     <!-- Car, the chooser and the car's Settings: what the key does now. %1$s: one of the jolly_title_* below -->
     <string name="jolly_now">Flying now: %1$s</string>
     <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->

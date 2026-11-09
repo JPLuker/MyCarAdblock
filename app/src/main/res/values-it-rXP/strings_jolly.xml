@@ -14,10 +14,10 @@
     <string name="jolly_now">Sventola ora: %1$s</string>
     <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->
     <string name="jolly_kind_call">Chiama un compare</string>
-    <string name="jolly_kind_ai">Parlamenta con un\'IA</string>
+    <string name="jolly_kind_ai">Interroga l\'oracolo</string>
     <string name="jolly_kind_navigate">Fai rotta</string>
     <!-- A phrase myCar's assistant understands, run as if it had been said -->
-    <string name="jolly_kind_say">Ordine al pappagallo</string>
+    <string name="jolly_kind_say">Ordine di bordo</string>
     <string name="jolly_kind_app">Abborda un\'app</string>
     <!-- What the key does, in the chooser, the settings and the toasts. %1$s: the contact's name -->
     <string name="jolly_title_call">Chiama a rapporto %1$s</string>

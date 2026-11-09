@@ -25,7 +25,7 @@
     <string name="jolly_kind_home">Home Assistant</string>
     <string name="jolly_kind_navigate">Vai in un posto</string>
     <!-- A phrase myCar's assistant understands, run as if it had been said -->
-    <string name="jolly_kind_say">Comando all\'assistente</string>
+    <string name="jolly_kind_say">Comando a myCar</string>
     <string name="jolly_kind_app">Apri un\'app</string>
 
     <!-- What the key does, in the chooser, the settings and the toasts. %1$s: the contact's name -->

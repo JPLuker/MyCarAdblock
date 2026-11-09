@@ -14,7 +14,7 @@
     <string name="jolly_now">Tremulando agora: %1$s</string>
     <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->
     <string name="jolly_kind_call">Chamar um marujo</string>
-    <string name="jolly_kind_ai">Parlamentar com uma IA</string>
+    <string name="jolly_kind_ai">Consultar o oráculo</string>
     <string name="jolly_kind_navigate">Traçar rumo</string>
     <!-- A phrase myCar's assistant understands, run as if it had been said -->
     <string name="jolly_kind_say">Ordem ao papagaio</string>

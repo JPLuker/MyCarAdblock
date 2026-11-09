@@ -13,8 +13,8 @@
     <!-- Car, the chooser and the car's Settings: what the key does now. %1$s: one of the jolly_title_* below -->
     <string name="jolly_now">Ondea ahora: %1$s</string>
     <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->
-    <string name="jolly_kind_call">Llamar a un compadre</string>
-    <string name="jolly_kind_ai">Parlamentar con una IA</string>
+    <string name="jolly_kind_call">Llamar a cubierta</string>
+    <string name="jolly_kind_ai">Parlamentar con IA</string>
     <string name="jolly_kind_navigate">Fijar rumbo</string>
     <!-- A phrase myCar's assistant understands, run as if it had been said -->
     <string name="jolly_kind_say">Orden al loro</string>

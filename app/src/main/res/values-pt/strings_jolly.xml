@@ -20,12 +20,12 @@
     <string name="jolly_now">Agora: %1$s</string>
 
     <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->
-    <string name="jolly_kind_call">Ligar para um contato</string>
+    <string name="jolly_kind_call">Ligar para alguém</string>
     <string name="jolly_kind_ai">Falar com uma IA</string>
     <string name="jolly_kind_home">Home Assistant</string>
     <string name="jolly_kind_navigate">Ir a um lugar</string>
     <!-- A phrase myCar's assistant understands, run as if it had been said -->
-    <string name="jolly_kind_say">Comando ao assistente</string>
+    <string name="jolly_kind_say">Comando ao myCar</string>
     <string name="jolly_kind_app">Abrir um app</string>
 
     <!-- What the key does, in the chooser, the settings and the toasts. %1$s: the contact's name -->

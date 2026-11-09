@@ -18,7 +18,7 @@
     <string name="jolly_kind_navigate">Проложить курс</string>
     <!-- A phrase myCar's assistant understands, run as if it had been said -->
     <string name="jolly_kind_say">Приказ попугаю</string>
-    <string name="jolly_kind_app">Абордаж приложения</string>
+    <string name="jolly_kind_app">На абордаж!</string>
     <!-- What the key does, in the chooser, the settings and the toasts. %1$s: the contact's name -->
     <string name="jolly_title_call">Окликнуть: %1$s</string>
     <!-- %1$s: an assistant app's name (Gemini, Claude…) -->

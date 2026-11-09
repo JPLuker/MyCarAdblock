@@ -13,12 +13,10 @@
     <!-- Car, the chooser and the car's Settings: what the key does now. %1$s: one of the jolly_title_* below -->
     <string name="jolly_now">Κυματίζει τώρα: %1$s</string>
     <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->
-    <string name="jolly_kind_call">Κάλεσμα συντρόφου</string>
+    <string name="jolly_kind_call">Κάλεσε σύντροφο</string>
     <string name="jolly_kind_ai">Κουβέντα με AI</string>
     <string name="jolly_kind_navigate">Χάραξη πορείας</string>
-    <!-- A phrase myCar's assistant understands, run as if it had been said -->
-    <string name="jolly_kind_say">Διαταγή στον παπαγάλο</string>
-    <string name="jolly_kind_app">Ρεσάλτο σε εφαρμογή</string>
+    <string name="jolly_kind_app">Ρεσάλτο!</string>
     <!-- What the key does, in the chooser, the settings and the toasts. %1$s: the contact's name -->
     <string name="jolly_title_call">Κάλεσμα: %1$s</string>
     <!-- %1$s: an assistant app's name (Gemini, Claude…) -->

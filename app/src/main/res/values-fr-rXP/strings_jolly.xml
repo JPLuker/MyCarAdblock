@@ -14,7 +14,7 @@
     <string name="jolly_now">Hissé : %1$s</string>
     <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->
     <string name="jolly_kind_call">Héler un matelot</string>
-    <string name="jolly_kind_ai">Parlementer avec une IA</string>
+    <string name="jolly_kind_ai">Consulter l’oracle</string>
     <string name="jolly_kind_navigate">Mettre le cap</string>
     <!-- A phrase myCar's assistant understands, run as if it had been said -->
     <string name="jolly_kind_say">Ordre au perroquet</string>

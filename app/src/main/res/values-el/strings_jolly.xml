@@ -26,7 +26,7 @@
     <string name="jolly_kind_navigate">Μετάβαση κάπου</string>
     <!-- A phrase myCar's assistant understands, run as if it had been said -->
     <string name="jolly_kind_say">Εντολή στον βοηθό</string>
-    <string name="jolly_kind_app">Άνοιγμα εφαρμογής</string>
+    <string name="jolly_kind_app">Ανοίξτε εφαρμογή</string>
 
     <!-- What the key does, in the chooser, the settings and the toasts. %1$s: the contact's name -->
     <string name="jolly_title_call">Κλήση: %1$s</string>
