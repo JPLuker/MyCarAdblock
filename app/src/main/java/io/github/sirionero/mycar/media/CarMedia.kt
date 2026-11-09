@@ -21,6 +21,8 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import io.github.sirionero.mycar.MyCarLog
+import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.Words
 import io.github.sirionero.mycar.host.KnownApps
 import io.github.sirionero.mycar.notify.MyCarNotificationListener
 import io.github.sirionero.mycar.webmusic.WebMusic
@@ -40,19 +42,21 @@ class MediaEntry(
     val playable: Boolean,
 )
 
-/** [icon] is a drawable id inside the media app's own package, not myCar's; 0 for none. */
-class CustomAction(val id: String, val name: String, val extras: Bundle?, val icon: Int = 0, val iconName: String = "") {
-    /**
-     * Whether a toggle like heart or shuffle is on, read from the icon's name - Tidal swaps
-     * ic_favorite for ic_favorite_filled and ic_shuffle for ic_shuffle_active, and keeps the
-     * button's name the same. Whole words only, so "inactive" doesn't count as "active".
-     */
+/**
+ * [icon] is a drawable id inside the media app's own package, not myCar's; 0 for none.
+ * [hasOutline]: the app also has an outline of the same icon (ic_heart beside ic_heart_outline).
+ */
+class CustomAction(
+    val id: String,
+    val name: String,
+    val extras: Bundle?,
+    val icon: Int = 0,
+    val iconName: String = "",
+    val hasOutline: Boolean = false,
+) {
+    /** Whether a toggle like heart or shuffle is on, from its icon (see [AppButtons.on]). */
     val on: Boolean
-        get() = iconName.lowercase().split('_', '.', '-').any { it in ON_WORDS }
-
-    private companion object {
-        val ON_WORDS = setOf("filled", "fill", "active", "on", "selected", "checked", "enabled", "solid", "one", "all")
-    }
+        get() = AppButtons.on(iconName, hasOutline)
 }
 
 /** One entry in the app's own queue - not its library, whatever it has lined up to play next. */
@@ -115,12 +119,13 @@ class NowPlaying(
     val repeatAction get() = customFor("repeat", "loop")
 
     /**
-     * Liked or not; null when the app offers no way to like at all. An app's own like button
-     * only says which way it goes next by its name ("Remove from Liked Songs"), so that's read.
+     * Liked or not; null when the app offers no way to like at all. An app's own like button says
+     * it by its icon ([CustomAction.on]: Metrolist's heart filled in) or by which way it goes next,
+     * in its name ("Remove from Liked Songs").
      */
     val liked: Boolean?
-        get() = heart ?: likeAction?.name?.let { name ->
-            listOf("remove", "unlike", "unfav", "unheart").any { name.contains(it, ignoreCase = true) }
+        get() = heart ?: likeAction?.let { action ->
+            action.on || listOf("remove", "unlike", "unfav", "unheart").any { action.name.contains(it, ignoreCase = true) }
         }
 
     val playing get() = state == PlaybackState.STATE_PLAYING || state == PlaybackState.STATE_BUFFERING
@@ -432,7 +437,12 @@ class CarMedia(private val context: Context) {
             speed = state?.playbackSpeed ?: 1f,
             updatedAt = state?.lastPositionUpdateTime ?: 0,
             actions = state?.actions ?: 0,
-            custom = state?.customActions.orEmpty().map { CustomAction(it.action, it.name.toString(), it.extras, it.icon, iconName(it.icon)) },
+            custom = withNextChapter(
+                state?.customActions.orEmpty().map {
+                    val iconName = iconName(it.icon)
+                    CustomAction(it.action, it.name.toString(), it.extras, it.icon, iconName, hasOutline(it.icon, iconName))
+                },
+            ),
             error = state?.errorMessage?.toString(),
             activeQueueItemId = state?.activeQueueItemId ?: MediaSession.QueueItem.UNKNOWN_ID.toLong(),
             heart = if (controller?.ratingType == Rating.RATING_HEART) {
@@ -448,14 +458,47 @@ class CarMedia(private val context: Context) {
 
     private var appResources: Pair<String, android.content.res.Resources?>? = null
 
+    /** The resources of the app [pkg], kept for the app myCar talks to; what's known of its icons goes with another. */
+    private fun resourcesOf(pkg: String): android.content.res.Resources? {
+        if (appResources?.first != pkg) {
+            appResources = pkg to runCatching { context.packageManager.getResourcesForApplication(pkg) }.getOrNull()
+            outlines.clear()
+        }
+        return appResources?.second
+    }
+
     /** The icon's resource name in the app's package, or "" when it can't be read. */
     private fun iconName(icon: Int): String {
         val pkg = controller?.packageName ?: return ""
-        if (appResources?.first != pkg) {
-            appResources = pkg to runCatching { context.packageManager.getResourcesForApplication(pkg) }.getOrNull()
-        }
-        val res = appResources?.second ?: return ""
+        val res = resourcesOf(pkg) ?: return ""
         return runCatching { res.getResourceEntryName(icon) }.getOrDefault("")
+    }
+
+    /**
+     * AntennaPod takes a Next chapter command whenever it plays, but offers the button only when it's
+     * turned on in its own notification settings: myCar offers it either way, with AntennaPod's icon,
+     * second among its buttons (AppButtons.secondPlace). An episode without chapters does nothing with it.
+     */
+    private fun withNextChapter(actions: List<CustomAction>): List<CustomAction> {
+        if (controller?.packageName != ANTENNAPOD || actions.any { it.id in ANTENNAPOD_NEXT_CHAPTER }) return actions
+        val icon = resourcesOf(ANTENNAPOD)?.let { res ->
+            runCatching { res.getIdentifier("ic_notification_next_chapter", "drawable", ANTENNAPOD) }.getOrDefault(0)
+        } ?: 0
+        return AppButtons.secondPlace(actions, CustomAction(NEXT_CHAPTER, Words.get(R.string.car_player_next_chapter), null, icon))
+    }
+
+    /** Whether each icon has an outline in the app, by icon id: looked up once, the state changes often. */
+    private val outlines = HashMap<Int, Boolean>()
+
+    /** The app has an outline of the icon [name] too ([AppButtons.outlineNames]): the plain one is then "on". */
+    private fun hasOutline(icon: Int, name: String): Boolean {
+        val pkg = controller?.packageName ?: return false
+        val res = resourcesOf(pkg) ?: return false
+        val outlined = AppButtons.outlineNames(name)
+        if (outlined.isEmpty()) return false
+        return outlines.getOrPut(icon) {
+            outlined.any { runCatching { res.getIdentifier(it, "drawable", pkg) }.getOrDefault(0) != 0 }
+        }
     }
 
     private var loggedButtons: String? = null
@@ -595,6 +638,14 @@ class CarMedia(private val context: Context) {
         controller?.transportControls?.play()
     }
 
+    /**
+     * Pause and play for the car's own moment on its speakers (CarServices.pausePhoneMediaForNow),
+     * not the driver's: not counted as asked ([askMark]), so the driver's own asks still show.
+     */
+    fun pauseForCar() = controller?.transportControls?.pause()
+
+    fun playForCar() = controller?.transportControls?.play()
+
     fun next() {
         asks.asked()
         skippedAt = SystemClock.elapsedRealtime()
@@ -616,7 +667,13 @@ class CarMedia(private val context: Context) {
         private set
 
     fun seek(ms: Long) = controller?.transportControls?.seekTo(ms)
-    fun custom(action: CustomAction) = controller?.transportControls?.sendCustomAction(action.id, action.extras)
+    fun custom(action: CustomAction) {
+        val controls = controller?.transportControls ?: return
+        // myCar's own Next chapter for AntennaPod (withNextChapter): its Media3 service and its
+        // older one each know only their own name for it.
+        if (action.id == NEXT_CHAPTER) ANTENNAPOD_NEXT_CHAPTER.forEach { controls.sendCustomAction(it, null) }
+        else controls.sendCustomAction(action.id, action.extras)
+    }
 
     fun playQueueItem(track: QueueTrack) {
         asks.asked()
@@ -914,3 +971,11 @@ class CarMedia(private val context: Context) {
         const val RELINK_GAP_MS = 60_000L
     }
 }
+
+private const val ANTENNAPOD = "de.danoeh.antennapod"
+
+/** AntennaPod's names for Next chapter: its Media3 service's, then its older one's. */
+private val ANTENNAPOD_NEXT_CHAPTER = listOf("next_chapter", "action.de.danoeh.antennapod.core.service.next_chapter")
+
+/** The id of myCar's own Next chapter button for AntennaPod, sent as both of its names (CarMedia.custom). */
+private const val NEXT_CHAPTER = "mycar.next_chapter"

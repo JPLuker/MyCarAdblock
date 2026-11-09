@@ -55,7 +55,7 @@ WAIT="-100,-100"       # a tap off the screen: only gives an app time before the
 
 # shoot <name> <width> <height> <dpi> <taps "x,y;x,y" in screen pixels> [command, run 5s in]
 # EXTRA adds intent extras for the preview activity; BEFORE is a command run just before it starts;
-# LOGTAGS, more log tags to keep besides myCar's.
+# LOGTAGS, more log tags to keep besides myCar's; KEEP_FILES keeps the shot before's files (its log).
 # ONLY (the workflow's "shots" input) names the shots to take, all of them when empty.
 shoot() {
     case " ${ONLY:-$1} " in *" $1 "*) ;; *) return ;; esac
@@ -65,7 +65,7 @@ shoot() {
     fi
     adb shell am force-stop "$PKG"
     for p in $VELA $PLANCIA $XONOS; do adb shell am force-stop "$p"; done
-    adb shell rm -rf "$FILES" 2>/dev/null
+    [ -n "${KEEP_FILES:-}" ] || adb shell rm -rf "$FILES" 2>/dev/null
     adb logcat -c
     # The log as it comes, kept only if the emulator is gone by the end of the shot.
     mkdir -p "previews/$1"
@@ -123,10 +123,13 @@ alive() {
 # ended - the signal, the crashing thread's frames - as a drive's log would after a crash.
 EXTRA="--ei crashAfterMs 5000" shoot last-exit-crash 800 480 160 "$WAIT;$WAIT;$WAIT"
 alive last-exit-crash
-shoot last-exit 800 480 160 "$WAIT"
+# The crashed shot's log stays (its pictures go): the new run also writes how it ended at its foot.
+KEEP_FILES=1 BEFORE="adb shell 'rm -f $FILES/preview-*.png'" shoot last-exit 800 480 160 "$WAIT"
 case " ${ONLY:-last-exit} " in *" last-exit "*)
     echo "--- last-exit: how the shot before ended, in myCar's log ---"
-    grep -h "last exit" previews/last-exit/log.txt 2>/dev/null | cut -c1-250 | head -50 || echo "last-exit: nothing" ;;
+    grep -h "last exit" previews/last-exit/log.txt 2>/dev/null | cut -c1-250 | head -50 || echo "last-exit: nothing"
+    echo "--- last-exit: the same at the foot of the crashed run's own log ---"
+    grep -h "Android ended this run" previews/last-exit/mycar-*.log 2>/dev/null | cut -c1-250 | head -5 || true ;;
 esac
 
 # The hunt for "LayoutNode should be attached to an owner": scripted shots, only when named (crash-*).
@@ -560,6 +563,18 @@ EXTRA="--ez wallpapers true" shoot wallpapers 1920 720 240 "$WAIT;$WAIT"
 EXTRA="--ez player true" shoot player 1920 720 240 "$WAIT"
 EXTRA="--ez player true" shoot player-800x480 800 480 160 "$WAIT"
 
+# An app's alert across the top of the car's screen (CarAlerts; --ez alert true puts up one like
+# Waze's question about a hazard, 12 s long, with a blue button and a neutral one). At 1920x720
+# "Still there" is tapped, at 800x480 its time runs out, and once with the light theme. The log
+# says what the app was told.
+EXTRA="--ez alert true" shoot alert 1920 720 240 "$WAIT;800,200;$WAIT"
+EXTRA="--ez alert true" shoot alert-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez alert true --es carTheme LIGHT" shoot alert-light 1920 720 240 "$WAIT"
+case " ${ONLY:-alert} " in *" alert "*|*" alert-800x480 "*)
+    echo "--- alert: the button tapped and the time run out, as the app was told ---"
+    grep -h "alert" previews/alert/log.txt previews/alert-800x480/log.txt 2>/dev/null | cut -c1-200 | head -20 || echo "alert: nothing" ;;
+esac
+
 # An incoming call from an unknown number, rung on the emulator's modem once the car UI is up.
 shoot call 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT" "adb emu gsm call 3331234567"
 adb emu gsm cancel 3331234567
@@ -705,6 +720,36 @@ case " ${ONLY:-jolly-800x480} " in *" jolly-800x480 "*)
     echo "--- the Jolly key ---"
     grep -h "jolly\|assistant: a written" previews/jolly-*/log.txt 2>/dev/null | head -60 || echo "jolly: nothing in the log" ;;
 esac
+
+# A call under way (car/CallPill.kt): its pill over every screen until it ends, a call picked up 1:23 ago
+# with no modem behind it (--ez fakeCall true, debug only). Over the map, the app grid and the car's
+# Settings, each given a wait (the emulator draws a new screen slowly); held and dragged to the bottom
+# left, where it stays; a tap on it opens the Phone. At 800x480, Normal and Extra large (drawn smaller);
+# light. Over the mini player: the column's X brings it out, the pill dragged onto its corner moves it up,
+# and the pill dragged away lets it back. Then the emulator's modem rings, myCar's Answer takes the call
+# (the pill), and the pill's red button ends it. "call-bubble" in the workflow's shots takes them all.
+# At 1920x720 (240 dpi) the pill starts 810-1254 px across, 18-114 down.
+case " ${ONLY:-} " in *" call-bubble "*)
+    ONLY="$ONLY call-bubble-800x480 call-bubble-xl-800x480 call-bubble-light call-bubble-mini call-bubble-knob call-answer" ;;
+esac
+EXTRA="--ez fakeCall true" shoot call-bubble 1920 720 240 \
+    "$WAIT;$GRID_BUTTON;$WAIT;$(at settings);$WAIT;900,66,drag,400,640;$WAIT;450,640;$WAIT"
+EXTRA="--ez fakeCall true" shoot call-bubble-800x480 800 480 160 "$WAIT;48,436;$WAIT"
+EXTRA="--ez fakeCall true --es carScale 1.5" shoot call-bubble-xl-800x480 800 480 160 "$WAIT;72,414;$WAIT"
+EXTRA="--ez fakeCall true --es carTheme LIGHT" shoot call-bubble-light 1920 720 240 "$WAIT;$GRID_BUTTON;$WAIT;$(at settings);$WAIT"
+EXTRA="--ez fakeCall true --ez demoSong true" shoot call-bubble-mini 1920 720 240 \
+    "$WAIT;1866,54;$WAIT;900,66,drag,1700,700;$WAIT;1550,654,drag,900,300;$WAIT"
+# The car's knob (a script, see PreviewScript: knob:n turns it, knob:ok presses it). Its first turn puts the
+# focus on Home (the weather of the page left of the map), the next one back on the dock's foot; back
+# along the dock (mic, map, clock) and round past its top, the last thing on the screen: the pill's red
+# button, at the sixth turn (a picture after each). Pressed, it ends the call ("calls: there was no call
+# to end", for the made-up one). Seen (0.7.4): the ring on the red button, then on the rest of the pill.
+EXTRA="--ez fakeCall true --es script 'wait:7000;knob:-1;wait:600;knob:-1;wait:600;rep:4;knob:-1;wait:700;snap:;end;knob:ok;wait:1500;snap:pressed'" \
+    shoot call-bubble-knob 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+# The ringing card's Answer is 1068-1176 px across, 444-579 down (with or without its Bluetooth line);
+# the pill's red button 1158-1254 across.
+shoot call-answer 1920 720 240 "$WAIT;$WAIT;1122,510;$WAIT;$WAIT;1206,66;$WAIT;$WAIT" "adb emu gsm call 3339876543"
+adb emu gsm cancel 3339876543 >/dev/null 2>&1
 
 # The dock's microphone with "Phone's assistant" chosen: myCar should wake the phone's assistant
 # as the swipe up from a bottom corner does, through SystemUI. First with the Settings app standing

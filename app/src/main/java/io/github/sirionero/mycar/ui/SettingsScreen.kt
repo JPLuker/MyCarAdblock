@@ -322,6 +322,8 @@ private fun ConnectionSection() {
         )
         SettingsDivider()
         WirelessAutoRow()
+        SettingsDivider()
+        PhoneAddressRow()
     }
 }
 

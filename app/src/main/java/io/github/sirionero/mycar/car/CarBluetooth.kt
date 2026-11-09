@@ -40,6 +40,12 @@ import java.security.MessageDigest
  * phone's own Bluetooth address (apps get a placeholder), and confirming the pairing code without
  * asking. So a car may turn the request down, and the phone always shows its pairing dialog. The
  * channel stays closed unless the driver taps Pair: every new channel is a risk to cars that work.
+ *
+ * The one exception is a driver who wrote the phone's address in Settings > Connection. Some cars
+ * can't tell that the phone connecting is the one they're paired with without it: a 2021 Bolt hung
+ * up on Gearslip's cable until it was sent (Gearslip issue #18). With an address written, a car already
+ * paired gets its channel opened and the same request at every connection, as Android Auto does,
+ * and no pairing is started. Without one, nothing changes.
  */
 object CarBluetooth {
 
@@ -63,13 +69,15 @@ object CarBluetooth {
     @Volatile private var bondStarted = false
     /** From the Pair tap until it succeeds or fails, whether or not the card still shows. */
     @Volatile private var pairing = false
+    /** Already paired, with the phone's address written: the channel is open only to say which phone this is. */
+    @Volatile private var announcing = false
     private var receiver: BroadcastReceiver? = null
 
     /** The car's Bluetooth address, when it named one in its service list. */
     val carAddress: String? get() = car?.service?.carAddress
 
-    /** The car's Bluetooth channel once the driver has asked to pair, -1 otherwise. */
-    val channelId: Int get() = car?.takeIf { pairing }?.service?.serviceId ?: -1
+    /** The car's Bluetooth channel once the driver has asked to pair, or while telling the car which phone this is; -1 otherwise. */
+    val channelId: Int get() = car?.takeIf { pairing || announcing }?.service?.serviceId ?: -1
 
     fun init(context: Context) {
         appContext = context.applicationContext
@@ -83,9 +91,15 @@ object CarBluetooth {
     ) {
         car = Car(service, open, send)
         bondStarted = false
+        announcing = false
         log.i("the car offers Bluetooth pairing, methods=${service.pairingMethods}")
         val device = device() ?: return
         when {
+            device.bondState == BluetoothDevice.BOND_BONDED && writtenAddress() != null -> {
+                log.i("already paired with this car - telling it which phone this is, with the address written in Settings")
+                announcing = true
+                open()
+            }
             device.bondState == BluetoothDevice.BOND_BONDED -> log.i("already paired with this car")
             declined(service.carAddress) -> log.i("not paired, and the driver said not now for this car")
             else -> _prompt.value = Prompt.ASK
@@ -95,6 +109,7 @@ object CarBluetooth {
     fun onCarDisconnected() {
         car = null
         pairing = false
+        announcing = false
         main.post {
             stopWatching()
             _prompt.value = Prompt.NONE
@@ -139,7 +154,8 @@ object CarBluetooth {
                 val status = Protobuf.readInt32Field(body, 1) ?: 0
                 log.i("<- ChannelOpenResponse: status=$status")
                 if (status != 0) {
-                    main.post { startBond("the car wouldn't open its Bluetooth channel") }
+                    if (announcing) log.i("the car wouldn't open its Bluetooth channel")
+                    else main.post { startBond("the car wouldn't open its Bluetooth channel") }
                     return
                 }
                 val method = c.service.pairingMethods.firstOrNull { it == METHOD_NUMERIC_COMPARISON }
@@ -153,6 +169,8 @@ object CarBluetooth {
             MSG_PAIRING_RESPONSE -> {
                 val fields = Wire.fields(body)
                 log.i("<- PairingResponse status=${Wire.varint(fields, 1)} already_paired=${Wire.varint(fields, 2) == 1L}")
+                // Only telling an already paired car which phone this is: nothing to pair.
+                if (!pairing) return
                 // Some cars start pairing themselves once they answer; give them a moment first.
                 main.postDelayed({ startBond("the car answered") }, CAR_BOND_WAIT_MS)
             }
@@ -229,11 +247,28 @@ object CarBluetooth {
         return adapter.getRemoteDevice(address)
     }
 
-    /** Apps get 02:00:00:00:00:00 here, not the real address. Sent anyway, as the field is required. */
+    /**
+     * The address written in Settings, else what Android gives apps (02:00:00:00:00:00, not the real
+     * one). Sent either way, as the field is required. Never logged nor reported: it names the phone.
+     */
     @SuppressLint("MissingPermission", "HardwareIds")
     private fun phoneAddress(): String =
-        runCatching { appContext?.getSystemService(BluetoothManager::class.java)?.adapter?.address }.getOrNull()
-            ?: "02:00:00:00:00:00"
+        writtenAddress()
+            ?: runCatching { appContext?.getSystemService(BluetoothManager::class.java)?.adapter?.address }.getOrNull()
+            ?: PhoneAddress.HIDDEN
+
+    private fun writtenAddress(): String? = appContext?.let { writtenAddress(it) }
+
+    /** The phone's own address as written in Settings > Connection, or null. */
+    fun writtenAddress(context: Context): String? =
+        PhoneAddress.tidy(AppSettings.getString(context, KEY_PHONE_ADDRESS, ""))?.takeIf { it.isNotEmpty() }
+
+    /** Keeps [text] as the phone's address ([PhoneAddress.tidy]); false when it isn't one. Empty forgets it. */
+    fun writeAddress(context: Context, text: String): Boolean {
+        val address = PhoneAddress.tidy(text) ?: return false
+        AppSettings.putString(context, KEY_PHONE_ADDRESS, address)
+        return true
+    }
 
     private fun declined(address: String): Boolean {
         val context = appContext ?: return false
@@ -246,6 +281,7 @@ object CarBluetooth {
             .take(8).joinToString("") { "%02x".format(it) }
 
     private const val KEY_DECLINED = "bluetooth_pair_declined"
+    private const val KEY_PHONE_ADDRESS = "phone_bluetooth_address"
     private const val CAR_REPLY_WAIT_MS = 5_000L
     private const val CAR_BOND_WAIT_MS = 3_000L
     private const val GIVE_UP_MS = 90_000L

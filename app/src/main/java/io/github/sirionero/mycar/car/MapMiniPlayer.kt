@@ -127,7 +127,6 @@ internal fun MapMiniPlayer(now: NowPlaying, modifier: Modifier = Modifier) {
                 if (size.height > 0) size.height.toDp().value else MINI_HEIGHT * fit,
             )
         }
-        val restNow by rememberUpdatedState(rest)
         // The area and its own size in dp, as MiniPlace counts them, for where it's let go.
         val areaNow by rememberUpdatedState(androidx.compose.ui.geometry.Size(maxWidth.value, maxHeight.value))
         val ownNow by rememberUpdatedState(
@@ -138,6 +137,12 @@ internal fun MapMiniPlayer(now: NowPlaying, modifier: Modifier = Modifier) {
                 )
             },
         )
+        // A call's pill over the map wins (see CallPill): the mini player moves out of its way for the call,
+        // and is back where it rests once the call ends. The map has the whole screen beside the dock here.
+        val pill = CallPillSpot.rest
+        val at = if (pill == null) rest
+        else CallPillPlace.miniApart(rest, pill.moved(-MINI_EDGE, -MINI_EDGE), maxWidth.value, maxHeight.value, ownNow.width, ownNow.height)
+        val restNow by rememberUpdatedState(at)
         var held by remember { mutableStateOf(false) }
         // How far the finger has taken it from where it rests, in pixels.
         var moved by remember { mutableStateOf(Offset.Zero) }
@@ -153,7 +158,7 @@ internal fun MapMiniPlayer(now: NowPlaying, modifier: Modifier = Modifier) {
         CompositionLocalProvider(LocalDensity provides if (fit < 1f) Density(density.density * fit, density.fontScale) else density) {
             Surface(
                 modifier = Modifier
-                    .align(BiasAbsoluteAlignment(rest.x * 2 - 1, rest.y * 2 - 1))
+                    .align(BiasAbsoluteAlignment(at.x * 2 - 1, at.y * 2 - 1))
                     .offset { IntOffset(moved.x.roundToInt(), moved.y.roundToInt()) }
                     .onSizeChanged { size = it }
                     .pointerInput(Unit) {
@@ -236,13 +241,15 @@ internal fun MapMiniPlayer(now: NowPlaying, modifier: Modifier = Modifier) {
  * with each move once it has gone past the touch slop after that; [onEnd] when it lifts, with
  * whether it was dragged. Watched on the way in (the Initial pass), so a drag is taken before the
  * button under the finger and the pages see it: the button's tap is cancelled and no page turns.
- * A hold let go without moving is left to the button: a slow tap on a bumpy road is still a tap.
+ * A hold let go without moving is left to the button: a slow tap on a bumpy road is still a tap -
+ * unless [tapAfterHold] is false (a call's pill, whose red button would end the call): then it's taken.
  * A swipe begun before the hold is taken and dropped: on the map's page nothing turns the pages.
  */
-private suspend fun PointerInputScope.dragAfterHold(
+internal suspend fun PointerInputScope.dragAfterHold(
     onHold: () -> Unit,
     onDrag: (Offset) -> Unit,
     onEnd: (dragged: Boolean) -> Unit,
+    tapAfterHold: Boolean = true,
 ) = awaitEachGesture {
     val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
     val slop = viewConfiguration.touchSlop
@@ -278,8 +285,11 @@ private suspend fun PointerInputScope.dragAfterHold(
         while (true) {
             val change = awaitPointerEvent(PointerEventPass.Initial).changes.firstOrNull { it.id == down.id } ?: break
             if (!dragged) {
-                // Let go without moving: the button under the finger keeps its tap.
-                if (!change.pressed) break
+                // Let go without moving: the button under the finger keeps its tap, if it may.
+                if (!change.pressed) {
+                    if (!tapAfterHold) change.consume()
+                    break
+                }
                 // Not moved yet, so its own coordinates still hold: the finger's way from where it went down.
                 val travel = change.position - down.position
                 if (travel.getDistance() <= slop) continue

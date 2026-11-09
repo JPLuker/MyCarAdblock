@@ -749,6 +749,7 @@ class MyCarActivity : ComponentActivity(), Projection {
             vehicleProfileFor = { info -> VehicleProfiles.find(VehicleProfiles.load(this), info) },
             onCertVerdict = { identity, verdict -> CertRotation.report(applicationContext, identity, verdict) },
             certAcceptedBefore = { CertRotation.acceptedBefore(applicationContext, it) },
+            phoneIcons = { PhoneIcons.pngs(applicationContext) },
         )
         this.runner = runner
         worker = runSession(runner)
@@ -816,6 +817,7 @@ class MyCarActivity : ComponentActivity(), Projection {
             onCertVerdict = { identity, verdict -> CertRotation.report(applicationContext, identity, verdict) },
             certAcceptedBefore = { CertRotation.acceptedBefore(applicationContext, it) },
             closeTransport = { socket.close() },
+            phoneIcons = { PhoneIcons.pngs(applicationContext) },
         )
         this.runner = runner
         worker = runSession(runner)
@@ -924,7 +926,9 @@ class MyCarActivity : ComponentActivity(), Projection {
         // car showed: a start-up that ended before the picture - the car's Android Auto not ready
         // yet, a certificate turned down, and each start-over after them - paused the phone's
         // music, often playing on the car's Bluetooth.
-        if (surface != null) io.github.sirionero.mycar.car.CarServices.pausePhoneMedia()
+        // Looked at again 2 s later, unless a new drive is under way by then: an app can start again
+        // by itself, out of the phone's speaker.
+        if (surface != null) io.github.sirionero.mycar.car.CarServices.pausePhoneMedia(again = io.github.sirionero.mycar.car.CarServices::noDriveUnderWay)
         runOnUiThread {
             PhoneMirror.requestStop()
             io.github.sirionero.mycar.car.CarKeys.focusSink = null

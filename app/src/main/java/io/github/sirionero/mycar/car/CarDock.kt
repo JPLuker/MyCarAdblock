@@ -103,8 +103,8 @@ internal fun CarDock(navigator: CarNavigator, modifier: Modifier = Modifier) {
     // phone moves a pin at once.
     io.github.sirionero.mycar.webmusic.WebMusic.hideApp.collectAsState().value
     val frame by CarEnvironment.frame.collectAsState()
-    // A call's card covers the top of the map, the next turn's arrow and distance with it - ringing,
-    // and for the whole call once answered: the next turn is here meanwhile.
+    // A call's card covers the map while it rings, and its pill (CallPill) can sit over the next turn's
+    // arrow and distance for the whole call once answered: the next turn is here meanwhile.
     val onCall = CarCalls.state.collectAsState().value !is CallUiState.None
     // Read only when it shows: during a route the map app sends its screen about once a second, and
     // reading it anyway made the whole dock compose again each time, with the map in view.

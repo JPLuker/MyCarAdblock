@@ -167,7 +167,7 @@ internal fun WirelessButton() {
                     }
                     list.forEach { device ->
                         Text(
-                            WirelessLink.name(device),
+                            WirelessLink.shownName(device),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier
                                 .fillMaxWidth()

@@ -285,6 +285,12 @@ object CarAudioRoute {
         return manager.getDevices(AudioManager.GET_DEVICES_OUTPUTS).any { it.type in types }
     }
 
+    /**
+     * Right now, an output for music other than the phone itself ([anyBluetoothOut]): music started
+     * now doesn't come out of the phone's speaker. For CarServices' second pause after the car left.
+     */
+    fun musicOutsideThePhone(): Boolean = audio != null && anyBluetoothOut()
+
     /** A Bluetooth music output that may be the car: any, unless the car named another address. */
     private fun bluetoothMusic(): Boolean {
         val outputs = audio?.getDevices(AudioManager.GET_DEVICES_OUTPUTS).orEmpty()

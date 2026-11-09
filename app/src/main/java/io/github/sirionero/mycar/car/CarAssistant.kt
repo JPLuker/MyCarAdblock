@@ -72,8 +72,11 @@ object CarAssistant {
     private var systemFocus = false
     private var tts: TextToSpeech? = null
     @Volatile private var ttsReady = false
-    /** The engine didn't start, or stopped speaking (updated in the background): made anew next drive. */
+    /** The engine didn't start, or stopped speaking (updated in the background): made anew (SpeechRestart). */
     @Volatile private var ttsFailed = false
+    /** When the engine was last made (elapsed clock), and which one it is: an older one's answer counts for nothing. */
+    @Volatile private var ttsStartedAt = 0L
+    private var engineNumber = 0
     /** The language the voice was last set to, so it's set again only when that changes. */
     private var voiceIn: VoiceLanguage? = null
     /** The engine the voice was set on (its package), the locale's tag, and whether it said it had no voice for it. */
@@ -132,19 +135,44 @@ object CarAssistant {
         silentSaid = false
         // Started again, at the next drive, after a start that failed or an engine that went away
         // (updated in the background, Android never binds it again), as DirectionsVoice does:
-        // otherwise answers and messages stayed silent until myCar's process went.
-        if (tts != null && !ttsFailed) return
+        // otherwise answers and messages stayed silent until myCar's process went. A start that never
+        // answered too, and inside a drive at an answer ([restartIfDue]).
+        if (tts != null && !SpeechRestart.due(ttsReady, ttsFailed, ttsStartedAt, SystemClock.elapsedRealtime())) return
+        startEngine()
+        syncLanguage()
+    }
+
+    /** Makes the phone's engine, the first time or anew; on the main thread. */
+    private fun startEngine() {
         tts?.shutdown()
         voiceIn = null
         ttsReady = false
         ttsFailed = false
+        ttsStartedAt = SystemClock.elapsedRealtime()
+        val mine = ++engineNumber
         tts = TextToSpeech(appContext) { status ->
-            ttsReady = status == TextToSpeech.SUCCESS
-            ttsFailed = !ttsReady
-            if (ttsFailed) MyCarLog.w("assistant: text-to-speech didn't start (status $status) - trying again next drive")
-            if (ttsReady) mainHandler.post(::syncLanguage)
+            // An engine made again meanwhile: what this one says is no news of it.
+            if (mine == engineNumber) {
+                ttsReady = status == TextToSpeech.SUCCESS
+                ttsFailed = !ttsReady
+                if (ttsFailed) MyCarLog.w("assistant: text-to-speech didn't start (status $status) - trying again later")
+                if (ttsReady) mainHandler.post(::syncLanguage)
+            }
         }
-        syncLanguage()
+    }
+
+    /**
+     * The engine made again inside a drive, as at the next one, when it can't speak and its last start
+     * has had its time ([SpeechRestart]). The answer of now is shown without a voice, the next said.
+     */
+    private fun restartIfDue() {
+        // Not before init made the first one.
+        if (tts == null || !SpeechRestart.due(ttsReady, ttsFailed, ttsStartedAt, SystemClock.elapsedRealtime())) return
+        // Marked at once: another answer before the main thread gets to it doesn't start it twice.
+        ttsStartedAt = SystemClock.elapsedRealtime()
+        ttsReady = false
+        MyCarLog.i("assistant: starting text-to-speech again")
+        if (Looper.myLooper() == Looper.getMainLooper()) startEngine() else mainHandler.post(::startEngine)
     }
 
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -317,6 +345,7 @@ object CarAssistant {
         // longer with the phone's speech rate turned down.
         speakLimitMs = ((SPEAK_BASE_MS + text.length * SPEAK_PER_CHAR_MS) * slowness()).toLong().coerceAtMost(SPEAK_MAX_MS)
 
+        restartIfDue()
         val engine = tts
         if (text.isBlank()) {
             _state.value = _state.value.copy(phase = Phase.IDLE)
@@ -459,6 +488,7 @@ object CarAssistant {
      */
     fun say(text: String, onDone: () -> Unit) {
         syncLanguage()
+        restartIfDue()
         val engine = tts
         val context = appContext
         if (engine == null || context == null || !ttsReady || text.isBlank()) {
@@ -551,9 +581,9 @@ object CarAssistant {
         askedAt = SystemClock.uptimeMillis()
         if (engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, id) != TextToSpeech.SUCCESS) {
             // A text too long for any engine says nothing about the engine; otherwise it went away
-            // (updated in the background) and is made again at the next drive.
+            // (updated in the background) and is made again at a later answer or the next drive.
             if (text.length < TextToSpeech.getMaxSpeechInputLength()) {
-                MyCarLog.w("assistant: speech engine refused to speak - starting it again next drive")
+                MyCarLog.w("assistant: speech engine refused to speak - it will be started again")
                 ttsFailed = true
             } else {
                 MyCarLog.w("assistant: too long to speak (${text.length} characters)")
