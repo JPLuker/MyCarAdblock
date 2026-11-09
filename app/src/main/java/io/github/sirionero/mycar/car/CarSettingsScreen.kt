@@ -122,6 +122,8 @@ fun CarSettingsScreen() {
 
         HiddenAppsSettings()
 
+        JollyCarSettings()
+
         ChoiceRow(
             stringResource(R.string.car_settings_size),
             listOf(
@@ -277,7 +279,7 @@ fun CarSettingsScreen() {
 private val ROOMY_CHOICE = 110.dp
 
 @Composable
-private fun <T> ChoiceRow(title: String, options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit) {
+internal fun <T> ChoiceRow(title: String, options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
         // Too narrow for each name whole (six choices at Extra large broke "Browse/r"): wider choices

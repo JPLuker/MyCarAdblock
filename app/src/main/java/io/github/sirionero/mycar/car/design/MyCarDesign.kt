@@ -58,6 +58,8 @@ object MyCarPalette {
     val Warning = Color(0xFFFFB020)
     val Indigo = Color(0xFF6C63FF)
     val Graphite = Color(0xFF6B6B72)
+    /** The Jolly key's: a touch of magic, apart from every app's colour in the dock. */
+    val Violet = Color(0xFFA855F7)
 }
 
 /** Corner radii. App icons use [Icon] as a fraction of their side, the rest are fixed. */
