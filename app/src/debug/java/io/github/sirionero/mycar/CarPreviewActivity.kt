@@ -179,6 +179,11 @@ class CarPreviewActivity : ComponentActivity() {
         io.github.sirionero.mycar.car.MiniPlayerSetting.moveTo(
             io.github.sirionero.mycar.car.MiniPlace.parse(intent.getStringExtra("miniAt").orEmpty()),
         )
+        // --es videoCover http://10.0.2.2:8003/canvas.mp4: that video as the cover of whatever plays, as if
+        // the car's music had video covers (the button on the cover shows); --ez videoCoverOn true: video
+        // covers on from the start, still every other run. Both set every run.
+        io.github.sirionero.mycar.car.VideoCoverPreview.url = intent.getStringExtra("videoCover")
+        io.github.sirionero.mycar.car.VideoCoverSetting.setOn(intent.getBooleanExtra("videoCoverOn", false))
         // --es carTheme LIGHT: the car's screen in that theme (PHONE, LIGHT, DARK); dark every other run.
         CarSettings.setAppTheme(
             intent.getStringExtra("carTheme")?.let { runCatching { io.github.sirionero.mycar.car.AppTheme.valueOf(it) }.getOrNull() }

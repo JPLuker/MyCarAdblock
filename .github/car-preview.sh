@@ -180,6 +180,31 @@ EXTRA="--ez demoSong true --es carScale 1.5" shoot mini-xl-800x480 800 480 160 "
 EXTRA="--ez demoSong true --es carTheme LIGHT" shoot mini-light 1920 720 240 "$WAIT;1866,54;$WAIT"
 EXTRA="--ez demoSong true --es miniAt 0.5,0" shoot mini-kept 1920 720 240 "$WAIT;1866,54;$WAIT"
 EXTRA="--ez demoSong true --ez miniPlayer false" shoot mini-off 1920 720 240 "$WAIT;1866,54;$WAIT"
+# The video cover (car/VideoCover.kt): the made-up song with a fake Canvas from the runner (10.0.2.2:8003,
+# a 4 s looping 9:16 video made with ffmpeg), as if the car's music had video covers (--es videoCover,
+# debug only), so the button on the cover shows (top left). Off, then tapped on: the video fades in over
+# the cover and loops (shot every 2.5 s); then the player's X: the mini player over the map keeps the still
+# cover. The same at 800x480. On from the start (--ez videoCoverOn true) with the car moving (--ez moving
+# true): it plays all the same; the button then turns it off, back to the still cover. And Spotify Web as the
+# drive's music, its column kept while it starts: the button there too, for the real service.
+VIDEO_COVER=/tmp/video-cover
+if [ -z "${ONLY:-}" ] || [[ " $ONLY " == *" video-cover"* ]]; then
+    mkdir -p "$VIDEO_COVER"
+    docker run --rm -v "$VIDEO_COVER":/out --entrypoint /ffmpeg mwader/static-ffmpeg:7.1 -loglevel error -y \
+        -f lavfi -i "testsrc2=size=720x1280:rate=30:duration=4" -an -c:v libx264 -pix_fmt yuv420p -movflags +faststart \
+        /out/canvas.mp4 || echo "video cover: no test video"
+    python3 -m http.server 8003 --bind 127.0.0.1 --directory "$VIDEO_COVER" > /tmp/video-cover.txt 2>&1 &
+fi
+CANVAS="--ez demoSong true --es videoCover http://10.0.2.2:8003/canvas.mp4"
+EXTRA="$CANVAS" shoot video-cover 1920 720 240 "$WAIT;$WAIT;1405,54;$WAIT;$WAIT;1866,54;$WAIT"
+EXTRA="$CANVAS" shoot video-cover-800x480 800 480 160 "$WAIT;$WAIT;612,36;$WAIT;$WAIT;764,36;$WAIT"
+EXTRA="$CANVAS --ez videoCoverOn true --ez moving true" shoot video-cover-moving 1920 720 240 "$WAIT;$WAIT;$WAIT;1405,54;$WAIT"
+EXTRA="--es webMusic spotify --ez webMusicKey false" shoot video-cover-spotify 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT"
+case " ${ONLY:-video-cover} " in *" video-cover"*)
+    echo "--- video cover ---"
+    grep -h "video cover\|preview: demo" previews/video-cover*/log.txt previews/video-cover*/stream.txt 2>/dev/null | cut -c1-300 | head -30 || true
+    grep -h "GET" /tmp/video-cover.txt 2>/dev/null | head -10 || echo "video cover: nothing asked of the runner" ;;
+esac
 # Hiding an app from the grid: a long press on the browser for its menu, then "Hide from the app
 # grid" (the fourth button of the card in the middle of the screen), the grid without it and the
 # car saying where it comes back from. Then the settings' hidden apps, with the browser hidden.
