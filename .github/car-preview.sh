@@ -170,16 +170,6 @@ EXTRA="--ez demoSong true" shoot split-1920x1080 1920 1080 240 "$WAIT;$WAIT;$WAI
 EXTRA="--ez demoSong true --es carTheme LIGHT" shoot split-light 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es wallpaper waves" shoot split-waves 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez demoSong true --es wallpaper none" shoot split-none 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
-# Temporary: which part of the raised panels the emulator can't draw. The player beside a stand-in map,
-# each shot leaving out less (--es panelsOff); the first that takes the emulator down names it.
-for v in "a:shadow,corners,clip,rim,playerclip" "b:shadow,corners,clip,rim" "c:shadow,corners,rim" "d:shadow,rim" "e:shadow" "f:-"; do
-    EXTRA="--ez player true --es panelsOff ${v#*:}" shoot "panels-${v%%:*}" 1920 720 240 "$WAIT"
-done
-# The same on Home with the real map and the made-up song, adding the wallpaper behind the map's page and
-# the corners painted over the map.
-for v in "a:shadow,corners,clip,rim,mask,wall,playerclip" "b:shadow,corners,clip,rim,mask,playerclip" "c:shadow,mask" "d:mask" "e:wall" "f:-"; do
-    EXTRA="--ez demoSong true --es panelsOff ${v#*:}" shoot "split-${v%%:*}" 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT"
-done
 # The lyrics beside the map at Extra large, from the player's Lyrics button (the fourth of its bottom
 # row): the made-up song has none, so the cover above one line where there's room (1920x720), the line
 # alone at 800x480; 4 s later the player has the column back.

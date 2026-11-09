@@ -60,23 +60,19 @@ val PanelShape = RoundedCornerShape(MyCarRadius.Panel)
  */
 fun Modifier.raisedPanel(coverCorners: Boolean = false): Modifier = composed {
     val dark = MaterialTheme.colorScheme.background.luminance() < 0.5f
-    val off = panelsOff
-    (if ("shadow" in off) Modifier else Modifier.drawWithCache {
+    drawWithCache {
         // Worked out again only when the panel's size changes.
         val shadow = panelShadow(size, MyCarRadius.Panel.toPx(), MyCarLift.ShadowSpread.toPx(), MyCarLift.ShadowDrop.toPx(), dark)
         onDrawBehind { shadow.forEach { (piece, brush) -> drawPath(piece, brush) } }
-    })
-        .then(if (coverCorners && "mask" !in off) Modifier.groundOutside() else Modifier)
-        .then(if ("corners" in off) Modifier else PanelCornersElement)
-        .then(if ("clip" in off) Modifier else Modifier.clip(PanelShape))
-        .then(if ("rim" in off) Modifier else Modifier.drawWithContent {
+    }
+        .then(if (coverCorners) Modifier.groundOutside() else Modifier)
+        .then(PanelCornersElement)
+        .clip(PanelShape)
+        .drawWithContent {
             drawContent()
             drawPanelRim(MyCarRadius.Panel.toPx(), dark)
-        })
+        }
 }
-
-/** Temporary, debug only (CarPreviewActivity's --es panelsOff): parts of the panels left out, to find which one the emulator can't draw. */
-internal var panelsOff: Set<String> = emptySet()
 
 /**
  * Where a raised panel is and how round its corners are, for what's inside it: the knob's ring
