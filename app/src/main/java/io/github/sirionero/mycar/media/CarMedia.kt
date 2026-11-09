@@ -40,19 +40,21 @@ class MediaEntry(
     val playable: Boolean,
 )
 
-/** [icon] is a drawable id inside the media app's own package, not myCar's; 0 for none. */
-class CustomAction(val id: String, val name: String, val extras: Bundle?, val icon: Int = 0, val iconName: String = "") {
-    /**
-     * Whether a toggle like heart or shuffle is on, read from the icon's name - Tidal swaps
-     * ic_favorite for ic_favorite_filled and ic_shuffle for ic_shuffle_active, and keeps the
-     * button's name the same. Whole words only, so "inactive" doesn't count as "active".
-     */
+/**
+ * [icon] is a drawable id inside the media app's own package, not myCar's; 0 for none.
+ * [hasOutline]: the app also has an outline of the same icon (ic_heart beside ic_heart_outline).
+ */
+class CustomAction(
+    val id: String,
+    val name: String,
+    val extras: Bundle?,
+    val icon: Int = 0,
+    val iconName: String = "",
+    val hasOutline: Boolean = false,
+) {
+    /** Whether a toggle like heart or shuffle is on, from its icon (see [AppButtons.on]). */
     val on: Boolean
-        get() = iconName.lowercase().split('_', '.', '-').any { it in ON_WORDS }
-
-    private companion object {
-        val ON_WORDS = setOf("filled", "fill", "active", "on", "selected", "checked", "enabled", "solid", "one", "all")
-    }
+        get() = AppButtons.on(iconName, hasOutline)
 }
 
 /** One entry in the app's own queue - not its library, whatever it has lined up to play next. */
@@ -115,12 +117,13 @@ class NowPlaying(
     val repeatAction get() = customFor("repeat", "loop")
 
     /**
-     * Liked or not; null when the app offers no way to like at all. An app's own like button
-     * only says which way it goes next by its name ("Remove from Liked Songs"), so that's read.
+     * Liked or not; null when the app offers no way to like at all. An app's own like button says
+     * it by its icon ([CustomAction.on]: Metrolist's heart filled in) or by which way it goes next,
+     * in its name ("Remove from Liked Songs").
      */
     val liked: Boolean?
-        get() = heart ?: likeAction?.name?.let { name ->
-            listOf("remove", "unlike", "unfav", "unheart").any { name.contains(it, ignoreCase = true) }
+        get() = heart ?: likeAction?.let { action ->
+            action.on || listOf("remove", "unlike", "unfav", "unheart").any { action.name.contains(it, ignoreCase = true) }
         }
 
     val playing get() = state == PlaybackState.STATE_PLAYING || state == PlaybackState.STATE_BUFFERING
@@ -432,7 +435,10 @@ class CarMedia(private val context: Context) {
             speed = state?.playbackSpeed ?: 1f,
             updatedAt = state?.lastPositionUpdateTime ?: 0,
             actions = state?.actions ?: 0,
-            custom = state?.customActions.orEmpty().map { CustomAction(it.action, it.name.toString(), it.extras, it.icon, iconName(it.icon)) },
+            custom = state?.customActions.orEmpty().map {
+                val iconName = iconName(it.icon)
+                CustomAction(it.action, it.name.toString(), it.extras, it.icon, iconName, hasOutline(it.icon, iconName))
+            },
             error = state?.errorMessage?.toString(),
             activeQueueItemId = state?.activeQueueItemId ?: MediaSession.QueueItem.UNKNOWN_ID.toLong(),
             heart = if (controller?.ratingType == Rating.RATING_HEART) {
@@ -448,14 +454,34 @@ class CarMedia(private val context: Context) {
 
     private var appResources: Pair<String, android.content.res.Resources?>? = null
 
+    /** The resources of the app [pkg], kept for the app myCar talks to; what's known of its icons goes with another. */
+    private fun resourcesOf(pkg: String): android.content.res.Resources? {
+        if (appResources?.first != pkg) {
+            appResources = pkg to runCatching { context.packageManager.getResourcesForApplication(pkg) }.getOrNull()
+            outlines.clear()
+        }
+        return appResources?.second
+    }
+
     /** The icon's resource name in the app's package, or "" when it can't be read. */
     private fun iconName(icon: Int): String {
         val pkg = controller?.packageName ?: return ""
-        if (appResources?.first != pkg) {
-            appResources = pkg to runCatching { context.packageManager.getResourcesForApplication(pkg) }.getOrNull()
-        }
-        val res = appResources?.second ?: return ""
+        val res = resourcesOf(pkg) ?: return ""
         return runCatching { res.getResourceEntryName(icon) }.getOrDefault("")
+    }
+
+    /** Whether each icon has an outline in the app, by icon id: looked up once, the state changes often. */
+    private val outlines = HashMap<Int, Boolean>()
+
+    /** The app has an outline of the icon [name] too ([AppButtons.outlineNames]): the plain one is then "on". */
+    private fun hasOutline(icon: Int, name: String): Boolean {
+        val pkg = controller?.packageName ?: return false
+        val res = resourcesOf(pkg) ?: return false
+        val outlined = AppButtons.outlineNames(name)
+        if (outlined.isEmpty()) return false
+        return outlines.getOrPut(icon) {
+            outlined.any { runCatching { res.getIdentifier(it, "drawable", pkg) }.getOrDefault(0) != 0 }
+        }
     }
 
     private var loggedButtons: String? = null
