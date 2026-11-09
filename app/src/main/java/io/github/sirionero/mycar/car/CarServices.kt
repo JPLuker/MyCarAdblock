@@ -494,14 +494,24 @@ object CarServices {
 
     /**
      * A player really playing on the phone, whose sound takes the car's speakers from its radio (see
-     * [CarAudio.playerPlaying]): the car's music app, Cinema's film, or any app's media session, read
-     * with the notification access the music asks for anyway. Not a map's voice, a web page or the
-     * assistant, which have no player. From the capture's thread: the sessions, a call to Android, are
-     * asked at most every half second.
+     * [CarAudio.playerPlaying]): the car's music app, Cinema's film, a site open in Cinema or the
+     * browser open full screen, or any app's media session, read with the notification access the
+     * music asks for anyway. Not a map's voice, a page in a part of the Home or the assistant, which
+     * have no player. From the capture's thread: the sessions, a call to Android, are asked at most
+     * every half second.
      */
     private fun aPlayerPlays(): Boolean {
         if (mediaOrNull()?.now?.value?.state == PlaybackState.STATE_PLAYING) return true
-        if (CinemaNow.playing?.invoke() == true) return true
+        // Cinema's own player says whether its film plays. A site open in Cinema, or the browser full
+        // screen, has no player to ask: the driver opened it on the car's screen, so its sound - a video,
+        // a web radio - is theirs. Left out, it stayed silent after the radio for the rest of the drive:
+        // the phone muted by the capture, the car on its radio, its own GAIN starting nothing.
+        val film = CinemaNow.playing
+        if (film != null) {
+            if (film()) return true
+        } else if (CinemaNow.pause != null) {
+            return true
+        }
         val now = android.os.SystemClock.elapsedRealtime()
         if (now - sessionsAskedAt < SESSIONS_EVERY_MS) return sessionsPlaying
         sessionsAskedAt = now
