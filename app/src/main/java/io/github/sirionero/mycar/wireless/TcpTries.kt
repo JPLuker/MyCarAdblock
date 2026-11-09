@@ -42,4 +42,31 @@ internal object TcpTries {
 
     /** A car with its channel open asked for its Wi-Fi again 0.2 s after Android dropped it. */
     const val LOSS_GRACE_MS = 4_000L
+
+    /**
+     * The port the car gave in its StartRequest is gone. An adapter that doesn't see the phone on its
+     * Wi-Fi within moments closes the Bluetooth channel and restarts, and the port goes with it: the
+     * car answers on its Wi-Fi but refuses that port, and the tries spent their minute on it with
+     * the car already on the road. So: this start-up's channel closed before the phone joined the
+     * Wi-Fi, and the port has been refused for [REFUSED_MIN_MS], with the car's Bluetooth back
+     * [RESTART_GAP_MS] or more after the channel closed (it restarted), or refused for
+     * [REFUSED_ALONE_MS]. A car that opens its port late keeps its channel open: it still gets the minute.
+     *
+     * All on one clock (elapsedRealtime). [channelClosedAt]: this start-up's channel, null while open;
+     * [joinedAt]: the Wi-Fi; [refusedSince]: the first refusal in a row on the car's network, null
+     * without one; [carBackAt]: the car's Bluetooth came last, null if never seen.
+     */
+    fun stalePort(channelClosedAt: Long?, joinedAt: Long, refusedSince: Long?, carBackAt: Long?, now: Long): Boolean {
+        if (channelClosedAt == null || channelClosedAt > joinedAt || refusedSince == null) return false
+        val refused = now - refusedSince
+        if (refused < REFUSED_MIN_MS) return false
+        val restarted = carBackAt != null && carBackAt - channelClosedAt >= RESTART_GAP_MS
+        return restarted || refused >= REFUSED_ALONE_MS
+    }
+
+    const val REFUSED_MIN_MS = 4_000L
+    const val REFUSED_ALONE_MS = 5_000L
+
+    /** An adapter that restarts is away from Bluetooth for 20 s and more; a channel it just closes, about 1 s. */
+    const val RESTART_GAP_MS = 10_000L
 }

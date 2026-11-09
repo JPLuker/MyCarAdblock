@@ -221,6 +221,8 @@ object WirelessLink {
     private val ends = Any()
     /** The current start-up's Bluetooth channel is over. */
     private var channelOver = false
+    /** When it ended (elapsedRealtime), 0 while open: a port given before is gone if it closed before the Wi-Fi came. */
+    @Volatile private var channelClosedAt = 0L
     /** The car ended the session on Wi-Fi with the channel still open: the car's network goes with the channel. */
     private var releaseWithChannel = false
 
@@ -253,6 +255,7 @@ object WirelessLink {
         goneAddress = null
         synchronized(ends) {
             channelOver = false
+            channelClosedAt = 0L
             releaseWithChannel = false
         }
         val app = context.applicationContext
@@ -337,6 +340,7 @@ object WirelessLink {
         synchronized(ends) {
             if (mine != startRun) return
             channelOver = true
+            channelClosedAt = SystemClock.elapsedRealtime()
             if (releaseWithChannel && tcp == null) releaseNetwork(context)
             if (tcp != null) return
             // The car's Wi-Fi asked for and not over: some cars close the channel once the phone has
@@ -425,8 +429,17 @@ object WirelessLink {
 
     /** The car's Bluetooth back (Android's companion watch): a start-up waiting on its going goes on. */
     fun carHere(address: String) {
+        arrivals[address.uppercase(java.util.Locale.ROOT)] = SystemClock.elapsedRealtime()
         if (goneAddress.equals(address, ignoreCase = true)) goneAddress = null
     }
+
+    /**
+     * When each car's Bluetooth last came (Android's companion watch, every arrival, during a drive
+     * too), by address in capitals, on elapsedRealtime: an adapter that restarted is back on it.
+     */
+    private val arrivals = java.util.concurrent.ConcurrentHashMap<String, Long>()
+
+    private fun arrivalOf(address: String): Long? = arrivals[address.uppercase(java.util.Locale.ROOT)]
 
     /** The car whose Bluetooth went during an automatic start-up, until it's back or the start-up stops. */
     @Volatile private var goneAddress: String? = null
@@ -1052,6 +1065,11 @@ object WirelessLink {
     ) {
         SessionStatus.connecting(R.string.wireless_link_wifi_reaching, name)
         lostNetwork = null
+        val joinedAt = SystemClock.elapsedRealtime()
+        // The first of the car's refusals in a row on its own network, 0 without one (TcpTries.stalePort).
+        var refusedSince = 0L
+        // The car refused the port it gave: it's reachable, and the port is gone.
+        var stale = false
         var last: Exception? = null
         // Set once Android refuses to bind to the car's network, which a VPN causes. Plain sockets
         // then go through the VPN, and VPNs that let local traffic past still reach the car.
@@ -1120,6 +1138,23 @@ object WirelessLink {
                     }
                 }
             }
+            // An adapter that restarted while the phone joined its Wi-Fi refuses the port it gave
+            // before: a new start-up gets a new one, instead of a minute of refusals on the road.
+            val now = SystemClock.elapsedRealtime()
+            val carBack = car?.address?.let { arrivalOf(it) }
+            val closedAt = channelClosedAt.takeIf { it != 0L }
+            if (!bindRefused && TcpTries.stalePort(closedAt, joinedAt, refusedSince.takeIf { it != 0L }, carBack, now)) {
+                stale = true
+                cut = "the car refuses the port it gave before it restarted"
+                val since = if (carBack != null && closedAt != null && carBack > closedAt) ", its Bluetooth back ${(carBack - closedAt) / 1000}s after" else ""
+                log.w(
+                    "TCP: $ip:$port refused for ${(now - refusedSince) / 1000}s, and the car closed its Bluetooth channel " +
+                        "before the Wi-Fi came$since - that port is gone, starting over for a new one",
+                )
+                break
+            }
+            // The try goes over the car's own network, or its Wi-Fi joined by hand: a refusal there is the car's.
+            var viaCar = false
             try {
                 val viaOther = when (verdict) {
                     CarNetwork.Verdict.CAR -> lost || attempt % 2 == 0
@@ -1134,6 +1169,7 @@ object WirelessLink {
                     lost -> Socket()
                     else -> net.socketFactory.createSocket()
                 }
+                viaCar = !bindRefused && if (viaOther) verdict == CarNetwork.Verdict.CAR else !lost
                 socket.tcpNoDelay = true
                 socket.connect(InetSocketAddress(ip, port), 5_000)
                 // Stopped while it connected (the cable went in meanwhile): handing it on would
@@ -1167,6 +1203,10 @@ object WirelessLink {
                     bindRefused = true
                     log.i("TCP: Android won't let myCar use the car's network directly; trying the phone's ordinary route")
                 }
+                if (viaCar) {
+                    refusedSince = if (e.message?.contains("ECONNREFUSED") != true) 0L
+                    else refusedSince.takeIf { it != 0L } ?: SystemClock.elapsedRealtime()
+                }
                 if (attempt == 0) probe(context, net, ip, port)
                 Thread.sleep(1_000)
             }
@@ -1184,7 +1224,8 @@ object WirelessLink {
             saidWhy = true
             releaseNetwork(context)
         }
-        if (vpnActive(context)) {
+        // A car that refused the port is reachable: neither a VPN nor Android's local-network rule is in the way.
+        if (!stale && vpnActive(context)) {
             SessionStatus.failed(
                 R.string.wireless_link_vpn,
                 R.string.wireless_link_vpn_detail,
@@ -1195,7 +1236,7 @@ object WirelessLink {
         }
         // Android 17 keeps myCar off local networks until it's allowed, the car's Wi-Fi among them:
         // every try timed out, and no start-over mends that. Said as it is, with what to allow.
-        if (!io.github.sirionero.mycar.LocalNetwork.allowed(context)) {
+        if (!stale && !io.github.sirionero.mycar.LocalNetwork.allowed(context)) {
             log.w("TCP: Android doesn't let myCar reach local networks (Nearby devices) - the car's Wi-Fi is one")
             SessionStatus.failed(R.string.wireless_link_no_connection, R.string.wireless_link_local_network_detail)
             endJoin(noStartOver = true)
