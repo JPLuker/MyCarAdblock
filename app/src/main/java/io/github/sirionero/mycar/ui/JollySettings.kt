@@ -358,6 +358,7 @@ private fun AppDialog(current: JollyAction?, onPick: (JollyAction) -> Unit, onDi
     val order by CarSettings.appOrder.collectAsState()
     val apps = launcherOrder(entries.filterNot(replaced), vehicleData, order)
         .filter { it.componentId != null && it.builtIn !== BuiltInApps.Exit }
+        .distinctBy { it.componentId }
     val now = (current as? JollyAction.OpenApp)?.let { pinShown(it.id, entries) }
     AlertDialog(
         onDismissRequest = onDismiss,
