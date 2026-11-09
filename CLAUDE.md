@@ -1755,24 +1755,37 @@ Tutti i token in un solo posto, `car/design/`:
   (`PhoneAssistants.launch` come il microfono, col telefono bloccato `AssistantUnlock.start(…, then)` o, con
   Home Assistant pronto, myCar ascolta da sé, `CarAssistant.listenHere()`); Home Assistant (solo con Plancia
   configurata in myCar, sul collegamento del viaggio: script e scene `turn_on`, pulsanti `press`, interruttori,
-  luci e cancelli `toggle`, serrature `lock`/`unlock`; aprire una serratura vuole un secondo tocco entro 3 s,
-  `SecondTap`; allarmi no; "done" vuol dire che Home Assistant ha accettato il servizio); andare a un posto
-  scritto sul telefono (`CarServices.connectNav`, come il «portami a» dell'assistente); un comando
-  dell'assistente come se fosse detto (`CarAssistant.runPhrase` → `heard()`, nella lingua in cui è scritto,
-  `written`, fino al microfono dopo; quattro pronti per lingua, che `JollyActionTest` fa capire ai frasari);
-  aprire un'app della griglia. In auto non si scrive niente. Durante lo squillo il tasto tace; in chiamata
-  chiamata, IA e comando aspettano. Il comando si salva come "type=…&chiave=valore" (%XX per % & = e controlli);
-  quello che la versione non conosce vale come nessuna scelta. Un widget vero di Android su un tasto non si può
-  (va ospitato e disegnato intero, le sue azioni sono dell'altra app): lo coprono Home Assistant, chiamata e
-  comando. La manopola si ferma anche sul tasto (fra microfono e mappa): `call-bubble-knob` arriva al tasto
-  rosso della pillola al settimo giro; altri scatti che contano i giri della manopola nel dock vanno contati
-  così. Anteprima `--es jolly <call|ai|home|unlock|navigate|say|app>`, `--es jollySay`/`jollyLang`, `--ez
-  jollyKey false`, `--ez jollySettings true`; scatti `jolly-*` (`shots: jolly`, con Home Assistant). Verificato
-  in CI (0.7.4): tasto e microfono a 800x480 e 1920x720, Large ed Extra large, scelta in 9 lingue e in
-  piratesco, comando scritto risposto (anche in italiano), assistenti, app, contatti (anche sul telefono), cose
-  di un Home Assistant vero, script eseguito, serratura col secondo tocco, posto passato a Vela. Non provato con
-  un telefono e un'auto veri. Idee per dopo: dettare posto o comando a macchina ferma, più tasti o un Jolly per
-  auto, lo stato di Home Assistant sul tasto, "portami a casa" dalla zona home, una sequenza di azioni.
+  luci e cancelli `toggle`, serrature `lock`/`unlock`; aprire una serratura vuole un secondo tocco fra 0,7 e 3 s
+  dal primo, `SecondTap`; allarmi no; prima del comando myCar legge lo stato di quella sola cosa,
+  `home/EntityWatch.kt` con `subscribe_entities` + `entity_ids`: mancante o `unavailable` non manda niente e lo
+  dice, `unknown` va avanti perché è lo stato normale di scene, pulsanti e cancelli senza sensore; una serratura
+  si aspetta fino a 10 s, `locked`/`unlocked`/`open` o `jammed`, poi "still locked" o "hasn't said"; lo stesso
+  comando non riparte mentre gira e per 1 s dopo, `RepeatGuard`; regole in `HomeChecks` + test; un Home
+  Assistant senza `entity_ids` riceve solo il comando, come prima); andare a un posto scritto sul telefono
+  (`CarServices.connectNav`, come il «portami a» dell'assistente); un comando dell'assistente come se fosse
+  detto (`CarAssistant.runPhrase` → `heard()`, nella lingua in cui è scritto, `written`, fino al microfono dopo;
+  quattro pronti per lingua, che `JollyActionTest` fa capire ai frasari); aprire un'app della griglia. In auto
+  non si scrive niente. Nell'anteprima dell'auto sul telefono, senza viaggio, il tasto dice solo cosa farebbe.
+  Al tocco "Chiama" ricontrolla con `PhoneLookup` che il numero sia ancora di un contatto con quel nome, se no
+  riapre la scelta. Col telefono bloccato e lo sblocco negato l'auto dice di ritoccare il tasto Jolly; il
+  microfono lascia cadere un assistente del Jolly che aspetta lo sblocco (`AssistantUnlock.dropJolly`). La
+  lingua di un comando scritto vale solo per la sua risposta (`CarAssistant.forgetWritten`). Durante lo squillo
+  il tasto tace; in chiamata chiamata, IA e comando aspettano. Il comando si salva come "type=…&chiave=valore"
+  (%XX per % & = e controlli); quello che la versione non conosce vale come nessuna scelta. Un widget vero di
+  Android su un tasto non si può (va ospitato e disegnato intero, le sue azioni sono dell'altra app): lo coprono
+  Home Assistant, chiamata e comando. La manopola si ferma anche sul tasto (fra microfono e mappa):
+  `call-bubble-knob` arriva al tasto rosso della pillola al settimo giro; altri scatti che contano i giri della
+  manopola nel dock vanno contati così. Anteprima `--es jolly <call|ai|home|unlock|navigate|say|app>`, `--es
+  jollySay`/`jollyLang`, `--ez jollyKey false`, `--ez jollySettings true`; scatti `jolly-*` (`shots: jolly`, con
+  Home Assistant; `jolly-lock` e `jolly-lock-stuck` con una serratura finta scritta con l'API REST, `--es
+  jollyHome`). Verificato in CI (0.7.4): tasto e microfono a 800x480 e 1920x720, Large ed Extra large, scelta in
+  9 lingue e in piratesco, comando scritto risposto (anche in italiano), assistenti, app, contatti (anche sul
+  telefono), cose di un Home Assistant vero, script eseguito, serratura col secondo tocco (troppo presto
+  ignorato, poi "done"; una che resta chiusa: "still locked" dopo 10 s; una che non c'è: lo dice), posto passato
+  a Vela. Una revisione indipendente ha trovato 13 punti, tutti corretti tranne il tasto acceso di predefinito
+  (voluto dall'utente). Non provato con un telefono e un'auto veri. Idee per dopo: dettare posto o comando a
+  macchina ferma, più tasti o un Jolly per auto, lo stato di Home Assistant sul tasto, "portami a casa" dalla
+  zona home, una sequenza di azioni.
 - **Copertina video** (0.7.4, `feature/video-cover`; richiesta dell'utente: "se attivo Spotify Web, la
   possibilità di scelta fra locandina fissa e locandina video", poi "un video anche in marcia, se abilitato; lo
   attiva la prima volta un tasto nel lettore condiviso, poi resta così finché non lo ritocca"). Dove la musica
