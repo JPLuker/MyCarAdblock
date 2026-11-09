@@ -88,13 +88,15 @@ class MirrorService : Service() {
      * awake, and without myCar's Accessibility there are none (with it, the window of
      * [TouchRelayService] does the same). From Android 16 the lock that follows also ends the sharing.
      * Taken just after the driver's Start, with the screen on: it keeps the screen on, never turns it
-     * on, and the power button still turns it off.
+     * on, and the power button still turns it off. Let go, the screen stays on for the usual timeout
+     * (ON_AFTER_RELEASE) instead of going dark the moment a long sharing ends.
      */
     @Suppress("DEPRECATION") // SCREEN_BRIGHT_WAKE_LOCK: still honoured, and a service has no window for FLAG_KEEP_SCREEN_ON
     private fun keepScreenOn() {
         if (screenOn != null) return
         screenOn = runCatching {
-            getSystemService(PowerManager::class.java).newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "myCar:mirror")
+            getSystemService(PowerManager::class.java)
+                .newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE, "myCar:mirror")
                 .apply { setReferenceCounted(false); acquire() }
         }.onFailure { MyCarLog.w("mirror: couldn't keep the phone's screen on: ${it.message}") }.getOrNull()
     }
