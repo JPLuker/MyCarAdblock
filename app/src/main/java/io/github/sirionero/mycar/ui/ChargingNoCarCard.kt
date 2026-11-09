@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.sirionero.mycar.AppSettings
 import io.github.sirionero.mycar.BuildConfig
+import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.SessionStatus
 import io.github.sirionero.mycar.setup.ChargingNoCar
@@ -73,8 +74,13 @@ internal fun ChargingNoCarCard() {
         // Looked at every second while it charges: the wait runs out, or a car comes - on the
         // cable, read from the USB port, or wirelessly, with the cable there only to charge.
         while (true) {
-            val car = live || WirelessLink.busy || carCameToMyCar(context)
-            shown = hint.update(SystemClock.elapsedRealtime(), usb, car)
+            val cable = onCable(context)
+            val show = hint.update(SystemClock.elapsedRealtime(), usb, car = live || WirelessLink.busy || cable == OnCable.MYCAR)
+            if (show && !shown) {
+                val what = if (cable == OnCable.ELSEWHERE) "a car is on the cable, but Android hasn't handed it to myCar" else "nothing on the cable"
+                MyCarLog.i("home: charging from a USB port with no car for ${ChargingNoCar.WAIT_MS / 1000}s - $what")
+            }
+            shown = show
             if (!usb || live) break
             delay(LOOK_MS)
         }
@@ -117,13 +123,19 @@ private fun chargesFromUsb(battery: Intent?): Boolean =
     battery?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) == BatteryManager.BATTERY_PLUGGED_USB
 
 /**
- * A car on the cable that came to myCar: Android gave myCar the accessory attached, as it does
- * when it opens myCar for it. One it holds while it asks which app to open, or gave to another
- * app, doesn't count: that tells myCar nothing either, and the card has something to say about it.
+ * What's on the cable: nothing a car has switched over, a car Android hasn't handed to myCar
+ * (it's asking which app to open, or gave it to another app: that tells myCar nothing either, and
+ * the card has something to say about it), or a car that came to myCar - Android gives myCar the
+ * accessory as it opens myCar for it.
  */
-private fun carCameToMyCar(context: Context): Boolean {
-    val usb = context.getSystemService(UsbManager::class.java) ?: return false
-    return runCatching { usb.accessoryList?.any { usb.hasPermission(it) } == true }.getOrDefault(false)
+private enum class OnCable { NOTHING, ELSEWHERE, MYCAR }
+
+private fun onCable(context: Context): OnCable {
+    val usb = context.getSystemService(UsbManager::class.java) ?: return OnCable.NOTHING
+    val accessories = runCatching { usb.accessoryList }.getOrNull()
+    if (accessories.isNullOrEmpty()) return OnCable.NOTHING
+    val mine = accessories.any { runCatching { usb.hasPermission(it) }.getOrDefault(false) }
+    return if (mine) OnCable.MYCAR else OnCable.ELSEWHERE
 }
 
 /**
