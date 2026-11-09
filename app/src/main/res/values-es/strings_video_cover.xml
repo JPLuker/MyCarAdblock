@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">Activar la portada en vídeo</string>
+    <string name="car_player_video_cover_off">Desactivar la portada en vídeo</string>
+    <string name="car_player_video_cover_now_on">Portada en vídeo activada, para las canciones que la tienen</string>
+    <string name="car_player_video_cover_now_off">Portada fija</string>
+    <string name="car_settings_cover">Portada en el reproductor</string>
+    <string name="car_settings_cover_still">Fija</string>
+    <string name="car_settings_cover_video">Vídeo</string>
+    <string name="car_settings_cover_note">Algunas canciones tienen un vídeo corto en bucle, como los Canvas de Spotify. Con Vídeo, el reproductor junto al mapa lo muestra en lugar de la portada. El botón de la portada también lo cambia.</string>
+    <string name="music_video_cover">Portada en vídeo</string>
+    <string name="music_video_cover_detail">En el reproductor del coche junto al mapa, el vídeo corto en bucle que tienen algunas canciones (los Canvas de Spotify), en lugar de la portada. El botón de la portada en el coche también lo cambia. Cada vídeo gasta unos pocos megabytes de datos.</string>
+</resources>

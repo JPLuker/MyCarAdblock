@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">Hoist the video cover</string>
+    <string name="car_player_video_cover_off">Strike the video cover</string>
+    <string name="car_player_video_cover_now_on">Video cover hoisted, for the shanties that have one</string>
+    <string name="car_player_video_cover_now_off">Cover lying still at anchor</string>
+    <string name="car_settings_cover">Cover on the shanty box</string>
+    <string name="car_settings_cover_note">Some shanties have a short looping video, as Spotify\'s Canvas. With Video, the shanty box beside the chart shows it in place of the cover. The button on the cover switches it too.</string>
+    <string name="music_video_cover">Video cover aboard</string>
+    <string name="music_video_cover_detail">In the ship\'s shanty box beside the chart, the short looping video some shanties have (Spotify\'s Canvas), in place of the cover. The button on the cover aboard switches it too. Each video uses a few megabytes of data.</string>
+</resources>

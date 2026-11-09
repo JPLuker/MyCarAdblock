@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">Ύψωση εξωφύλλου βίντεο</string>
+    <string name="car_player_video_cover_off">Υποστολή εξωφύλλου βίντεο</string>
+    <string name="car_player_video_cover_now_on">Το εξώφυλλο βίντεο υψώθηκε, για τους σκοπούς που έχουν</string>
+    <string name="car_player_video_cover_now_off">Σταθερό εξώφυλλο, αγκυροβολημένο</string>
+    <string name="car_settings_cover">Εξώφυλλο στο γραμμόφωνο</string>
+    <string name="car_settings_cover_note">Ορισμένοι σκοποί έχουν ένα σύντομο βίντεο σε επανάληψη, όπως τα Canvas του Spotify. Με την επιλογή Βίντεο, το γραμμόφωνο δίπλα στον χάρτη το δείχνει στη θέση του εξωφύλλου. Το αλλάζει και το κουμπί πάνω στο εξώφυλλο.</string>
+    <string name="music_video_cover">Εξώφυλλο βίντεο στο καράβι</string>
+    <string name="music_video_cover_detail">Στο γραμμόφωνο του καραβιού δίπλα στον χάρτη, το σύντομο βίντεο σε επανάληψη που έχουν ορισμένοι σκοποί (τα Canvas του Spotify), στη θέση του εξωφύλλου. Το αλλάζει και το κουμπί πάνω στο εξώφυλλο στο καράβι. Κάθε βίντεο χρησιμοποιεί λίγα megabyte δεδομένων.</string>
+</resources>

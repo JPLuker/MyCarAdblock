@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">Video-Cover hissen</string>
+    <string name="car_player_video_cover_off">Video-Cover einholen</string>
+    <string name="car_player_video_cover_now_on">Video-Cover gehisst, für die Shantys, die eins haben</string>
+    <string name="car_player_video_cover_now_off">Cover liegt still vor Anker</string>
+    <string name="car_settings_cover">Cover in der Drehorgel</string>
+    <string name="car_settings_cover_note">Manche Shantys haben ein kurzes Video in Schleife, wie die Canvas von Spotify. Mit Video zeigt es die Drehorgel neben der Karte statt des Covers. Die Taste auf dem Cover schaltet es auch um.</string>
+    <string name="music_video_cover">Video-Cover an Bord</string>
+    <string name="music_video_cover_detail">In der Drehorgel des Schiffs neben der Karte das kurze Video in Schleife, das manche Shantys haben (die Canvas von Spotify), statt des Covers. Die Taste auf dem Cover an Bord schaltet es auch um. Jedes Video braucht ein paar Megabyte Daten.</string>
+</resources>

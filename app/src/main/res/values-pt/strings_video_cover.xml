@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">Ativar a capa em vídeo</string>
+    <string name="car_player_video_cover_off">Desativar a capa em vídeo</string>
+    <string name="car_player_video_cover_now_on">Capa em vídeo ativada, para as músicas que têm uma</string>
+    <string name="car_player_video_cover_now_off">Capa fixa</string>
+    <string name="car_settings_cover">Capa no player</string>
+    <string name="car_settings_cover_still">Fixa</string>
+    <string name="car_settings_cover_video">Vídeo</string>
+    <string name="car_settings_cover_note">Algumas músicas têm um vídeo curto em loop, como os Canvas do Spotify. Com Vídeo, o player ao lado do mapa mostra esse vídeo no lugar da capa. O botão na capa também muda isso.</string>
+    <string name="music_video_cover">Capa em vídeo</string>
+    <string name="music_video_cover_detail">No player do carro ao lado do mapa, o vídeo curto em loop que algumas músicas têm (os Canvas do Spotify), no lugar da capa. O botão na capa, no carro, também muda isso. Cada vídeo usa alguns megabytes de dados.</string>
+</resources>
