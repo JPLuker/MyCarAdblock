@@ -1,6 +1,7 @@
 package io.github.sirionero.mycar.car
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.sirionero.mycar.AppSettings
 import io.github.sirionero.mycar.R
-import io.github.sirionero.mycar.car.design.MyCarRadius
 import io.github.sirionero.mycar.car.theme.GsButton
 import io.github.sirionero.mycar.car.theme.GsColors
 import io.github.sirionero.mycar.car.theme.GsIconBox
@@ -92,6 +91,7 @@ internal fun rememberSidePaneApp(): Entry? {
  * A templated app beside the map, under a bar with its name and Close. It runs on the connection
  * an app opened full screen from the grid uses too: on Home the pane takes it back, so it always
  * shows the app chosen for it. Close puts the pane away for the drive, as the player's X does.
+ * The panel it sits in rounds it (see raisedPanel).
  */
 @Composable
 internal fun SideAppPane(app: TemplateApp, frame: CarEnvironment.Frame, modifier: Modifier) {
@@ -104,7 +104,7 @@ internal fun SideAppPane(app: TemplateApp, frame: CarEnvironment.Frame, modifier
         if (!closed && (!live || CarServices.browse.connectedComponent != app.component)) CarServices.connectBrowse(app, frame)
         started = true
     }
-    Box(modifier.clip(RoundedCornerShape(MyCarRadius.Card)), contentAlignment = Alignment.Center) {
+    Box(modifier.background(MaterialTheme.colorScheme.surface), contentAlignment = Alignment.Center) {
         if (status.phase == CarAppConnection.Phase.REJECTED || status.phase == CarAppConnection.Phase.FAILED) {
             // Why, and a way on: only the sentence, it held a third of Home for the whole drive.
             Column(

@@ -1,6 +1,7 @@
 package io.github.sirionero.mycar.car
 
 import io.github.sirionero.mycar.car.theme.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +57,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.car.design.MyCarSpace
+import io.github.sirionero.mycar.car.design.raisedPanel
 import io.github.sirionero.mycar.host.CarAppConnection
 import io.github.sirionero.mycar.media.CarMedia
 import io.github.sirionero.mycar.media.NowPlaying
@@ -148,48 +151,55 @@ fun CarHome() {
     val panning by CarServices.nav.panMode.collectAsStateWithLifecycle()
     val miniNow = if (musicShown && !musicOn && !now.isActive && lastActive[0].isActive) lastActive[0].playingAs(now) else now
 
-    // The map's page among the driver's own (see HomePager). No outer padding on any side, split
-    // screen or not - only the gap between the two panes when the player is sharing the screen
-    // with the map.
+    // The map's page among the driver's own (see HomePager). The map alone fills it, edge to edge.
+    // Split, the map and what's beside it are panels raised off the wallpaper (see Panels.kt), with the
+    // same small gap round them as between them; HomePager draws the wallpaper behind them.
     val planciaWeb = LocalPlanciaWeb.current
     val planciaBeside = splitScreen && sideApp?.builtIn == BuiltInApps.Plancia
-    HomePager(onHome) { inView ->
+    HomePager(onHome, mapSplit = splitScreen) { inView ->
     androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
     // Plancia's page beside the map stays a frame after it goes (out of view, Close, another choice),
     // so a tap's focus can leave it first (see LeaveWithoutFocus.kt); the column with it.
     val planciaShown = leavesWithoutFocus(planciaBeside && inView) { planciaWeb?.dropFocus() }
     val split = splitScreen || planciaShown
+    val gap = if (split) MyCarSpace.Panel else 0.dp
     // As far as it fits: the map keeps room for an app's card over it, the column for its X over the glass.
-    val sideScale = if (music) sideScaleFor(playerSize, maxWidth.value - 8f, maxHeight.value, MAP_PANE_MIN_EDGE.value + 24f) else 1f
+    val sideScale = if (music) sideScaleFor(playerSize, (maxWidth - gap * 3).value, (maxHeight - gap * 2).value, MAP_PANE_MIN_EDGE.value + 24f) else 1f
     Row(
-        Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        Modifier.fillMaxSize().padding(gap),
+        horizontalArrangement = Arrangement.spacedBy(gap),
     ) {
         Box(
             Modifier
                 // The side a third of the screen, as it always was, times its size: the map takes the rest.
                 .weight(if (split) MAP_SHARE / sideScale - 1f else 1f)
-                .fillMaxHeight(),
+                .fillMaxHeight()
+                // The map app's surface ignores the panel's clip: its corners are painted over.
+                .then(if (split) Modifier.raisedPanel(coverCorners = true).background(MaterialTheme.colorScheme.surface) else Modifier),
         ) {
             MapPane(navStatus, frame, inView, mini = miniNow.takeIf { miniPlayerShows(miniOn, navigator.miniPlayerHidden, musicShown, split, inView, panning) })
         }
-        if (split) CompositionLocalProvider(LocalPlayerInView provides inView, LocalDensity provides LocalDensity.current.scaledBy(sideScale)) {
-            val side = Modifier.weight(1f).fillMaxHeight()
-            val sideTemplate = sideApp?.template
-            val sideMedia = sideApp?.media
-            when {
-                // Plancia inside myCar: its one page goes wherever it's on screen, so here too only in
-                // view (and a frame more, see planciaShown).
-                planciaShown -> PlanciaPane(side)
-                // Only while its page is in view on Home: an app opened full screen from the grid,
-                // or on another page, uses the same connection, and two stages on it would pull its
-                // surface back and forth.
-                sideTemplate != null ->
-                    if (inView) SideAppPane(sideTemplate, frame, side) else AppPlaceholder(sideApp?.shownLabel.orEmpty(), sideApp?.icon, side)
-                sideApp?.builtIn == BuiltInApps.Plancia -> AppPlaceholder("Plancia", null, side, builtInId = BuiltInApps.Plancia.id)
-                panel == SidePanel.LYRICS -> SideLyrics(shownNow, side)
-                sideMedia != null -> SideMediaPane(sideMedia, shownNow, side)
-                else -> GlassDockedPlayer(shownNow, side, startingApp = mediaApp?.label?.takeIf { reserved && !shownNow.isActive })
+        // The column's panel at the screen's own density, outside the player's size: its corners, rim and
+        // shadow match the map's at any size. Painted over at the corners for an app's screen or a web page.
+        if (split) Box(Modifier.weight(1f).fillMaxHeight().raisedPanel(coverCorners = planciaShown || !music)) {
+            CompositionLocalProvider(LocalPlayerInView provides inView, LocalDensity provides LocalDensity.current.scaledBy(sideScale)) {
+                val side = Modifier.fillMaxSize()
+                val sideTemplate = sideApp?.template
+                val sideMedia = sideApp?.media
+                when {
+                    // Plancia inside myCar: its one page goes wherever it's on screen, so here too only in
+                    // view (and a frame more, see planciaShown).
+                    planciaShown -> PlanciaPane(side)
+                    // Only while its page is in view on Home: an app opened full screen from the grid,
+                    // or on another page, uses the same connection, and two stages on it would pull its
+                    // surface back and forth.
+                    sideTemplate != null ->
+                        if (inView) SideAppPane(sideTemplate, frame, side) else AppPlaceholder(sideApp?.shownLabel.orEmpty(), sideApp?.icon, side, raised = false)
+                    sideApp?.builtIn == BuiltInApps.Plancia -> AppPlaceholder("Plancia", null, side, builtInId = BuiltInApps.Plancia.id, raised = false)
+                    panel == SidePanel.LYRICS -> SideLyrics(shownNow, side)
+                    sideMedia != null -> SideMediaPane(sideMedia, shownNow, side)
+                    else -> GlassDockedPlayer(shownNow, side, startingApp = mediaApp?.label?.takeIf { reserved && !shownNow.isActive })
+                }
             }
         }
     }

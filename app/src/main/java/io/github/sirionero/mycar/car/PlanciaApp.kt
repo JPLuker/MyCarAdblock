@@ -361,13 +361,16 @@ internal fun PlanciaPart(runs: Boolean, onHold: () -> Unit, modifier: Modifier) 
     }
 }
 
-/** Plancia beside the map, under a bar with its name and Close, as an app chosen for that place. */
+/**
+ * Plancia beside the map, under a bar with its name and Close, as an app chosen for that place. The
+ * panel it sits in rounds it (see raisedPanel).
+ */
 @Composable
 internal fun PlanciaPane(modifier: Modifier) {
     val navigator = LocalCarNavigator.current
     val web = LocalPlanciaWeb.current
     MenuOpensFullScreen(web)
-    Column(modifier.clip(RoundedCornerShape(MyCarRadius.Card))) {
+    Column(modifier) {
         Surface(
             color = MaterialTheme.colorScheme.surfaceContainerLow,
             contentColor = MaterialTheme.colorScheme.onSurface,

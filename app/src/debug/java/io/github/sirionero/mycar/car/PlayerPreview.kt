@@ -9,11 +9,13 @@ import android.graphics.Shader
 import android.media.session.PlaybackState
 import android.os.SystemClock
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,9 +26,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import io.github.sirionero.mycar.car.design.MyCarCarTheme
 import io.github.sirionero.mycar.car.design.MyCarSize
+import io.github.sirionero.mycar.car.design.MyCarSpace
+import io.github.sirionero.mycar.car.design.raisedPanel
+import io.github.sirionero.mycar.car.design.rememberWallpaper
+import io.github.sirionero.mycar.car.design.wallpaperBackground
 import io.github.sirionero.mycar.media.CarMedia
 import io.github.sirionero.mycar.media.NowPlaying
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,11 +51,21 @@ internal fun PlayerPreview() {
         CompositionLocalProvider(LocalCarNavigator provides navigator) {
             Row(Modifier.fillMaxSize().background(Color.Black)) {
                 Spacer(Modifier.width(MyCarSize.DockWidth).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceContainerLow))
-                Box(Modifier.weight(2.1f).fillMaxHeight().background(Color(0xFFDDE3E8)), contentAlignment = Alignment.Center) {
-                    Text("Map", color = Color(0xFF7A8794))
+                // As Home has them: the map and the player as panels over the wallpaper (see Panels.kt).
+                val wallpaper = rememberWallpaper()
+                Row(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .then(wallpaper?.let { Modifier.wallpaperBackground(it) } ?: Modifier)
+                        .padding(MyCarSpace.Panel),
+                    horizontalArrangement = Arrangement.spacedBy(MyCarSpace.Panel),
+                ) {
+                    Box(Modifier.weight(2.1f).fillMaxHeight().raisedPanel().background(Color(0xFFDDE3E8)), contentAlignment = Alignment.Center) {
+                        Text("Map", color = Color(0xFF7A8794))
+                    }
+                    Box(Modifier.weight(1f).fillMaxHeight().raisedPanel()) { GlassDockedPlayer(now, Modifier.fillMaxSize()) }
                 }
-                Spacer(Modifier.width(8.dp))
-                GlassDockedPlayer(now, Modifier.weight(1f).fillMaxHeight())
             }
         }
     }

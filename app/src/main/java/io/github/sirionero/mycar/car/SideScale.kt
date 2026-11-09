@@ -7,9 +7,9 @@ internal const val MAP_SHARE = 3.1f
  * How big the music beside the map is drawn: the size chosen for it ([wanted], see
  * CarSettings.playerSize), but no bigger than leaves the map [mapMin] wide (an app's card over it)
  * and the column tall enough for its X above the glass pane ([columnNeeds]). Never under 1, the
- * column at Small, as it always was. [width] and [height] are the map's page in dp, the gap between
- * map and column taken off [width]: an Extra large player on a small screen at a large size left the
- * map narrower than an app's card, and the pane over the X.
+ * column at Small, as it always was. [width] and [height] are the map's page in dp, the gaps round the
+ * two panels and between them taken off: an Extra large player on a small screen at a large size left
+ * the map narrower than an app's card, and the pane over the X.
  */
 internal fun sideScaleFor(wanted: Float, width: Float, height: Float, mapMin: Float): Float {
     if (wanted <= 1f || width <= 0f || height <= 0f) return wanted

@@ -104,10 +104,11 @@ import kotlinx.coroutines.launch
  * (see CarUi), and a page turned back to finds its browser where it was left. Only the page in
  * view runs a car app, though: apps other than the map share one connection
  * ([CarServices.browse]), and it can draw in one place only. [mapPage] is told when its page is
- * the one in view, for the app beside the map.
+ * the one in view, for the app beside the map; [mapSplit] says the map shares its page, as panels
+ * with the wallpaper round them.
  */
 @Composable
-internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -> Unit) {
+internal fun HomePager(onHome: Boolean, mapSplit: Boolean, mapPage: @Composable (inView: Boolean) -> Unit) {
     val navigator = LocalCarNavigator.current
     val scope = rememberCoroutineScope()
     val view = LocalView.current
@@ -208,10 +209,11 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
     }
 
     Box(Modifier.fillMaxSize()) {
-        // Behind the driver's pages, and still while they slide over it; the map's page covers it.
-        // Not under another screen: a moving one went on being drawn there for nobody.
+        // Behind the driver's pages, and still while they slide over it; the map alone covers it, the
+        // map sharing its page shows it round the panels. Not under another screen: a moving one went on
+        // being drawn there for nobody.
         val wallpaper = rememberWallpaper()
-        if (onHome && wallpaper != null && (pager.currentPage != mapIndex || pager.isScrollInProgress)) {
+        if (onHome && wallpaper != null && (pager.currentPage != mapIndex || pager.isScrollInProgress || mapSplit)) {
             WallpaperBackground(wallpaper, Modifier.matchParentSize())
         }
         HorizontalPager(
@@ -225,7 +227,8 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
             val page = pages.getOrNull(index) ?: return@HorizontalPager
             val inView = onHome && pager.settledPage == index
             if (page.layout == PageLayout.MAP) {
-                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) { mapPage(inView) }
+                val ground = if (mapSplit) Modifier else Modifier.background(MaterialTheme.colorScheme.background)
+                Box(Modifier.fillMaxSize().then(ground)) { mapPage(inView) }
             } else {
                 DriverPage(
                     page,
