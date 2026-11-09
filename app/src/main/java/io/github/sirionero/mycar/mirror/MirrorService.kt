@@ -73,6 +73,8 @@ class MirrorService : Service() {
         runCatching { screenOn?.release() }
         screenOn = null
         Handler(Looper.getMainLooper()).post {
+            // Before the sharing's projection stops: a capture of the phone's sound on it ends first.
+            io.github.sirionero.mycar.audio.AudioCaptureService.sharingEnded()
             PhoneMirror.end()
             PhoneMirror.onEnded?.invoke()
         }

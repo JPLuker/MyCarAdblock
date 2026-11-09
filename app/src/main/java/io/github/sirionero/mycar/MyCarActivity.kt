@@ -82,12 +82,17 @@ class MyCarActivity : ComponentActivity(), Projection {
         if (result.resultCode == RESULT_OK && data != null) {
             // Answered once the car had gone: there's no screen to share with.
             if (surface != null) {
-                // Android keeps one projection: sharing the screen ends the one that sends the
-                // phone's sound to the car, which unmutes the phone. The music pauses first, rather
-                // than carrying on out of the phone's speaker for the whole sharing.
+                // Android keeps one projection: the sharing's takes the place of the one that sends the
+                // phone's sound to the car. The capture moves onto the sharing's, and the music carries
+                // on in the car. Where it can't, the music pauses first, rather than carrying on out of
+                // the phone's speaker, unmuted, for the whole sharing.
                 if (CarAudio.capture.value == CarAudio.Capture.ON) {
-                    io.github.sirionero.mycar.car.CarServices.pausePhoneMedia("screen sharing", keep = packageName)
-                    io.github.sirionero.mycar.car.CarToasts.show(this, Words.get(R.string.activity_toast_music_pauses_sharing), androidx.car.app.CarToast.LENGTH_LONG)
+                    val follows = AudioCaptureService.followSharing()
+                    if (!follows) io.github.sirionero.mycar.car.CarServices.pausePhoneMedia("screen sharing", keep = packageName)
+                    // The car says so when its music stops all the same: a web player's page goes with the car's screen.
+                    if (!follows || webMusicPlaying()) {
+                        io.github.sirionero.mycar.car.CarToasts.show(this, Words.get(R.string.activity_toast_music_pauses_sharing), androidx.car.app.CarToast.LENGTH_LONG)
+                    }
                 }
                 MirrorService.start(this, result.resultCode, data)
             } else {
@@ -97,6 +102,10 @@ class MyCarActivity : ComponentActivity(), Projection {
             MyCarLog.w("screen capture consent declined")
         }
     }
+
+    /** A music service's web player plays, on the car's screen, which a screen sharing takes down. */
+    private fun webMusicPlaying(): Boolean =
+        io.github.sirionero.mycar.webmusic.WebMusic.on.value.any { io.github.sirionero.mycar.webmusic.WebMusicPlayer.state(it).value.playing }
 
     /** Media audio needs the microphone permission (a platform rule for playback capture) first. */
     private val audioPermission = registerForActivityResult(
@@ -551,11 +560,17 @@ class MyCarActivity : ComponentActivity(), Projection {
         }
         screenProjector?.stop()
         screenProjector = null
-        // Sharing the phone's screen stops the web music, as it stops the sound's capture: not again
-        // when the car's screen comes back.
+        // Sharing the phone's screen stops the web music, whose pages go with the car's screen, and the
+        // sound's capture ends with the sharing: not again when the car's screen comes back.
         WebMusicPlayer.resumeAfterRebuild = emptyList()
         PhoneMirror.begin(token, target, frameWidth, frameHeight, frameDensity)
-        if (PhoneMirror.active.value) PhoneMirror.launchPending(this) else showCarUi()
+        if (PhoneMirror.active.value) {
+            // The capture of the phone's sound, if it waits for this projection, carries on on it.
+            AudioCaptureService.follow(token)
+            PhoneMirror.launchPending(this)
+        } else {
+            showCarUi()
+        }
     }
 
     private fun showCarUi() {
