@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -268,11 +269,16 @@ private fun CallTime(since: Long) {
         stringResource(R.string.call_pill_voice_on_phone).takeIf { onPhone },
     ).joinToString(" · ")
     if (line.isEmpty()) return
+    // On the light pill the bright green and amber were too pale to read: their deeper shades.
+    val light = MaterialTheme.colorScheme.surface.luminance() > 0.5f
     Text(
         line,
         // Figures of one width, so the time doesn't shift as it counts.
         style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
-        color = if (onPhone) MyCarPalette.Warning else MaterialTheme.colorScheme.tertiary,
+        color = when {
+            onPhone -> if (light) MyCarPalette.WarningOnLight else MyCarPalette.Warning
+            else -> if (light) MyCarPalette.PositiveOnLight else MyCarPalette.Positive
+        },
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
     )
