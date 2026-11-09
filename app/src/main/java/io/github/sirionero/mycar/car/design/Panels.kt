@@ -52,11 +52,11 @@ val PanelShape = RoundedCornerShape(MyCarRadius.Panel)
  * Raises this element off the wallpaper as a panel: its shadow round it, its content clipped to
  * [PanelShape], a rim of light over the content's edge.
  *
- * [coverCorners] is for content that may not keep to the clip, which then has what lies under the
- * panels (the wallpaper, or the screen's ground without one) painted again over its corners. Another
- * app's map is a SurfaceView: Android composes its surface as a rectangle of its own under the
- * window, and only the hole the view clears in the window follows a rounded clip. A WebView drawn
- * through Vulkan gets a rectangular clip only.
+ * [coverCorners] is for a web page, which may not keep to the clip: what lies under the panels (the
+ * wallpaper, or the screen's ground without one) is painted again over its corners. A WebView drawn
+ * through Vulkan gets the clip's bounds only, a rectangle. Another app's map needs nothing: Android
+ * composes its SurfaceView's surface as a rectangle under the window, seen only through the hole the
+ * view clears in the window, and that hole keeps to the rounded clip.
  */
 fun Modifier.raisedPanel(coverCorners: Boolean = false): Modifier = composed {
     val dark = MaterialTheme.colorScheme.background.luminance() < 0.5f

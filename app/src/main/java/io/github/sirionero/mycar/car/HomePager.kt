@@ -455,8 +455,7 @@ private fun AppPart(entry: Entry, app: TemplateApp, runs: Boolean, onHold: () ->
         if (!closed && (!live || CarServices.browse.connectedComponent != app.component)) CarServices.connectBrowse(app, frame)
         started = true
     }
-    // A map an app may draw here ignores the panel's clip: its corners are painted over.
-    Box(modifier.raisedPanel(coverCorners = true).background(MaterialTheme.colorScheme.surface), contentAlignment = Alignment.Center) {
+    Box(modifier.raisedPanel().background(MaterialTheme.colorScheme.surface), contentAlignment = Alignment.Center) {
         if (status.phase == CarAppConnection.Phase.REJECTED || status.phase == CarAppConnection.Phase.FAILED) {
             Text(
                 stringResource(R.string.car_home_app_failed, app.label),

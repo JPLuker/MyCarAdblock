@@ -174,14 +174,15 @@ fun CarHome() {
                 // The side a third of the screen, as it always was, times its size: the map takes the rest.
                 .weight(if (split) MAP_SHARE / sideScale - 1f else 1f)
                 .fillMaxHeight()
-                // The map app's surface ignores the panel's clip: its corners are painted over.
-                .then(if (split) Modifier.raisedPanel(coverCorners = true).background(MaterialTheme.colorScheme.surface) else Modifier),
+                // The map app's surface lies under the window, seen through the hole its view clears in
+                // it: that hole keeps to the panel's rounded clip, and the wallpaper covers the rest.
+                .then(if (split) Modifier.raisedPanel().background(MaterialTheme.colorScheme.surface) else Modifier),
         ) {
             MapPane(navStatus, frame, inView, mini = miniNow.takeIf { miniPlayerShows(miniOn, navigator.miniPlayerHidden, musicShown, split, inView, panning) })
         }
         // The column's panel at the screen's own density, outside the player's size: its corners, rim and
-        // shadow match the map's at any size. Painted over at the corners for an app's screen or a web page.
-        if (split) Box(Modifier.weight(1f).fillMaxHeight().raisedPanel(coverCorners = planciaShown || !music)) {
+        // shadow match the map's at any size. Painted over at the corners for Plancia's web page.
+        if (split) Box(Modifier.weight(1f).fillMaxHeight().raisedPanel(coverCorners = planciaShown)) {
             CompositionLocalProvider(LocalPlayerInView provides inView, LocalDensity provides LocalDensity.current.scaledBy(sideScale)) {
                 val side = Modifier.fillMaxSize()
                 val sideTemplate = sideApp?.template
