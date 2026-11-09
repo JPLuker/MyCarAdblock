@@ -681,6 +681,11 @@ object WirelessLink {
         var waitingJoin: ((String, Int) -> Unit)? = null
         // The car closed the channel (not myCar).
         var byCar = false
+        // The car's VersionRequest answered, whether with the Wi-Fi channel type, and whether the car went
+        // on after it (its StartRequest or Wi-Fi details): one that didn't may want the type (WirelessVersion).
+        var answered = false
+        var gaveChannelType = false
+        var wentOn = false
         try {
             while (!Thread.currentThread().isInterrupted) {
                 val length = input.readUnsignedShort()
@@ -690,24 +695,23 @@ object WirelessLink {
                     MSG_VERSION_REQUEST -> {
                         log.i("<- VersionRequest")
                         log.hex("   version", body)
-                        // Laid out the way a real phone's reply is (aa-proxy-rs and LIVI both
-                        // parse it from real phones): 1 and 2 the version, echoing the car's;
-                        // 3 a serial; 4 the status; 6 the device's ids.
                         val f = Wire.fields(body)
-                        val serial = deviceId(context)
-                        val ids = Protobuf.stringField(1, serial) + Protobuf.stringField(2, UUID.randomUUID().toString())
-                        val reply = Protobuf.varintField(1, Wire.varint(f, 1) ?: 1) +
-                            Protobuf.varintField(2, Wire.varint(f, 2) ?: 0) +
-                            Protobuf.stringField(3, serial) +
-                            Protobuf.varintField(4, STATUS_SUCCESS) +
-                            Protobuf.varint(((6 shl 3) or 2).toLong()) + Protobuf.varint(ids.size.toLong()) + ids
+                        // The Wi-Fi channel type back only to a car that went quiet without it (WirelessVersion).
+                        val withType = WirelessAuto.wantsChannelType(context, device.address) && Wire.varint(f, 3) != null
+                        val reply = WirelessVersion.reply(body, deviceId(context), UUID.randomUUID().toString(), withType)
                         send(output, MSG_VERSION_RESPONSE, reply)
+                        answered = true
+                        gaveChannelType = withType
                         log.i("-> VersionResponse")
                         // With the phone's id (its serial, twice) only in the debug build: logs get shared.
                         if (BuildConfig.DEBUG) log.hex("   reply", reply)
-                        else log.i("   reply: version ${Wire.varint(f, 1) ?: 1}.${Wire.varint(f, 2) ?: 0}, status $STATUS_SUCCESS (the phone's id left out)")
+                        else log.i(
+                            "   reply: version ${Wire.varint(f, 1) ?: 1}.${Wire.varint(f, 2) ?: 0}, status $STATUS_SUCCESS" +
+                                (if (withType) ", Wi-Fi channel type ${Wire.varint(f, 3)}" else "") + " (the phone's id left out)",
+                        )
                     }
                     MSG_START_REQUEST -> {
+                        wentOn = true
                         val f = Wire.fields(body)
                         val ip = f.firstOrNull { it.number == 1 && it.wireType == 2 }?.bytes?.decodeToString().orEmpty()
                         val port = Wire.varint(f, 2)?.toInt() ?: 0
@@ -724,6 +728,7 @@ object WirelessLink {
                     }
                     MSG_INFO_RESPONSE -> {
                         wifiDetails = true
+                        wentOn = true
                         val f = Wire.fields(body)
                         fun text(n: Int) = f.firstOrNull { it.number == n && it.wireType == 2 }?.bytes?.decodeToString().orEmpty()
                         val ssid = text(1)
@@ -773,6 +778,12 @@ object WirelessLink {
                 byCar = true
             }
         } finally {
+            // Nothing more from the car after the VersionResponse: a strict car (Gearslip: Toyota's) may
+            // wait for the Wi-Fi channel type in it. It gets it from the next try on, a start-over too.
+            if (mine == startRun && WirelessVersion.wantsChannelType(answered, wentOn, byCar, gaveChannelType, afterDrive = quiet)) {
+                WirelessAuto.rememberWantsChannelType(context, device.address)
+                log.i("Bluetooth: $name said nothing more after the VersionResponse - from now on it gets the Wi-Fi channel type in it")
+            }
             channelEnded(context, mine, byCar)
         }
     }
