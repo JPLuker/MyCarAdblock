@@ -62,6 +62,11 @@ class WebMusicService(
      * through the service's own video player and has no such address. Null to read only the <video>.
      */
     val videoCoverProp: String? = null,
+    /**
+     * A component given such an address with this prop at this value is a preview of another song, never
+     * the cover of the one in play (Spotify's cards play a Canvas on hover: playbackType loopOnHover).
+     */
+    val videoCoverPreview: Pair<String, String>? = null,
 ) {
     class Bar(
         val playPause: String,
@@ -129,6 +134,7 @@ object WebMusic {
         // own video player (seen in its web player's script, November 2026).
         videoCovers = listOf("https://canvaz.scdn.co/"),
         videoCoverProp = "canvasUrl",
+        videoCoverPreview = "playbackType" to "loopOnHover",
     )
 
     private val AMAZON = listOf("com", "de", "co.uk", "it", "fr", "es", "ca", "com.br", "com.mx", "co.jp", "in", "com.au")
