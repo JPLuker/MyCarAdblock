@@ -100,6 +100,33 @@ class SharingHandOverTest {
     }
 
     @Test
+    fun `the service going while the capture waits for the sharing's projection says the capture's end`() {
+        val h = SharingHandOver()
+        assertFalse(h.serviceEnds())
+        assertTrue(h.sharingStarts(ownAlive = true))
+        assertTrue(h.serviceEnds())
+        // The own reading, stopped as the service goes, leaves it to the service.
+        assertEquals(End.NOTHING, h.captureEnded(onSharing = false, stoppedHere = true))
+        assertTrue(h.ownStopped())
+        assertTrue(h.serviceEnds())
+        // On the sharing's projection its reading says it, as with no sharing.
+        assertTrue(h.sharingUp())
+        assertFalse(h.serviceEnds())
+        assertEquals(End.AS_BEFORE, h.captureEnded(onSharing = true, stoppedHere = true))
+    }
+
+    @Test
+    fun `once the sharing is over, or never took the own projection, the service's end is as before`() {
+        val ended = shared()
+        ended.sharingOver(ownAlive = false)
+        assertFalse(ended.serviceEnds())
+        val stayed = SharingHandOver()
+        assertTrue(stayed.sharingStarts(ownAlive = true))
+        assertEquals(Over.STAY, stayed.sharingOver(ownAlive = true))
+        assertFalse(stayed.serviceEnds())
+    }
+
+    @Test
     fun `a second Start while moving or shared moves nothing more`() {
         val h = SharingHandOver()
         assertTrue(h.sharingStarts(ownAlive = true))

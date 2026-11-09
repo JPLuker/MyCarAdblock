@@ -302,6 +302,9 @@ class AudioCaptureService : Service() {
         // Belt and braces: a phone left muted after the drive is a bug the driver blames on their
         // phone, not on myCar, so unmute on every way out of here.
         unmutePhone()
+        // Waiting for the screen sharing's projection, no capture's reading is left to say it ended:
+        // unsaid, the car kept its speakers and the capture read as on for the rest of the drive.
+        if (handOver.serviceEnds()) CarAudio.captureStopped()
         // The service's own only: the screen sharing's, if the capture runs on it, stays the sharing's.
         runCatching { projection?.stop() }
         projection = null

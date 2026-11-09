@@ -75,6 +75,13 @@ internal class SharingHandOver {
     }
 
     /**
+     * The service goes (the driver's Stop, the sound moved to Bluetooth, the car gone). True when the
+     * capture's end is said there: while it waits for the sharing's projection no reading is left to
+     * say it - the own one's ends, or has ended, with [End.NOTHING].
+     */
+    fun serviceEnds(): Boolean = stage == Stage.MOVING
+
+    /**
      * The sharing is over, its projection stopped or never came, or the capture on it couldn't go on.
      * [ownAlive]: the service's own projection hasn't stopped.
      */
