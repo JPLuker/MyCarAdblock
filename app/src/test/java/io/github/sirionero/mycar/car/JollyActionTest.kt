@@ -59,6 +59,11 @@ class JollyActionTest {
         // A broken escape spoils the line.
         assertNull(JollyActions.parse("type=navigate&place=50%"))
         assertNull(JollyActions.parse("type=navigate&place=5%G0"))
+        // A sign is no hex digit, though a number reader would take it.
+        assertNull(JollyActions.parse("type=navigate&place=a%+1"))
+        assertNull(JollyActions.parse("type=navigate&place=a%-1"))
+        assertEquals(JollyAction.Navigate("a&b"), JollyActions.parse("type=navigate&place=a%26b"))
+        assertEquals(JollyAction.Navigate("a=b"), JollyActions.parse("type=navigate&place=a%3db"))
     }
 
     @Test

@@ -108,7 +108,7 @@ internal object JollyActions {
         }
     }
 
-    /** [encode] undone; null for a "%" not followed by two hex digits. */
+    /** [encode] undone; null for a "%" not followed by two hex digits ("%+1" isn't: toIntOrNull would take it). */
     private fun decode(text: String): String? {
         if ('%' !in text) return text
         val out = StringBuilder(text.length)
@@ -121,8 +121,10 @@ internal object JollyActions {
                 continue
             }
             if (i + 3 > text.length) return null
-            val code = text.substring(i + 1, i + 3).toIntOrNull(16) ?: return null
-            out.append(code.toChar())
+            val high = Character.digit(text[i + 1], 16)
+            val low = Character.digit(text[i + 2], 16)
+            if (high < 0 || low < 0) return null
+            out.append((high * 16 + low).toChar())
             i += 3
         }
         return out.toString()
