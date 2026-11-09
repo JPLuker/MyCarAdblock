@@ -262,6 +262,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
         playerTitleFlow.value = AppSettings.getString(app, KEY_PLAYER_TITLE, "false") == "true"
         CarRoutes.init(app)
         CarSource.init(app)
+        io.github.sirionero.mycar.audio.HeldScreenCars.init(app)
         // The drive's car may have a route of its own (see carIdentified).
         audioRouteFlow.value = carRoute ?: savedRoute()
         // Automatic's pick belongs to the drive, so a second init mid-drive leaves it be.
