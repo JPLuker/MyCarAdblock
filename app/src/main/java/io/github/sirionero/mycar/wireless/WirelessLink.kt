@@ -128,6 +128,8 @@ object WirelessLink {
     @Volatile private var car: BluetoothDevice? = null
     /** Set when Android drops the car's network mid-try, so the rest don't bind to a dead one. */
     @Volatile private var lostNetwork: Network? = null
+    /** When [lostNetwork] went (elapsedRealtime). */
+    @Volatile private var lostAt = 0L
     /** The car network asked for or joined, until Android says it's gone or never came. */
     @Volatile private var activeSsid: String? = null
     /** Bumped on each Wi-Fi join and on stop, so an older run of TCP tries ends instead of racing the new one. */
@@ -889,12 +891,13 @@ object WirelessLink {
             }
 
             override fun onLost(net: Network) {
+                // The time first: the tries read it once they see the network gone.
+                lostAt = SystemClock.elapsedRealtime()
                 lostNetwork = net
                 if (activeSsid == ssid) activeSsid = null
-                log.w(
-                    "Wi-Fi: lost \"$ssid\" - Android dropped the car's network. Picking it by hand " +
-                        "in the Wi-Fi list does this; the remaining tries go over the phone's own Wi-Fi",
-                )
+                // "Picking it by hand in the Wi-Fi list does this" was said at the end of every drive,
+                // the car switched off: the tries say it where it can be so (the car's Wi-Fi left).
+                log.w("Wi-Fi: lost \"$ssid\" - the car's Wi-Fi went away")
             }
         }
         // In the foreground for the request (see [run]): the service started with the channel, given
@@ -1055,6 +1058,9 @@ object WirelessLink {
         var bindRefused = false
         // The phone's other Wi-Fi networks in the car's address range met so far, and whether each is the car's.
         val judged = HashMap<Network, CarNetwork.Verdict>()
+        // Why the tries ended before their minute (TcpTries); null: the minute is up.
+        var cut: String? = null
+        var saidAfterLoss = false
         // For about a minute, not only twelve tries: a port no one listens on yet is refused at
         // once, so the tries a second apart were over in some 12 s, and the car, listening moments
         // later, found no one - Disconnect and Connect then worked at once.
@@ -1065,27 +1071,67 @@ object WirelessLink {
                 log.i("TCP: stopping the tries on the old network - the car started over")
                 return
             }
+            // The phone's own Wi-Fi on the car's network wins when it is the car's (CarNetwork): that
+            // is how Android Auto itself connects, and a Pixel 6 passed pings but no TCP over the side
+            // connection Android opens for myCar's request. One that may be the car's is tried every
+            // other time, after the car's own network; a home or office Wi-Fi with addresses like the
+            // car's (both 192.168.1.x) never: the first try went there, and an adapter that wants the
+            // phone within moments of its Wi-Fi had closed it by the second.
+            val other = runCatching { otherOnCarSubnet(context, ip, net) }.getOrNull()
+            val verdict = other?.let { judged.getOrPut(it) { judgeOther(context, it, carSsid, carBssid) } }
+            // A network Android has dropped refuses every bind (EPERM). If the driver joined the car's
+            // Wi-Fi by hand, it's left, and the tries go over it; behind a VPN the ordinary route
+            // goes on, as before. Anything else doesn't lead to the car: the tries spent the rest of
+            // their minute on the home Wi-Fi or mobile data, and the start-up now starts over.
+            val lost = lostNetwork == net
+            if (lost) {
+                val channelOpen = synchronized(ends) { !channelOver }
+                val next = TcpTries.afterLoss(
+                    carLeft = verdict == CarNetwork.Verdict.CAR, bindRefused = bindRefused,
+                    newerJoin = network !== cb, channelOpen = channelOpen,
+                    sinceLossMs = SystemClock.elapsedRealtime() - lostAt,
+                )
+                when (next) {
+                    TcpTries.AfterLoss.GO_ON -> if (!saidAfterLoss && !bindRefused) {
+                        saidAfterLoss = true
+                        log.i(
+                            "TCP: Android dropped the car's network, but the phone is on the car's Wi-Fi itself - " +
+                                "picking it by hand in the Wi-Fi list does this; the remaining tries go over it",
+                        )
+                    }
+                    TcpTries.AfterLoss.WAIT -> {
+                        if (!saidAfterLoss) {
+                            saidAfterLoss = true
+                            log.i("TCP: the car's network went with its Bluetooth channel open - giving the car a moment to ask for it again")
+                        }
+                        // Not a try: the car's network is gone, and a try on the ordinary route takes up to 5 s.
+                        attempt--
+                        Thread.sleep(250)
+                        continue
+                    }
+                    TcpTries.AfterLoss.YIELD -> {
+                        log.i("TCP: the car asked for its Wi-Fi again - the tries on the network it dropped stop")
+                        return
+                    }
+                    TcpTries.AfterLoss.STOP -> {
+                        cut = "the car's Wi-Fi went before any TCP"
+                        log.w("TCP: Android dropped the car's network and nothing else leads to the car - stopping the tries")
+                        break
+                    }
+                }
+            }
             try {
-                // A network Android has dropped refuses every bind (EPERM). If the driver joined the
-                // car's Wi-Fi by hand, the phone's ordinary route reaches it, so use that instead.
-                // The phone's own Wi-Fi on the car's network wins when it is the car's (CarNetwork):
-                // that is how Android Auto itself connects, and a Pixel 6 passed pings but no TCP over
-                // the side connection Android opens for myCar's request. One that may be the car's is
-                // tried every other time, after the car's own network; a home or office Wi-Fi with
-                // addresses like the car's (both 192.168.1.x) never: the first try went there, and an
-                // adapter that wants the phone within moments of its Wi-Fi had closed it by the second.
-                val other = otherOnCarSubnet(context, ip, net)
-                val verdict = other?.let { judged.getOrPut(it) { judgeOther(context, it, carSsid, carBssid) } }
                 val viaOther = when (verdict) {
-                    CarNetwork.Verdict.CAR -> attempt % 2 == 0
-                    CarNetwork.Verdict.MAYBE -> attempt % 2 == 1
+                    CarNetwork.Verdict.CAR -> lost || attempt % 2 == 0
+                    CarNetwork.Verdict.MAYBE -> !lost && attempt % 2 == 1
                     else -> false
                 }
                 // Once Android has refused a bind - a VPN that apps can't get past, like Tailscale,
                 // refuses one to the main Wi-Fi as well - the ordinary route is the only one left.
                 val socket = when {
-                    lostNetwork == net || bindRefused -> Socket()
+                    bindRefused -> Socket()
                     viaOther && other != null -> other.socketFactory.createSocket()
+                    lost -> Socket()
                     else -> net.socketFactory.createSocket()
                 }
                 socket.tcpNoDelay = true
@@ -1125,7 +1171,7 @@ object WirelessLink {
                 Thread.sleep(1_000)
             }
         }
-        log.e("TCP: gave up on $ip:$port", last)
+        if (cut == null) log.e("TCP: gave up on $ip:$port", last)
         // Stopped meanwhile (Disconnect, the cable, a tap), or a newer join that will say its own.
         if (run != tcpRun) return
         giveBackService(context)
@@ -1156,7 +1202,7 @@ object WirelessLink {
             return
         }
         // Not behind a VPN, which no start-over gets past. Said only when nothing follows.
-        if (startOver(context, mine, "no TCP to the car")) return
+        if (startOver(context, mine, cut ?: "no TCP to the car")) return
         SessionStatus.failed(
             R.string.wireless_link_no_connection,
             R.string.wireless_link_no_connection_detail,
