@@ -1,5 +1,6 @@
 package io.github.sirionero.mycar.car.design
 
+import android.graphics.RadialGradient
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
@@ -18,11 +19,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.LayoutAwareModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
@@ -154,10 +157,6 @@ internal fun panelShadow(size: Size, radius: Float, spread: Float, drop: Float, 
     val strength = if (dark) MyCarLift.SHADOW_DARK else MyCarLift.SHADOW_LIGHT
     val full = Color.Black.copy(alpha = strength)
     val fade = SHADOW_FADE.map { (at, alpha) -> at to Color.Black.copy(alpha = alpha * strength) }.toTypedArray()
-    // Round a corner the fade starts at the corner's circle, r from its centre, and ends spread further:
-    // four stops at most, as glassFinish has (five or more brought the emulator's graphics down).
-    val inner = r / (r + spread)
-    val ring = (listOf(0f to full) + SHADOW_FADE.map { (at, alpha) -> inner + at * (1f - inner) to Color.Black.copy(alpha = alpha * strength) }).toTypedArray()
     val top = drop
     val bottom = h + drop
     val run = (w - 2 * r).coerceAtLeast(0f)
@@ -171,12 +170,13 @@ internal fun panelShadow(size: Size, radius: Float, spread: Float, drop: Float, 
     pieces += box(w, top + r, spread, side) to Brush.horizontalGradient(*fade, startX = w, endX = w + spread)
     // The strip the drop leaves under the panel, between the corners.
     if (drop > 0f) pieces += box(r, h, run, drop) to SolidColor(full)
-    // Each corner: the square from its circle's centre out, less the panel, ringed round that centre.
+    // Each corner: the square from its circle's centre out, less the panel, with the same fade as the
+    // sides from the corner's circle (r from its centre) to spread further out.
     val panel = Path().apply { addRoundRect(RoundRect(0f, 0f, w, h, CornerRadius(r))) }
     val reach = r + spread
     fun corner(cx: Float, cy: Float, left: Float, up: Float) {
         val piece = Path.combine(PathOperation.Difference, box(left, up, reach, reach), panel)
-        pieces += piece to Brush.radialGradient(*ring, center = Offset(cx, cy), radius = reach)
+        pieces += piece to ringFade(Offset(cx, cy), r, reach, fade)
     }
     corner(r, top + r, r - reach, top + r - reach)
     corner(w - r, top + r, w - r, top + r - reach)
@@ -184,6 +184,21 @@ internal fun panelShadow(size: Size, radius: Float, spread: Float, drop: Float, 
     corner(w - r, bottom - r, w - r, bottom - r)
     return pieces
 }
+
+/**
+ * [stops] from the circle [from] round [centre] (0) to the circle [to] round it (1): a gradient between
+ * two circles, so the fade needs no stop of its own for the inside of the corner. A radial gradient
+ * would: four stops, the first stretch flat, and on the Car preview's emulator (SwiftShader) that drew
+ * a dotted dark line where the shadow ends. With three stops, as on the sides, it's clean.
+ */
+private fun ringFade(centre: Offset, from: Float, to: Float, stops: Array<Pair<Float, Color>>): Brush = ShaderBrush(
+    RadialGradient(
+        centre.x, centre.y, from, centre.x, centre.y, to,
+        LongArray(stops.size) { android.graphics.Color.pack(stops[it].second.toArgb()) },
+        FloatArray(stops.size) { stops[it].first },
+        android.graphics.Shader.TileMode.CLAMP,
+    ),
+)
 
 /**
  * The panel's rim: light along its top edge, fading down its sides, as on the dock's glass and the
@@ -205,11 +220,7 @@ internal fun DrawScope.drawPanelRim(radius: Float, dark: Boolean) {
     )
 }
 
-/**
- * How the shadow fades, from the panel's edge (0) to the end of its spread (1): soft, a third left at
- * 40%. Three stops: gradients of five or more stops made the emulator of the Car preview go down at
- * the first frame with a panel, every time (the same shadow with three looks the same).
- */
+/** How the shadow fades, from the panel's edge (0) to the end of its spread (1): soft, a third left at 40%. */
 private val SHADOW_FADE = listOf(0f to 1f, 0.4f to 0.35f, 1f to 0f)
 
 /** The rim's light at the top, a third of the way down and at the foot: on a dark screen, and on a light one. */
