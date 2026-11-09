@@ -121,7 +121,7 @@ internal object Jolly {
             is JollyAction.Home -> home(action)
             is JollyAction.Navigate -> navigate(app, navigator, entries, frame, action)
             is JollyAction.Say -> CarAssistant.runPhrase(action.phrase, language(action.lang))
-            is JollyAction.OpenApp -> open(navigator, entries, running, frame, action)
+            is JollyAction.OpenApp -> open(app, navigator, entries, running, frame, action)
         }
     }
 
@@ -347,15 +347,20 @@ internal object Jolly {
     }
 
     /** As its icon on the grid or in the dock opens it: back to it if it's open. */
-    private fun open(navigator: CarNavigator, entries: List<Entry>, running: Map<String, RunningSlot>, frame: CarEnvironment.Frame, action: JollyAction.OpenApp) {
-        // Saved as the Plancia or Xonos app, or a music service's: the one that stands for it now, as a pin.
-        val shown = pinShown(action.id, entries)
-        val entry = entries.find { it.componentId == shown } ?: findEntry(action.id)
-        if (entry == null) {
-            toast(Words.get(R.string.jolly_app_gone, action.name.ifBlank { action.id }))
-            return
+    private fun open(context: Context, navigator: CarNavigator, entries: List<Entry>, running: Map<String, RunningSlot>, frame: CarEnvironment.Frame, action: JollyAction.OpenApp) {
+        scope.launch {
+            // Just after the start the phone's apps may not have been read yet: read them, as navigate()
+            // does, rather than say the app is gone.
+            if (LauncherCache.entries == null) withContext(Dispatchers.IO) { LauncherCache.load(context) }
+            // Saved as the Plancia or Xonos app, or a music service's: the one that stands for it now, as a pin.
+            val shown = pinShown(action.id, entries)
+            val entry = entries.find { it.componentId == shown } ?: findEntry(shown) ?: findEntry(action.id)
+            if (entry == null) {
+                toast(Words.get(R.string.jolly_app_gone, action.name.ifBlank { action.id }))
+                return@launch
+            }
+            openApp(entry, entry.componentId?.let { running[it] }, navigator, frame)
         }
-        openApp(entry, entry.componentId?.let { running[it] }, navigator, frame)
     }
 
     /** The language a command was written in, as the assistant knows it; myCar's own for one it doesn't. */
