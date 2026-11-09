@@ -607,9 +607,10 @@ EXTRA="--ez fakeCall true --ez demoSong true" shoot call-bubble-mini 1920 720 24
     "$WAIT;1866,54;$WAIT;900,66,drag,1700,700;$WAIT;1550,654,drag,900,300;$WAIT"
 # The car's knob (a script, see PreviewScript: knob:n turns it, knob:ok presses it). Its first turn puts the
 # focus on Home (the weather of the page left of the map), the next one back on the dock's foot; back
-# along the dock and round past its top, the last thing on the screen: the pill's red button (a picture
-# after each turn). Pressed, it ends the call ("calls: there was no call to end", for the made-up one).
-EXTRA="--ez fakeCall true --es script 'wait:7000;knob:-1;wait:600;knob:-1;wait:600;rep:6;knob:-1;wait:700;snap:;end;knob:ok;wait:1500;snap:pressed'" \
+# along the dock (mic, map, clock) and round past its top, the last thing on the screen: the pill's red
+# button, at the sixth turn (a picture after each). Pressed, it ends the call ("calls: there was no call
+# to end", for the made-up one). Seen (0.7.4): the ring on the red button, then on the rest of the pill.
+EXTRA="--ez fakeCall true --es script 'wait:7000;knob:-1;wait:600;knob:-1;wait:600;rep:4;knob:-1;wait:700;snap:;end;knob:ok;wait:1500;snap:pressed'" \
     shoot call-bubble-knob 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 # The ringing card's Answer is 1068-1176 px across, 444-579 down (with or without its Bluetooth line);
 # the pill's red button 1158-1254 across.
