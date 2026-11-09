@@ -602,6 +602,8 @@ esac
 #   there's no room for both, and the map keeps its place.
 # - jolly-ai, jolly-apps, jolly-contacts: the lists of assistants, apps and contacts (two contacts written
 #   as root, one with two numbers: tapped, its numbers).
+# - jolly-navigate: the key set to a place (the Castello Sforzesco): the map on Home (Vela) takes it, as
+#   it takes the assistant's "navigate to".
 # - jolly-it-800x480, jolly-de, jolly-en-XP: the chooser in Italian at 800x480, in German, in pirate speak;
 #   jolly-ru-800x480, jolly-el-800x480, jolly-pt-XP-800x480: where the names of the kinds are longest.
 # - jolly-settings: the car settings' rows on their own (--ez jollySettings true).
@@ -619,7 +621,7 @@ JOLLY_ROW_1="1032,186"     # the lines of a kind's list, 80 dp apart
 JOLLY_ROW_2="1032,306"
 case " ${ONLY:-} " in *" jolly "*)
     ONLY="$ONLY jolly-800x480 jolly-1920x720 jolly-choose jolly-say-it jolly-light jolly-large-800x480 jolly-xl-800x480"
-    ONLY="$ONLY jolly-ai jolly-apps jolly-contacts jolly-home jolly-unlock jolly-it-800x480 jolly-de jolly-en-XP"
+    ONLY="$ONLY jolly-ai jolly-navigate jolly-apps jolly-contacts jolly-home jolly-unlock jolly-it-800x480 jolly-de jolly-en-XP"
     ONLY="$ONLY jolly-settings jolly-phone jolly-ru-800x480 jolly-el-800x480 jolly-pt-XP-800x480" ;;
 esac
 EXTRA="--es jolly say" shoot jolly-800x480 800 480 160 "$WAIT;$JOLLY_KEY_800;$WAIT;$WAIT;$JOLLY_KEY_800,long;$WAIT"
@@ -630,6 +632,7 @@ EXTRA="--es jolly say --es carTheme LIGHT" shoot jolly-light 1920 720 240 "$WAIT
 EXTRA="--es jolly say --es carScale 1.25" shoot jolly-large-800x480 800 480 160 "$WAIT"
 EXTRA="--es jolly say --es carScale 1.5" shoot jolly-xl-800x480 800 480 160 "$WAIT"
 shoot jolly-ai 1920 720 240 "$WAIT;$JOLLY_KEY;$JOLLY_TILE_AI;$WAIT"
+installed $VELA && EXTRA="--es jolly navigate" shoot jolly-navigate 1920 720 240 "$WAIT;$WAIT;$JOLLY_KEY;$WAIT;$WAIT;$WAIT;$WAIT"
 EXTRA="--ez jollySettings true --es jolly call" shoot jolly-settings 1920 720 240 "$WAIT"
 jolly_lang() {  # jolly_lang <shot> <locale> <width> <height> <dpi> <the key>: the chooser in that language
     case " ${ONLY:-$1} " in *" $1 "*) ;; *) return ;; esac

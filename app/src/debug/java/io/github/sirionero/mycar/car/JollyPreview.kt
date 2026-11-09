@@ -27,7 +27,8 @@ internal object JollyPreview {
                 "ai" -> JollyAction.Assistant(PhoneAssistants.PHONE)
                 "home" -> JollyAction.Home("script.jolly_test", HomeAct.RUN, "Jolly test")
                 "unlock" -> JollyAction.Home("lock.front_door", HomeAct.UNLOCK, "Front door")
-                "navigate" -> JollyAction.Navigate("Piazza del Duomo, Milano", "Duomo")
+                // Not the Duomo: the emulator's position is there (car-preview.sh).
+                "navigate" -> JollyAction.Navigate("Castello Sforzesco, Milano", "Castello")
                 "say" -> JollyAction.Say(phrase ?: "what time is it", lang ?: "en")
                 "app" -> JollyAction.OpenApp(BUILT_IN_PREFIX + BuiltInApps.Settings.id, "Settings")
                 else -> null
