@@ -46,6 +46,21 @@ class CallPillPlaceTest {
         }
     }
 
+    @Test fun alwaysBesideTheDockAndInsideTheScreen() {
+        // Its area starts where the dock ends and stays inside the car's margins: every place it starts
+        // at, on any screen from 800x480 at Extra large to a wide one, is inside that area.
+        var w = 400f
+        while (w <= 2_000f) {
+            val fit = CallPillPlace.fitScale(w - 2 * PILL_EDGE)
+            val place = CallPillPlace.start(w - 2 * PILL_EDGE, PILL_WIDTH * fit)
+            assertTrue("$w: $place", place.x in 0f..1f && place.y == 0f)
+            val (left, right) = startOn(w, fit)
+            assertTrue("$w: $left", left >= PILL_EDGE - 0.01f)
+            assertTrue("$w: $right", right <= w - PILL_EDGE + 0.01f)
+            w += 37f
+        }
+    }
+
     @Test fun drawnSmallerOnlyWhereItDoesNotFit() {
         // 1920x720 and 800x480 at Normal: its size.
         assertEquals(1f, CallPillPlace.fitScale(1160f), 0.001f)
