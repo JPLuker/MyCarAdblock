@@ -602,7 +602,8 @@ esac
 #   there's no room for both, and the map keeps its place.
 # - jolly-ai, jolly-apps, jolly-contacts: the lists of assistants, apps and contacts (two contacts written
 #   as root, one with two numbers: tapped, its numbers).
-# - jolly-it-800x480, jolly-de, jolly-en-XP: the chooser in Italian at 800x480, in German, in pirate speak.
+# - jolly-it-800x480, jolly-de, jolly-en-XP: the chooser in Italian at 800x480, in German, in pirate speak;
+#   jolly-ru-800x480, jolly-el-800x480, jolly-pt-XP-800x480: where the names of the kinds are longest.
 # - jolly-settings: the car settings' rows on their own (--ez jollySettings true).
 # - jolly-phone: on the phone, Settings > Car screen: the section, the kinds, a ready-made command picked
 #   and saved, a place written with the phone's keyboard and saved.
@@ -618,7 +619,7 @@ JOLLY_ROW_2="1032,306"
 case " ${ONLY:-} " in *" jolly "*)
     ONLY="$ONLY jolly-800x480 jolly-1920x720 jolly-choose jolly-say-it jolly-light jolly-large-800x480 jolly-xl-800x480"
     ONLY="$ONLY jolly-ai jolly-apps jolly-contacts jolly-home jolly-unlock jolly-it-800x480 jolly-de jolly-en-XP"
-    ONLY="$ONLY jolly-settings jolly-phone" ;;
+    ONLY="$ONLY jolly-settings jolly-phone jolly-ru-800x480 jolly-el-800x480 jolly-pt-XP-800x480" ;;
 esac
 EXTRA="--es jolly say" shoot jolly-800x480 800 480 160 "$WAIT;$JOLLY_KEY_800;$WAIT;$WAIT;$JOLLY_KEY_800,long;$WAIT"
 shoot jolly-1920x720 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT"
@@ -638,6 +639,9 @@ jolly_lang() {  # jolly_lang <shot> <locale> <width> <height> <dpi> <the key>: t
 jolly_lang jolly-it-800x480 it 800 480 160 "$JOLLY_KEY_800"
 jolly_lang jolly-de de 1920 720 240 "$JOLLY_KEY"
 jolly_lang jolly-en-XP en-XP 1920 720 240 "$JOLLY_KEY"
+jolly_lang jolly-ru-800x480 ru 800 480 160 "$JOLLY_KEY_800"
+jolly_lang jolly-el-800x480 el 800 480 160 "$JOLLY_KEY_800"
+jolly_lang jolly-pt-XP-800x480 pt-XP 800 480 160 "$JOLLY_KEY_800"
 shoot jolly-apps 1920 720 240 "$WAIT;$JOLLY_KEY;$JOLLY_TILE_APP;$WAIT"
 case " ${ONLY:-jolly-contacts} " in *" jolly-contacts "*)
     if adb root >/dev/null 2>&1; then
