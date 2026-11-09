@@ -667,7 +667,7 @@ Tutti i token in un solo posto, `car/design/`:
   arrotondato dal suo ritaglio. **Ombra negli angoli**: gradiente fra due cerchi (`RadialGradient` di API 31) a
   tre colori; con il radiale a quattro colori SwiftShader disegnava puntini scuri dove finisce l'ombra e
   l'emulatore della CI cadeva al primo disegno della Home divisa (7 corse su 9; con tre colori una caduta sola
-  in 6 corse, la causa non è dimostrata). Con un sfondo animato i margini fra i pannelli si muovono: più
+  in 6 corse, la causa non è dimostrata). Con uno sfondo animato i margini fra i pannelli si muovono: più
   fotogrammi da mandare al video. Gli angoli tagliati della mappa (meno di 24 dp) non prendono tocchi.
   **Manopola**: l'anello in un angolo di un pannello prende l'angolo del pannello (`PanelCornersNode`). Scatti
   `split-800x480`, `split-xs-800x480`, `split-1920x1080`, `split-light`, `split-waves`, `split-none`,
