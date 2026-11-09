@@ -92,7 +92,7 @@ object MyCarLift {
     val ShadowDrop = 2.dp
     /** How dark the shadow is against the panel: deeper on a dark screen, where it's harder to see. */
     const val SHADOW_DARK = 0.5f
-    const val SHADOW_LIGHT = 0.16f
+    const val SHADOW_LIGHT = 0.2f
     /** The rim of light along a panel's edge. */
     val Rim = 1.dp
 }

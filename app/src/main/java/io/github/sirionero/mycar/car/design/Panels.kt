@@ -171,4 +171,4 @@ private val SHADOW_FADE = listOf(0f to 1f, 0.25f to 0.6f, 0.5f to 0.28f, 0.75f t
 
 /** The rim's light at the top, a third of the way down and at the foot: on a dark screen, and on a light one. */
 private val RIM_DARK = Triple(0.3f, 0.08f, 0.05f)
-private val RIM_LIGHT = Triple(0.85f, 0.35f, 0.2f)
+private val RIM_LIGHT = Triple(0.6f, 0.2f, 0.1f)
