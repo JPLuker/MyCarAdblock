@@ -179,27 +179,45 @@ object CarServices {
         // up took the phone's cores and storage at the very moment the car connected. Not at all when
         // the phone's own speech recognition does the listening.
         speechWarm.removeCallbacks(warmSpeech)
+        speechWarm.removeCallbacks(warmFinal)
         // Which models there are, at once: a command before the loading finds them, as before.
         io.github.sirionero.mycar.speech.SpeechModels.init(appContext)
         val phoneListens = CarSettings.systemSpeech.value && android.speech.SpeechRecognizer.isRecognitionAvailable(appContext)
-        if (!phoneListens) speechWarm.postDelayed(warmSpeech, SPEECH_WARM_AFTER_MS)
+        if (!phoneListens) {
+            speechWarm.postDelayed(warmSpeech, SPEECH_WARM_AFTER_MS)
+            speechWarm.postDelayed(warmFinal, FINAL_WARM_AFTER_MS)
+        }
     }
 
     private val speechWarm = android.os.Handler(android.os.Looper.getMainLooper())
-    private val warmSpeech = Runnable {
-        val app = context ?: return@Runnable
+    private val warmSpeech = Runnable { warmModels(final = false) }
+
+    /**
+     * The model that rereads the phrase (Parakeet: ~950 MB and seconds of every core) only once the
+     * drive has lasted a while: after many drives the car, switched off, made a session of 20-40 s
+     * that loaded it for nobody - 19 loads for 2 commands in three days. A command before then loads
+     * it at the press, if there's the memory for it (SpeechEngine).
+     */
+    private val warmFinal = Runnable { warmModels(final = true) }
+
+    private fun warmModels(final: Boolean) {
+        val app = context ?: return
         // The phone's preview of the car's screen alone (Settings, no car): no voice models for it.
-        if (phonePreview && !io.github.sirionero.mycar.SessionService.running) return@Runnable
+        if (phonePreview && !io.github.sirionero.mycar.SessionService.running) return
         io.github.sirionero.mycar.speech.SpeechEngine.warm(
             app,
             io.github.sirionero.mycar.speech.VoiceLanguages.effective(
                 app, CarSettings.systemSpeech.value && android.speech.SpeechRecognizer.isRecognitionAvailable(app),
             ),
+            final,
         )
     }
 
-    /** How long after the car connects the voice models start loading. */
+    /** How long after the car connects the live voice model (Kroko) starts loading. */
     private const val SPEECH_WARM_AFTER_MS = 20_000L
+
+    /** How long a drive lasts before the model that rereads the phrase loads ahead of a command. */
+    private const val FINAL_WARM_AFTER_MS = 120_000L
 
     /**
      * Xonos switched on or off on the phone in the middle of a drive: connected to Music Assistant
@@ -654,7 +672,8 @@ object CarServices {
         io.github.sirionero.mycar.bridge.BridgeProxy.stop()
         // About 900 MB that nothing needs once the car's gone - and not loaded after it either.
         speechWarm.removeCallbacks(warmSpeech)
-        io.github.sirionero.mycar.speech.SpeechEngine.unload()
+        speechWarm.removeCallbacks(warmFinal)
+        io.github.sirionero.mycar.speech.SpeechEngine.unload("at the end of the drive")
         CarAudio.release()
         _mediaApp.value = null
         _mediaDecided.value = false

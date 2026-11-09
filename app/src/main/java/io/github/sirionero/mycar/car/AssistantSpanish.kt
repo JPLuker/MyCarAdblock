@@ -230,6 +230,7 @@ internal object SpanishPhrases : Phrasebook() {
         Said.MODEL_NOT_DOWNLOADED to t("Primero descarga un modelo de voz en los ajustes de myCar en el teléfono."),
         Said.MIC_SILENCED to t("El micrófono del teléfono está silenciado. Desbloquea el teléfono y vuelve a intentarlo."),
         Said.MIC_UNAVAILABLE to t("El micrófono no está disponible ahora."),
+        Said.SHORT_OF_MEMORY to t("Ahora el teléfono no tiene memoria suficiente para el modelo de voz."),
         Said.MISSED_CALL_FROM to t("Llamada perdida de $1."),
         Said.WANT_TO_REPLY to t("¿Quieres responder?"),
         Said.GO_AHEAD to t("Adelante."),

@@ -252,6 +252,7 @@ internal object FrenchPhrases : Phrasebook() {
         Said.MODEL_NOT_DOWNLOADED to t("Téléchargez d'abord un modèle vocal dans les paramètres de myCar sur le téléphone."),
         Said.MIC_SILENCED to t("Le micro du téléphone est coupé. Déverrouillez le téléphone et réessayez."),
         Said.MIC_UNAVAILABLE to t("Le micro n'est pas disponible pour le moment."),
+        Said.SHORT_OF_MEMORY to t("Le téléphone manque de mémoire pour le modèle vocal en ce moment."),
         Said.MISSED_CALL_FROM to t("Appel manqué de $1."),
         Said.WANT_TO_REPLY to t("Voulez-vous répondre ?"),
         Said.GO_AHEAD to t("Je vous écoute."),

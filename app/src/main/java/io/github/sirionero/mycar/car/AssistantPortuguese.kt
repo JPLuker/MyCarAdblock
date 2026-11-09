@@ -270,6 +270,7 @@ internal object PortuguesePhrases : Phrasebook() {
         Said.MODEL_NOT_DOWNLOADED to { _ -> pt("Primeiro, transfira", "Primeiro, baixe") + " um modelo de voz nas configurações do myCar no telefone." },
         Said.MIC_SILENCED to t("O microfone do telefone está silenciado. Desbloqueie o telefone e tente de novo."),
         Said.MIC_UNAVAILABLE to t("O microfone não está disponível agora."),
+        Said.SHORT_OF_MEMORY to t("Agora o telefone não tem memória suficiente para o modelo de voz."),
         Said.MISSED_CALL_FROM to t("Chamada perdida de $1."),
         Said.WANT_TO_REPLY to t("Quer responder?"),
         Said.GO_AHEAD to t("Pode falar."),

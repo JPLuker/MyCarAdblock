@@ -442,6 +442,7 @@ internal object ChinesePhrases : Phrasebook() {
         Said.MODEL_NOT_DOWNLOADED to t("请先在手机上的myCar设置里下载语音模型。"),
         Said.MIC_SILENCED to t("手机的麦克风被静音了。请解锁手机后再试一次。"),
         Said.MIC_UNAVAILABLE to t("麦克风现在不可用。"),
+        Said.SHORT_OF_MEMORY to t("手机现在内存不足，无法加载语音模型。"),
         Said.MISSED_CALL_FROM to t("来自$1的未接来电。"),
         Said.WANT_TO_REPLY to t("要回复吗？"),
         Said.GO_AHEAD to t("请说。"),

@@ -342,6 +342,7 @@ internal fun saidSample(said: Said): String = when (said) {
     Said.MODEL_NOT_DOWNLOADED -> "Download a voice model in myCar's settings on the phone first."
     Said.MIC_SILENCED -> "The phone's microphone is silenced. Unlock the phone and try again."
     Said.MIC_UNAVAILABLE -> "The microphone isn't available right now."
+    Said.SHORT_OF_MEMORY -> "The phone is short of memory for the voice model right now."
     Said.MISSED_CALL_FROM -> "Missed call from Anna."
     Said.WANT_TO_REPLY -> "Do you want to reply?"
     Said.GO_AHEAD -> "Go ahead."

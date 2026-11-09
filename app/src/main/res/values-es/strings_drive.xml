@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_voice_small_model">El teléfono tiene poca memoria: el asistente te escucha solo con el modelo pequeño y puede equivocarse con los nombres.</string>
+</resources>

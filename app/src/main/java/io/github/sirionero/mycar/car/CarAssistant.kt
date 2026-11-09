@@ -91,6 +91,8 @@ object CarAssistant {
 
     fun init(context: Context) {
         appContext = context.applicationContext
+        // Said on the car once per drive (see smallModelOnce).
+        smallModelSaid = false
         // Started again, at the next drive, after a start that failed or an engine that went away
         // (updated in the background, Android never binds it again), as DirectionsVoice does:
         // otherwise answers and messages stayed silent until myCar's process went.
@@ -535,7 +537,21 @@ object CarAssistant {
             onHeard = onHeard,
             onResult = onResult,
             onError = failed,
+            onLiveWords = ::smallModelOnce,
         )
+    }
+
+    /** Whether this drive's car was told the phone is short of memory for the big voice model. */
+    private var smallModelSaid = false
+
+    /**
+     * The phone hasn't the memory for the model that rereads the phrase (SpeechEngine): the small one
+     * hears alone, and may get names and places wrong. Said on the car once per drive.
+     */
+    private fun smallModelOnce() {
+        if (smallModelSaid) return
+        smallModelSaid = true
+        CarToasts.show(this, Words.get(R.string.car_voice_small_model), androidx.car.app.CarToast.LENGTH_LONG)
     }
 
     private fun systemListen(

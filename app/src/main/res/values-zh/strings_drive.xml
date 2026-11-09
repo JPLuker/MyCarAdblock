@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_voice_small_model">手机内存不足：助手只能用小模型听你说话，可能会听错名字。</string>
+</resources>

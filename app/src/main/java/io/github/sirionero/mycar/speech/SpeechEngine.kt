@@ -53,6 +53,9 @@ object SpeechEngine {
     /** Said when the chosen model hasn't been downloaded yet. */
     const val NOT_DOWNLOADED = "Download a voice model in myCar's settings on the phone first."
 
+    /** Said when the phone hasn't the memory for the only model that hears the language (see SpeechRoom). */
+    const val SHORT_OF_MEMORY = "The phone is short of memory for the voice model right now."
+
     private const val RATE = 16_000
     private const val CHUNK = 1_600 // 100 ms
     private const val MAX_S = 15f
@@ -92,6 +95,8 @@ object SpeechEngine {
     @Volatile private var loadedFinal: SpeechModels.Model? = null
     /** The language [finalRecognizer] was set up for: Canary is told which one it hears. */
     @Volatile private var loadedLanguage: VoiceLanguage? = null
+    /** The final model being loaded now, if any: a press meanwhile waits for it rather than weighing the memory again. */
+    @Volatile private var loadingFinal: SpeechModels.Model? = null
 
     /**
      * The final model holds most of the memory the two models take, so it goes after a few
@@ -103,8 +108,12 @@ object SpeechEngine {
     /** Bumped by [unload]: a warm-up whose loads haven't started yet doesn't start them after it. */
     private val generation = AtomicInteger()
 
-    /** Loads the models ahead of time, so the first command doesn't wait for them; [language] is the one the assistant will listen in. */
-    fun warm(context: Context, language: VoiceLanguage = VoiceLanguage.EN) {
+    /**
+     * Loads the models ahead of time, so the first command doesn't wait for them; [language] is the one
+     * the assistant will listen in. Without [final], only the live model (Kroko): the drive's warm-up
+     * loads the final one later (see CarServices), as a short session doesn't need its ~950 MB.
+     */
+    fun warm(context: Context, language: VoiceLanguage = VoiceLanguage.EN, final: Boolean = true) {
         val app = context.applicationContext
         SpeechModels.init(app)
         val gen = generation.get()
@@ -112,6 +121,7 @@ object SpeechEngine {
         worker.execute {
             if (gen != generation.get()) return@execute
             ensureLoaded(app)
+            if (!final) return@execute
             finalWorker.execute {
                 // The car went away (or the models changed) while Kroko loaded: no ~800 MB for nobody,
                 // held five minutes after the drive. And ahead of any command only with memory to spare.
@@ -132,13 +142,43 @@ object SpeechEngine {
      */
     private fun roomForFinal(context: Context, language: VoiceLanguage): Boolean {
         val model = SpeechModels.finalFor(context, language) ?: return false
-        val manager = context.getSystemService(ActivityManager::class.java) ?: return true
-        val mem = ActivityManager.MemoryInfo().also { manager.getMemoryInfo(it) }
-        val need = model.files.sumOf { File(SpeechModels.dir(context, model), it).length() } * 5 / 4
-        if (!mem.lowMemory && mem.availMem - need > maxOf(4 * mem.threshold, 2L shl 30)) return true
+        val mem = memory(context) ?: return true
+        if (SpeechRoom.ahead(mem.availMem, mem.threshold, mem.lowMemory, need(context, model))) return true
         MyCarLog.i("speech: ${model.label} waits for the first command, ${mem.availMem shr 20} MB free")
         return false
     }
+
+    /**
+     * At a press, what the memory allows for the final model (SpeechRoom): the same room as ahead of a
+     * command, or English keeps Kroko's live words; another language, which only the final model
+     * hears, loads it unless Android itself would be short of memory. Already there or on its way: loaded.
+     */
+    private fun roomAtPress(context: Context, language: VoiceLanguage): SpeechRoom.Press {
+        val model = SpeechModels.finalFor(context, language) ?: return SpeechRoom.Press.LOAD
+        if (loadingFinal == model || (finalRecognizer != null && loadedFinal == model && loadedLanguage == language)) return SpeechRoom.Press.LOAD
+        if (!SpeechModels.isReady(context, model)) return SpeechRoom.Press.LOAD
+        val mem = memory(context) ?: return SpeechRoom.Press.LOAD
+        val need = need(context, model)
+        val press = SpeechRoom.atPress(mem.availMem, mem.threshold, mem.lowMemory, need, language == VoiceLanguage.EN)
+        val free = mem.availMem shr 20
+        when {
+            press == SpeechRoom.Press.LIVE_WORDS -> MyCarLog.i("speech: ${model.label} stays out, $free MB free - the live words only")
+            press == SpeechRoom.Press.NONE -> MyCarLog.w("speech: no room for ${model.label}, $free MB free - nothing hears ${language.code}")
+            !SpeechRoom.ahead(mem.availMem, mem.threshold, mem.lowMemory, need) ->
+                MyCarLog.i("speech: ${model.label} loads at the press under the margin for loading ahead, $free MB free - the only model for ${language.code}")
+        }
+        return press
+    }
+
+    /** The phone's memory as Android sees it; null if it doesn't say. */
+    private fun memory(context: Context): ActivityManager.MemoryInfo? {
+        val manager = context.getSystemService(ActivityManager::class.java) ?: return null
+        return ActivityManager.MemoryInfo().also { manager.getMemoryInfo(it) }
+    }
+
+    /** What [model] takes in myCar's memory: its weights are read in, not mapped, a quarter more than on disk. */
+    private fun need(context: Context, model: SpeechModels.Model): Long =
+        model.files.sumOf { File(SpeechModels.dir(context, model), it).length() } * 5 / 4
 
     /** What Android counts as available, in MB, for the line before a load. */
     private fun freeMb(context: Context): Long {
@@ -160,22 +200,29 @@ object SpeechEngine {
         }
     }
 
-    /** Drops the loaded models: the driver picked another or deleted one, or the car went away. */
-    fun unload() {
+    /**
+     * Drops the loaded models: the driver picked another or deleted one, or the car went away. [why],
+     * for the log: each model that was loaded gets a line ("at the end of the drive").
+     */
+    fun unload(why: String? = null) {
         generation.incrementAndGet()
         main.removeCallbacks(idleUnload)
         run++
         worker.execute {
+            val model = loadedModel.takeIf { recognizer != null }
             recognizer?.release()
             recognizer = null
             loadedModel = null
+            if (why != null && model != null) MyCarLog.i("speech: unloaded ${model.label} $why")
         }
         finalWorker.execute {
             synchronized(finalLock) {
+                val model = loadedFinal.takeIf { finalRecognizer != null }
                 finalRecognizer?.release()
                 finalRecognizer = null
                 loadedFinal = null
                 loadedLanguage = null
+                if (why != null && model != null) MyCarLog.i("speech: unloaded ${model.label} $why")
             }
         }
     }
@@ -198,6 +245,8 @@ object SpeechEngine {
         onHeard: () -> Unit,
         onResult: (String) -> Unit,
         onError: (String) -> Unit,
+        /** The phone hasn't the memory for the final model: this phrase is heard by the live model alone (English). */
+        onLiveWords: () -> Unit = {},
     ) {
         val app = context.applicationContext
         if (app.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -213,9 +262,15 @@ object SpeechEngine {
             val r = ensureLoaded(app) ?: return@execute post { onError(NOT_LOADED) }
             // Cancelled while the model loaded (X, Back, a call): no beep, the music not paused.
             if (id != run) return@execute
-            // Parakeet back if it was unloaded, while the driver talks - after Kroko, never beside it:
-            // two loads at once slowed Kroko to seconds and stacked their memory.
-            finalWorker.execute { if (id == run) ensureFinalLoaded(app, language) }
+            // Parakeet back if it was unloaded (or not loaded ahead), while the driver talks - after Kroko,
+            // never beside it: two loads at once slowed Kroko to seconds and stacked their memory. Only with
+            // the memory for it: never loaded at the press without a look, as it used to be.
+            when (roomAtPress(app, language)) {
+                SpeechRoom.Press.LOAD -> finalWorker.execute { if (id == run) ensureFinalLoaded(app, language) }
+                SpeechRoom.Press.LIVE_WORDS -> post(onLiveWords)
+                // Another language, which nothing else hears: said now, rather than after the driver spoke.
+                SpeechRoom.Press.NONE -> return@execute post { onError(SHORT_OF_MEMORY) }
+            }
             VoiceFocus.acquire(app)
             val text = try {
                 if (cue) cue()
@@ -387,6 +442,7 @@ object SpeechEngine {
         fun path(name: String) = File(dir, name).absolutePath
         MyCarLog.i("speech: loading ${model.label} (${language.code}), ${freeMb(context)} MB free")
         val started = SystemClock.uptimeMillis()
+        loadingFinal = model
         return runCatching {
             OfflineRecognizer(
                 config = OfflineRecognizerConfig(
@@ -426,6 +482,8 @@ object SpeechEngine {
             MyCarLog.i("speech: loaded ${model.label} (${language.code}) in ${SystemClock.uptimeMillis() - started} ms, native heap ${Debug.getNativeHeapAllocatedSize() shr 20} MB")
         }.onFailure {
             MyCarLog.e("speech: couldn't load ${model.label}", it)
+        }.also {
+            loadingFinal = null
         }.getOrNull()
     }
 

@@ -546,6 +546,7 @@ internal object GreekPhrases : Phrasebook() {
         Said.MODEL_NOT_DOWNLOADED to t("Κατεβάστε πρώτα ένα φωνητικό μοντέλο από τις ρυθμίσεις του myCar στο τηλέφωνο."),
         Said.MIC_SILENCED to t("Το μικρόφωνο του τηλεφώνου είναι σε σίγαση. Ξεκλειδώστε το τηλέφωνο και δοκιμάστε ξανά."),
         Said.MIC_UNAVAILABLE to t("Το μικρόφωνο δεν είναι διαθέσιμο αυτή τη στιγμή."),
+        Said.SHORT_OF_MEMORY to t("Το τηλέφωνο δεν έχει αυτή τη στιγμή αρκετή μνήμη για το φωνητικό μοντέλο."),
         Said.MISSED_CALL_FROM to { g -> "Αναπάντητη κλήση από ${acc(g[1]) ?: g[1]}." },
         Said.WANT_TO_REPLY to t("Θέλετε να απαντήσετε;"),
         Said.GO_AHEAD to t("Σας ακούω."),

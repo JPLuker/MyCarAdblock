@@ -237,6 +237,7 @@ internal object ItalianPhrases : Phrasebook() {
         Said.MODEL_NOT_DOWNLOADED to t("Prima scarica un modello vocale nelle impostazioni di myCar sul telefono."),
         Said.MIC_SILENCED to t("Il microfono del telefono è silenziato. Sblocca il telefono e riprova."),
         Said.MIC_UNAVAILABLE to t("Il microfono non è disponibile adesso."),
+        Said.SHORT_OF_MEMORY to t("Il telefono ora non ha abbastanza memoria per il modello vocale."),
         Said.MISSED_CALL_FROM to t("Chiamata persa da $1."),
         Said.WANT_TO_REPLY to t("Vuoi rispondere?"),
         Said.GO_AHEAD to t("Dimmi."),

@@ -231,6 +231,7 @@ internal object GermanPhrases : Phrasebook() {
         Said.MODEL_NOT_DOWNLOADED to t("Lade zuerst ein Sprachmodell in den Einstellungen von myCar auf dem Telefon herunter."),
         Said.MIC_SILENCED to t("Das Mikrofon des Telefons ist stumm. Entsperre das Telefon und versuch es noch einmal."),
         Said.MIC_UNAVAILABLE to t("Das Mikrofon ist gerade nicht verfügbar."),
+        Said.SHORT_OF_MEMORY to t("Das Telefon hat gerade nicht genug Arbeitsspeicher für das Sprachmodell."),
         Said.MISSED_CALL_FROM to t("Verpasster Anruf von $1."),
         Said.WANT_TO_REPLY to t("Möchtest du antworten?"),
         Said.GO_AHEAD to t("Ich höre."),

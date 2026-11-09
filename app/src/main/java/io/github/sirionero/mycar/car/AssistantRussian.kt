@@ -770,6 +770,7 @@ internal object RussianPhrases : Phrasebook() {
         Said.MODEL_NOT_DOWNLOADED to t("Сначала скачайте голосовую модель в настройках myCar на телефоне."),
         Said.MIC_SILENCED to t("Микрофон телефона отключён. Разблокируйте телефон и попробуйте ещё раз."),
         Said.MIC_UNAVAILABLE to t("Микрофон сейчас недоступен."),
+        Said.SHORT_OF_MEMORY to t("Сейчас телефону не хватает памяти для голосовой модели."),
         Said.MISSED_CALL_FROM to t("Пропущенный звонок: $1."),
         Said.WANT_TO_REPLY to t("Хотите ответить?"),
         Said.GO_AHEAD to t("Говорите."),
