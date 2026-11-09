@@ -1,6 +1,7 @@
 package io.github.sirionero.mycar.car
 
 import android.Manifest
+import android.provider.ContactsContract
 import androidx.car.app.CarToast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -252,7 +253,7 @@ private fun ContactsPick(current: JollyAction?, person: String?, onPerson: (Stri
         contacts == null -> Note(stringResource(R.string.dialer_loading_contacts))
         contacts.isEmpty() -> Note(stringResource(R.string.dialer_no_contacts))
         person != null -> LazyColumn(verticalArrangement = Arrangement.spacedBy(MyCarSpace.S)) {
-            items(contacts.filter { it.name == person }) { c ->
+            items(numbersOf(contacts, person)) { c ->
                 PickLine(
                     c.typeLabel ?: shownNumber(c.number),
                     call != null && call.name == c.name && call.number == c.number,
@@ -280,6 +281,14 @@ private fun ContactsPick(current: JollyAction?, person: String?, onPerson: (Stri
         }
     }
 }
+
+/**
+ * The numbers of the contact called [name], the one the phone calls them on first (the default, then
+ * the mobile), the way "call Anna" picks one.
+ */
+internal fun numbersOf(contacts: List<Contact>, name: String): List<Contact> =
+    contacts.filter { it.name == name }
+        .sortedWith(compareByDescending<Contact> { it.primary }.thenByDescending { it.type == ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE })
 
 /** A contact's initial in a circle, as the Phone lists them. */
 @Composable

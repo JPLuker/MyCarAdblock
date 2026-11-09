@@ -15,7 +15,7 @@
     <string name="jolly_does">%1$s: %2$s</string>
 
     <!-- Car, the chooser (the key held, or tapped with nothing chosen): under the tiles of the kinds. %1$s: jolly_name -->
-    <string name="jolly_choose_intro">A tap on the key does what you pick here; hold the key to come back. On the phone too: Settings > Car screen > %1$s.</string>
+    <string name="jolly_choose_intro">A tap on the key does what you pick here; holding it brings you back. On the phone too: Settings > Car screen > %1$s.</string>
     <!-- Car, the chooser and the car's Settings: what the key does now. %1$s: one of the jolly_title_* below -->
     <string name="jolly_now">Now: %1$s</string>
 

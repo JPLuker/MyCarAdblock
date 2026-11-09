@@ -55,6 +55,7 @@ import io.github.sirionero.mycar.car.design.AppIcon
 import io.github.sirionero.mycar.car.kindLabel
 import io.github.sirionero.mycar.car.launcherOrder
 import io.github.sirionero.mycar.car.loadContacts
+import io.github.sirionero.mycar.car.numbersOf
 import io.github.sirionero.mycar.car.pinShown
 import io.github.sirionero.mycar.car.rememberAllEntries
 import io.github.sirionero.mycar.car.rememberReplacedByWeb
@@ -170,7 +171,7 @@ private fun ContactDialog(current: JollyAction?, onPick: (JollyAction) -> Unit, 
                     }
                     list == null -> Text(stringResource(R.string.dialer_loading_contacts))
                     list.isEmpty() -> Text(stringResource(R.string.dialer_no_contacts))
-                    person != null -> list.filter { it.name == person }.forEach { c ->
+                    person != null -> numbersOf(list, person!!).forEach { c ->
                         ChoiceLine(
                             c.typeLabel ?: shownNumber(c.number),
                             call != null && call.name == c.name && call.number == c.number,
