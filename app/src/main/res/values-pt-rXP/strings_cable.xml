@@ -3,4 +3,8 @@
     <string name="home_no_car_title">O telefone está carregando, mas o navio não responde</string>
     <string name="home_no_car_check">Se ele estiver atracado no navio, confira:</string>
     <string name="home_no_car_always">Quando o Android perguntar qual app abrir, escolha o myCar e toque em Sempre: o leme fica com o myCar.</string>
+
+    <string name="setup_audio_auto_effect">A cada travessia o myCar escolhe uma das duas opções abaixo: o Bluetooth quando o seu navio aceita as cantigas do telefone assim; senão, pelo myCar.</string>
+    <string name="setup_audio_bluetooth_effect">Nenhuma pergunta do Android a cada travessia, e o rádio de bordo continua tocando. As cantigas do telefone só chegam a bordo se o navio as receber pelo Bluetooth: alguns navios só aceitam chamadas por ele.</string>
+    <string name="setup_audio_mycar_effect">O navio toca o som do telefone, pelo cabo ou Wi-Fi. A cada travessia o Android pede para compartilhar a tela: basta um toque para aceitar. É essa permissão que deixa o myCar passar o som dos seus outros apps.</string>
 </resources>

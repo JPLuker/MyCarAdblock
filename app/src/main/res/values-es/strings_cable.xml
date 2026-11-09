@@ -7,4 +7,8 @@
     <string name="usb_c_graphene">GrapheneOS puede desactivar los datos del puerto USB-C, y entonces el coche solo ve un teléfono que cargar. En Ajustes &gt; Seguridad y privacidad &gt; Exploit protection &gt; USB-C port, con Charging-only el coche se queda fuera; con Charging-only when locked, la opción predeterminada, desbloquea el teléfono al conectarlo.</string>
 
     <string name="help_step_usb_c">En GrapheneOS, deja pasar los datos por el puerto USB-C.</string>
+
+    <string name="setup_audio_auto_effect">En cada viaje myCar elige una de las dos opciones de abajo: Bluetooth cuando tu coche recibe así la música del teléfono; si no, a través de myCar.</string>
+    <string name="setup_audio_bluetooth_effect">Android no pregunta nada en cada viaje, y la radio del coche sigue sonando. La música del teléfono solo llega al coche si el coche la recibe por Bluetooth: algunos coches solo admiten llamadas así.</string>
+    <string name="setup_audio_mycar_effect">El coche reproduce el sonido del teléfono, por cable o Wi-Fi. En cada viaje Android pide compartir la pantalla: basta un toque para aceptar. Ese permiso es lo que permite a myCar pasar el sonido de tus otras apps.</string>
 </resources>

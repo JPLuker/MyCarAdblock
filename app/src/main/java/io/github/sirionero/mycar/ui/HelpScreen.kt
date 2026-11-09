@@ -72,11 +72,14 @@ private fun inTheCar(onRequestCallScreening: () -> Unit, onOpenUsbC: (() -> Unit
     ),
 )
 
+/** Stops Android's question for the sound through myCar, for good: here and in the setup's car audio step. */
+internal val PROJECT_MEDIA_COMMAND = "adb shell appops set ${BuildConfig.APPLICATION_ID} PROJECT_MEDIA allow"
+
 private val USB_AUDIO = listOf(
     Step(
         R.string.help_step_audio_prompt,
         R.string.help_step_audio_prompt_detail,
-        command = "adb shell appops set ${BuildConfig.APPLICATION_ID} PROJECT_MEDIA allow",
+        command = PROJECT_MEDIA_COMMAND,
     ),
     Step(
         R.string.help_step_notifications,

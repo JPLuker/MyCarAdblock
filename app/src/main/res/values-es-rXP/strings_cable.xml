@@ -3,4 +3,8 @@
     <string name="home_no_car_title">El teléfono se está cargando, pero el barco no responde</string>
     <string name="home_no_car_check">Si está amarrado al barco, comprueba:</string>
     <string name="home_no_car_always">Cuando Android pregunte qué app abrir, elige myCar y toca Siempre: myCar toma el timón.</string>
+
+    <string name="setup_audio_auto_effect">En cada travesía myCar elige una de las dos opciones de abajo: Bluetooth cuando tu barco recibe así las tonadas del teléfono; si no, a través de myCar.</string>
+    <string name="setup_audio_bluetooth_effect">Android no pregunta nada en cada travesía, y la radio de a bordo sigue sonando. Las tonadas del teléfono solo llegan a bordo si el barco las recibe por Bluetooth: algunos barcos solo admiten llamadas así.</string>
+    <string name="setup_audio_mycar_effect">El barco reproduce el sonido del teléfono, por cable o Wi-Fi. En cada travesía Android pide compartir la pantalla: basta un toque para aceptar. Ese permiso es lo que permite a myCar pasar el sonido de tus otras apps.</string>
 </resources>

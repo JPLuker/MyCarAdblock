@@ -3,4 +3,8 @@
     <string name="home_no_car_title">手机正在充电，但船没有回应</string>
     <string name="home_no_car_check">如果手机已系泊在船上，请检查：</string>
     <string name="home_no_car_always">Android 询问要打开哪个应用时，选择 myCar，然后点按“始终”，让 myCar 掌舵。</string>
+
+    <string name="setup_audio_auto_effect">每趟航程，myCar 会从下面两种方式中选一种：船能通过蓝牙播放手机船歌时用蓝牙，否则通过 myCar。</string>
+    <string name="setup_audio_bluetooth_effect">每趟航程 Android 都不会询问，船上的收音机也照常播放。只有船通过蓝牙接收手机船歌时，船歌才能传到船上：部分船只通过蓝牙只接收通话。</string>
+    <string name="setup_audio_mycar_effect">船通过数据线或 WLAN 播放手机的声音。每趟航程 Android 都会请求共享屏幕：点按一下即可接受。正是这项权限让 myCar 能转发其他应用的声音。</string>
 </resources>

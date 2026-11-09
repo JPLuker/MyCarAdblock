@@ -3,4 +3,8 @@
     <string name="home_no_car_title">The phone is charging, but the ship doesn\'t answer the hail</string>
     <string name="home_no_car_check">If it\'s moored to the ship, check:</string>
     <string name="home_no_car_always">When Android asks which app to open, choose myCar and tap Always: myCar takes the helm.</string>
+
+    <string name="setup_audio_auto_effect">At each voyage myCar picks one of the two below: Bluetooth when your ship takes the phone\'s shanties that way, otherwise through myCar.</string>
+    <string name="setup_audio_bluetooth_effect">No question from Android at each voyage, and the ship\'s radio stays on. The phone\'s shanties reach the ship only if it takes them over Bluetooth: some ships take only calls that way.</string>
+    <string name="setup_audio_mycar_effect">The ship plays the phone\'s sound, over the cable or Wi-Fi. At each voyage Android asks to share the screen: one tap to accept. That permission is what lets myCar pass on the sound of your other apps.</string>
 </resources>

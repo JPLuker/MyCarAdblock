@@ -3,4 +3,8 @@
     <string name="home_no_car_title">Das Telefon lädt, aber das Schiff antwortet nicht</string>
     <string name="home_no_car_check">Wenn es am Schiff festgemacht ist, prüfe:</string>
     <string name="home_no_car_always">Wenn Android fragt, welche App sich öffnen soll, wähle myCar und tippe auf „Immer“: Dann übernimmt myCar das Ruder.</string>
+
+    <string name="setup_audio_auto_effect">Bei jedem Törn wählt myCar einen der beiden Wege unten: Bluetooth, wenn dein Schiff die Shantys des Telefons so annimmt, sonst über myCar.</string>
+    <string name="setup_audio_bluetooth_effect">Keine Frage von Android bei jedem Törn, und das Radio an Bord läuft weiter. Die Shantys des Telefons kommen nur an Bord, wenn das Schiff sie über Bluetooth annimmt: Manche Schiffe nehmen darüber nur Anrufe an.</string>
+    <string name="setup_audio_mycar_effect">Das Schiff spielt den Ton des Telefons, per Kabel oder WLAN. Bei jedem Törn fragt Android, ob der Bildschirm geteilt werden darf: Ein Tippen genügt. Erst diese Erlaubnis lässt myCar den Ton deiner anderen Apps weitergeben.</string>
 </resources>

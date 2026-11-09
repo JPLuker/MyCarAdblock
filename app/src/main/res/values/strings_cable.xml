@@ -20,4 +20,10 @@
 
     <!-- How to connect: a step only on GrapheneOS, with usb_c_graphene under it -->
     <string name="help_step_usb_c">On GrapheneOS, let the USB-C port carry data.</string>
+
+    <!-- Setup list: the car audio step, now with calls, map and music. Under each way, what it means at every drive -->
+    <string name="setup_audio_auto_effect">At each drive myCar picks one of the two below: Bluetooth when your car takes the phone\'s music that way, otherwise through myCar.</string>
+    <string name="setup_audio_bluetooth_effect">No question from Android at each drive, and the car\'s radio stays on. The phone\'s music reaches the car only if the car takes it over Bluetooth: some cars take only calls that way.</string>
+    <!-- "Share the screen": Android's question before myCar can pass the phone's sound on (Android 14 and older word it as recording or casting) -->
+    <string name="setup_audio_mycar_effect">The car plays the phone\'s sound, over the cable or Wi-Fi. At each drive Android asks to share the screen: one tap to accept. That permission is what lets myCar pass on the sound of your other apps.</string>
 </resources>
