@@ -129,6 +129,21 @@ class AudioLinkFocusTest {
     }
 
     @Test
+    fun `the car taking its speakers again after its GAIN is a moment of its own, given back by the next GAIN`() {
+        // A call: the car takes the speakers to ring, gives them back, takes them for the call, and
+        // gives them back at its end. CarServices keeps what the first moment paused for the last GAIN
+        // (PausedForCar.Memory: PausedForCarTest).
+        val link = streaming()
+        link.onFocus(LOSS_TRANSIENT)
+        link.onFocus(GAIN)
+        link.onFocus(LOSS_TRANSIENT)
+        link.onFocus(GAIN)
+        assertEquals(2, pausedForNow)
+        assertEquals(2, givenBack)
+        assertEquals(listOf("stop", "start", "stop", "start"), sent)
+    }
+
+    @Test
     fun `ducking and a guidance-only moment pause nothing`() {
         val link = streaming()
         link.onFocus(LOSS_TRANSIENT_CAN_DUCK)

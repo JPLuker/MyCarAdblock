@@ -687,7 +687,7 @@ object CarServices {
      */
     fun pausePhoneMedia(why: String = "the car left", keep: String? = null, again: (() -> Boolean)? = null) {
         // Nothing paused for the car's moment on its speakers plays again after this.
-        pausedForCar = null
+        pausedForCar.forget()
         val ctx = context ?: return
         val manager = ctx.getSystemService(MediaSessionManager::class.java)
         val listener = ComponentName(ctx, MyCarNotificationListener::class.java)
@@ -747,18 +747,13 @@ object CarServices {
         return { !media.askedSince(mark) }
     }
 
-    /** What [pausePhoneMediaForNow] paused, for [resumePhoneMedia]; null when nothing waits to play again. */
-    private class PausedForNow(
-        val controllers: List<android.media.session.MediaController>,
-        /** Without notification access: the app myCar drives itself, paused through it. */
-        val own: Boolean,
-        /** Where the driver's asks of the music stood ([CarMedia.askMark]); null with no music app. */
-        val askMark: Int?,
-        /** The car's music app then: another one picked since is the driver's choice. */
-        val app: ComponentName?,
-    )
-
-    @Volatile private var pausedForCar: PausedForNow? = null
+    /**
+     * What [pausePhoneMediaForNow] paused, for [resumePhoneMedia]: the sessions (or, without
+     * notification access, the app myCar drives itself, paused through it), where the driver's asks of
+     * the music stood ([CarMedia.askMark]), and the car's music app then (another one picked since is
+     * the driver's choice).
+     */
+    private val pausedForCar = PausedForCar.Memory<android.media.session.MediaController> { it.sessionToken }
 
     /**
      * The car takes its speakers for a moment (AudioLink: a call on the car, its own voice or
@@ -781,22 +776,20 @@ object CarServices {
         }
         if (playing == null) {
             // No notification access: the app myCar itself is driving is all it can reach.
-            if (media != null && media.now.value.playing) {
-                media.pauseForCar()
-                pausedForCar = PausedForNow(emptyList(), own = true, askMark = mark, app = app)
+            val own = media?.now?.value?.playing == true
+            if (own) {
+                media?.pauseForCar()
                 io.github.sirionero.mycar.MyCarLog.i("media: paused the music app while the car has the speakers for a moment")
-            } else {
-                pausedForCar = null
             }
-            return
-        }
-        if (playing.isEmpty()) {
-            pausedForCar = null
+            pausedForCar.paused(emptyList(), own, mark, app)
             return
         }
         playing.forEach { runCatching { it.transportControls.pause() } }
-        pausedForCar = PausedForNow(playing, own = false, askMark = mark, app = app)
-        io.github.sirionero.mycar.MyCarLog.i("media: paused ${playing.joinToString { it.packageName }} while the car has the speakers for a moment")
+        // With what an earlier moment of the car's paused, if it hasn't played again yet (PausedForCar.Memory).
+        pausedForCar.paused(playing, own = false, askMark = mark, app = app)
+        if (playing.isNotEmpty()) {
+            io.github.sirionero.mycar.MyCarLog.i("media: paused ${playing.joinToString { it.packageName }} while the car has the speakers for a moment")
+        }
     }
 
     /**
@@ -805,11 +798,15 @@ object CarServices {
      * another music app meanwhile, or the drive ended (see [PausedForCar]). During a call, once it's over.
      */
     fun resumePhoneMedia() {
-        repause.post { resumeWhenFree(PausedForCar.CALL_CHECKS) }
+        // What waits now, on the session's thread: a moment of the car's after this GAIN waits for its own.
+        val paused = pausedForCar.given() ?: return
+        repause.post { resumeWhenFree(paused, PausedForCar.CALL_CHECKS) }
     }
 
-    private fun resumeWhenFree(waitsLeft: Int) {
-        val paused = pausedForCar ?: return
+    private fun resumeWhenFree(paused: PausedForCar.Paused<android.media.session.MediaController>, waitsLeft: Int) {
+        // Forgotten (the drive ended, the radio, the car left), or the car took its speakers again
+        // since: the GAIN after that plays it.
+        if (!pausedForCar.waits(paused)) return
         val media = mediaOrNull()
         val mark = paused.askMark
         val asked = (mark != null && media != null && media.askedSince(mark)) || _mediaApp.value?.component != paused.app
@@ -818,25 +815,23 @@ object CarServices {
                 if (waitsLeft == PausedForCar.CALL_CHECKS) {
                     io.github.sirionero.mycar.MyCarLog.i("media: the car gave the speakers back during a call - the music waits for its end")
                 }
-                repause.postDelayed({ if (pausedForCar === paused) resumeWhenFree(waitsLeft - 1) }, PausedForCar.CALL_CHECK_MS)
+                repause.postDelayed({ resumeWhenFree(paused, waitsLeft - 1) }, PausedForCar.CALL_CHECK_MS)
                 return
             }
             PausedForCar.Then.DROP -> {
-                pausedForCar = null
+                if (!pausedForCar.done(paused)) return
                 val why = if (asked) "the driver asked it for something since" else "the call went on too long"
                 io.github.sirionero.mycar.MyCarLog.i("media: the music paused for the car stays paused: $why")
                 return
             }
-            PausedForCar.Then.PLAY -> pausedForCar = null
+            // Not if the car took its speakers again in the meantime.
+            PausedForCar.Then.PLAY -> if (!pausedForCar.done(paused)) return
         }
-        if (paused.own) {
-            if (media != null && media.now.value.state == PlaybackState.STATE_PAUSED) {
-                media.playForCar()
-                io.github.sirionero.mycar.MyCarLog.i("media: resumed the music app: the car gave the speakers back")
-            }
-            return
+        if (paused.own && media != null && media.now.value.state == PlaybackState.STATE_PAUSED) {
+            media.playForCar()
+            io.github.sirionero.mycar.MyCarLog.i("media: resumed the music app: the car gave the speakers back")
         }
-        val waiting = paused.controllers.filter { it.playbackState?.state == PlaybackState.STATE_PAUSED }
+        val waiting = paused.players.filter { it.playbackState?.state == PlaybackState.STATE_PAUSED }
         waiting.forEach { runCatching { it.transportControls.play() } }
         if (waiting.isNotEmpty()) {
             io.github.sirionero.mycar.MyCarLog.i("media: resumed ${waiting.joinToString { it.packageName }}: the car gave the speakers back")
@@ -862,7 +857,7 @@ object CarServices {
     fun shutdown() {
         if (holders == 0 || --holders > 0) return
         // The drive's moment on the car's speakers ends with it: nothing plays again after.
-        pausedForCar = null
+        pausedForCar.forget()
         context?.let { io.github.sirionero.mycar.notify.CarMotion.stop(it) }
         io.github.sirionero.mycar.call.CarCalls.stop()
         runCatching { nav.disconnect() }
