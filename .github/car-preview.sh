@@ -602,6 +602,36 @@ case " ${ONLY:-phone-recents} " in *" phone-recents "*)
     ;;
 esac
 
+# A call under way (car/CallPill.kt): its pill over every screen until it ends, a call picked up 1:23 ago
+# with no modem behind it (--ez fakeCall true, debug only). Over the map, the app grid and the car's
+# Settings, each given a wait (the emulator draws a new screen slowly); held and dragged to the bottom
+# left, where it stays; a tap on it opens the Phone. At 800x480, Normal and Extra large (drawn smaller);
+# light. Over the mini player: the column's X brings it out, the pill dragged onto its corner moves it up,
+# and the pill dragged away lets it back. Then the emulator's modem rings, myCar's Answer takes the call
+# (the pill), and the pill's red button ends it. "call-bubble" in the workflow's shots takes them all.
+# At 1920x720 (240 dpi) the pill starts 810-1254 px across, 18-114 down.
+case " ${ONLY:-} " in *" call-bubble "*)
+    ONLY="$ONLY call-bubble-800x480 call-bubble-xl-800x480 call-bubble-light call-bubble-mini call-bubble-knob call-answer" ;;
+esac
+EXTRA="--ez fakeCall true" shoot call-bubble 1920 720 240 \
+    "$WAIT;$GRID_BUTTON;$WAIT;$(at settings);$WAIT;900,66,drag,400,640;$WAIT;450,640;$WAIT"
+EXTRA="--ez fakeCall true" shoot call-bubble-800x480 800 480 160 "$WAIT;48,436;$WAIT"
+EXTRA="--ez fakeCall true --es carScale 1.5" shoot call-bubble-xl-800x480 800 480 160 "$WAIT;72,414;$WAIT"
+EXTRA="--ez fakeCall true --es carTheme LIGHT" shoot call-bubble-light 1920 720 240 "$WAIT;$GRID_BUTTON;$WAIT;$(at settings);$WAIT"
+EXTRA="--ez fakeCall true --ez demoSong true" shoot call-bubble-mini 1920 720 240 \
+    "$WAIT;1866,54;$WAIT;900,66,drag,1700,700;$WAIT;1550,654,drag,900,300;$WAIT"
+# The car's knob (a script, see PreviewScript: knob:n turns it, knob:ok presses it). Its first turn puts the
+# focus on Home (the weather of the page left of the map), the next one back on the dock's foot; back
+# along the dock (mic, map, clock) and round past its top, the last thing on the screen: the pill's red
+# button, at the sixth turn (a picture after each). Pressed, it ends the call ("calls: there was no call
+# to end", for the made-up one). Seen (0.7.4): the ring on the red button, then on the rest of the pill.
+EXTRA="--ez fakeCall true --es script 'wait:7000;knob:-1;wait:600;knob:-1;wait:600;rep:4;knob:-1;wait:700;snap:;end;knob:ok;wait:1500;snap:pressed'" \
+    shoot call-bubble-knob 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+# The ringing card's Answer is 1068-1176 px across, 444-579 down (with or without its Bluetooth line);
+# the pill's red button 1158-1254 across.
+shoot call-answer 1920 720 240 "$WAIT;$WAIT;1122,510;$WAIT;$WAIT;1206,66;$WAIT;$WAIT" "adb emu gsm call 3339876543"
+adb emu gsm cancel 3339876543 >/dev/null 2>&1
+
 # The dock's microphone with "Phone's assistant" chosen: myCar should wake the phone's assistant
 # as the swipe up from a bottom corner does, through SystemUI. First with the Settings app standing
 # in for an assistant that's an activity; the phone's own screen, shot after the tap, should show it.
