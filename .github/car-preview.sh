@@ -607,7 +607,7 @@ esac
 # - jolly-800x480: Home with the key and two slots above it (the user's Golf), then a tap: its command
 #   "what time is it" as if said - the assistant shows it and answers; then held: the chooser, its kinds
 #   in two rows.
-# - jolly-1920x720: nothing chosen yet, so the tap opens the chooser.
+# - jolly-1920x720: nothing chosen yet, so the tap opens the chooser; a second tap on the lit key closes it.
 # - jolly-choose: the chooser from a long press ("Assistant command" lit, what the key does now), that
 #   kind's list (the key's own command, then the ready-made ones), "Read my messages" chosen: back
 #   Home with the car saying what the key does now.
@@ -641,7 +641,7 @@ case " ${ONLY:-} " in *" jolly "*)
     ONLY="$ONLY jolly-settings jolly-phone jolly-ru-800x480 jolly-el-800x480 jolly-pt-XP-800x480" ;;
 esac
 EXTRA="--es jolly say" shoot jolly-800x480 800 480 160 "$WAIT;$JOLLY_KEY_800;$WAIT;$WAIT;$JOLLY_KEY_800,long;$WAIT"
-shoot jolly-1920x720 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT"
+shoot jolly-1920x720 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT;$JOLLY_KEY;$WAIT"
 EXTRA="--es jolly say" shoot jolly-choose 1920 720 240 "$WAIT;$JOLLY_KEY,long;$JOLLY_TILE_SAY;$JOLLY_ROW_2;$WAIT"
 EXTRA="--es jolly say --es jollySay 'che ore sono' --es jollyLang it" shoot jolly-say-it 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT;$WAIT"
 EXTRA="--es jolly say --es carTheme LIGHT" shoot jolly-light 1920 720 240 "$WAIT;$JOLLY_KEY,long;$WAIT"
