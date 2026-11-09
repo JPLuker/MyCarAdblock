@@ -104,8 +104,9 @@
     <string name="car_settings_save_failed">Could not save</string>
     <!-- Button: keeps the screen fit for this car -->
     <string name="car_settings_save_for_vehicle">Save for this vehicle</string>
-    <!-- The same button, unusable: myCar doesn't know this car -->
-    <string name="car_settings_no_vehicle_profile">No vehicle profile matched</string>
+    <!-- The same button, unusable when no vehicle profile (vehicles.json) names this car. Not an error:
+         myCar then takes the picture size and the margins the car declares. One line on the button: short -->
+    <string name="car_settings_no_vehicle_profile">No saved profile: myCar uses the car\'s sizes</string>
 
     <!-- What's new, a card over the car's screen after an update (car/CarWhatsNew.kt) -->
     <!-- %1$s: the version, as 0.5.18-alpha -->

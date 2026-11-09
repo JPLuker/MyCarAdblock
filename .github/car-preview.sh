@@ -209,6 +209,31 @@ for layout in full half-quarters quarters-half strip-quarters quarters-strip; do
 done
 EXTRA="--es pageLayout half-quarters" shoot layout-800x480 800 480 160 "48,116;404,450;$WAIT"
 
+# An upright car screen, as some cars have: Home, then the app grid and the dashboard; Home with the
+# made-up song beside the real map, over 15s; Home's pages, left of the map and then right of it.
+# At 720x1280 (160 dpi) and 1080x1920 (320 dpi); "portrait" in the workflow's shots takes them all.
+# The taps are worked out in dp, as myCar lays the screen out, and give the 800x480 and 1920x720 taps
+# above too: the dock 96 wide on the left, its clock 44 from the top, its map 116, the grid button 44
+# from the bottom; the page dots 30 from the bottom, 44 apart around the middle of what's right of the
+# dock, the map's dot in the middle. Each shot starts with a wait, as the first frames are slower here.
+dp_at() { echo "$(($2 * $1 / 160)),$(($3 * $1 / 160))"; }   # dp_at <dpi> <x> <y>: "x,y" in pixels
+portrait() {   # portrait <width> <height> <dpi>
+    local w=$1 h=$2 dpi=$3
+    local size=${w}x$h high=$((h * 160 / dpi)) mid=$((96 + (w * 160 / dpi - 96) / 2))
+    local clock map grid left right
+    clock=$(dp_at "$dpi" 48 44)
+    map=$(dp_at "$dpi" 48 116)
+    grid=$(dp_at "$dpi" 48 $((high - 44)))
+    left=$(dp_at "$dpi" $((mid - 44)) $((high - 30)))
+    right=$(dp_at "$dpi" $((mid + 44)) $((high - 30)))
+    case " ${ONLY:-} " in *" portrait "*) ONLY="$ONLY portrait-$size portrait-split-$size portrait-pages-$size" ;; esac
+    shoot "portrait-$size" "$w" "$h" "$dpi" "$WAIT;$WAIT;$WAIT;$grid;$clock"
+    EXTRA="--ez demoSong true" shoot "portrait-split-$size" "$w" "$h" "$dpi" "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+    shoot "portrait-pages-$size" "$w" "$h" "$dpi" "$WAIT;$map;$left;$WAIT;$map;$right;$WAIT;$WAIT"
+}
+portrait 720 1280 160
+portrait 1080 1920 320
+
 # Plancia inside myCar, on the run's own Home Assistant (.github/home-assistant.sh), which the
 # emulator reaches at 10.0.2.2: full screen from the grid, where the Plancia app was, then its
 # menu (Home Assistant's ☰, in its bar under myCar's); on its ready-made page right of the map,

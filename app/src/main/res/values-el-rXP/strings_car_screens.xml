@@ -32,7 +32,7 @@
     <string name="car_settings_screen_fit">Προσαρμογή οθόνης καραβιού</string>
     <string name="car_settings_save_failed">Η αποθήκευση ναυάγησε</string>
     <string name="car_settings_save_for_vehicle">Αποθήκευση για αυτό το καράβι</string>
-    <string name="car_settings_no_vehicle_profile">Κανένα προφίλ για αυτό το καράβι</string>
+    <string name="car_settings_no_vehicle_profile">Τίποτα στο αμπάρι: διαστάσεις από το καράβι</string>
 
     <string name="car_whatsnew_title">Νέα λάφυρα της %1$s</string>
     <string name="car_whatsnew_show_after_updates">Στο φως μετά από ενημερώσεις</string>
