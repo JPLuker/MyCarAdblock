@@ -606,7 +606,8 @@ esac
 #   jolly-ru-800x480, jolly-el-800x480, jolly-pt-XP-800x480: where the names of the kinds are longest.
 # - jolly-settings: the car settings' rows on their own (--ez jollySettings true).
 # - jolly-phone: on the phone, Settings > Car screen: the section, the kinds, a ready-made command picked
-#   and saved, a place written with the phone's keyboard and saved.
+#   and saved, a place written with the phone's keyboard and saved, the contacts (after jolly-contacts)
+#   and a number chosen.
 JOLLY_KEY="72,444"         # at 1920x720
 JOLLY_KEY_800="48,296"
 JOLLY_TILE_CALL="314,222"  # the kinds, one row at 1920x720
@@ -1089,8 +1090,8 @@ phone_settings() {
 phone_settings
 
 # The Jolly key on the phone (ui/JollySettings.kt), in Settings > Car screen: its section, the kinds, a
-# ready-made command picked and saved, a place written with the phone's keyboard and saved. Here, after
-# the helpers above it and before setup-phone, which wipes myCar's data.
+# ready-made command picked and saved, a place written with the phone's keyboard and saved, a contact's
+# number. Here, after the helpers above it and before setup-phone, which wipes myCar's data.
 phone_jolly() {
     case " ${ONLY:-jolly-phone} " in *" jolly-phone "*) ;; *) return ;; esac
     local d=previews/jolly-phone
@@ -1110,6 +1111,11 @@ phone_jolly() {
     tap_match 'class="android.widget.EditText"'; sleep 1
     adb shell input text "Piazza%sdel%sDuomo%s1"; sleep 1; adb exec-out screencap -p > $d/07-place-written.png
     tap_text "Save"; sleep 1.5; adb exec-out screencap -p > $d/08-place-saved.png
+    # The contacts (those jolly-contacts wrote, when it ran before), one with two numbers.
+    tap_text "What it does"; sleep 1.5
+    tap_text "Call a contact"; sleep 2; adb exec-out screencap -p > $d/09-contacts.png
+    tap_text "Anna Verdi"; sleep 1.5; adb exec-out screencap -p > $d/10-numbers.png
+    tap_text "Mobile"; sleep 1.5; adb exec-out screencap -p > $d/11-call-saved.png
     adb logcat -d -s myCar > $d/log.txt
     adb logcat -d -b crash > $d/crash.txt 2>&1
     echo "--- the Jolly key on the phone ---"

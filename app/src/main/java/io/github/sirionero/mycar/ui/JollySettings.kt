@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.KeyboardOptions
@@ -162,31 +164,38 @@ private fun ContactDialog(current: JollyAction?, onPick: (JollyAction) -> Unit, 
         onDismissRequest = onDismiss,
         title = { Text(person ?: stringResource(R.string.jolly_kind_call)) },
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
-                val list = contacts
-                when {
-                    !allowed -> {
-                        Text(stringResource(R.string.settings_jolly_contacts_permission), style = MaterialTheme.typography.bodyLarge)
-                        TextButton(onClick = { ask.launch(Manifest.permission.READ_CONTACTS) }) { Text(stringResource(R.string.common_allow)) }
-                    }
-                    list == null -> Text(stringResource(R.string.dialer_loading_contacts))
-                    list.isEmpty() -> Text(stringResource(R.string.dialer_no_contacts))
-                    person != null -> numbersOf(list, person!!).forEach { c ->
+            val list = contacts
+            val who = person
+            when {
+                !allowed -> Column {
+                    Text(stringResource(R.string.settings_jolly_contacts_permission), style = MaterialTheme.typography.bodyLarge)
+                    TextButton(onClick = { ask.launch(Manifest.permission.READ_CONTACTS) }) { Text(stringResource(R.string.common_allow)) }
+                }
+                list == null -> Text(stringResource(R.string.dialer_loading_contacts))
+                list.isEmpty() -> Text(stringResource(R.string.dialer_no_contacts))
+                who != null -> LazyColumn {
+                    items(numbersOf(list, who)) { c ->
                         ChoiceLine(
                             c.typeLabel ?: shownNumber(c.number),
                             call != null && call.name == c.name && call.number == c.number,
                             subtitle = shownNumber(c.number).takeIf { c.typeLabel != null },
                         ) { onPick(JollyAction.Call(c.name, c.number, c.typeLabel.orEmpty())) }
                     }
-                    else -> list.groupBy { it.name }.forEach { (name, numbers) ->
-                        val one = numbers.singleOrNull()
-                        ChoiceLine(
-                            name,
-                            call?.name == name,
-                            subtitle = if (one != null) listOfNotNull(one.typeLabel, shownNumber(one.number)).joinToString("  ·  ")
-                            else pluralStringResource(R.plurals.jolly_numbers, numbers.size, numbers.size),
-                        ) {
-                            if (one != null) onPick(JollyAction.Call(name, one.number, one.typeLabel.orEmpty())) else person = name
+                }
+                else -> {
+                    // A list, not a column: a phone can have a thousand contacts.
+                    val people = remember(list) { list.groupBy { it.name }.toList() }
+                    LazyColumn {
+                        items(people, key = { it.first }) { (name, numbers) ->
+                            val one = numbers.singleOrNull()
+                            ChoiceLine(
+                                name,
+                                call?.name == name,
+                                subtitle = if (one != null) listOfNotNull(one.typeLabel, shownNumber(one.number)).joinToString("  ·  ")
+                                else pluralStringResource(R.plurals.jolly_numbers, numbers.size, numbers.size),
+                            ) {
+                                if (one != null) onPick(JollyAction.Call(name, one.number, one.typeLabel.orEmpty())) else person = name
+                            }
                         }
                     }
                 }
