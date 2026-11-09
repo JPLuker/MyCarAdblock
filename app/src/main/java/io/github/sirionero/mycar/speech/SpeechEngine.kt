@@ -158,7 +158,9 @@ object SpeechEngine {
         if (loadingFinal == model || (finalRecognizer != null && loadedFinal == model && loadedLanguage == language)) return SpeechRoom.Press.LOAD
         if (!SpeechModels.isReady(context, model)) return SpeechRoom.Press.LOAD
         val mem = memory(context) ?: return SpeechRoom.Press.LOAD
-        val need = need(context, model)
+        // A final model loaded for another language goes before this one loads (ensureFinalLoaded): its memory counts as free.
+        val held = loadedFinal?.takeIf { finalRecognizer != null }?.let { need(context, it) } ?: 0L
+        val need = (need(context, model) - held).coerceAtLeast(0L)
         val press = SpeechRoom.atPress(mem.availMem, mem.threshold, mem.lowMemory, need, language == VoiceLanguage.EN)
         val free = mem.availMem shr 20
         when {

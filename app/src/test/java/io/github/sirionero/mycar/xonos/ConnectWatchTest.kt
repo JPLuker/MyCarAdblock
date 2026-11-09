@@ -48,8 +48,12 @@ class ConnectWatchTest {
         val watch = ConnectWatch()
         watch.trying(0)
         watch.connected(100)
-        watch.failed(50_000, "LOST")
-        assertEquals("connected to Music Assistant again after 2.0 s (2 tries)", watch.connected(52_000))
+        watch.lost(50_000)
+        watch.trying(51_000)
+        assertEquals("connected to Music Assistant again after 2.0 s (1 try)", watch.connected(52_000))
+        watch.lost(60_000)
+        watch.failed(61_000, "NO_ANSWER")
+        assertEquals("connected to Music Assistant again after 4.0 s (2 tries)", watch.connected(64_000))
     }
 
     @Test

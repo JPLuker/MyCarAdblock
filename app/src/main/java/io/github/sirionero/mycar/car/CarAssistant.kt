@@ -51,7 +51,10 @@ object CarAssistant {
         val ready: Boolean = false,
         /** Home Assistant is being asked (AssistantBrain): the overlay says so while it waits. */
         val brain: Boolean = false,
-        /** A line over "Listening…": why the assistant listens in English though myCar is in another language. */
+        /**
+         * A line over "Listening…": why the assistant listens in English though myCar is in another
+         * language, or, once a drive, that the phone is short of memory for the big model (smallModelOnce).
+         */
         val hint: String = "",
     )
 

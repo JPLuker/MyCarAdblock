@@ -29,6 +29,11 @@ internal class ConnectWatch(private val slowMs: Long = SLOW_MS) {
         this.problem = problem
     }
 
+    /** The connection that was up dropped: trying again from now, and that's no failed try. */
+    fun lost(now: Long) {
+        if (since == NONE) start(now)
+    }
+
     /** Connected: the line that says after how long and how many tries, or null if it wasn't trying. */
     fun connected(now: Long): String? {
         if (since == NONE) return null

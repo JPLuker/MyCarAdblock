@@ -113,7 +113,8 @@ object Xonos {
                 val now = SystemClock.elapsedRealtime()
                 when (connection) {
                     is Connection.Connected -> watch.connected(now)?.let { MyCarLog.i("xonos: $it") }
-                    is Connection.Failed -> watch.failed(now, connection.problem.name)
+                    is Connection.Failed ->
+                        if (connection.problem == Problem.LOST) watch.lost(now) else watch.failed(now, connection.problem.name)
                     // An empty address: let go, nobody uses it now (the drive ended).
                     is Connection.Connecting -> if (connection.url.isEmpty()) watch.idle() else watch.trying(now)
                     Connection.NotConfigured -> watch.idle()
