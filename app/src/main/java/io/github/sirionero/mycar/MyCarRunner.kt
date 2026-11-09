@@ -1099,8 +1099,8 @@ class MyCarRunner(
             log.i("the car shows its own screen - Start waits until it hands the screen back")
         }
         // The car crops its margins off the frame, so keep the UI out of them unless a vehicle
-        // profile has its own tuned insets.
-        if (vehicleProfile?.insets.let { it == null || it == Insets.NONE }) {
+        // profile has its own tuned insets (all 0 too: the profile says the car shows the whole frame).
+        if (vehicleProfile?.insets == null) {
             val insets = config.marginInsets()
             CarEnvironment.setInsets(insets)
             if (insets != Insets.NONE) log.i("keeping the UI clear of the car's margins: $insets")

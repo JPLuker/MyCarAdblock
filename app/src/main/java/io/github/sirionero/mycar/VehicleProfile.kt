@@ -27,7 +27,8 @@ data class VehicleProfile(
     val match: Map<String, String>,
     /** Preferred video resolution, e.g. "800x480". Null keeps the default choice. */
     val resolution: String?,
-    val insets: Insets,
+    /** Null when the file gives none: the car's own margins apply. All 0 means no margins at all. */
+    val insets: Insets?,
 )
 
 object VehicleProfiles {
@@ -92,9 +93,7 @@ object VehicleProfiles {
                 name = v.optString("name", "vehicle $i"),
                 match = match,
                 resolution = v.optString("resolution").ifEmpty { null },
-                insets = if (ins == null) Insets.NONE else Insets(
-                    ins.optInt("top"), ins.optInt("bottom"), ins.optInt("left"), ins.optInt("right"),
-                ),
+                insets = ins?.let { Insets(it.optInt("top"), it.optInt("bottom"), it.optInt("left"), it.optInt("right")) },
             )
         }
     }
