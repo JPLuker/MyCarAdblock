@@ -458,6 +458,8 @@ object CarAssistant {
     private val progress = object : UtteranceProgressListener() {
         override fun onStart(utteranceId: String?) {
             startedUtterance = utteranceId
+            // How soon the engine starts, for the log: whether it starts at all is what counts (watchStart).
+            if (utteranceId == askedUtterance) MyCarLog.i("assistant: the phone's voice started in ${SystemClock.uptimeMillis() - askedAt} ms")
             // The phone's voice speaks: its settings stop saying it didn't.
             appContext?.let(PhoneVoice::spoke)
         }
@@ -494,6 +496,8 @@ object CarAssistant {
             return id
         }
         engine.setOnUtteranceProgressListener(progress)
+        askedUtterance = id
+        askedAt = SystemClock.uptimeMillis()
         if (engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, id) != TextToSpeech.SUCCESS) {
             // A text too long for any engine says nothing about the engine; otherwise it went away
             // (updated in the background) and is made again at the next drive.
@@ -512,6 +516,9 @@ object CarAssistant {
 
     /** The last utterance the engine said it started (on its own thread). */
     @Volatile private var startedUtterance: String? = null
+    /** The last utterance given to the engine, and when (uptime). */
+    @Volatile private var askedUtterance: String? = null
+    @Volatile private var askedAt = 0L
 
     /**
      * An engine with no voice for the language may never start at all, nor say it finished: the music
