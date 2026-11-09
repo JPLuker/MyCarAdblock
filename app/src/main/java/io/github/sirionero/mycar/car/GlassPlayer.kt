@@ -152,13 +152,11 @@ internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp:
                     colors = GsColors(Color.Black.copy(alpha = 0.4f), Color.White),
                     size = 52.dp, iconSize = 24.dp, shape = CircleShape,
                 )
-                if (videoPossible) VideoCoverButton(Modifier.align(Alignment.TopStart).zIndex(1f).padding(10.dp))
                 // Music that can't reach the car (Android's question turned down): says so, and asks again.
-                // Under the two buttons when the video cover's is there, as wide as the column.
-                MusicNotReaching(
-                    now.playing,
-                    Modifier.align(Alignment.TopStart).padding(start = 10.dp, top = if (videoPossible) 72.dp else 10.dp, end = if (videoPossible) 10.dp else 72.dp),
-                )
+                val notReaching = musicNotReaching(now.playing)
+                notReaching?.let { MusicNotReaching(it, Modifier.align(Alignment.TopStart).padding(start = 10.dp, top = 10.dp, end = 72.dp)) }
+                // The video cover's button gives way to it: lower down, under the glass, it couldn't be read or touched.
+                if (videoPossible && notReaching == null) VideoCoverButton(Modifier.align(Alignment.TopStart).zIndex(1f).padding(10.dp))
                 Column(
                     Modifier
                         .align(Alignment.BottomCenter)
