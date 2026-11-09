@@ -51,11 +51,15 @@ private class Step(
     val onClick: (() -> Unit)? = null,
 )
 
-private fun inTheCar(onRequestCallScreening: () -> Unit) = listOf(
+private fun inTheCar(onRequestCallScreening: () -> Unit, onOpenUsbC: (() -> Unit)?) = listOfNotNull(
     Step(
         R.string.help_step_connect,
         R.string.help_step_connect_detail,
     ),
+    // GrapheneOS can keep the car from seeing the phone on the cable: a step of its own, only there.
+    onOpenUsbC?.let {
+        Step(R.string.help_step_usb_c, R.string.usb_c_graphene, buttonLabel = R.string.common_open_settings, onClick = it)
+    },
     Step(
         R.string.help_step_pair,
         R.string.help_step_pair_detail,
@@ -85,9 +89,12 @@ private val USB_AUDIO = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HelpScreen(onBack: () -> Unit, onRequestCallScreening: () -> Unit, onOpenSetup: () -> Unit) {
-    val car = remember(onRequestCallScreening) { inTheCar(onRequestCallScreening) }
-    val route by CarSettings.audioRoute.collectAsState()
     val context = LocalContext.current
+    val graphene = remember { runsGrapheneOs(context) }
+    val car = remember(onRequestCallScreening, graphene) {
+        inTheCar(onRequestCallScreening, onOpenUsbC = { openSecuritySettings(context) }.takeIf { graphene })
+    }
+    val route by CarSettings.audioRoute.collectAsState()
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,

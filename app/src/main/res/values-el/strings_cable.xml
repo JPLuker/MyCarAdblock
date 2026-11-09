@@ -5,4 +5,6 @@
     <string name="home_no_car_cable">Χρησιμοποιήστε καλώδιο που μεταφέρει δεδομένα: μερικά μόνο φορτίζουν.</string>
     <string name="home_no_car_always">Όταν το Android ρωτήσει ποια εφαρμογή να ανοίξει, επιλέξτε το myCar και πατήστε «Πάντα».</string>
     <string name="usb_c_graphene">Το GrapheneOS μπορεί να κλείσει τα δεδομένα στη θύρα USB-C, και τότε το αυτοκίνητο βλέπει μόνο ένα τηλέφωνο για φόρτιση. Στις Ρυθμίσεις &gt; Ασφάλεια και απόρρητο &gt; Exploit protection &gt; USB-C port, το Charging-only αφήνει το αυτοκίνητο απέξω· με το Charging-only when locked, την προεπιλογή, ξεκλειδώστε το τηλέφωνο όταν το συνδέετε.</string>
+
+    <string name="help_step_usb_c">Στο GrapheneOS, αφήστε τα δεδομένα να περνούν από τη θύρα USB-C.</string>
 </resources>

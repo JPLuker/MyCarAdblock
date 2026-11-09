@@ -17,7 +17,7 @@
     <string name="help_title">Como abordar</string>
     <string name="help_in_the_car">A bordo</string>
     <string name="help_step_connect">Aborde pelo cabo ou sem fio.</string>
-    <string name="help_step_connect_detail">O myCar abre sozinho quando o navio se conecta. Para usar sem fio, pareie primeiro o telefone com o navio e depois toque em Abordar sem fio no porto.</string>
+    <string name="help_step_connect_detail">O myCar abre sozinho quando o navio se conecta. Na primeira vez com o cabo, o Android pergunta qual app abrir: escolha o myCar e toque em Sempre. Para usar sem fio, pareie primeiro o telefone com o navio e depois toque em Abordar sem fio no porto.</string>
     <string name="help_set_up">Preparar</string>
     <string name="help_step_audio_prompt">Jogue ao mar a pergunta de áudio a cada viagem.</string>
 

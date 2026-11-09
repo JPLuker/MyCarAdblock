@@ -28,7 +28,7 @@
     <string name="help_in_the_car">在车上</string>
     <string name="help_sound_through_mycar">通过 myCar 传输声音</string>
     <string name="help_step_connect">插上数据线，或无线连接。</string>
-    <string name="help_step_connect_detail">汽车连接后，myCar 会自动打开。如需无线连接，请先将手机与汽车配对，然后在主页上点按“无线连接”。</string>
+    <string name="help_step_connect_detail">汽车连接后，myCar 会自动打开。第一次用数据线连接时，Android 会询问要打开哪个应用：选择 myCar，然后点按“始终”。如需无线连接，请先将手机与汽车配对，然后在主页上点按“无线连接”。</string>
     <string name="help_step_pair">通过蓝牙配对，用于通话。</string>
     <string name="help_step_pair_detail">手机与汽车配对后，通话会通过汽车播放。首次插上数据线时，myCar 会提议配对。</string>
     <string name="help_step_screening">在响铃前拒接陌生来电。</string>

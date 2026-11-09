@@ -5,4 +5,6 @@
     <string name="home_no_car_cable">Кабель должен передавать данные: некоторые только заряжают.</string>
     <string name="home_no_car_always">Когда Android спросит, какое приложение открыть, выберите myCar и нажмите «Всегда».</string>
     <string name="usb_c_graphene">GrapheneOS может отключить передачу данных через порт USB-C, и тогда автомобиль видит только телефон, который нужно зарядить. В «Настройки &gt; Защита и конфиденциальность &gt; Exploit protection &gt; USB-C port» режим Charging-only не пускает автомобиль; при Charging-only when locked (по умолчанию) разблокируйте телефон, когда подключаете его.</string>
+
+    <string name="help_step_usb_c">В GrapheneOS разрешите передачу данных через порт USB-C.</string>
 </resources>

@@ -23,7 +23,7 @@
     <string name="help_in_the_car">在船上</string>
     <string name="help_sound_through_mycar">通过 myCar 把声音送上船</string>
     <string name="help_step_connect">插上数据线，或无线登船。</string>
-    <string name="help_step_connect_detail">船连上后，myCar 会自动打开。如需无线登船，请先将手机与船配对，然后在母港点按“无线登船”。</string>
+    <string name="help_step_connect_detail">船连上后，myCar 会自动打开。第一次用数据线连接时，Android 会询问要打开哪个应用：选择 myCar，然后点按“始终”。如需无线登船，请先将手机与船配对，然后在母港点按“无线登船”。</string>
     <string name="help_step_audio_prompt">不再每趟航程都询问音频。</string>
     <string name="help_step_audio_prompt_detail">在手机上开启 USB 调试，连接到电脑，然后运行一次这条命令。如果跳过，每次起航时都要点按“开始”。</string>
     <string name="help_step_notifications_detail">共享音频时，Android 会隐藏通知的内容。同时运行这条命令后，myCar 只会在船歌传到车上时解除隐藏。</string>

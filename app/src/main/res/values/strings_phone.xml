@@ -48,8 +48,8 @@
     <string name="help_sound_through_mycar">Sound through myCar</string>
     <!-- Each step: a short line that says what to do, then how -->
     <string name="help_step_connect">Plug in, or connect wirelessly.</string>
-    <!-- "Connect wirelessly" is the button on Home (wireless_button_connect) -->
-    <string name="help_step_connect_detail">myCar opens by itself when the car connects. For wireless, pair the phone with the car first, then tap Connect wirelessly on Home.</string>
+    <!-- "Always": Android's button when it asks which app to open for the car. "Connect wirelessly" is the button on Home (wireless_button_connect) -->
+    <string name="help_step_connect_detail">myCar opens by itself when the car connects. The first time with the cable, Android asks which app to open: choose myCar and tap Always. For wireless, pair the phone with the car first, then tap Connect wirelessly on Home.</string>
     <string name="help_step_pair">Pair over Bluetooth for calls.</string>
     <string name="help_step_pair_detail">Calls play through the car once your phone and the car are paired. myCar offers to pair the first time you plug in.</string>
     <string name="help_step_screening">Turn down unknown callers before they ring.</string>

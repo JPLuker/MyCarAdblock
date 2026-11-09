@@ -28,7 +28,7 @@
     <string name="help_in_the_car">No carro</string>
     <string name="help_sound_through_mycar">Som pelo myCar</string>
     <string name="help_step_connect">Conecte pelo cabo ou sem fio.</string>
-    <string name="help_step_connect_detail">O myCar abre sozinho quando o carro se conecta. Para usar sem fio, pareie primeiro o telefone com o carro e depois toque em Conectar sem fio na tela inicial.</string>
+    <string name="help_step_connect_detail">O myCar abre sozinho quando o carro se conecta. Na primeira vez com o cabo, o Android pergunta qual app abrir: escolha o myCar e toque em Sempre. Para usar sem fio, pareie primeiro o telefone com o carro e depois toque em Conectar sem fio na tela inicial.</string>
     <string name="help_step_pair">Pareie pelo Bluetooth para as chamadas.</string>
     <string name="help_step_pair_detail">As chamadas tocam pelo carro depois que o telefone e o carro estiverem pareados. O myCar oferece o pareamento na primeira vez que você conectar o cabo.</string>
     <string name="help_step_screening">Recuse chamadas desconhecidas antes que toquem.</string>

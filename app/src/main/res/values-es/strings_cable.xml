@@ -5,4 +5,6 @@
     <string name="home_no_car_cable">Usa un cable que transmita datos: algunos solo cargan.</string>
     <string name="home_no_car_always">Cuando Android pregunte qué app abrir, elige myCar y toca Siempre.</string>
     <string name="usb_c_graphene">GrapheneOS puede desactivar los datos del puerto USB-C, y entonces el coche solo ve un teléfono que cargar. En Ajustes &gt; Seguridad y privacidad &gt; Exploit protection &gt; USB-C port, con Charging-only el coche se queda fuera; con Charging-only when locked, la opción predeterminada, desbloquea el teléfono al conectarlo.</string>
+
+    <string name="help_step_usb_c">En GrapheneOS, deja pasar los datos por el puerto USB-C.</string>
 </resources>

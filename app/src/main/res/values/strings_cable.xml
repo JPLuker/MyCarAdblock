@@ -17,4 +17,7 @@
     <string name="home_no_car_always">When Android asks which app to open, choose myCar and tap Always.</string>
     <!-- Only on GrapheneOS: in the card above and in "How to connect", with a button that opens Android's Security & privacy. Settings and Security & privacy as Android names them in your language; Exploit protection, USB-C port, Charging-only and Charging-only when locked in English, as GrapheneOS shows them on every phone -->
     <string name="usb_c_graphene">GrapheneOS can turn off data on the USB-C port, and then the car sees only a phone to charge. In Settings &gt; Security &amp; privacy &gt; Exploit protection &gt; USB-C port, Charging-only keeps the car out; with Charging-only when locked, the default, unlock the phone when you plug it in.</string>
+
+    <!-- How to connect: a step only on GrapheneOS, with usb_c_graphene under it -->
+    <string name="help_step_usb_c">On GrapheneOS, let the USB-C port carry data.</string>
 </resources>

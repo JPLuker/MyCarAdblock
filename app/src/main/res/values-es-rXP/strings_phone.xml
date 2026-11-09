@@ -18,7 +18,7 @@
     <string name="help_title">Cómo abordar</string>
     <string name="help_in_the_car">A bordo</string>
     <string name="help_step_connect">Conecta el cable o aborda sin cable.</string>
-    <string name="help_step_connect_detail">myCar se abre solo cuando el barco se conecta. Para abordar sin cable, vincula primero el teléfono con el barco y luego toca Abordar sin cable en Inicio.</string>
+    <string name="help_step_connect_detail">myCar se abre solo cuando el barco se conecta. La primera vez con cable, Android pregunta qué app abrir: elige myCar y toca Siempre. Para abordar sin cable, vincula primero el teléfono con el barco y luego toca Abordar sin cable en Inicio.</string>
     <string name="help_set_up">Aparejar</string>
     <string name="help_step_audio_prompt">Evita la pregunta del audio en cada travesía.</string>
     <string name="help_step_audio_prompt_detail">Conecta el teléfono a un ordenador con la depuración por USB activada y ejecuta esto una vez. Si no lo haces, tocarás Empezar cada vez que zarpes.</string>
