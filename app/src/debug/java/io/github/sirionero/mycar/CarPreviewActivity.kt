@@ -188,6 +188,14 @@ class CarPreviewActivity : ComponentActivity() {
         // --es hideApps mycar:web,mycar:cinema: those off it.
         io.github.sirionero.mycar.car.HiddenApps.reset()
         intent.getStringExtra("hideApps")?.split(',')?.filter { it.isNotBlank() }?.forEach(io.github.sirionero.mycar.car.HiddenApps::hide)
+        // --es jolly say: the Jolly key set to a made-up command of that kind (see JollyPreview); nothing
+        // every other run, so a tap on it opens its chooser. --ez jollyKey false: off the dock.
+        io.github.sirionero.mycar.car.JollyPreview.set(
+            intent.getStringExtra("jolly"),
+            intent.getStringExtra("jollySay"),
+            intent.getStringExtra("jollyLang"),
+            intent.getBooleanExtra("jollyKey", true),
+        )
         // --ez webMusicPlay true: a music service's page presses its first "Play" a few seconds in (no
         // account plays here). Set every run.
         io.github.sirionero.mycar.car.WebMusicPreview.play = intent.getBooleanExtra("webMusicPlay", false)

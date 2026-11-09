@@ -587,6 +587,101 @@ case " ${ONLY:-phone-recents} " in *" phone-recents "*)
     ;;
 esac
 
+# The Jolly key (car/Jolly*.kt), in the dock just above the microphone: 296 dp down (184 dp from the
+# bottom), the microphone 70 dp under it. "jolly" in the workflow's shots takes them all.
+# - jolly-800x480: Home with the key and two slots above it (the user's Golf), then a tap: its command
+#   "what time is it" as if said - the assistant shows it and answers.
+# - jolly-1920x720: nothing chosen yet, so the tap opens the chooser.
+# - jolly-choose: the chooser from a long press ("Assistant command" lit, what the key does now), that
+#   kind's list (the key's own command, then the ready-made ones), "Read my messages" chosen: back
+#   Home with the car saying what the key does now.
+# - jolly-say-it: a command written in Italian, myCar in English: understood and answered in Italian.
+# - jolly-light: Home and the chooser in the light theme.
+# - jolly-large-800x480 / jolly-xl-800x480: Large keeps the key and one slot (the map); at Extra large
+#   there's no room for both, and the map keeps its place.
+# - jolly-ai, jolly-apps, jolly-contacts: the lists of assistants, apps and contacts (two contacts written
+#   as root, one with two numbers: tapped, its numbers).
+JOLLY_KEY="72,444"         # at 1920x720
+JOLLY_KEY_800="48,296"
+JOLLY_TILE_CALL="314,222"  # the kinds, one row at 1920x720
+JOLLY_TILE_AI="601,222"
+JOLLY_TILE_HOME="888,222"
+JOLLY_TILE_SAY="1462,222"
+JOLLY_TILE_APP="1749,222"
+JOLLY_ROW_1="1032,186"     # the lines of a kind's list, 80 dp apart
+JOLLY_ROW_2="1032,306"
+case " ${ONLY:-} " in *" jolly "*)
+    ONLY="$ONLY jolly-800x480 jolly-1920x720 jolly-choose jolly-say-it jolly-light jolly-large-800x480 jolly-xl-800x480"
+    ONLY="$ONLY jolly-ai jolly-apps jolly-contacts jolly-home jolly-unlock" ;;
+esac
+EXTRA="--es jolly say" shoot jolly-800x480 800 480 160 "$WAIT;$JOLLY_KEY_800;$WAIT;$WAIT"
+shoot jolly-1920x720 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT"
+EXTRA="--es jolly say" shoot jolly-choose 1920 720 240 "$WAIT;$JOLLY_KEY,long;$JOLLY_TILE_SAY;$JOLLY_ROW_2;$WAIT"
+EXTRA="--es jolly say --es jollySay 'che ore sono' --es jollyLang it" shoot jolly-say-it 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT;$WAIT"
+EXTRA="--es jolly say --es carTheme LIGHT" shoot jolly-light 1920 720 240 "$WAIT;$JOLLY_KEY,long;$WAIT"
+EXTRA="--es jolly say --es carScale 1.25" shoot jolly-large-800x480 800 480 160 "$WAIT"
+EXTRA="--es jolly say --es carScale 1.5" shoot jolly-xl-800x480 800 480 160 "$WAIT"
+shoot jolly-ai 1920 720 240 "$WAIT;$JOLLY_KEY;$JOLLY_TILE_AI;$WAIT"
+shoot jolly-apps 1920 720 240 "$WAIT;$JOLLY_KEY;$JOLLY_TILE_APP;$WAIT"
+case " ${ONLY:-jolly-contacts} " in *" jolly-contacts "*)
+    if adb root >/dev/null 2>&1; then
+        sleep 3; adb wait-for-device
+        contact() {  # <name> <number> [number]: the first a mobile number, the second a work one
+            adb shell "content insert --uri content://com.android.contacts/raw_contacts --bind account_type:n: --bind account_name:n:"
+            local id type=2 number name=$1
+            id=$(adb shell "content query --uri content://com.android.contacts/raw_contacts --projection _id" | tr -d '\r' | sed -n 's/.*_id=\([0-9]*\).*/\1/p' | sort -n | tail -1)
+            adb shell "content insert --uri content://com.android.contacts/data --bind raw_contact_id:i:$id --bind mimetype:s:vnd.android.cursor.item/name --bind data1:s:'$name'"
+            shift
+            for number in "$@"; do
+                adb shell "content insert --uri content://com.android.contacts/data --bind raw_contact_id:i:$id --bind mimetype:s:vnd.android.cursor.item/phone_v2 --bind data1:s:$number --bind data2:i:$type"
+                type=3
+            done
+        }
+        contact "Anna Verdi" 3335550101 0255501010
+        contact "Bruno Neri" 3475550202
+        adb unroot >/dev/null 2>&1; sleep 3; adb wait-for-device
+    fi
+    shoot jolly-contacts 1920 720 240 "$WAIT;$JOLLY_KEY;$JOLLY_TILE_CALL;$JOLLY_ROW_1;$WAIT"
+    ;;
+esac
+# With the run's own Home Assistant: a script, a button and a switch of its own (made here, as the
+# install has none), then the chooser's Home Assistant list from the drive's connection, the script
+# chosen, and the key running it ("Jolly test: done"). Then a lock that isn't there: the first tap
+# asks for a second, the second one goes - and Home Assistant says no.
+if [ -n "${HA_TOKEN:-}" ]; then
+    case " ${ONLY:-jolly-home} " in *" jolly-home "*)
+        curl -sf -X POST "http://localhost:8123/api/config/script/config/jolly_test" -H "Authorization: Bearer $HA_TOKEN" \
+            -H 'Content-Type: application/json' -d '{"alias":"Jolly test","sequence":[{"delay":{"seconds":1}}]}' >/dev/null ||
+            echo "jolly: no script made"
+        python3 - "$HA_TOKEN" <<'HELPERS' || echo "jolly: no helpers made"
+import json, sys
+import websocket
+
+ws = websocket.create_connection("ws://localhost:8123/api/websocket")
+ws.recv()
+ws.send(json.dumps({"type": "auth", "access_token": sys.argv[1]}))
+ws.recv()
+for i, (kind, name) in enumerate([("input_button", "Garage"), ("input_boolean", "Porch light")], start=1):
+    ws.send(json.dumps({"id": i, "type": f"{kind}/create", "name": name}))
+    print("jolly:", kind, json.loads(ws.recv()).get("success"))
+HELPERS
+        ;;
+    esac
+    HA="--es haUrl http://10.0.2.2:8123 --es haToken $HA_TOKEN"
+    EXTRA="$HA" shoot jolly-home 1920 720 240 "$WAIT;$WAIT;$JOLLY_KEY;$JOLLY_TILE_HOME;$JOLLY_ROW_1;$JOLLY_KEY;$WAIT"
+    EXTRA="$HA --es jolly unlock" shoot jolly-unlock 1920 720 240 "$WAIT;$WAIT;$JOLLY_KEY;$JOLLY_KEY;$WAIT"
+    case " ${ONLY:-jolly-home} " in *" jolly-home "*)
+        echo "--- the Jolly key and Home Assistant ---"
+        grep -h "jolly\|plancia: connected" previews/jolly-home/log.txt previews/jolly-unlock/log.txt 2>/dev/null || echo "jolly-home: nothing in the log" ;;
+    esac
+else
+    echo "--- no Home Assistant: the Jolly key's Home Assistant shots left out ---"
+fi
+case " ${ONLY:-jolly-800x480} " in *" jolly-800x480 "*)
+    echo "--- the Jolly key ---"
+    grep -h "jolly\|assistant: a written" previews/jolly-*/log.txt 2>/dev/null | head -60 || echo "jolly: nothing in the log" ;;
+esac
+
 # The dock's microphone with "Phone's assistant" chosen: myCar should wake the phone's assistant
 # as the swipe up from a bottom corner does, through SystemUI. First with the Settings app standing
 # in for an assistant that's an activity; the phone's own screen, shot after the tap, should show it.
