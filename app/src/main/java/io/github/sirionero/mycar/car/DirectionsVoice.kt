@@ -279,8 +279,24 @@ object DirectionsVoice {
         }
         // Cut while it was being made (Cancel, the microphone): nothing to start on the car's channel.
         if (!going()) return
-        stream(sink, pcm, going)
+        streamAsked(sink, pcm, going)
         MyCarLog.i("guidance: spoke $what (${pcm.size / (2 * sink.channels) * 1000 / sink.sampleRate} ms)")
+    }
+
+    /**
+     * [stream], with the car's speakers asked for around it when they aren't myCar's - the radio, the
+     * phone's Bluetooth music, the radio kept until the phone plays: the car lowers its own source
+     * under the words and brings it back after, as with Android Auto (see AudioLink.askForSpeakers).
+     * With the music myCar's, the car mixes the words into it as before.
+     */
+    private fun streamAsked(sink: AudioLink, pcm: ByteArray, going: () -> Boolean) {
+        val asked = sink.askForSpeakers()
+        try {
+            // Not cut while the car answered.
+            if (going()) stream(sink, pcm, going)
+        } finally {
+            if (asked) sink.handBackSpeakers()
+        }
     }
 
     /**

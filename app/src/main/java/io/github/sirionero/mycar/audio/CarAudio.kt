@@ -33,6 +33,12 @@ object CarAudio {
         fun stop()
         fun write(pcm: ByteArray, size: Int)
 
+        /** Streaming: the car plays what the phone sends. */
+        val streaming: Boolean get() = false
+
+        /** The car's speakers are the sink's, asked for, or held by the car for a moment (a call, its own voice). */
+        val speakersAsked: Boolean get() = streaming
+
         /**
          * The capture is on: the speakers asked for now ([start]), unless the car keeps its own
          * source until a player plays (see AudioLink.captureOn).
@@ -97,6 +103,9 @@ object CarAudio {
     /** Rate and channel count the capture should use: the car's, or a sensible default. */
     val sampleRate get() = link?.sampleRate ?: 48_000
     val channels get() = link?.channels ?: 2
+
+    /** The media sink has the car's speakers, has asked for them, or the car holds them for a moment. */
+    val speakersAsked: Boolean get() = link?.speakersAsked == true
 
     /**
      * Whether a player is really playing on the phone - not a map's voice, a web page or the

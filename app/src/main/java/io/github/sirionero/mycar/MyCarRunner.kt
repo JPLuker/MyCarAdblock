@@ -6,6 +6,7 @@ import io.github.sirionero.mycar.audio.AudioLink
 import io.github.sirionero.mycar.audio.CarAudio
 import io.github.sirionero.mycar.audio.CarAudioRoute
 import io.github.sirionero.mycar.audio.CarMic
+import io.github.sirionero.mycar.audio.FocusAnswers
 import io.github.sirionero.mycar.media.CarMediaStatus
 import io.github.sirionero.mycar.car.BluetoothAudioCheck
 import io.github.sirionero.mycar.car.LocationCheck
@@ -299,7 +300,8 @@ class MyCarRunner(
             MSG_SERVICE_DISCOVERY_RESPONSE -> onServiceDiscoveryResponse(body)
             MSG_PING_REQUEST -> onPingRequest(body)
             MSG_BYEBYE_REQUEST -> onByeByeRequest(body)
-            AudioLink.MSG_FOCUS_RESPONSE -> audioLink?.onFocus(Protobuf.readInt32Field(body, 1) ?: 0)
+            // One answer for both sinks: the directions' while they wait on one (see FocusAnswers).
+            AudioLink.MSG_FOCUS_RESPONSE -> FocusAnswers.route(Protobuf.readInt32Field(body, 1) ?: 0, audioLink, guidanceLink)
             // The car saying it didn't like something it got: its name in the log, the session goes on.
             MSG_UNEXPECTED_MESSAGE -> log.w("<- the head unit reports an unexpected message from the phone - continuing")
             MSG_FRAMING_ERROR -> log.w("<- the head unit reports a framing error - continuing")

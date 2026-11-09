@@ -4,6 +4,8 @@ import io.github.sirionero.mycar.Protobuf
 import io.github.sirionero.mycar.ServiceDiscovery
 import java.util.Collections
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -18,6 +20,8 @@ class AudioLinkFocusTest {
     private var takenBack = 0
     /** A player playing on the phone, as CarServices would say. */
     private var playing = true
+    /** The links' clock, in milliseconds: moved on by the capture as it plays, and by hand. */
+    @Volatile private var now = 0L
 
     private fun link(): AudioLink = AudioLink(
         ServiceDiscovery.AudioService(
@@ -30,6 +34,28 @@ class AudioLinkFocusTest {
         onClose = {},
         onTakenBack = { takenBack++ },
         playerPlaying = { playing },
+        clock = { now },
+    ).apply {
+        onMessage(CHANNEL_OPEN_RESPONSE, Protobuf.varintField(1, 0))
+        onMessage(CONFIG, Protobuf.varintField(1, READY) + Protobuf.varintField(2, 4) + Protobuf.varintField(3, 0))
+        sent.clear()
+    }
+
+    /** The directions' sink, which asks for the speakers only while [media] has none of them. */
+    private fun guidance(media: AudioLink): AudioLink = AudioLink(
+        ServiceDiscovery.AudioService(
+            6, ServiceDiscovery.STREAM_GUIDANCE, ServiceDiscovery.CODEC_PCM,
+            listOf(ServiceDiscovery.AudioConfig(16_000, 16, 1)),
+        ),
+        sendOnChannel = { id, _ -> sent += "guidance " + (SINK_MESSAGES[id] ?: "message $id") },
+        sendControl = { _, body -> sent += "focus:${Protobuf.readInt32Field(body, 1)}" },
+        tag = "guidance",
+        sessionId = 3,
+        asksFocus = false,
+        onReady = {},
+        onClose = {},
+        musicHasSpeakers = { media.speakersAsked },
+        clock = { now },
     ).apply {
         onMessage(CHANNEL_OPEN_RESPONSE, Protobuf.varintField(1, 0))
         onMessage(CONFIG, Protobuf.varintField(1, READY) + Protobuf.varintField(2, 4) + Protobuf.varintField(3, 0))
@@ -47,7 +73,22 @@ class AudioLinkFocusTest {
     private fun AudioLink.play(ms: Int, loud: Boolean) {
         val chunk = ByteArray(CHUNK)
         if (loud) for (i in chunk.indices step 2) chunk[i + 1] = 0x20
-        repeat(ms * BYTES_PER_MS / CHUNK + 1) { write(chunk, chunk.size) }
+        repeat(ms * BYTES_PER_MS / CHUNK + 1) {
+            write(chunk, chunk.size)
+            now += CHUNK / BYTES_PER_MS
+        }
+    }
+
+    /** The directions asking for the speakers on their own thread, as they do, until [answered] says the car replied. */
+    private fun asking(guidance: AudioLink, answered: () -> Unit): Long {
+        var asked = false
+        val began = System.nanoTime()
+        val thread = Thread { asked = guidance.askForSpeakers() }.apply { start() }
+        while (sent.none { it == "focus:$MAY_DUCK" }) Thread.sleep(1)
+        answered()
+        thread.join(2_000)
+        assertTrue(asked)
+        return (System.nanoTime() - began) / 1_000_000
     }
 
     @Test
@@ -143,6 +184,7 @@ class AudioLinkFocusTest {
         kept.captureOn(radioFirst = true)
         kept.play(5_000, loud = false)
         assertEquals(emptyList<String>(), sent)
+        assertFalse(kept.speakersAsked)
     }
 
     @Test
@@ -213,6 +255,107 @@ class AudioLinkFocusTest {
         assertEquals(listOf("focus:$GAIN_REQUEST", "start"), sent)
     }
 
+    @Test
+    fun `a GAIN the music never asked for starts nothing`() {
+        val link = link()
+        link.onFocus(GAIN)
+        link.onFocus(GAIN_TRANSIENT)
+        assertEquals(emptyList<String>(), sent)
+        link.captureOn(radioFirst = true)
+        link.onFocus(GAIN)
+        assertEquals(emptyList<String>(), sent)
+        // Asked for, it starts the stream as before.
+        link.start()
+        assertEquals(listOf("focus:$GAIN_REQUEST", "start"), sent)
+    }
+
+    @Test
+    fun `the car's answers inside the directions' window go to the directions`() {
+        val media = link()
+        val guidance = guidance(media)
+        val took = asking(guidance) { FocusAnswers.route(GAIN_TRANSIENT, media, guidance) }
+        assertTrue("the directions waited ${took}ms for an answer they had", took < 400)
+        guidance.handBackSpeakers()
+        FocusAnswers.route(LOSS, media, guidance)
+        assertEquals(listOf("focus:$MAY_DUCK", "focus:$RELEASE"), sent)
+        assertFalse(media.speakersAsked)
+        assertEquals(0, takenBack)
+    }
+
+    @Test
+    fun `the directions' late answer starts no music`() {
+        val media = link()
+        val guidance = guidance(media)
+        val began = System.nanoTime()
+        assertTrue(guidance.askForSpeakers())
+        assertTrue((System.nanoTime() - began) / 1_000_000 >= 450)
+        now += 600
+        // GAIN_TRANSIENT after the half second: to the music, which never asked.
+        FocusAnswers.route(GAIN_TRANSIENT, media, guidance)
+        assertEquals(listOf("focus:$MAY_DUCK"), sent)
+    }
+
+    @Test
+    fun `a GAIN in the directions' window is the music's when it waits for one`() {
+        val media = streaming()
+        media.onFocus(LOSS)
+        media.play(1_600, loud = false)
+        val guidance = guidance(media)
+        val thread = Thread { guidance.askForSpeakers() }.apply { start() }
+        while (sent.none { it == "focus:$MAY_DUCK" }) Thread.sleep(1)
+        // A player after the pause: the music asks for the speakers and waits for the car's word.
+        media.play(400, loud = true)
+        FocusAnswers.route(GAIN, media, guidance)
+        assertTrue(sent.contains("start"))
+        // The directions' own answer is still theirs.
+        assertTrue(thread.isAlive)
+        FocusAnswers.route(GAIN_TRANSIENT, media, guidance)
+        thread.join(1_000)
+        assertFalse(thread.isAlive)
+    }
+
+    @Test
+    fun `a late LOSS after the directions' RELEASE doesn't stop the music started since`() {
+        val media = link()
+        val guidance = guidance(media)
+        asking(guidance) { FocusAnswers.route(GAIN_TRANSIENT, media, guidance) }
+        now = 1_000
+        guidance.handBackSpeakers()
+        // Past the directions' half second, the music starts: the car's LOSS for the RELEASE comes late.
+        now = 1_600
+        media.start()
+        sent.clear()
+        now = 1_700
+        FocusAnswers.route(LOSS, media, guidance)
+        assertEquals(emptyList<String>(), sent)
+        assertTrue(media.streaming)
+        // Later, a LOSS is the driver's: the radio.
+        now = 3_000
+        media.onFocus(GAIN)
+        FocusAnswers.route(LOSS, media, guidance)
+        assertEquals(listOf("stop", "focus:$RELEASE"), sent)
+        assertEquals(1, takenBack)
+    }
+
+    @Test
+    fun `the directions ask nothing while the music has the speakers`() {
+        val media = streaming()
+        val guidance = guidance(media)
+        assertFalse(guidance.askForSpeakers())
+        guidance.handBackSpeakers()
+        assertEquals(emptyList<String>(), sent)
+    }
+
+    @Test
+    fun `the directions don't give back the speakers the music asked for meanwhile`() {
+        val media = link()
+        val guidance = guidance(media)
+        asking(guidance) { FocusAnswers.route(GAIN_TRANSIENT, media, guidance) }
+        media.start()
+        guidance.handBackSpeakers()
+        assertEquals(listOf("focus:$MAY_DUCK", "focus:$GAIN_REQUEST", "start"), sent)
+    }
+
     private companion object {
         const val CHANNEL_OPEN_RESPONSE = 8
         const val CONFIG = 32771
@@ -221,10 +364,12 @@ class AudioLinkFocusTest {
 
         // AudioFocusStateNotification states, and the AudioFocusRequest types myCar sends.
         const val GAIN = 1
+        const val GAIN_TRANSIENT = 2
         const val LOSS = 3
         const val LOSS_TRANSIENT_CAN_DUCK = 4
         const val LOSS_TRANSIENT = 5
         const val GAIN_REQUEST = 1
+        const val MAY_DUCK = 3
         const val RELEASE = 4
 
         const val CHUNK = 4096

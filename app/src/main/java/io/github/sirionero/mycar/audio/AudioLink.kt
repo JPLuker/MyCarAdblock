@@ -4,6 +4,8 @@ import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.Protobuf
 import io.github.sirionero.mycar.ServiceDiscovery
 import io.github.sirionero.mycar.Wire
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  * The phone end of the head unit's media audio sink, the audio twin of the video channel:
@@ -25,7 +27,11 @@ class AudioLink(
     /** Log name: "audio" for the media sink, "guidance" for the directions sink. */
     private val tag: String = "audio",
     private val sessionId: Int = SESSION_ID,
-    /** Media asks the car for focus; directions just start, and the car ducks music under them. */
+    /**
+     * Media asks the car for focus. Directions ask only around a prompt said while the car's
+     * speakers aren't myCar's ([askForSpeakers]); with the music myCar's they just start, and the
+     * car ducks the music under them.
+     */
     private val asksFocus: Boolean = true,
     private val onReady: (AudioLink) -> Unit = { CarAudio.attach(it) },
     private val onClose: (AudioLink) -> Unit = { CarAudio.detach(it) },
@@ -37,6 +43,10 @@ class AudioLink(
      * source ([listenForPlayback]).
      */
     private val playerPlaying: () -> Boolean = { CarAudio.playerPlaying() },
+    /** For directions: whether the media sink has the car's speakers, or has asked for them. */
+    private val musicHasSpeakers: () -> Boolean = { CarAudio.speakersAsked },
+    /** Milliseconds, on a clock that only goes forward. */
+    private val clock: () -> Long = { System.nanoTime() / 1_000_000 },
 ) : CarAudio.Link {
 
     private var configIndex = 0
@@ -64,6 +74,16 @@ class AudioLink(
     private var preroll: ByteArray? = null
     private var prerollEnd = 0
     private var prerollFull = false
+    /** When the media sink last asked for the speakers or started its stream, on [clock]: see [FocusAnswers]. */
+    @Volatile internal var askedAt = NEVER
+        private set
+    // Directions only (see askForSpeakers): whether they asked the car for its speakers, and the car's answer.
+    @Volatile private var holdsSpeakers = false
+    @Volatile private var focusAnswer: CountDownLatch? = null
+    @Volatile private var answerDueBy = NEVER
+    /** When the directions last gave the speakers back (RELEASE), on [clock]: see [FocusAnswers]. */
+    @Volatile internal var releasedAt = NEVER
+        private set
     @Volatile private var inFlight = 0
     // The Uconnect asks for 4 on its video channel; assume the same until its Config says otherwise.
     @Volatile private var maxUnacked = 4
@@ -97,6 +117,18 @@ class AudioLink(
 
     val channelId get() = service.serviceId
 
+    /** Streaming: the car plays what the phone sends. */
+    override val streaming get() = started
+
+    /** The car's speakers are this sink's, asked for, or held by the car for a moment (a call, its own voice). */
+    override val speakersAsked get() = started || heldBack || focusRequested
+
+    /** Asked the car for its speakers, and its answer still to come. */
+    internal val awaitsGrant get() = focusRequested && !focusGranted && !heldBack
+
+    /** Now, on this link's clock. */
+    internal fun now() = clock()
+
     /**
      * The capture is on, with the phone's sound to send: the speakers are asked for at once
      * ([start]), as before - unless the car is on its own source. The driver picked it this drive
@@ -112,6 +144,56 @@ class AudioLink(
                 awaitingFirstSound = true
             }
             else -> start()
+        }
+    }
+
+    /** True just after [askForSpeakers] or [handBackSpeakers], while the car's answer to them is due: it's theirs. */
+    fun expectsFocusAnswer() = clock() < answerDueBy
+
+    /**
+     * For the directions channel, before a prompt said while the car's speakers aren't myCar's: the
+     * radio, the phone's Bluetooth music, the radio kept until the phone plays. Android Auto asks
+     * for them before each prompt, letting the other source duck, and hands them back after
+     * ([handBackSpeakers]). Said without asking, a prompt could be lost under the radio, and left a
+     * 2025 Nissan's Bosch head unit rebooting mid-drive (Gearslip issue #35). With the music
+     * myCar's - streaming, asked for, or held back for a moment - nothing is asked: the car mixes
+     * the words into it, as before. Waits up to [FOCUS_WAIT_MS] for the car's answer, and speaks
+     * anyway without one, as some cars never answer. True when it asked.
+     */
+    fun askForSpeakers(): Boolean {
+        val answer = CountDownLatch(1)
+        synchronized(focusLock) {
+            if (holdsSpeakers || musicHasSpeakers()) return false
+            focusAnswer = answer
+            answerDueBy = clock() + FOCUS_WAIT_MS
+            holdsSpeakers = true
+            MyCarLog.i("$tag: -> AudioFocusRequest(GAIN_TRANSIENT_MAY_DUCK)")
+            runCatching { sendControl(MSG_FOCUS_REQUEST, Protobuf.varintField(1, FOCUS_GAIN_TRANSIENT_MAY_DUCK.toLong())) }
+        }
+        val answered = runCatching { answer.await(FOCUS_WAIT_MS, TimeUnit.MILLISECONDS) }.getOrDefault(false)
+        if (!answered) MyCarLog.i("$tag: no focus answer after ${FOCUS_WAIT_MS}ms - speaking anyway")
+        focusAnswer = null
+        return true
+    }
+
+    /**
+     * Gives back what [askForSpeakers] took, so the other source comes back to full volume - unless
+     * the music has asked for the speakers meanwhile. The car's focus is the phone's, not a
+     * channel's: a RELEASE then would give the music's away too, and the car would never send the
+     * GAIN it waits for.
+     */
+    fun handBackSpeakers() {
+        synchronized(focusLock) {
+            if (!holdsSpeakers) return
+            holdsSpeakers = false
+            if (musicHasSpeakers()) {
+                MyCarLog.i("$tag: the music has the speakers now - nothing to give back")
+                return
+            }
+            releasedAt = clock()
+            answerDueBy = releasedAt + FOCUS_WAIT_MS
+            MyCarLog.i("$tag: -> AudioFocusRequest(RELEASE)")
+            runCatching { sendControl(MSG_FOCUS_REQUEST, Protobuf.varintField(1, FOCUS_RELEASE.toLong())) }
         }
     }
 
@@ -227,13 +309,28 @@ class AudioLink(
      * and the music stayed off for the rest of the drive. Ducking keeps it playing under the car's
      * own sound. Only a LOSS - the driver picked the radio - lets go, and then the phone playing
      * again asks once more ([listenForPlayback]).
+     *
+     * The directions get the car's answers to their own questions instead ([FocusAnswers]).
      */
     fun onFocus(state: Int) {
         val name = FOCUS_STATES[state] ?: "unknown($state)"
         MyCarLog.i("$tag: <- AudioFocusResponse state=$name")
+        if (!asksFocus) {
+            // The answer to the directions' own question: they speak whatever it is - a lost turn
+            // is worse than a loud one.
+            answerDueBy = NEVER
+            focusAnswer?.countDown()
+            return
+        }
         val ours = focusGranted || heldBack
         when (state) {
             FOCUS_STATE_GAIN, FOCUS_STATE_GAIN_TRANSIENT, FOCUS_STATE_GAIN_MEDIA_ONLY -> {
+                // Not asked for: the car's answer to the directions, come after their wait, or its
+                // own word. It mustn't start the music over the radio the driver chose.
+                if (!focusRequested && !heldBack) {
+                    MyCarLog.i("$tag: the music didn't ask for the speakers - this answer starts nothing")
+                    return
+                }
                 focusGranted = true
                 heldBack = false
                 startStream()
@@ -279,13 +376,24 @@ class AudioLink(
         // The car has the speakers for now; its GAIN starts the stream.
         if (heldBack) return
         if (asksFocus && !focusRequested) {
-            focusRequested = true
-            sendControl(MSG_FOCUS_REQUEST, Protobuf.varintField(1, FOCUS_GAIN.toLong()))
+            askForGain()
             MyCarLog.i("$tag: -> AudioFocusRequest(GAIN); waiting for the head unit to hand the sink over")
         }
         // Some head units grant the sink silently and never answer. Do not let that be the end of
         // it: start anyway, and let the acks say whether anything is being taken.
         startStream()
+    }
+
+    /**
+     * The music asks the car for its speakers. Under [focusLock], so it never falls between the
+     * directions finding the speakers free and giving them back (see [handBackSpeakers]).
+     */
+    private fun askForGain() {
+        synchronized(focusLock) {
+            focusRequested = true
+            askedAt = clock()
+            runCatching { sendControl(MSG_FOCUS_REQUEST, Protobuf.varintField(1, FOCUS_GAIN.toLong())) }
+        }
     }
 
     private fun startStream() {
@@ -328,6 +436,7 @@ class AudioLink(
         // The car's speakers are the phone's again.
         awaitingFirstSound = false
         carSource = false
+        if (asksFocus) askedAt = clock()
         MyCarLog.i("$tag: -> Start(session=$sessionId, config=$configIndex) - streaming ${sampleRate}Hz x$channels")
     }
 
@@ -491,7 +600,7 @@ class AudioLink(
         // a call the phone's music is paused or silenced, so this doesn't ask then.
         if (heldBack && millis(soundBytes) >= HELD_SOUND_MS) {
             soundBytes = 0
-            runCatching { sendControl(MSG_FOCUS_REQUEST, Protobuf.varintField(1, FOCUS_GAIN.toLong())) }
+            askForGain()
             MyCarLog.i("$tag: no GAIN ${HELD_SOUND_MS / 1000}s after the car took the speakers, the phone still playing - -> AudioFocusRequest(GAIN)")
             return
         }
@@ -502,8 +611,7 @@ class AudioLink(
         }
         if (!armed || !aPlayerPlays()) return
         armed = false
-        focusRequested = true
-        runCatching { sendControl(MSG_FOCUS_REQUEST, Protobuf.varintField(1, FOCUS_GAIN.toLong())) }
+        askForGain()
         MyCarLog.i("$tag: the phone is playing again - -> AudioFocusRequest(GAIN)")
     }
 
@@ -579,6 +687,7 @@ class AudioLink(
         configTimer?.interrupt()
         configTimer = null
         stop()
+        handBackSpeakers()
         ready = false
         onClose(this)
     }
@@ -600,11 +709,12 @@ class AudioLink(
         private const val MAX_PAD_MS = 240
         private const val STATUS_READY = 2
         private const val FOCUS_GAIN = 1
+        private const val FOCUS_GAIN_TRANSIENT_MAY_DUCK = 3
         private const val FOCUS_RELEASE = 4
-        private const val FOCUS_STATE_GAIN = 1
+        internal const val FOCUS_STATE_GAIN = 1
         private const val FOCUS_STATE_GAIN_TRANSIENT = 2
-        private const val FOCUS_STATE_GAIN_MEDIA_ONLY = 6
-        private const val FOCUS_STATE_LOSS = 3
+        internal const val FOCUS_STATE_GAIN_MEDIA_ONLY = 6
+        internal const val FOCUS_STATE_LOSS = 3
         private const val FOCUS_STATE_LOSS_TRANSIENT = 5
         private const val FOCUS_STATE_LOSS_TRANSIENT_CAN_DUCK = 4
         private const val FOCUS_STATE_GAIN_TRANSIENT_GUIDANCE_ONLY = 7
@@ -617,6 +727,15 @@ class AudioLink(
         /** What a player's first sound sends ahead of itself once the car is asked ([firstSound]), and in what pieces. */
         private const val PREROLL_MS = 300
         private const val PREROLL_PIECE = 4_096
+        /** How long the directions wait for the car's answer before they speak anyway (Gearslip's). */
+        private const val FOCUS_WAIT_MS = 500L
+        /** Never, on the clock: further back than any time it gives. */
+        internal const val NEVER = Long.MIN_VALUE / 4
+        /**
+         * The car's focus is the phone's: the music asking for it, and the directions finding it
+         * free and giving it back, one at a time (see [askForGain], [handBackSpeakers]).
+         */
+        private val focusLock = Any()
         /** About -54 dB: below it, a sample is silence or noise. */
         private const val WHISPER = 64
         private const val SESSION_ID = 2
