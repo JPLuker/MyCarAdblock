@@ -41,7 +41,8 @@ object Assist {
      * Home Assistant's voice assistant can't find its conversation agent: "Intent recognition engine
      * … is not found" (the agent's integration removed, renamed or not loaded), or the agent of a
      * conversation going on gone. Something to set again in Home Assistant, not a network that didn't
-     * answer.
+     * answer. Home Assistant (2026.11) says it as the error result of assist_pipeline/run, when it
+     * checks the voice assistant before running it, not as an "error" event.
      */
     fun agentMissing(e: Throwable): Boolean = e is HaException && e.code?.let { it in AGENT_MISSING } == true
 

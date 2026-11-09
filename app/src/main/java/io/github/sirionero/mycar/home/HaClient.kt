@@ -18,7 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Why Home Assistant can't be reached or used, in words for the car and the phone alike; [cause] is the
- * network's error, [code] Home Assistant's own for it where it gives one (Assist's "error" event).
+ * network's error, [code] Home Assistant's own for it where it gives one (a command's error result,
+ * Assist's "error" event).
  */
 class HaException(message: String, val reason: Reason = Reason.OTHER, cause: Throwable? = null, val code: String? = null) : Exception(message, cause) {
     enum class Reason { BAD_ADDRESS, NO_RESPONSE, INVALID_TOKEN, ACCESS_DENIED, HTTP_ERROR, NETWORK, CLOSED, OTHER }
@@ -182,7 +183,9 @@ class HaClient(private val http: OkHttpClient) {
                     deferred.complete(Box(if (result == JSONObject.NULL) null else result))
                 } else {
                     val error = msg.optJSONObject("error")
-                    deferred.completeExceptionally(HaException(error?.str("message") ?: Words.get(R.string.ha_command_refused)))
+                    // With its code: assist_pipeline/run refuses a voice assistant whose agent is gone with
+                    // "intent-not-supported" here, before any event (see Assist.agentMissing).
+                    deferred.completeExceptionally(HaException(error?.str("message") ?: Words.get(R.string.ha_command_refused), code = error?.str("code")))
                 }
             }
             "event" -> {
