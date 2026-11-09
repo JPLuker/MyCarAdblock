@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">Activer la pochette vidéo</string>
+    <string name="car_player_video_cover_off">Désactiver la pochette vidéo</string>
+    <string name="car_player_video_cover_now_on">Pochette vidéo activée, pour les titres qui en ont une</string>
+    <string name="car_player_video_cover_now_off">Pochette fixe</string>
+    <string name="car_settings_cover">Pochette dans le lecteur</string>
+    <string name="car_settings_cover_still">Fixe</string>
+    <string name="car_settings_cover_video">Vidéo</string>
+    <string name="car_settings_cover_note">Certains titres ont une courte vidéo en boucle, comme les Canvas de Spotify. Avec Vidéo, le lecteur à côté de la carte l’affiche à la place de la pochette. Le bouton sur la pochette change aussi ce réglage.</string>
+    <string name="music_video_cover">Pochette vidéo</string>
+    <string name="music_video_cover_detail">Dans le lecteur de la voiture à côté de la carte, la courte vidéo en boucle de certains titres (les Canvas de Spotify), à la place de la pochette. Le bouton sur la pochette dans la voiture change aussi ce réglage. Chaque vidéo utilise quelques mégaoctets de données.</string>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">Izar la portada en vídeo</string>
+    <string name="car_player_video_cover_off">Arriar la portada en vídeo</string>
+    <string name="car_player_video_cover_now_on">Portada en vídeo izada, para las tonadas que la tienen</string>
+    <string name="car_player_video_cover_now_off">Portada fija y anclada</string>
+    <string name="car_settings_cover">Portada en la gramola</string>
+    <string name="car_settings_cover_note">Algunas tonadas tienen un vídeo corto en bucle, como los Canvas de Spotify. Con Vídeo, la gramola junto a la carta lo muestra en lugar de la portada. El botón de la portada también lo cambia.</string>
+    <string name="music_video_cover">Portada en vídeo a bordo</string>
+    <string name="music_video_cover_detail">En la gramola del barco junto a la carta, el vídeo corto en bucle que tienen algunas tonadas (los Canvas de Spotify), en lugar de la portada. El botón de la portada a bordo también lo cambia. Cada vídeo gasta unos pocos megabytes de datos.</string>
+</resources>

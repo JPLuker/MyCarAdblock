@@ -304,6 +304,7 @@ private const val KEY_LOCATION_WARNING = "car_location_warning"
         SidePaneChoice.init(app)
         MiniPlayerSetting.init(app)
         CallPillSetting.init(app)
+        VideoCoverSetting.init(app)
         HiddenApps.init(app)
         JollySetting.init(app)
         HomePages.init(app)

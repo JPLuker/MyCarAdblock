@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">Içar a capa em vídeo</string>
+    <string name="car_player_video_cover_off">Arriar a capa em vídeo</string>
+    <string name="car_player_video_cover_now_on">Capa em vídeo içada, para as cantigas que têm uma</string>
+    <string name="car_player_video_cover_now_off">Capa fixa, de âncora lançada</string>
+    <string name="car_settings_cover">Capa na vitrola</string>
+    <string name="car_settings_cover_note">Algumas cantigas têm um vídeo curto em loop, como os Canvas do Spotify. Com Vídeo, a vitrola ao lado do mapa mostra esse vídeo no lugar da capa. O botão na capa também muda isso.</string>
+    <string name="music_video_cover">Capa em vídeo a bordo</string>
+    <string name="music_video_cover_detail">Na vitrola do navio ao lado do mapa, o vídeo curto em loop que algumas cantigas têm (os Canvas do Spotify), no lugar da capa. O botão na capa, a bordo, também muda isso. Cada vídeo usa alguns megabytes de dados.</string>
+</resources>

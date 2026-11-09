@@ -49,6 +49,7 @@ import io.github.sirionero.mycar.AppSettings
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.audio.AudioRoute
 import io.github.sirionero.mycar.ui.CertSummary
+import io.github.sirionero.mycar.webmusic.WebMusic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -72,6 +73,8 @@ fun CarSettingsScreen() {
     val radioFirst by CarSettings.radioFirst.collectAsState()
     val playerSize by CarSettings.playerSize.collectAsState()
     val miniPlayer by MiniPlayerSetting.on.collectAsState()
+    val videoCover by VideoCoverSetting.on.collectAsState()
+    val webMusicOn by WebMusic.on.collectAsState()
     val theme by CarSettings.appTheme.collectAsState()
     val uiTheme by CarSettings.uiTheme.collectAsState()
     val experimentalFeatures by CarSettings.experimentalFeaturesEnabled.collectAsState()
@@ -111,6 +114,21 @@ fun CarSettingsScreen() {
             ),
             playerSize,
         ) { CarSettings.setPlayerSize(it) }
+
+        // With a music service in the car whose songs can have a video cover (Spotify Web): the cover
+        // in the player beside the map, as the button on the cover sets it.
+        if (WebMusic.CATALOG.any { it.id in webMusicOn && it.videoCovers.isNotEmpty() }) {
+            ChoiceRow(
+                stringResource(R.string.car_settings_cover),
+                listOf(false to stringResource(R.string.car_settings_cover_still), true to stringResource(R.string.car_settings_cover_video)),
+                videoCover,
+            ) { VideoCoverSetting.setOn(it) }
+            Text(
+                stringResource(R.string.car_settings_cover_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
 
         ChoiceRow(
             stringResource(R.string.car_settings_mini_player),

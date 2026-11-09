@@ -17,6 +17,9 @@ internal object WebMusicScripts {
      *   engine has none (seen in the car preview): then a stand-in, there before the page's scripts,
      *   takes what they say. Where the page says nothing there, its media elements and its player
      *   bar ([WebMusicService.bar]) stand in;
+     * - the song's video cover, where the service has them ([WebMusicService.videoCovers]): the
+     *   address of the <video> its page shows for the song (Spotify's Canvas), or the one its own
+     *   component playing that <video> was given ([WebMusicService.videoCoverProp]); never the video;
      * - `__mycarMusicAct(action, seconds)`: a button from the car, through the page's own handler as
      *   a computer's media key would, or else the service's own button on the page.
      */
@@ -29,6 +32,9 @@ internal object WebMusicScripts {
                 .toString()
         } ?: "null"
         return SETUP.replace("__MYCAR_BAR__", bar).replace("__MYCAR_CSS__", JSONObject.quote(service.css))
+            .replace("__MYCAR_VIDEO__", org.json.JSONArray(service.videoCovers).toString())
+            .replace("__MYCAR_VIDEO_PROP__", JSONObject.quote(service.videoCoverProp.orEmpty()))
+            .replace("__MYCAR_VIDEO_PREVIEW__", service.videoCoverPreview?.let { org.json.JSONArray(listOf(it.first, it.second)).toString() } ?: "null")
     }
 
     private const val SETUP = """
@@ -39,6 +45,15 @@ internal object WebMusicScripts {
   // The service's own player bar, by data-testid (or null), and its own CSS.
   var BAR = __MYCAR_BAR__;
   var CSS = __MYCAR_CSS__;
+  // Where the song's video cover comes from, by the start of its address (Spotify's Canvas: the muted
+  // loop its Now playing view shows over the cover); none for most services.
+  var VIDEO = __MYCAR_VIDEO__;
+  // And where the page's own component playing it gets its address, as React keeps it (Spotify's Canvas
+  // player: canvasUrl): its <video> plays through the service's own video player, with no such address.
+  var VIDEO_PROP = __MYCAR_VIDEO_PROP__;
+  // A component given such an address with this prop at this value is a preview of another song, never
+  // this song's cover (Spotify's cards play a Canvas on hover): [prop, value], or null.
+  var VIDEO_PREVIEW = __MYCAR_VIDEO_PREVIEW__;
 
   var style = document.createElement('style');
   style.textContent = CSS;
@@ -212,6 +227,110 @@ internal object WebMusicScripts {
     return absolute(best);
   }
 
+  // The song's video cover: the address of the video the page shows for the song from one of the VIDEO
+  // addresses - its <video>'s own, or the one the page's own component playing it was given - the one
+  // most on screen if there are a few; '' with none. Never in the way of what plays: whatever goes
+  // wrong here, no video cover.
+  function videoCover() {
+    if (!VIDEO.length) return '';
+    try {
+      return videoIn(document.getElementsByTagName('video')) || (VIDEO_PROP ? videoInTree() : '');
+    } catch (e) {
+      return '';
+    }
+  }
+  function ours(src) {
+    for (var i = 0; i < VIDEO.length; i++) if (src.indexOf(VIDEO[i]) === 0) return src.length < 2000;
+    return false;
+  }
+  function fiberOf(node) {
+    var keys = Object.keys(node);
+    for (var k = 0; k < keys.length; k++) if (keys[k].indexOf('__reactFiber$') === 0) return node[keys[k]];
+    return null;
+  }
+  // The address a component was given for its video ('' if none, or if it's a preview of another song).
+  function givenTo(props) {
+    if (!props || typeof props[VIDEO_PROP] !== 'string') return '';
+    if (VIDEO_PREVIEW && props[VIDEO_PREVIEW[0]] === VIDEO_PREVIEW[1]) return '';
+    return props[VIDEO_PROP];
+  }
+  // How much of an element is on the page's screen (all of it while the page has no size of its own).
+  function shownArea(el) {
+    var r = el.getBoundingClientRect();
+    if (!(innerWidth > 0 && innerHeight > 0)) return r.width * r.height;
+    var w = Math.min(r.right, innerWidth) - Math.max(r.left, 0), h = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+    return w > 0 && h > 0 ? w * h : 0;
+  }
+  // The page's own videos: their own address, or the one given to the component around them (from the
+  // element up to the nearest one React drew, then up its components). One it took away (the song
+  // before's) stays out of the page.
+  function videoIn(videos) {
+    var best = '', area = 0;
+    for (var i = 0; i < videos.length; i++) {
+      var el = videos[i], src = String(el.currentSrc || el.src || '');
+      if (!src && el.querySelector) {
+        var source = el.querySelector('source[src]');
+        src = source ? String(source.src || '') : '';
+      }
+      if (!ours(src) && VIDEO_PROP) src = givenAround(el);
+      if (!ours(src)) continue;
+      var a = shownArea(el);
+      if (a > area) { area = a; best = src; }
+    }
+    return best;
+  }
+  function givenAround(el) {
+    for (var node = el, hops = 0; node && hops < 6; node = node.parentElement, hops++) {
+      var fiber = fiberOf(node);
+      if (!fiber) continue;
+      for (var f = fiber, up = 0; f && up < 12; f = f.return, up++) {
+        if (f.memoizedProps && typeof f.memoizedProps[VIDEO_PROP] === 'string') return givenTo(f.memoizedProps);
+      }
+      return '';
+    }
+    return '';
+  }
+  // Out of sight (the car shows the map) the page may not load the video at all: then the component
+  // that would play it, found in React's record of the whole page - the one most on screen. Looked
+  // through at most every TREE_MS.
+  var treeAt = 0, treeBest = '', TREE_MS = 5000, TREE_MAX = 60000;
+  function videoInTree() {
+    var now = Date.now();
+    if (now - treeAt < TREE_MS) return treeBest;
+    treeAt = now;
+    treeBest = '';
+    // React's roots: from the top of the page down to the first elements React drew.
+    var roots = [], level = [document.body];
+    for (var depth = 0; depth < 8 && level.length && roots.length < 4; depth++) {
+      var next = [];
+      for (var i = 0; i < level.length; i++) {
+        var fiber = fiberOf(level[i]);
+        if (fiber) {
+          while (fiber.return) fiber = fiber.return;
+          if (fiber.stateNode && fiber.stateNode.current) fiber = fiber.stateNode.current;
+          if (roots.indexOf(fiber) < 0) roots.push(fiber);
+          continue;
+        }
+        for (var c = level[i].firstElementChild; c; c = c.nextElementSibling) next.push(c);
+      }
+      level = next;
+    }
+    var area = 0, stack = roots, count = 0;
+    while (stack.length && count++ < TREE_MAX) {
+      var f = stack.pop(), src = givenTo(f.memoizedProps);
+      if (src && ours(src)) {
+        // Its first element on the page: how much of it shows.
+        var host = f.child, hops = 0;
+        while (host && !(host.stateNode && host.stateNode.nodeType === 1) && hops++ < 8) host = host.child;
+        var a = host && host.stateNode && host.stateNode.nodeType === 1 ? shownArea(host.stateNode) : 0;
+        if (a > area) { area = a; treeBest = src; }
+      }
+      if (f.sibling) stack.push(f.sibling);
+      if (f.child) stack.push(f.child);
+    }
+    return treeBest;
+  }
+
   function snapshot() {
     var meta = session && session.metadata;
     var widget = BAR && byTestId(BAR.widget);
@@ -252,7 +371,8 @@ internal object WebMusicScripts {
       remote: remote,
       position: Math.round(at),
       duration: Math.round(duration),
-      seek: typeof handlers.seekto === 'function'
+      seek: typeof handlers.seekto === 'function',
+      video: videoCover()
     };
   }
 
@@ -298,7 +418,7 @@ internal object WebMusicScripts {
     var s;
     try { s = snapshot(); } catch (e) { return; }
     var now = Date.now();
-    var key = [s.title, s.artist, s.album, s.art, s.playing, s.remote, s.duration, s.seek].join('\n');
+    var key = [s.title, s.artist, s.album, s.art, s.playing, s.remote, s.duration, s.seek, s.video].join('\n');
     var expected = lastPosition + (lastPlaying ? now - lastAt : 0);
     if (key === last && Math.abs(s.position - expected) < 2500) return;
     last = key;

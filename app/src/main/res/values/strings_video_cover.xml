@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The video cover (car/VideoCover.kt): the short looping video some songs have in place of their
+  cover (Spotify's Canvas), shown in the car's player beside the map once the driver turns it on with
+  the button on the cover, or in the car's settings, or on the phone in Settings > Music.
+-->
+<resources>
+    <!-- The button on the cover of the player beside the map, as said for it: it turns the video cover on (it is off now). The video cover: the short looping video some songs have in place of their cover, as Spotify's Canvas -->
+    <string name="car_player_video_cover_on">Video cover on</string>
+    <!-- The same button when the video cover is on: it turns it off -->
+    <string name="car_player_video_cover_off">Video cover off</string>
+    <!-- A short message on the car's screen after the button turned the video cover on. Most songs have no video: only some do -->
+    <string name="car_player_video_cover_now_on">Video cover on, for the songs that have one</string>
+    <!-- A short message on the car's screen after the button turned it off: the usual picture, which doesn't move -->
+    <string name="car_player_video_cover_now_off">Still cover</string>
+    <!-- Settings on the car's screen, next to "Size of the player beside the map": what the player beside the map shows as the song's picture. Its two choices follow -->
+    <string name="car_settings_cover">Cover in the player</string>
+    <!-- A choice under "Cover in the player": the usual picture, which doesn't move -->
+    <string name="car_settings_cover_still">Still</string>
+    <!-- A choice under "Cover in the player": the song's short looping video, where it has one -->
+    <string name="car_settings_cover_video">Video</string>
+    <!-- Under "Cover in the player" in the car's Settings. "Video" is the choice above (the same word). "Canvas" is Spotify's own name for these videos: keep it -->
+    <string name="car_settings_cover_note">Some songs have a short looping video, as Spotify\'s Canvas. With Video, the player beside the map shows it in place of the cover. The button on the cover switches it too.</string>
+    <!-- Phone, Settings > Music, in Spotify's part: a switch for the video cover in the car's player -->
+    <string name="music_video_cover">Video cover</string>
+    <!-- Under "Video cover" on the phone. "Canvas" is Spotify's own name for these videos: keep it -->
+    <string name="music_video_cover_detail">In the car\'s player beside the map, the short looping video some songs have (Spotify\'s Canvas), in place of the cover. The button on the cover in the car switches it too. Each video uses a few megabytes of data.</string>
+</resources>
