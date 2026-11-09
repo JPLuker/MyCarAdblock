@@ -47,9 +47,10 @@ import androidx.compose.ui.unit.sp
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.car.design.MyCarMotion
 import io.github.sirionero.mycar.car.design.MyCarPalette
-import io.github.sirionero.mycar.car.design.MyCarRadius
 import io.github.sirionero.mycar.car.design.MyCarSpace
+import io.github.sirionero.mycar.car.design.PanelShape
 import io.github.sirionero.mycar.car.design.glassPanel
+import io.github.sirionero.mycar.car.design.raisedPanel
 import io.github.sirionero.mycar.car.design.rememberWallpaper
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -251,7 +252,8 @@ private fun BoxScope.WidgetNote(text: String) {
 }
 
 /**
- * A widget's card: frosted glass over the wallpaper, or a plain surface without one. Tapped it
+ * A widget's card: frosted glass over the wallpaper, or a plain surface without one, raised off it
+ * as a panel (see Panels.kt) - not [raised] where the panel round it is (beside the map). Tapped it
  * opens the widget's own screen, held it changes the page, and it gives a touch under the finger.
  */
 @OptIn(ExperimentalFoundationApi::class)
@@ -260,9 +262,10 @@ internal fun WidgetCard(
     onClick: (() -> Unit)?,
     onHold: () -> Unit,
     modifier: Modifier = Modifier,
+    raised: Boolean = true,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val shape = RoundedCornerShape(MyCarRadius.Card)
+    val shape = PanelShape
     val source = remember { MutableInteractionSource() }
     val pressed by source.collectIsPressedAsState()
     val scale by animateFloatAsState(
@@ -278,8 +281,9 @@ internal fun WidgetCard(
                 scaleX = scale
                 scaleY = scale
             }
-            .clip(shape)
-            .then(if (glass) Modifier.glassPanel(shape, surface.copy(alpha = 0.62f)) else Modifier.background(surface))
+            // The panel's rim, its own or the one round it, stands for the glass's own.
+            .then(if (raised) Modifier.raisedPanel() else Modifier.clip(shape))
+            .then(if (glass) Modifier.glassPanel(shape, surface.copy(alpha = 0.62f), rim = false) else Modifier.background(surface))
             .combinedClickable(
                 interactionSource = source,
                 indication = LocalIndication.current,

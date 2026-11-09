@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -77,7 +76,9 @@ import io.github.sirionero.mycar.media.NowPlaying
  * anywhere else on the cover opens the full media screen. Drawn in the dark scheme whatever the
  * app theme, since it all sits on a picture. With no cover, the column takes the app's colour and
  * shows its icon instead. Where the car's music can have video covers (Spotify Web), a button on the
- * cover turns them on: a song with one shows it in place of the cover (see VideoCover.kt).
+ * cover turns them on: a song with one shows it in place of the cover (see VideoCover.kt). The panel
+ * it sits in rounds it, the video too (see raisedPanel): beside the map that panel is drawn at the
+ * screen's own density, this player at the size chosen for it.
  */
 @Composable
 internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp: String? = null) {
@@ -112,7 +113,7 @@ internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp:
         // ring kept, which MaterialTheme would swap for its plain ripple.
         val ring = LocalIndication.current
         MaterialTheme(colorScheme = scheme) { CompositionLocalProvider(LocalContentColor provides Color.White, LocalIndication provides ring) {
-            Box(modifier.clip(RoundedCornerShape(MyCarRadius.Card)).background(ground)) {
+            Box(modifier.background(ground)) {
                 // Paused out of sight and with the music: each picture of it is a new frame to send the car.
                 if (video != null) key(video) { VideoCoverView(video, running = LocalPlayerInView.current && now.playing, modifier = Modifier.fillMaxSize()) }
                 if (cover != null) {

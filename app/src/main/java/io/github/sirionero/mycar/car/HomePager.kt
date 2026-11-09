@@ -76,7 +76,9 @@ import io.github.sirionero.mycar.car.design.MyCarPalette
 import io.github.sirionero.mycar.car.design.MyCarRadius
 import io.github.sirionero.mycar.car.design.MyCarSize
 import io.github.sirionero.mycar.car.design.MyCarSpace
+import io.github.sirionero.mycar.car.design.PanelShape
 import io.github.sirionero.mycar.car.design.WallpaperBackground
+import io.github.sirionero.mycar.car.design.raisedPanel
 import io.github.sirionero.mycar.car.design.rememberWallpaper
 import io.github.sirionero.mycar.car.theme.GsButton
 import io.github.sirionero.mycar.car.theme.GsColors
@@ -102,10 +104,11 @@ import kotlinx.coroutines.launch
  * (see CarUi), and a page turned back to finds its browser where it was left. Only the page in
  * view runs a car app, though: apps other than the map share one connection
  * ([CarServices.browse]), and it can draw in one place only. [mapPage] is told when its page is
- * the one in view, for the app beside the map.
+ * the one in view, for the app beside the map; [mapSplit] says the map shares its page, as panels
+ * with the wallpaper round them.
  */
 @Composable
-internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -> Unit) {
+internal fun HomePager(onHome: Boolean, mapSplit: Boolean, mapPage: @Composable (inView: Boolean) -> Unit) {
     val navigator = LocalCarNavigator.current
     val scope = rememberCoroutineScope()
     val view = LocalView.current
@@ -204,10 +207,11 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
     }
 
     Box(Modifier.fillMaxSize()) {
-        // Behind the driver's pages, and still while they slide over it; the map's page covers it.
-        // Not under another screen: a moving one went on being drawn there for nobody.
+        // Behind the driver's pages, and still while they slide over it; the map alone covers it, the
+        // map sharing its page shows it round the panels. Not under another screen: a moving one went on
+        // being drawn there for nobody.
         val wallpaper = rememberWallpaper()
-        if (onHome && wallpaper != null && (pager.currentPage != mapIndex || pager.isScrollInProgress)) {
+        if (onHome && wallpaper != null && (pager.currentPage != mapIndex || pager.isScrollInProgress || mapSplit)) {
             WallpaperBackground(wallpaper, Modifier.matchParentSize())
         }
         HorizontalPager(
@@ -221,7 +225,8 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
             val page = pages.getOrNull(index) ?: return@HorizontalPager
             val inView = onHome && pager.settledPage == index
             if (page.layout == PageLayout.MAP) {
-                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) { mapPage(inView) }
+                val ground = if (mapSplit) Modifier else Modifier.background(MaterialTheme.colorScheme.background)
+                Box(Modifier.fillMaxSize().then(ground)) { mapPage(inView) }
             } else {
                 DriverPage(
                     page,
@@ -311,7 +316,8 @@ private fun DriverPage(page: HomePage, inView: Boolean, editing: Boolean, onEdit
         PagePart(page.slots[slot], entries, inView, inView && slot == runner, editing, onEdit, { onChoose(slot) }, keyboard, modifier)
     }
     Column(Modifier.fillMaxSize()) {
-        Box(Modifier.weight(1f).fillMaxWidth()) {
+        // The parts are panels raised off the wallpaper (see Panels.kt), the same gap round them as between them.
+        Box(Modifier.weight(1f).fillMaxWidth().padding(PageGap)) {
             when (page.layout) {
                 PageLayout.HALVES -> Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(PageGap)) {
                     repeat(2) { slot ->
@@ -443,7 +449,7 @@ private fun AppPart(entry: Entry, app: TemplateApp, runs: Boolean, onHold: () ->
         if (!closed && (!live || CarServices.browse.connectedComponent != app.component)) CarServices.connectBrowse(app, frame)
         started = true
     }
-    Box(modifier.clip(RoundedCornerShape(MyCarRadius.Card)), contentAlignment = Alignment.Center) {
+    Box(modifier.raisedPanel().background(MaterialTheme.colorScheme.surface), contentAlignment = Alignment.Center) {
         if (status.phase == CarAppConnection.Phase.REJECTED || status.phase == CarAppConnection.Phase.FAILED) {
             Text(
                 stringResource(R.string.car_home_app_failed, app.label),
@@ -474,7 +480,8 @@ private val LIVE_PHASES = setOf(CarAppConnection.Phase.BINDING, CarAppConnection
 
 /**
  * An app that isn't running where it sits - its page is out of view, or the connection is in use
- * elsewhere - as its icon and name, so turning to it shows what's coming rather than a gap.
+ * elsewhere - as its icon and name, so turning to it shows what's coming rather than a gap. Not
+ * [raised] where the panel round it is (beside the map).
  */
 @Composable
 internal fun AppPlaceholder(
@@ -483,8 +490,9 @@ internal fun AppPlaceholder(
     modifier: Modifier,
     onHold: () -> Unit = {},
     builtInId: String? = null,
+    raised: Boolean = true,
 ) {
-    WidgetCard(onClick = null, onHold = onHold, modifier = modifier) {
+    WidgetCard(onClick = null, onHold = onHold, modifier = modifier, raised = raised) {
         Column(
             Modifier.align(Alignment.Center).padding(MyCarSpace.L),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -514,7 +522,8 @@ private fun BrowserPart(inView: Boolean, onHold: () -> Unit, keyboard: MutableSt
     val start = remember { ProjectedContent.resolve(context) }
     val hold by rememberUpdatedState(onHold)
     val tile = remember(keyboard) { WebTile({ hold() }, keyboard) }
-    Box(modifier.clip(RoundedCornerShape(MyCarRadius.Card))) {
+    // The web page may not keep to the panel's clip (see raisedPanel): its corners are painted over.
+    Box(modifier.raisedPanel(coverCorners = true)) {
         WebApp(start, tile)
     }
 }
@@ -558,7 +567,8 @@ internal fun TileBar(title: String, onBack: () -> Unit, onHold: () -> Unit) {
 @Composable
 private fun EmptyPart(onChoose: () -> Unit, onHold: () -> Unit, modifier: Modifier, hint: Boolean = true) {
     val scheme = MaterialTheme.colorScheme
-    val shape = RoundedCornerShape(MyCarRadius.Card)
+    // A place for a panel, not one: outlined in its shape, flat on the wallpaper.
+    val shape = PanelShape
     Column(
         modifier
             .clip(shape)
@@ -598,7 +608,7 @@ private fun MissingPart(onChoose: () -> Unit, onHold: () -> Unit, modifier: Modi
 @Composable
 private fun EditCover(name: String, onChoose: () -> Unit, modifier: Modifier) {
     val scheme = MaterialTheme.colorScheme
-    val shape = RoundedCornerShape(MyCarRadius.Card)
+    val shape = PanelShape
     Box(
         modifier
             .clip(shape)
@@ -939,8 +949,8 @@ internal fun HomePagesSettings() {
     }
 }
 
-/** Between the parts of a page, and between pages as they slide: the gap beside the map. */
-private val PageGap = 8.dp
+/** Between the parts of a page and round them, and between pages as they slide: the gap beside the map. */
+private val PageGap = MyCarSpace.Panel
 private val DotSize = 44.dp
 private const val DotsFadeMs = 250
 private const val DELETE_ARMED_MS = 4_000L

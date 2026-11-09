@@ -164,6 +164,15 @@ EXTRA="--ez demoSong true --es playerSize 1.4" shoot split-extra-800x480 800 480
 # The same with the car's screen at Extra large: the player as big as leaves the map room for an app's
 # card (MAP_PANE_MIN_EDGE) and itself room for its X over the glass.
 EXTRA="--ez demoSong true --es playerSize 1.4 --es carScale 1.5" shoot split-extra-xl-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
+# The map and the player as panels raised off the wallpaper (car/design/Panels.kt): at 800x480, also at
+# Extra small; at 1920x1080; in the light theme; over a moving wallpaper, which the map's corners
+# painted over must follow; and with none.
+EXTRA="--ez demoSong true" shoot split-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es carScale 0.83" shoot split-xs-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true" shoot split-1920x1080 1920 1080 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es carTheme LIGHT" shoot split-light 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es wallpaper waves" shoot split-waves 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez demoSong true --es wallpaper none" shoot split-none 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 # The lyrics beside the map at Extra large, from the player's Lyrics button (the fourth of its bottom
 # row): the made-up song has none, so the cover above one line where there's room (1920x720), the line
 # alone at 800x480; 4 s later the player has the column back.
@@ -233,6 +242,8 @@ installed $XONOS && EXTRA="--es sidePane $XONOS" shoot split-xonos 1920 720 240 
 DOCK_MAP="72,174"
 shoot pages 1920 720 240 "$DOCK_MAP;966,675;$WAIT;$DOCK_MAP;1098,675;$WAIT;$WAIT;$WAIT"
 shoot pages-800x480 800 480 160 "48,116;404,450;$WAIT"
+# The same pages in the light theme, as panels on its light ground.
+EXTRA="--es carTheme LIGHT" shoot pages-light 1920 720 240 "$DOCK_MAP;966,675;$WAIT;$DOCK_MAP;1098,675;$WAIT"
 # Changing a page: the pencil beside the dots, then a part, for the list of what can go there.
 shoot pages-edit 1920 720 240 "$WAIT;$DOCK_MAP;966,675;1138,675;585,400;$WAIT"
 # The layouts a page can take: the pencil, the Layout button at the start of its bar, the list of
