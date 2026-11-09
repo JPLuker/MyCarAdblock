@@ -119,7 +119,8 @@ internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp:
                     Image(
                         cover,
                         null,
-                        Modifier.fillMaxSize().graphicsLayer { alpha = still() }.clickable { navigator.media() },
+                        // The touch and the focus ring outside the fading layer: seen over the video too.
+                        Modifier.fillMaxSize().clickable { navigator.media() }.graphicsLayer { alpha = still() },
                         contentScale = ContentScale.Crop,
                     )
                     Image(
@@ -138,7 +139,7 @@ internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp:
                     )
                 } else {
                     Box(
-                        Modifier.fillMaxSize().graphicsLayer { alpha = still() }.clickable { navigator.media() }.padding(bottom = NO_COVER_LIFT),
+                        Modifier.fillMaxSize().clickable { navigator.media() }.graphicsLayer { alpha = still() }.padding(bottom = NO_COVER_LIFT),
                         contentAlignment = Alignment.Center,
                     ) {
                         AppIcon(appIcon, null, NO_COVER_ICON)
