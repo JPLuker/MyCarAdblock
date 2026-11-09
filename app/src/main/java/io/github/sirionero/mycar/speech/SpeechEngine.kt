@@ -151,7 +151,8 @@ object SpeechEngine {
     /**
      * At a press, what the memory allows for the final model (SpeechRoom): the same room as ahead of a
      * command, or English keeps Kroko's live words; another language, which only the final model
-     * hears, loads it unless Android itself would be short of memory. Already there or on its way: loaded.
+     * hears, loads it with a smaller margin, never on the memory of the 0.6.8/0.6.9 crashes. Already
+     * there or on its way: loaded.
      */
     private fun roomAtPress(context: Context, language: VoiceLanguage): SpeechRoom.Press {
         val model = SpeechModels.finalFor(context, language) ?: return SpeechRoom.Press.LOAD
