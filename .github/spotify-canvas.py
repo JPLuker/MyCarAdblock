@@ -21,7 +21,7 @@ def has(pattern):
 print("scripts:", len(scripts), "-", sum(1 for _ in js), "characters")
 print("components given canvasUrl:", has(r'canvasUrl:'))
 print("the Canvas player plays by file id (MANIFEST_ID) near canvasUrl:",
-      bool(re.search(r'canvasUrl:[^;]{0,4000}format:"MANIFEST_ID"|format:"MANIFEST_ID"[^;]{0,4000}canvasUrl', js)))
+      bool(re.search(r'canvasUrl:[\s\S]{0,3000}format:"MANIFEST_ID"', js)))
 print("its playback types: loopOnHover", has(r'"loopOnHover"'), "- loopOnPlayback", has(r'"loopOnPlayback"'))
 print("canvas.url in the songs' metadata:", has(r'"canvas\.url"'), "- the canvas query:", has(r'"canvas","query"'))
 print("canvaz.scdn.co in the scripts:", has(r'canvaz\.scdn\.co'))
