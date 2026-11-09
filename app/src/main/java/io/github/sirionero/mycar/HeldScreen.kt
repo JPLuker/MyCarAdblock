@@ -9,7 +9,7 @@ package io.github.sirionero.mycar
  * Android: MyCarRunner asks for the screen, waits [WAIT_MS], and tells this what happened.
  */
 internal class HeldScreen(
-    /** At an earlier drive this car gave its screen only once the channel was open (HeldScreenCars). */
+    /** At earlier drives this car gave its screen only once the channel was open (HeldScreenCars). */
     private val known: Boolean,
 ) {
     /** When the channel was opened here for the screen, on the session's clock; null until then. */
@@ -28,15 +28,32 @@ internal class HeldScreen(
         return true
     }
 
+    /** What the screen's coming says of the car, for HeldScreenCars. */
+    enum class Seen {
+        /** It came only once the channel was opened for it, and soon after: it may need it open. */
+        NEEDED,
+        /** It came with the channel held closed: the car doesn't need it open. */
+        NOT_NEEDED,
+        /** Nothing: a car known already, the channel open anyway, or the screen much later. */
+        NOTHING,
+    }
+
     /**
-     * The screen came, at [now]: whether to remember the car - it came only once the channel was
-     * opened for it, and soon after ([REMEMBER_WITHIN_MS]). Later, it's the driver who chose the
-     * phone's screen (a car on its own menus when the phone came): the channel wasn't the reason,
-     * and a car remembered for nothing would get it open at every drive, music over Bluetooth or not.
+     * The screen came, at [now], with the channel still [held] closed or not. Soon after the channel
+     * was opened for it ([REMEMBER_WITHIN_MS]): [Seen.NEEDED]. Later, it's the driver who chose the
+     * phone's screen (a car on its own menus when the phone came): the channel wasn't the reason.
+     * HeldScreenCars counts a car as needing the channel only after [Seen.NEEDED] at [TIMES] drives in a
+     * row, as a car known to need it gets the channel at every drive, music over Bluetooth or not: one
+     * drive's slow screen (the driver on the car's menus, its system still starting) isn't for good.
      */
-    fun rememberCar(now: Long): Boolean {
-        val at = openedAt ?: return false
-        return !known && now - at <= REMEMBER_WITHIN_MS
+    fun screenCame(now: Long, held: Boolean): Seen {
+        val at = openedAt
+        return when {
+            known -> Seen.NOTHING
+            at != null -> if (now - at <= REMEMBER_WITHIN_MS) Seen.NEEDED else Seen.NOTHING
+            held -> Seen.NOT_NEEDED
+            else -> Seen.NOTHING
+        }
     }
 
     companion object {
@@ -48,5 +65,11 @@ internal class HeldScreen(
 
         /** From opening the channel to the screen, for the opening to count as its reason: the second ask, and a few seconds. */
         const val REMEMBER_WITHIN_MS = 5_000L
+
+        /** Drives in a row with [Seen.NEEDED] before a car's channel opens at once; a [Seen.NOT_NEEDED] starts over. */
+        const val TIMES = 2
+
+        /** A car seen [times] drives in a row giving its screen only once the channel was open is known to need it. */
+        fun knownAfter(times: Int): Boolean = times >= TIMES
     }
 }

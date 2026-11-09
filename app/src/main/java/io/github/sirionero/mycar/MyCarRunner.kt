@@ -1357,9 +1357,16 @@ class MyCarRunner(
             if (!projected) return
             videoStarted = true
             CarFocus.request = ::requestNativeFocus
-            if (heldScreen?.rememberCar(SystemClock.elapsedRealtime()) == true) {
-                io.github.sirionero.mycar.audio.HeldScreenCars.remember()
-                log.i("the screen came once the media channel was open - remembered: this car's next drive opens it at once")
+            when (heldScreen?.screenCame(SystemClock.elapsedRealtime(), held = CarAudio.openSink != null)) {
+                HeldScreen.Seen.NEEDED -> log.i(
+                    "the screen came once the media channel was open - " +
+                        if (io.github.sirionero.mycar.audio.HeldScreenCars.neededAgain()) "remembered: this car's next drive opens it at once"
+                        else "noted: if it does again, this car's drives open it at once",
+                )
+                HeldScreen.Seen.NOT_NEEDED -> if (io.github.sirionero.mycar.audio.HeldScreenCars.notNeeded()) {
+                    log.i("the screen came with the media channel closed - this car doesn't need it open")
+                }
+                else -> Unit
             }
             log.i("PHASE A COMPLETE - video focus granted; starting video source")
             startVideoSource()
