@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.Words
+import io.github.sirionero.mycar.audio.CarAudio
 import io.github.sirionero.mycar.mirror.PhoneMirror
 import io.github.sirionero.mycar.call.CallUiState
 import io.github.sirionero.mycar.call.CarCalls
@@ -91,6 +92,8 @@ object CarAssistant {
 
     fun init(context: Context) {
         appContext = context.applicationContext
+        // The beep before listening, on the car's channel for prompts as the answers are.
+        SpeechEngine.cueOnCar = { onPromptChannel() && DirectionsVoice.cueForAssistant() }
         // Started again, at the next drive, after a start that failed or an engine that went away
         // (updated in the background, Android never binds it again), as DirectionsVoice does:
         // otherwise answers and messages stayed silent until myCar's process went.
@@ -450,10 +453,9 @@ object CarAssistant {
     private fun speak(engine: TextToSpeech, text: String, ending: (stopped: Boolean, refused: Boolean) -> Unit): String {
         val id = "mycar-${++utterances}"
         endings[id] = ending
-        // The car's sound through myCar with nothing captured - myCar's own music (Xonos) goes
-        // straight into the car - and the voice came out of the phone's speaker: on the car's
-        // channel for spoken prompts instead, where the car has one.
-        if (CarSettings.pipeAudio.value && io.github.sirionero.mycar.audio.CarAudio.capture.value != io.github.sirionero.mycar.audio.CarAudio.Capture.ON &&
+        // On the car's channel for spoken prompts, where the car has one, while the phone's own sound
+        // doesn't reach the car through myCar (see onPromptChannel).
+        if (onPromptChannel() &&
             DirectionsVoice.speakForAssistant(text, VoiceLanguages.speakingLocale(AssistantLanguage.language)) { cut, refused ->
                 end(id, stopped = cut, refused = refused)
             }
@@ -474,6 +476,17 @@ object CarAssistant {
         }
         return id
     }
+
+    /**
+     * The assistant's voice - its answers, the messages read out, the listening cue - goes on the car's
+     * channel for spoken prompts while the phone's own sound doesn't reach the car through myCar:
+     * nothing captured (myCar's own music, Xonos, goes straight into the car), or the car's speakers
+     * not myCar's (the driver picked the radio, or the radio stays until the phone plays). Said on the
+     * phone, it came out of the phone's speaker; or, captured with the radio on, it was lost (the phone
+     * is muted while it captures) and took the radio away for the rest of the drive.
+     */
+    private fun onPromptChannel(): Boolean = CarSettings.pipeAudio.value &&
+        (CarAudio.capture.value != CarAudio.Capture.ON || !CarAudio.speakersOurs)
 
     fun stopSpeaking() { stopVoice() }
 

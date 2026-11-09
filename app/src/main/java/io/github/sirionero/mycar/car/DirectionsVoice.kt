@@ -24,7 +24,9 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.math.PI
 import kotlin.math.roundToInt
+import kotlin.math.sin
 
 /**
  * Spoken turn-by-turn on the car's directions channel (the GUIDANCE audio sink).
@@ -331,6 +333,58 @@ object DirectionsVoice {
         return true
     }
 
+    /**
+     * The assistant's listening cue on the car's channel for spoken prompts, for when the phone's own
+     * sound doesn't reach the car (see CarAssistant): played, and waited for up to [CUE_WAIT_MS]. A
+     * turn being said keeps the channel longer: the cue is skipped then, not heard over the driver.
+     * False when the car gave no such channel: the cue sounds on the phone as before.
+     */
+    fun cueForAssistant(): Boolean {
+        val sink = link ?: return false
+        val turn = cueTurn.incrementAndGet()
+        val done = CountDownLatch(1)
+        speaker.execute {
+            try {
+                if (turn == cueTurn.get() && link === sink) {
+                    streamAsked(sink, cue(sink.sampleRate, sink.channels), going = { turn == cueTurn.get() })
+                }
+            } catch (e: Exception) {
+                MyCarLog.w("guidance: could not play the listening cue: ${e.message}")
+            } finally {
+                done.countDown()
+            }
+        }
+        if (!runCatching { done.await(CUE_WAIT_MS, TimeUnit.MILLISECONDS) }.getOrDefault(false)) {
+            cueTurn.incrementAndGet()
+            MyCarLog.i("guidance: the channel was busy - no listening cue")
+        }
+        return true
+    }
+
+    /** The cue on the car's channel now; any other number, it's over or skipped. */
+    private val cueTurn = java.util.concurrent.atomic.AtomicInteger()
+
+    /**
+     * The phone's listening beep (Android's general beep: 400 and 1200 Hz for 35 ms) at the channel's
+     * rate, after a moment of quiet for the car to lower its own source, faded in and out so it
+     * doesn't click.
+     */
+    private fun cue(rate: Int, channels: Int): ByteArray {
+        val lead = rate * CUE_LEAD_MS / 1000
+        val tone = rate * CUE_TONE_MS / 1000
+        val fade = maxOf(1, rate * CUE_FADE_MS / 1000)
+        val out = ByteBuffer.allocate((lead + tone) * channels * 2).order(ByteOrder.LITTLE_ENDIAN)
+        repeat(lead * channels) { out.putShort(0) }
+        for (i in 0 until tone) {
+            val t = i.toDouble() / rate
+            val edge = minOf(1.0, minOf(i, tone - 1 - i).toDouble() / fade)
+            val v = (sin(2 * PI * 400 * t) + sin(2 * PI * 1200 * t)) / 2 * CUE_LEVEL * edge
+            val s = (v * Short.MAX_VALUE).roundToInt().toShort()
+            repeat(channels) { out.putShort(s) }
+        }
+        return out.array()
+    }
+
     /** The last text [play] gave the engine was refused (read on the speaker's thread, right after). */
     @Volatile private var refusedNow = false
 
@@ -453,6 +507,12 @@ object DirectionsVoice {
     private const val PREPARE_AT_METERS = 1_000
     private const val LEAD_MS = 100L
     private const val SYNTH_TIMEOUT_S = 10L
+    /** The listening cue: how long the assistant waits for it at most, its quiet lead, the beep, its fades, its level. */
+    private const val CUE_WAIT_MS = 1_500L
+    private const val CUE_LEAD_MS = 100
+    private const val CUE_TONE_MS = 35
+    private const val CUE_FADE_MS = 3
+    private const val CUE_LEVEL = 0.5
     /** The roundabout's exits, as directions_roundabout_exit says them. */
     private val ORDINALS = listOf(
         R.string.directions_ordinal_1, R.string.directions_ordinal_2, R.string.directions_ordinal_3, R.string.directions_ordinal_4,

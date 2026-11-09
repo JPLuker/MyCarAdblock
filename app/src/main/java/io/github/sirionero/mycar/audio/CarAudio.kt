@@ -104,6 +104,13 @@ object CarAudio {
     val sampleRate get() = link?.sampleRate ?: 48_000
     val channels get() = link?.channels ?: 2
 
+    /**
+     * The car plays myCar's media stream now: its speakers are myCar's, and what the phone plays is
+     * heard there. Not after the driver picked the car's radio, nor before the first song while the
+     * radio stays until the phone plays ([io.github.sirionero.mycar.car.CarSettings.radioFirst]).
+     */
+    val speakersOurs: Boolean get() = link?.streaming == true
+
     /** The media sink has the car's speakers, has asked for them, or the car holds them for a moment. */
     val speakersAsked: Boolean get() = link?.speakersAsked == true
 

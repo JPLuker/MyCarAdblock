@@ -478,10 +478,18 @@ object SpeechEngine {
         text.lowercase().replace(Regex("[^\\p{L}\\p{N}' ]"), " ").replace(Regex("\\s+"), " ").trim()
 
     /**
+     * Plays the cue on the car's channel for spoken prompts and gives true once it has, while the
+     * phone's own sound doesn't reach the car: the radio has the car's speakers, and the phone is
+     * muted as myCar captures its sound. False to play it on the media stream. Set by the assistant.
+     */
+    @Volatile var cueOnCar: () -> Boolean = { false }
+
+    /**
      * A short beep on the media stream, so it plays through the car like everything else, then a
      * pause long enough for it to finish there before the microphone opens and hears it.
      */
     private fun cue() {
+        if (runCatching { cueOnCar() }.getOrDefault(false)) return
         val tone = runCatching { ToneGenerator(AudioManager.STREAM_MUSIC, CUE_VOLUME) }.getOrNull() ?: return
         try {
             tone.startTone(ToneGenerator.TONE_PROP_BEEP, CUE_MS)
