@@ -217,10 +217,11 @@ class MyCarRunner(
         closeTransport?.let { runCatching { it() } }
     }
 
-    /** The car went quiet: the session ends as if it had closed the connection. */
-    private fun giveUp(why: String) {
+    /** The car went quiet: the session ends as if it had closed the connection. [silentS]: after a drive's silence, for the report. */
+    private fun giveUp(why: String, silentS: Long? = null) {
         if (gaveUp) return
         gaveUp = true
+        silentS?.let { SessionReport.gaveUp(it) }
         log.w("$why - ending the session")
         closeTransport?.let { runCatching { it() } }
     }
@@ -806,6 +807,21 @@ class MyCarRunner(
 
     private var lastSensorNight: Boolean? = null
 
+    /**
+     * The car's driving state, speed and gear as it said last, for the session report's end, with a
+     * line when it starts or stops moving: only each type's first event was in the log, and whether
+     * the car moved when its Wi-Fi went had to be guessed from the next session's start.
+     */
+    private var drive: SessionEnd.CarState? = null
+
+    private fun onDriveSensors(body: ByteArray) {
+        val before = drive
+        val now = SessionEnd.CarState.merge(before, body) ?: return
+        drive = now
+        SessionReport.car(now)
+        if (before?.moving != now.moving) log.i("car: ${now.describe()}")
+    }
+
     private fun onSensorMessage(messageId: Int, body: ByteArray) {
         when (messageId) {
             MSG_CHANNEL_OPEN_RESPONSE -> {
@@ -835,6 +851,7 @@ class MyCarRunner(
                 logSensorEvent(body)
                 onNightSensor(body)
                 CarDriving.onSensorEvent(body)
+                onDriveSensors(body)
             }
 
             // SensorError { required SensorType sensor_type = 1; required SensorErrorType sensor_error_type = 2; }
@@ -1050,6 +1067,8 @@ class MyCarRunner(
                     lastAckAt = SystemClock.elapsedRealtime()
                     ackLock.notifyAll()
                 }
+                // Not lastAckAt: a stalled window moves that on by itself.
+                SessionReport.heardFromCar()
                 if (framesSent <= 3 || framesSent % 60 == 0) {
                     log.i("<- MediaAck(ack=$acked) inFlight=$inFlight after $framesSent frames")
                 }
@@ -1268,6 +1287,7 @@ class MyCarRunner(
         }
         videoProjected = projected
         CarFocus.set(projected)
+        SessionReport.carOwnScreen(!projected)
         if (projected) {
             log.i("the car handed its screen back - restarting the stream")
             // Frames sent just before the car took over may never be acked.
@@ -1359,6 +1379,7 @@ class MyCarRunner(
         val now = SystemClock.elapsedRealtime()
         if (lastPingAt > 0) pingGap = maxOf(pingGap, now - lastPingAt)
         lastPingAt = now
+        SessionReport.heardFromCar(now)
     }
 
     private fun send(
@@ -1434,8 +1455,14 @@ class MyCarRunner(
         when (state) {
             State.WAIT_VERSION -> log.verdict(
                 "INCONCLUSIVE (no VersionRequest)",
-                "The head unit never opened the control channel. This is a connection problem, " +
-                    "not a certificate verdict - check that the accessory was actually claimed.",
+                // The accessory is the cable's: over Wi-Fi there is none to claim.
+                if (wireless) {
+                    "The car never started the session on its Wi-Fi. This is a connection problem, " +
+                        "not a certificate verdict."
+                } else {
+                    "The head unit never opened the control channel. This is a connection problem, " +
+                        "not a certificate verdict - check that the accessory was actually claimed."
+                },
             )
             State.TLS_HANDSHAKE -> log.verdict(
                 "LIKELY NOT VIABLE (dropped during TLS)",
@@ -1478,7 +1505,7 @@ class MyCarRunner(
                 } else if (wireless && pingGap > 0 && idle > maxOf(SILENCE_GIVE_UP_MS, pingGap * 4)) {
                     // The same for a car gone quiet mid-drive without closing the connection (its
                     // Wi-Fi still up). It pinged before, so this much silence means it's gone.
-                    giveUp("the car has said nothing for ${idle / 1000}s")
+                    giveUp("the car has said nothing for ${idle / 1000}s", silentS = idle / 1000)
                 }
                 // Over the cable a start that stalls, or a car that waits for a tap on its Android
                 // Auto, kept "connecting" for good: after a while Home says what to do. Only the

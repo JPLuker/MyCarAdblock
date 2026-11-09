@@ -3,6 +3,7 @@ package io.github.sirionero.mycar
 import android.content.Context
 import io.github.sirionero.mycar.stats.UsageStats
 import android.os.Build
+import android.os.SystemClock
 
 /**
  * The facts a bug report needs, gathered as a session runs and printed as one readable block
@@ -94,7 +95,75 @@ object SessionReport {
         headUnitInfo = null
         carScreen = ""; carDpi = 0
         headUnit = ""; profile = ""; video = ""; lastStream = ""; lastState = ""
+        lastFromCarAt = 0; wifiLostAt = 0; channelClosedAt = 0; gaveUpAfterS = -1
+        musicSeen = false; musicNow = false; musicLostAt = 0; ownScreenSince = 0; carState = null
+        endedAt = 0; musicOnBluetoothAtEnd = false
         printed = false
+    }
+
+    // How a wireless drive ended (SessionEnd), all on elapsedRealtime, 0 for "never".
+    @Volatile private var lastFromCarAt = 0L
+    @Volatile private var wifiLostAt = 0L
+    @Volatile private var channelClosedAt = 0L
+    @Volatile private var gaveUpAfterS = -1L
+    @Volatile private var musicSeen = false
+    @Volatile private var musicNow = false
+    @Volatile private var musicLostAt = 0L
+    @Volatile private var ownScreenSince = 0L
+    @Volatile private var carState: SessionEnd.CarState? = null
+    /** When the report was first printed, the session's end; and whether the drive's music was on Bluetooth then. */
+    @Volatile private var endedAt = 0L
+    @Volatile private var musicOnBluetoothAtEnd = false
+
+    /** The car pinged, or acked a video frame. */
+    fun heardFromCar(at: Long = SystemClock.elapsedRealtime()) { lastFromCarAt = at }
+
+    /** Android dropped the car's network under the session. */
+    fun carWifiLost(at: Long = SystemClock.elapsedRealtime()) { if (wifiLostAt == 0L) wifiLostAt = at }
+
+    /** The car closed its Bluetooth channel during the session. */
+    fun carChannelClosed(at: Long = SystemClock.elapsedRealtime()) { channelClosedAt = at }
+
+    /** myCar ended the session after [silentS] seconds of the car's silence. */
+    fun gaveUp(silentS: Long) { gaveUpAfterS = silentS }
+
+    /** Whether the phone has the car's Bluetooth music now (watched from the car's picture to the end). */
+    fun carMusicBluetooth(connected: Boolean, at: Long = SystemClock.elapsedRealtime()) {
+        if (connected) {
+            musicSeen = true
+            musicLostAt = 0
+        } else if (musicNow) {
+            musicLostAt = at
+        }
+        musicNow = connected
+    }
+
+    /** The car shows its own screen ([own]) or myCar's again. */
+    fun carOwnScreen(own: Boolean, at: Long = SystemClock.elapsedRealtime()) {
+        ownScreenSince = if (!own) 0L else ownScreenSince.takeIf { it != 0L } ?: at
+    }
+
+    /** The car's driving state, speed and gear, as it said last. */
+    internal fun car(state: SessionEnd.CarState) { carState = state }
+
+    private fun endFacts(): SessionEnd.Facts {
+        val ended = endedAt != 0L
+        return SessionEnd.Facts(
+            endedAt = if (ended) endedAt else SystemClock.elapsedRealtime(),
+            lastFromCarAt = lastFromCarAt.takeIf { it != 0L },
+            wifiLostAt = wifiLostAt.takeIf { it != 0L },
+            channelClosedAt = channelClosedAt.takeIf { it != 0L },
+            gaveUpAfterS = gaveUpAfterS.takeIf { it >= 0 },
+            music = when {
+                musicNow -> SessionEnd.Music.CONNECTED
+                musicSeen -> SessionEnd.Music.LOST
+                else -> SessionEnd.Music.NEVER
+            },
+            musicLostAt = musicLostAt.takeIf { it != 0L },
+            musicOnBluetooth = if (ended) musicOnBluetoothAtEnd else !io.github.sirionero.mycar.car.CarSettings.pipeAudio.value,
+            ownScreenSince = ownScreenSince.takeIf { it != 0L },
+            car = carState,
+        )
     }
 
     /** Moves the session's furthest stage on; never back. */
@@ -197,14 +266,20 @@ object SessionReport {
     /** The report as plain text, for the log file and for anything that gets sent. */
     fun render(): String {
         val seconds = if (startedAt == 0L) 0 else (System.currentTimeMillis() - startedAt) / 1000
-        fun row(name: String, value: String) = if (value.isEmpty()) "" else "  ${name.padEnd(16)}$value\n"
+        // Always a space after the label: "last stream stat" filled its 16 and ran into its value.
+        fun row(name: String, value: String) = if (value.isEmpty()) "" else "  ${name.padEnd(LABEL_WIDTH)} $value\n"
+        // A wireless drive that reached the car's screen: how it ended, from what the phone saw last.
+        val end = if (link == "wireless" && carScreen.isNotEmpty()) endFacts() else null
+        val result = if (category == Category.NONE) "ok / no failure recorded" else "FAILED - ${shown(category)}"
         return buildString {
             append("=".repeat(60)).append('\n')
             append("SESSION REPORT\n")
-            append(row("result", if (category == Category.NONE) "ok / no failure recorded" else "FAILED - ${shown(category)}"))
+            // Only the words: a transport that failed stays one for the usage note (print).
+            append(row("result", end?.takeIf { category == Category.USB }?.let { SessionEnd.result(it) } ?: result))
             append(row("detail", failure))
             append(row("failed in state", lastState))
             append(row("duration", "${seconds}s"))
+            end?.let { facts -> SessionEnd.rows(facts).forEach { (name, value) -> append(row(name, value)) } }
             append("\n")
             append(row("mycar", "$appVersion (code $appCode)"))
             append(row("phone", "${Build.MANUFACTURER} ${Build.MODEL}"))
@@ -231,6 +306,9 @@ object SessionReport {
     fun print() {
         if (printed || startedAt == 0L) return
         printed = true
+        // The session's end, for the report printed again later (a log shared): seconds since then stay.
+        endedAt = SystemClock.elapsedRealtime()
+        musicOnBluetoothAtEnd = !io.github.sirionero.mycar.car.CarSettings.pipeAudio.value
         render().lines().forEach { MyCarLog.i(it) }
         appContext?.let { context ->
             // Video started means the car showed myCar: that's a working car, and unplugging or
@@ -253,6 +331,9 @@ object SessionReport {
         }
         MyCarLog.flush()
     }
+
+    /** The longest label, "car Bluetooth audio". */
+    private const val LABEL_WIDTH = 19
 
     private fun authName(status: Int) = when (status) {
         0 -> "success"

@@ -239,14 +239,18 @@ object CarAudioRoute {
         val callback = object : AudioDeviceCallback() {
             override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>) {
                 _bluetoothOut.value = anyBluetoothOut()
+                SessionReport.carMusicBluetooth(bluetoothMusic())
             }
 
             override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>) {
                 _bluetoothOut.value = anyBluetoothOut()
+                SessionReport.carMusicBluetooth(bluetoothMusic())
             }
         }
         outputs = callback
         _bluetoothOut.value = anyBluetoothOut()
+        // For the session report's end: the car's Bluetooth music going is a car switching off.
+        SessionReport.carMusicBluetooth(bluetoothMusic())
         audio?.registerAudioDeviceCallback(callback, main)
     }
 
