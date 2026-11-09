@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
+import android.os.SystemClock
 import android.provider.Settings
 import android.view.MotionEvent
 import android.view.Surface
@@ -122,14 +123,19 @@ class MyCarActivity : ComponentActivity(), Projection {
 
     private val audioConsent = registerForActivityResult(StartActivityForResult()) { result ->
         questionUp = false
+        // How long the answer took: within a few hundred ms no window showed (Android allowed it for
+        // good, with the adb command in the help); seconds, the driver tapped Start.
+        val waited = audioAskedAt.takeIf { it > 0L }?.let { "${SystemClock.elapsedRealtime() - it} ms" } ?: "an unknown time"
+        audioAskedAt = 0L
         val data = result.data
         if (result.resultCode == RESULT_OK && data != null) {
+            MyCarLog.i("audio: Android said yes after $waited")
             // Answered after the car went away, or after the sound moved to Bluetooth: starting now
             // would mute the phone and send its music nowhere.
             if (CarAudio.stillWanted) AudioCaptureService.start(this, result.resultCode, data)
             else MyCarLog.i("audio: capture allowed, but the car no longer wants it")
         } else {
-            MyCarLog.w("audio: capture consent declined")
+            MyCarLog.w("audio: Android said no after $waited - capture consent declined")
             CarAudio.denied()
             // Only when the driver picked "through myCar" by hand. Automatic chose it because the car
             // takes no music over Bluetooth: offering Bluetooth would leave every drive silent.
@@ -495,9 +501,12 @@ class MyCarActivity : ComponentActivity(), Projection {
             manager.createScreenCaptureIntent()
         }
         questionUp = true
+        audioAskedAt = SystemClock.elapsedRealtime()
+        MyCarLog.i("audio: Android's question asked")
         runCatching { audioConsent.launch(intent) }
             .onFailure {
                 questionUp = false
+                audioAskedAt = 0L
                 MyCarLog.e("could not ask for audio capture", it)
                 CarAudio.denied()
             }
@@ -918,6 +927,9 @@ class MyCarActivity : ComponentActivity(), Projection {
 
 /** The myCar screen that holds the drive and myCar's hooks: a second one hands it its intent and goes. */
 private var current: java.lang.ref.WeakReference<MyCarActivity>? = null
+
+/** When Android's audio question went up (elapsed clock), for the line with its answer; 0 with none up. */
+private var audioAskedAt = 0L
 
 /**
  * The car came up over Bluetooth (WirelessAuto): straight to the myCar screen already open, in front
