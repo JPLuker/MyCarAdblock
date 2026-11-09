@@ -89,7 +89,6 @@ import io.github.sirionero.mycar.car.theme.LocalGsTheme
 import io.github.sirionero.mycar.media.CarMedia
 import io.github.sirionero.mycar.media.MediaArt
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
@@ -331,13 +330,6 @@ fun CarUi() {
                     )
                 }
                 val screen = navigator.current
-                // A call under way: its banner holds the top of the screen for the whole call, so the
-                // screens and a message's card move down under it instead of losing their Back, tabs
-                // and Stop to it. The map keeps the banner over it, as always.
-                val callActive = io.github.sirionero.mycar.call.CarCalls.state.collectAsState().value is io.github.sirionero.mycar.call.CallUiState.Active
-                var callBand by remember { mutableStateOf(0.dp) }
-                val callTop = if (callActive) callBand else 0.dp
-                val bandDensity = LocalDensity.current
                 // A page's dropdown belongs to the screen it was opened on.
                 LaunchedEffect(screen) { WebSelect.cancel() }
                 val safetyWarningSeen by CarSettings.hasSeenSafetyWarning.collectAsState()
@@ -355,9 +347,8 @@ fun CarUi() {
                     Box(Modifier.weight(1f).fillMaxHeight()) {
                         // Home never leaves the composition; other screens cover it. Dropping it
                         // would tear down the map's surface, and coming back would then show black
-                        // while the nav app redrew on a new one. Its driver's pages, not the map, move
-                        // down under a call's banner as the screens do.
-                        CompositionLocalProvider(LocalCallTop provides callTop) { CarHome() }
+                        // while the nav app redrew on a new one.
+                        CarHome()
                         if (screen != CarScreen.Home) {
                             // Each new screen settles in: a short fade and a slight grow, over an
                             // opaque background that's there at once, so the map never flashes
@@ -369,7 +360,6 @@ fun CarUi() {
                             Box(
                                 Modifier
                                     .fillMaxSize()
-                                    .padding(top = callTop)
                                     .background(MaterialTheme.colorScheme.background)
                                     // Keeps touches that miss this screen's controls off the map.
                                     .pointerInput(Unit) { detectTapGestures { } }
@@ -400,29 +390,33 @@ fun CarUi() {
                                     CarScreen.Dashboard -> CarDashboardScreen()
                                     CarScreen.Weather -> WeatherScreen()
                                     CarScreen.VehicleData -> VehicleDataScreen()
+                                    CarScreen.Jolly -> JollyScreen()
                                     is CarScreen.Notifications -> NotificationsScreen(screen.replyTo)
                                     is CarScreen.Messages -> MessagesScreen(screen.packageName)
                                     is CarScreen.App -> CarApps.find(screen.id)?.content?.invoke()
                                 }
                             }
                         }
+                        // A call under way: its pill over every screen, the map's included, until it ends; under
+                        // the toasts, the cards and the questions that come up over the screens.
+                        CallPill()
                         CarToastOverlay(Modifier.align(Alignment.BottomCenter))
-                        // A page's dropdown (see WebSelect): under a call's question, and its sheet under a call's banner.
-                        WebSelectSheet(Modifier.padding(top = callTop))
+                        // An app's alert (Waze: is the hazard still there?) across the top of any
+                        // screen, under a call's question, which comes first (a call under way is a pill).
+                        CarAlertOverlay(Modifier.align(Alignment.TopCenter))
+                        // A page's dropdown (see WebSelect): under a call's question.
+                        WebSelectSheet()
                         CallPromptOverlay()
                         BluetoothPairOverlay()
                         PopupTimer()
                         // The dashboard is already listing them, so it needs no popup.
                         NotificationPopup(
                             showNew = screen !is CarScreen.Notifications && screen != CarScreen.Dashboard,
-                            modifier = Modifier.align(Alignment.TopEnd).padding(top = callTop),
+                            modifier = Modifier.align(Alignment.TopEnd),
                         )
                         // Above the popup: a call is more urgent than any notification.
                         VoiceHelpOverlay(Modifier.align(Alignment.Center))
-                        CallOverlay(
-                            Modifier.align(Alignment.TopCenter)
-                                .onSizeChanged { callBand = with(bandDensity) { it.height.toDp() } },
-                        )
+                        CallOverlay()
                         AssistantOverlay(Modifier.align(Alignment.BottomCenter))
                         if (io.github.sirionero.mycar.BuildConfig.DEBUG) {
                             // Bottom corner, not top: a screen's own header almost always puts
@@ -442,13 +436,6 @@ fun CarUi() {
         }
     }
 }
-
-/**
- * How far a call's banner reaches down from the top of the screen beside the dock while a call is under
- * way (0 otherwise): what goes under it on Home - the driver's pages and their changing, not the map -
- * starts below it, as the other screens do.
- */
-internal val LocalCallTop = androidx.compose.runtime.compositionLocalOf { 0.dp }
 
 /**
  * A single blocking screen, shown once per install before anything else the car screen can show -

@@ -55,7 +55,7 @@ WAIT="-100,-100"       # a tap off the screen: only gives an app time before the
 
 # shoot <name> <width> <height> <dpi> <taps "x,y;x,y" in screen pixels> [command, run 5s in]
 # EXTRA adds intent extras for the preview activity; BEFORE is a command run just before it starts;
-# LOGTAGS, more log tags to keep besides myCar's.
+# LOGTAGS, more log tags to keep besides myCar's; KEEP_FILES keeps the shot before's files (its log).
 # ONLY (the workflow's "shots" input) names the shots to take, all of them when empty.
 shoot() {
     case " ${ONLY:-$1} " in *" $1 "*) ;; *) return ;; esac
@@ -65,7 +65,7 @@ shoot() {
     fi
     adb shell am force-stop "$PKG"
     for p in $VELA $PLANCIA $XONOS; do adb shell am force-stop "$p"; done
-    adb shell rm -rf "$FILES" 2>/dev/null
+    [ -n "${KEEP_FILES:-}" ] || adb shell rm -rf "$FILES" 2>/dev/null
     adb logcat -c
     # The log as it comes, kept only if the emulator is gone by the end of the shot.
     mkdir -p "previews/$1"
@@ -123,10 +123,13 @@ alive() {
 # ended - the signal, the crashing thread's frames - as a drive's log would after a crash.
 EXTRA="--ei crashAfterMs 5000" shoot last-exit-crash 800 480 160 "$WAIT;$WAIT;$WAIT"
 alive last-exit-crash
-shoot last-exit 800 480 160 "$WAIT"
+# The crashed shot's log stays (its pictures go): the new run also writes how it ended at its foot.
+KEEP_FILES=1 BEFORE="adb shell 'rm -f $FILES/preview-*.png'" shoot last-exit 800 480 160 "$WAIT"
 case " ${ONLY:-last-exit} " in *" last-exit "*)
     echo "--- last-exit: how the shot before ended, in myCar's log ---"
-    grep -h "last exit" previews/last-exit/log.txt 2>/dev/null | cut -c1-250 | head -50 || echo "last-exit: nothing" ;;
+    grep -h "last exit" previews/last-exit/log.txt 2>/dev/null | cut -c1-250 | head -50 || echo "last-exit: nothing"
+    echo "--- last-exit: the same at the foot of the crashed run's own log ---"
+    grep -h "Android ended this run" previews/last-exit/mycar-*.log 2>/dev/null | cut -c1-250 | head -5 || true ;;
 esac
 
 # The hunt for "LayoutNode should be attached to an owner": scripted shots, only when named (crash-*).
@@ -189,6 +192,35 @@ EXTRA="--ez demoSong true --es carScale 1.5" shoot mini-xl-800x480 800 480 160 "
 EXTRA="--ez demoSong true --es carTheme LIGHT" shoot mini-light 1920 720 240 "$WAIT;1866,54;$WAIT"
 EXTRA="--ez demoSong true --es miniAt 0.5,0" shoot mini-kept 1920 720 240 "$WAIT;1866,54;$WAIT"
 EXTRA="--ez demoSong true --ez miniPlayer false" shoot mini-off 1920 720 240 "$WAIT;1866,54;$WAIT"
+# The video cover (car/VideoCover.kt): the made-up song with a fake Canvas from the runner (10.0.2.2:8003,
+# a 4 s looping 9:16 video made with ffmpeg), as if the car's music had video covers (--es videoCover,
+# debug only), so the button on the cover shows (top left). Off, then tapped on: the video fades in over
+# the cover and loops (shot every 2.5 s); then the player's X: the mini player over the map keeps the still
+# cover. The same at 800x480. On from the start (--ez videoCoverOn true) with the car moving (--ez moving
+# true): it plays all the same; the button then turns it off, back to the still cover. And Spotify Web as the
+# drive's music, its column kept while it starts: the button there too, for the real service.
+VIDEO_COVER=/tmp/video-cover
+if [ -z "${ONLY:-}" ] || [[ " $ONLY " == *" video-cover"* ]]; then
+    mkdir -p "$VIDEO_COVER"
+    docker run --rm -v "$VIDEO_COVER":/out --entrypoint /ffmpeg mwader/static-ffmpeg:7.1 -loglevel error -y \
+        -f lavfi -i "testsrc2=size=720x1280:rate=30:duration=4" -an -c:v libx264 -pix_fmt yuv420p -movflags +faststart \
+        /out/canvas.mp4 || echo "video cover: no test video"
+    python3 -m http.server 8003 --bind 127.0.0.1 --directory "$VIDEO_COVER" > /tmp/video-cover.txt 2>&1 &
+    # Whether Spotify's web player still does what the page's script relies on for its Canvas (the runner
+    # reaches open.spotify.com, the cloud session can't): facts in the job's log, for when Spotify changes.
+    echo "--- Spotify's Canvas in its web player today ---"
+    timeout 180 python3 .github/spotify-canvas.py 2>&1 | head -20 || true
+fi
+CANVAS="--ez demoSong true --es videoCover http://10.0.2.2:8003/canvas.mp4"
+EXTRA="$CANVAS" shoot video-cover 1920 720 240 "$WAIT;$WAIT;1405,54;$WAIT;$WAIT;1866,54;$WAIT"
+EXTRA="$CANVAS" shoot video-cover-800x480 800 480 160 "$WAIT;$WAIT;612,36;$WAIT;$WAIT;764,36;$WAIT"
+EXTRA="$CANVAS --ez videoCoverOn true --ez moving true" shoot video-cover-moving 1920 720 240 "$WAIT;$WAIT;$WAIT;1405,54;$WAIT"
+EXTRA="--es webMusic spotify --ez webMusicKey false" shoot video-cover-spotify 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT"
+case " ${ONLY:-video-cover} " in *" video-cover"*)
+    echo "--- video cover ---"
+    grep -h "video cover\|preview: demo" previews/video-cover*/log.txt previews/video-cover*/stream.txt 2>/dev/null | cut -c1-300 | head -30 || true
+    grep -h "GET" /tmp/video-cover.txt 2>/dev/null | head -10 || echo "video cover: nothing asked of the runner" ;;
+esac
 # Hiding an app from the grid: a long press on the browser for its menu, then "Hide from the app
 # grid" (the fourth button of the card in the middle of the screen), the grid without it and the
 # car saying where it comes back from. Then the settings' hidden apps, with the browser hidden.
@@ -219,6 +251,31 @@ for layout in full half-quarters quarters-half strip-quarters quarters-strip; do
     EXTRA="--es pageLayout $layout" shoot "layout-$layout" 1920 720 240 "$WAIT;$DOCK_MAP;966,675;$WAIT;$WAIT"
 done
 EXTRA="--es pageLayout half-quarters" shoot layout-800x480 800 480 160 "48,116;404,450;$WAIT"
+
+# An upright car screen, as some cars have: Home, then the app grid and the dashboard; Home with the
+# made-up song beside the real map, over 15s; Home's pages, left of the map and then right of it.
+# At 720x1280 (160 dpi) and 1080x1920 (320 dpi); "portrait" in the workflow's shots takes them all.
+# The taps are worked out in dp, as myCar lays the screen out, and give the 800x480 and 1920x720 taps
+# above too: the dock 96 wide on the left, its clock 44 from the top, its map 116, the grid button 44
+# from the bottom; the page dots 30 from the bottom, 44 apart around the middle of what's right of the
+# dock, the map's dot in the middle. Each shot starts with a wait, as the first frames are slower here.
+dp_at() { echo "$(($2 * $1 / 160)),$(($3 * $1 / 160))"; }   # dp_at <dpi> <x> <y>: "x,y" in pixels
+portrait() {   # portrait <width> <height> <dpi>
+    local w=$1 h=$2 dpi=$3
+    local size=${w}x$h high=$((h * 160 / dpi)) mid=$((96 + (w * 160 / dpi - 96) / 2))
+    local clock map grid left right
+    clock=$(dp_at "$dpi" 48 44)
+    map=$(dp_at "$dpi" 48 116)
+    grid=$(dp_at "$dpi" 48 $((high - 44)))
+    left=$(dp_at "$dpi" $((mid - 44)) $((high - 30)))
+    right=$(dp_at "$dpi" $((mid + 44)) $((high - 30)))
+    case " ${ONLY:-} " in *" portrait "*) ONLY="$ONLY portrait-$size portrait-split-$size portrait-pages-$size" ;; esac
+    shoot "portrait-$size" "$w" "$h" "$dpi" "$WAIT;$WAIT;$WAIT;$grid;$clock"
+    EXTRA="--ez demoSong true" shoot "portrait-split-$size" "$w" "$h" "$dpi" "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+    shoot "portrait-pages-$size" "$w" "$h" "$dpi" "$WAIT;$map;$left;$WAIT;$map;$right;$WAIT;$WAIT"
+}
+portrait 720 1280 160
+portrait 1080 1920 320
 
 # Plancia inside myCar, on the run's own Home Assistant (.github/home-assistant.sh), which the
 # emulator reaches at 10.0.2.2: full screen from the grid, where the Plancia app was, then its
@@ -546,6 +603,18 @@ EXTRA="--ez wallpapers true" shoot wallpapers 1920 720 240 "$WAIT;$WAIT"
 EXTRA="--ez player true" shoot player 1920 720 240 "$WAIT"
 EXTRA="--ez player true" shoot player-800x480 800 480 160 "$WAIT"
 
+# An app's alert across the top of the car's screen (CarAlerts; --ez alert true puts up one like
+# Waze's question about a hazard, 12 s long, with a blue button and a neutral one). At 1920x720
+# "Still there" is tapped, at 800x480 its time runs out, and once with the light theme. The log
+# says what the app was told.
+EXTRA="--ez alert true" shoot alert 1920 720 240 "$WAIT;800,200;$WAIT"
+EXTRA="--ez alert true" shoot alert-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez alert true --es carTheme LIGHT" shoot alert-light 1920 720 240 "$WAIT"
+case " ${ONLY:-alert} " in *" alert "*|*" alert-800x480 "*)
+    echo "--- alert: the button tapped and the time run out, as the app was told ---"
+    grep -h "alert" previews/alert/log.txt previews/alert-800x480/log.txt 2>/dev/null | cut -c1-200 | head -20 || echo "alert: nothing" ;;
+esac
+
 # An incoming call from an unknown number, rung on the emulator's modem once the car UI is up.
 shoot call 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT" "adb emu gsm call 3331234567"
 adb emu gsm cancel 3331234567
@@ -572,6 +641,156 @@ case " ${ONLY:-phone-recents} " in *" phone-recents "*)
     shoot phone-recents 1920 720 240 "$GRID_BUTTON;$(at phone);$WAIT"
     ;;
 esac
+
+# The Jolly key (car/Jolly*.kt), in the dock just above the microphone: 296 dp down (184 dp from the
+# bottom), the microphone 70 dp under it. "jolly" in the workflow's shots takes them all.
+# - jolly-800x480: Home with the key and two slots above it (the user's Golf), then a tap: its command
+#   "what time is it" as if said - the assistant shows it and answers; then held: the chooser, its kinds
+#   in two rows.
+# - jolly-1920x720: nothing chosen yet, so the tap opens the chooser.
+# - jolly-choose: the chooser from a long press ("Assistant command" lit, what the key does now), that
+#   kind's list (the key's own command, then the ready-made ones), "Read my messages" chosen: back
+#   Home with the car saying what the key does now.
+# - jolly-say-it: a command written in Italian, myCar in English: understood and answered in Italian.
+# - jolly-light: Home and the chooser in the light theme.
+# - jolly-large-800x480 / jolly-xl-800x480: Large keeps the key and one slot (the map); at Extra large
+#   there's no room for both, and the map keeps its place.
+# - jolly-ai, jolly-apps, jolly-contacts: the lists of assistants, apps and contacts (two contacts written
+#   as root, one with two numbers: tapped, its numbers).
+# - jolly-navigate: the key set to a place (the Castello Sforzesco): the map on Home (Vela) takes it, as
+#   it takes the assistant's "navigate to".
+# - jolly-it-800x480, jolly-de, jolly-en-XP: the chooser in Italian at 800x480, in German, in pirate speak;
+#   jolly-ru-800x480, jolly-el-800x480, jolly-pt-XP-800x480: where the names of the kinds are longest.
+# - jolly-settings: the car settings' rows on their own (--ez jollySettings true).
+# - jolly-phone: on the phone, Settings > Car screen: the section, the kinds, a ready-made command picked
+#   and saved, a place written with the phone's keyboard and saved, the contacts (after jolly-contacts)
+#   and a number chosen.
+JOLLY_KEY="72,444"         # at 1920x720
+JOLLY_KEY_800="48,296"
+JOLLY_TILE_CALL="314,222"  # the kinds, one row at 1920x720
+JOLLY_TILE_AI="601,222"
+JOLLY_TILE_HOME="888,222"
+JOLLY_TILE_SAY="1462,222"
+JOLLY_TILE_APP="1749,222"
+JOLLY_ROW_1="1032,186"     # the lines of a kind's list, 80 dp apart
+JOLLY_ROW_2="1032,306"
+case " ${ONLY:-} " in *" jolly "*)
+    ONLY="$ONLY jolly-800x480 jolly-1920x720 jolly-choose jolly-say-it jolly-light jolly-large-800x480 jolly-xl-800x480"
+    ONLY="$ONLY jolly-ai jolly-navigate jolly-apps jolly-contacts jolly-home jolly-unlock jolly-it-800x480 jolly-de jolly-en-XP"
+    ONLY="$ONLY jolly-settings jolly-phone jolly-ru-800x480 jolly-el-800x480 jolly-pt-XP-800x480" ;;
+esac
+EXTRA="--es jolly say" shoot jolly-800x480 800 480 160 "$WAIT;$JOLLY_KEY_800;$WAIT;$WAIT;$JOLLY_KEY_800,long;$WAIT"
+shoot jolly-1920x720 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT"
+EXTRA="--es jolly say" shoot jolly-choose 1920 720 240 "$WAIT;$JOLLY_KEY,long;$JOLLY_TILE_SAY;$JOLLY_ROW_2;$WAIT"
+EXTRA="--es jolly say --es jollySay 'che ore sono' --es jollyLang it" shoot jolly-say-it 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT;$WAIT"
+EXTRA="--es jolly say --es carTheme LIGHT" shoot jolly-light 1920 720 240 "$WAIT;$JOLLY_KEY,long;$WAIT"
+EXTRA="--es jolly say --es carScale 1.25" shoot jolly-large-800x480 800 480 160 "$WAIT"
+EXTRA="--es jolly say --es carScale 1.5" shoot jolly-xl-800x480 800 480 160 "$WAIT"
+shoot jolly-ai 1920 720 240 "$WAIT;$JOLLY_KEY;$JOLLY_TILE_AI;$WAIT"
+installed $VELA && EXTRA="--es jolly navigate" shoot jolly-navigate 1920 720 240 "$WAIT;$WAIT;$JOLLY_KEY;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez jollySettings true --es jolly call" shoot jolly-settings 1920 720 240 "$WAIT"
+jolly_lang() {  # jolly_lang <shot> <locale> <width> <height> <dpi> <the key>: the chooser in that language
+    case " ${ONLY:-$1} " in *" $1 "*) ;; *) return ;; esac
+    BEFORE="adb shell cmd locale set-app-locales $PKG --locales $2" EXTRA="--es jolly say" \
+        shoot "$1" "$3" "$4" "$5" "$WAIT;$6,long;$WAIT"
+    adb shell cmd locale set-app-locales "$PKG" --locales en-US
+}
+jolly_lang jolly-it-800x480 it 800 480 160 "$JOLLY_KEY_800"
+jolly_lang jolly-de de 1920 720 240 "$JOLLY_KEY"
+jolly_lang jolly-en-XP en-XP 1920 720 240 "$JOLLY_KEY"
+jolly_lang jolly-ru-800x480 ru 800 480 160 "$JOLLY_KEY_800"
+jolly_lang jolly-el-800x480 el 800 480 160 "$JOLLY_KEY_800"
+jolly_lang jolly-pt-XP-800x480 pt-XP 800 480 160 "$JOLLY_KEY_800"
+shoot jolly-apps 1920 720 240 "$WAIT;$JOLLY_KEY;$JOLLY_TILE_APP;$WAIT"
+case " ${ONLY:-jolly-contacts} " in *" jolly-contacts "*)
+    if adb root >/dev/null 2>&1; then
+        sleep 3; adb wait-for-device
+        contact() {  # <name> <number> [number]: the first a mobile number, the second a work one
+            adb shell "content insert --uri content://com.android.contacts/raw_contacts --bind account_type:n: --bind account_name:n:"
+            local id type=2 number name=$1
+            id=$(adb shell "content query --uri content://com.android.contacts/raw_contacts --projection _id" | tr -d '\r' | sed -n 's/.*_id=\([0-9]*\).*/\1/p' | sort -n | tail -1)
+            adb shell "content insert --uri content://com.android.contacts/data --bind raw_contact_id:i:$id --bind mimetype:s:vnd.android.cursor.item/name --bind data1:s:'$name'"
+            shift
+            for number in "$@"; do
+                adb shell "content insert --uri content://com.android.contacts/data --bind raw_contact_id:i:$id --bind mimetype:s:vnd.android.cursor.item/phone_v2 --bind data1:s:$number --bind data2:i:$type"
+                type=3
+            done
+        }
+        contact "Anna Verdi" 3335550101 0255501010
+        contact "Bruno Neri" 3475550202
+        adb unroot >/dev/null 2>&1; sleep 3; adb wait-for-device
+    fi
+    shoot jolly-contacts 1920 720 240 "$WAIT;$JOLLY_KEY;$JOLLY_TILE_CALL;$JOLLY_ROW_1;$WAIT"
+    ;;
+esac
+# With the run's own Home Assistant: a script, a button and a switch of its own (made here, as the
+# install has none), then the chooser's Home Assistant list from the drive's connection, the script
+# chosen, and the key running it ("Jolly test: done"). Then a lock that isn't there: the first tap
+# asks for a second, the second one goes - and Home Assistant says no.
+if [ -n "${HA_TOKEN:-}" ]; then
+    case " ${ONLY:-jolly-home} " in *" jolly-home "*)
+        curl -sf -X POST "http://localhost:8123/api/config/script/config/jolly_test" -H "Authorization: Bearer $HA_TOKEN" \
+            -H 'Content-Type: application/json' -d '{"alias":"Jolly test","sequence":[{"delay":{"seconds":1}}]}' >/dev/null ||
+            echo "jolly: no script made"
+        python3 - "$HA_TOKEN" <<'HELPERS' || echo "jolly: no helpers made"
+import json, sys
+import websocket
+
+ws = websocket.create_connection("ws://localhost:8123/api/websocket")
+ws.recv()
+ws.send(json.dumps({"type": "auth", "access_token": sys.argv[1]}))
+ws.recv()
+for i, (kind, name) in enumerate([("input_button", "Garage"), ("input_boolean", "Porch light")], start=1):
+    ws.send(json.dumps({"id": i, "type": f"{kind}/create", "name": name}))
+    print("jolly:", kind, json.loads(ws.recv()).get("success"))
+HELPERS
+        ;;
+    esac
+    HA="--es haUrl http://10.0.2.2:8123 --es haToken $HA_TOKEN"
+    EXTRA="$HA" shoot jolly-home 1920 720 240 "$WAIT;$WAIT;$JOLLY_KEY;$JOLLY_TILE_HOME;$JOLLY_ROW_1;$JOLLY_KEY;$WAIT"
+    EXTRA="$HA --es jolly unlock" shoot jolly-unlock 1920 720 240 "$WAIT;$WAIT;$JOLLY_KEY;$JOLLY_KEY;$WAIT"
+    case " ${ONLY:-jolly-home} " in *" jolly-home "*)
+        echo "--- the Jolly key and Home Assistant ---"
+        grep -h "jolly\|plancia: connected" previews/jolly-home/log.txt previews/jolly-unlock/log.txt 2>/dev/null || echo "jolly-home: nothing in the log" ;;
+    esac
+else
+    echo "--- no Home Assistant: the Jolly key's Home Assistant shots left out ---"
+fi
+case " ${ONLY:-jolly-800x480} " in *" jolly-800x480 "*)
+    echo "--- the Jolly key ---"
+    grep -h "jolly\|assistant: a written" previews/jolly-*/log.txt 2>/dev/null | head -60 || echo "jolly: nothing in the log" ;;
+esac
+
+# A call under way (car/CallPill.kt): its pill over every screen until it ends, a call picked up 1:23 ago
+# with no modem behind it (--ez fakeCall true, debug only). Over the map, the app grid and the car's
+# Settings, each given a wait (the emulator draws a new screen slowly); held and dragged to the bottom
+# left, where it stays; a tap on it opens the Phone. At 800x480, Normal and Extra large (drawn smaller);
+# light. Over the mini player: the column's X brings it out, the pill dragged onto its corner moves it up,
+# and the pill dragged away lets it back. Then the emulator's modem rings, myCar's Answer takes the call
+# (the pill), and the pill's red button ends it. "call-bubble" in the workflow's shots takes them all.
+# At 1920x720 (240 dpi) the pill starts 810-1254 px across, 18-114 down.
+case " ${ONLY:-} " in *" call-bubble "*)
+    ONLY="$ONLY call-bubble-800x480 call-bubble-xl-800x480 call-bubble-light call-bubble-mini call-bubble-knob call-answer" ;;
+esac
+EXTRA="--ez fakeCall true" shoot call-bubble 1920 720 240 \
+    "$WAIT;$GRID_BUTTON;$WAIT;$(at settings);$WAIT;900,66,drag,400,640;$WAIT;450,640;$WAIT"
+EXTRA="--ez fakeCall true" shoot call-bubble-800x480 800 480 160 "$WAIT;48,436;$WAIT"
+EXTRA="--ez fakeCall true --es carScale 1.5" shoot call-bubble-xl-800x480 800 480 160 "$WAIT;72,414;$WAIT"
+EXTRA="--ez fakeCall true --es carTheme LIGHT" shoot call-bubble-light 1920 720 240 "$WAIT;$GRID_BUTTON;$WAIT;$(at settings);$WAIT"
+EXTRA="--ez fakeCall true --ez demoSong true" shoot call-bubble-mini 1920 720 240 \
+    "$WAIT;1866,54;$WAIT;900,66,drag,1700,700;$WAIT;1550,654,drag,900,300;$WAIT"
+# The car's knob (a script, see PreviewScript: knob:n turns it, knob:ok presses it). Its first turn puts the
+# focus on Home (the weather of the page left of the map), the next one back on the dock's foot; back
+# along the dock (mic, the Jolly key, map, clock) and round past its top, the last thing on the screen:
+# the pill's red button, at the seventh turn (a picture after each). Pressed, it ends the call ("calls:
+# there was no call to end", for the made-up one). Seen (0.7.4): the ring on the red button, then on the
+# rest of the pill.
+EXTRA="--ez fakeCall true --es script 'wait:7000;knob:-1;wait:600;knob:-1;wait:600;rep:5;knob:-1;wait:700;snap:;end;knob:ok;wait:1500;snap:pressed'" \
+    shoot call-bubble-knob 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+# The ringing card's Answer is 1068-1176 px across, 444-579 down (with or without its Bluetooth line);
+# the pill's red button 1158-1254 across.
+shoot call-answer 1920 720 240 "$WAIT;$WAIT;1122,510;$WAIT;$WAIT;1206,66;$WAIT;$WAIT" "adb emu gsm call 3339876543"
+adb emu gsm cancel 3339876543 >/dev/null 2>&1
 
 # The dock's microphone with "Phone's assistant" chosen: myCar should wake the phone's assistant
 # as the swipe up from a bottom corner does, through SystemUI. First with the Settings app standing
@@ -901,6 +1120,15 @@ scroll_to() {
     done
     echo "setup-phone: $1 never came into sight"; return 1
 }
+# The same, back up the list.
+scroll_back_to() {
+    local i
+    for i in 1 2 3 4 5 6 7 8; do
+        has_text "$1" && return 0
+        adb shell input swipe 160 260 160 380 400; sleep 1
+    done
+    echo "setup-phone: $1 never came back into sight"; return 1
+}
 # The phone's Settings: the car preview first at the top (opened, and back), then "Car screen" - the
 # car's settings on the phone - with a choice's dialog, a page of Home opened out with its layouts
 # and what a part can show, the rest of the group scrolled through, and the voice assistant in
@@ -949,6 +1177,40 @@ phone_settings() {
     grep -h "FATAL\|AndroidRuntime" $d/crash.txt || echo "phone-settings: no crash"
 }
 phone_settings
+
+# The Jolly key on the phone (ui/JollySettings.kt), in Settings > Car screen: its section, the kinds, a
+# ready-made command picked and saved, a place written with the phone's keyboard and saved, a contact's
+# number. Here, after the helpers above it and before setup-phone, which wipes myCar's data.
+phone_jolly() {
+    case " ${ONLY:-jolly-phone} " in *" jolly-phone "*) ;; *) return ;; esac
+    local d=previews/jolly-phone
+    mkdir -p $d
+    adb shell am force-stop "$PKG"
+    adb logcat -c
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen settings >/dev/null
+    sleep 4
+    tap_text "Car screen"; sleep 3
+    scroll_to "What it does"; sleep 1; adb exec-out screencap -p > $d/01-section.png
+    tap_text "What it does"; sleep 1.5; adb exec-out screencap -p > $d/02-kinds.png
+    tap_text "Assistant command"; sleep 1.5; adb exec-out screencap -p > $d/03-command.png
+    tap_text "Read my messages"; sleep 1; adb exec-out screencap -p > $d/04-command-picked.png
+    tap_text "Save"; sleep 1.5; adb exec-out screencap -p > $d/05-saved.png
+    tap_text "What it does"; sleep 1.5
+    tap_text "Go to a place"; sleep 1.5; adb exec-out screencap -p > $d/06-place.png
+    tap_match 'class="android.widget.EditText"'; sleep 1
+    adb shell input text "Piazza%sdel%sDuomo%s1"; sleep 1; adb exec-out screencap -p > $d/07-place-written.png
+    tap_text "Save"; sleep 1.5; adb exec-out screencap -p > $d/08-place-saved.png
+    # The contacts (those jolly-contacts wrote, when it ran before), one with two numbers.
+    tap_text "What it does"; sleep 1.5
+    tap_text "Call a contact"; sleep 2; adb exec-out screencap -p > $d/09-contacts.png
+    tap_text "Anna Verdi"; sleep 1.5; adb exec-out screencap -p > $d/10-numbers.png
+    tap_text "Mobile"; sleep 1.5; adb exec-out screencap -p > $d/11-call-saved.png
+    adb logcat -d -s myCar > $d/log.txt
+    adb logcat -d -b crash > $d/crash.txt 2>&1
+    echo "--- the Jolly key on the phone ---"
+    grep -h "FATAL\|AndroidRuntime" $d/crash.txt || echo "jolly-phone: no crash"
+}
+phone_jolly
 
 # Music on the phone (ui/MusicSettings.kt): Xonos's switch and settings, Spotify turned on (its
 # sign-in on the phone, the page in myCar's own web engine), "Add a service" with Deezer ticked.
@@ -1022,6 +1284,45 @@ phone_music() {
 }
 phone_music
 
+# Home's card when the phone charges from a USB port and no car comes (ui/ChargingNoCarCard.kt):
+# the emulator's battery set to charge from USB, no card at first, the card after the 20 s wait
+# (scrolled into sight), gone once "unplugged". --ez graphene true (debug only) adds GrapheneOS's
+# USB-C lines, here and in How to connect, whose step is shot too. Before setup-phone, which wipes
+# myCar's data.
+charging_no_car() {
+    case " ${ONLY:-charging-no-car} " in *" charging-no-car "*) ;; *) return ;; esac
+    local d=previews/charging-no-car
+    mkdir -p $d
+    adb shell am force-stop "$PKG"
+    adb logcat -c
+    adb shell dumpsys battery unplug
+    adb shell dumpsys battery set usb 1
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen home --ez graphene true >/dev/null
+    sleep 5; adb exec-out screencap -p > $d/01-plugged.png
+    sleep 20; adb exec-out screencap -p > $d/02-after-20s.png
+    # Home scrolls only above its bottom card (What's new, How to connect): the swipe starts on the
+    # status card, inside the part that scrolls.
+    adb shell input swipe 160 420 160 120 400; sleep 1.5; adb exec-out screencap -p > $d/03-card.png
+    adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1
+    adb shell cat /sdcard/ui.xml | grep -qF "The phone is charging" && echo "charging-no-car: card shown" || echo "charging-no-car: no card"
+    adb shell dumpsys battery set usb 0
+    sleep 3; adb exec-out screencap -p > $d/04-unplugged.png
+    adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1
+    adb shell cat /sdcard/ui.xml | grep -qF "The phone is charging" && echo "charging-no-car: card still there unplugged" || echo "charging-no-car: gone unplugged"
+    adb shell dumpsys battery reset
+    adb shell am force-stop "$PKG"
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen help --ez graphene true >/dev/null
+    sleep 4
+    scroll_to "On GrapheneOS, let the USB-C port carry data." && adb exec-out screencap -p > $d/05-help.png
+    adb shell input swipe 160 520 160 220 400; sleep 1.5; adb exec-out screencap -p > $d/06-help.png
+    adb logcat -d -s myCar > $d/log.txt
+    adb logcat -d -b crash > $d/crash.txt 2>&1
+    echo "--- charging, no car ---"
+    grep -h "home: charging" $d/log.txt || echo "charging-no-car: nothing in the log"
+    grep -h "FATAL\|AndroidRuntime" $d/crash.txt || echo "charging-no-car: no crash"
+}
+charging_no_car
+
 setup_phone() {
     case " ${ONLY:-setup-phone} " in *" setup-phone "*) ;; *) return ;; esac
     local d=previews/setup-phone i
@@ -1048,6 +1349,15 @@ setup_phone() {
         tap_match "permission_allow_foreground_only_button" || tap_match "permission_allow_button" || break
     done
     sleep 3; adb exec-out screencap -p > $d/04-after-allow.png
+    # Car audio, with the drive's steps: each way with what it means at every drive, and through
+    # myCar the command that stops Android's question. Then Automatic again, the default.
+    if scroll_to "Car audio"; then
+        adb exec-out screencap -p > $d/04b-audio.png
+        scroll_to "Through myCar" && tap_text "Through myCar"; sleep 1.5
+        adb exec-out screencap -p > $d/04c-audio-mycar.png
+        scroll_to "Tap to copy" && adb exec-out screencap -p > $d/04d-audio-command.png
+        scroll_back_to "Automatic" && tap_text "Automatic"; sleep 1
+    fi
     tap_text "Done"; sleep 3; adb exec-out screencap -p > $d/05-home.png
     tap_text "How to connect"; sleep 3; adb exec-out screencap -p > $d/06-help.png
     tap_text "Take me back to the initial setup"; sleep 3; adb exec-out screencap -p > $d/07-return.png

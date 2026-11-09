@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">Ενεργοποίηση εξωφύλλου βίντεο</string>
+    <string name="car_player_video_cover_off">Απενεργοποίηση εξωφύλλου βίντεο</string>
+    <string name="car_player_video_cover_now_on">Εξώφυλλο βίντεο ενεργό, για τα τραγούδια που έχουν</string>
+    <string name="car_player_video_cover_now_off">Σταθερό εξώφυλλο</string>
+    <string name="car_settings_cover">Εξώφυλλο στο πρόγραμμα αναπαραγωγής</string>
+    <string name="car_settings_cover_still">Σταθερό</string>
+    <string name="car_settings_cover_video">Βίντεο</string>
+    <string name="car_settings_cover_note">Ορισμένα τραγούδια έχουν ένα σύντομο βίντεο σε επανάληψη, όπως τα Canvas του Spotify. Με την επιλογή Βίντεο, το πρόγραμμα αναπαραγωγής δίπλα στον χάρτη το δείχνει στη θέση του εξωφύλλου. Το αλλάζει και το κουμπί πάνω στο εξώφυλλο.</string>
+    <string name="music_video_cover">Εξώφυλλο βίντεο</string>
+    <string name="music_video_cover_detail">Στο πρόγραμμα αναπαραγωγής του αυτοκινήτου δίπλα στον χάρτη, το σύντομο βίντεο σε επανάληψη που έχουν ορισμένα τραγούδια (τα Canvas του Spotify), στη θέση του εξωφύλλου. Το αλλάζει και το κουμπί πάνω στο εξώφυλλο στο αυτοκίνητο. Κάθε βίντεο χρησιμοποιεί λίγα megabyte δεδομένων.</string>
+</resources>

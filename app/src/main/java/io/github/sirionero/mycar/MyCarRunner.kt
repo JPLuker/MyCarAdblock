@@ -6,6 +6,8 @@ import io.github.sirionero.mycar.audio.AudioLink
 import io.github.sirionero.mycar.audio.CarAudio
 import io.github.sirionero.mycar.audio.CarAudioRoute
 import io.github.sirionero.mycar.audio.CarMic
+import io.github.sirionero.mycar.audio.CarSource
+import io.github.sirionero.mycar.audio.FocusAnswers
 import io.github.sirionero.mycar.media.CarMediaStatus
 import io.github.sirionero.mycar.car.BluetoothAudioCheck
 import io.github.sirionero.mycar.car.LocationCheck
@@ -55,6 +57,8 @@ class MyCarRunner(
     private val closeTransport: (() -> Unit)? = null,
     /** Whether a car accepted this certificate before (see [CertRotation.acceptedBefore]). */
     private val certAcceptedBefore: (CertProvider.Identity) -> Boolean = { false },
+    /** myCar's icon as 32, 64 and 128 px PNGs, for a car on protocol 1.0 or 1.1 ([DiscoveryRequest], [PhoneIcons]). */
+    private val phoneIcons: () -> List<ByteArray> = { emptyList() },
 ) {
     private val log = MyCarLog.tagged("PROTO")
 
@@ -217,10 +221,11 @@ class MyCarRunner(
         closeTransport?.let { runCatching { it() } }
     }
 
-    /** The car went quiet: the session ends as if it had closed the connection. */
-    private fun giveUp(why: String) {
+    /** The car went quiet: the session ends as if it had closed the connection. [silentS]: after a drive's silence, for the report. */
+    private fun giveUp(why: String, silentS: Long? = null) {
         if (gaveUp) return
         gaveUp = true
+        silentS?.let { SessionReport.gaveUp(it) }
         log.w("$why - ending the session")
         closeTransport?.let { runCatching { it() } }
     }
@@ -299,7 +304,8 @@ class MyCarRunner(
             MSG_SERVICE_DISCOVERY_RESPONSE -> onServiceDiscoveryResponse(body)
             MSG_PING_REQUEST -> onPingRequest(body)
             MSG_BYEBYE_REQUEST -> onByeByeRequest(body)
-            AudioLink.MSG_FOCUS_RESPONSE -> audioLink?.onFocus(Protobuf.readInt32Field(body, 1) ?: 0)
+            // One answer for both sinks: the directions' while they wait on one (see FocusAnswers).
+            AudioLink.MSG_FOCUS_RESPONSE -> FocusAnswers.route(Protobuf.readInt32Field(body, 1) ?: 0, audioLink, guidanceLink)
             // The car saying it didn't like something it got: its name in the log, the session goes on.
             MSG_UNEXPECTED_MESSAGE -> log.w("<- the head unit reports an unexpected message from the phone - continuing")
             MSG_FRAMING_ERROR -> log.w("<- the head unit reports a framing error - continuing")
@@ -349,6 +355,8 @@ class MyCarRunner(
         val minor = ((body[2].toInt() and 0xFF) shl 8) or (body[3].toInt() and 0xFF)
         log.i("<- VersionRequest: head unit speaks $major.$minor")
         SessionReport.protocolVersion(major, minor)
+        carMajor = major
+        carMinor = minor
 
         // Always 1.3, on purpose. Every car that accepts myCar was tested this way, 1.5 units
         // included. Echoing the car's own version was tried too: a 4.3 unit rejected the
@@ -498,11 +506,22 @@ class MyCarRunner(
         runCatching { onCertVerdict(identity, v) }.onFailure { log.e("the certificate's verdict went unhandled", it) }
     }
 
+    /** The protocol version the car's VersionRequest named, for [sendServiceDiscoveryRequest]. */
+    private var carMajor = 0
+    private var carMinor = 0
+
     private fun sendServiceDiscoveryRequest() {
-        val body = Protobuf.stringField(4, "myCar") + // label_text
-            Protobuf.stringField(5, Build.MODEL)        // device_name
+        // A car on 1.0 or 1.1 also gets myCar's icon and an id for this connection, as a phone with
+        // Android Auto sends them: without, it never answered. Every other car, the same as ever.
+        val old = DiscoveryRequest.wantsIcons(carMajor, carMinor)
+        val icons = if (old) runCatching(phoneIcons).getOrDefault(emptyList()) else emptyList()
+        val id = if (old) java.util.UUID.randomUUID().toString() else null
+        val body = DiscoveryRequest.body("myCar", Build.MODEL, icons, id)
         send(MSG_SERVICE_DISCOVERY_REQUEST, body, encrypted = true)
-        log.i("-> ServiceDiscoveryRequest (encrypted)")
+        log.i(
+            "-> ServiceDiscoveryRequest (encrypted)" +
+                if (old) ", with ${icons.size} icons and an id for this connection, for a car on $carMajor.$carMinor (${body.size} bytes)" else "",
+        )
     }
 
     private fun onServiceDiscoveryResponse(body: ByteArray) {
@@ -566,8 +585,11 @@ class MyCarRunner(
         video.configs.forEachIndexed { index, config ->
             log.i("  config[$index] = $config")
         }
-        if (video.codecType != CODEC_H264_BP) {
-            log.w("head unit wants ${video.codecName}, not H264_BP - Phase B must match this")
+        // Some units say the codec in each configuration (field 10) and not for the service.
+        val configCodecs = video.configCodecNames
+        if (configCodecs.isNotEmpty()) log.i("video: the configurations' codec: ${configCodecs.joinToString()}")
+        if (!video.saysH264Bp) {
+            log.w("head unit names ${video.codecName}${if (configCodecs.isNotEmpty()) " (configurations: ${configCodecs.joinToString()})" else ""}, not H264_BP - myCar sends H264_BP")
         }
 
         openChannel(video.serviceId)
@@ -625,26 +647,48 @@ class MyCarRunner(
             sendOnChannel = { id, body -> send(id, body, encrypted = true, channel = media.serviceId) },
             sendControl = { id, body -> send(id, body, encrypted = true) },
             // The driver picked the radio or another source on the car: pause the phone's music
-            // as Android Auto does, instead of letting it play on to no one.
+            // as Android Auto does, instead of letting it play on to no one. Remembered for the
+            // car's next drive, if it stays so (CarSource).
             onTakenBack = {
-                CarServices.pausePhoneMedia("the car switched to another source")
+                CarServices.pausePhoneMedia("the car switched to another source", again = CarServices.noMusicAskedFromNow())
                 io.github.sirionero.mycar.car.CinemaNow.pauseForCar()
+                CarSource.takenBack()
             },
+            // The car's own moment on its speakers (a call on the car, its voice): the music waits for it.
+            onPausedForNow = { CarServices.pausePhoneMediaForNow() },
+            onGivenBack = { CarServices.resumePhoneMedia() },
+            onClose = {
+                CarAudio.detach(it)
+                CarSource.driveEnded()
+            },
+            onMusic = { CarSource.musicBack() },
         )
+        val held = HeldScreen(io.github.sirionero.mycar.audio.HeldScreenCars.known())
+        heldScreen = held
         if (CarSettings.pipeAudio.value) {
+            openChannel(media.serviceId)
+        } else if (held.openAtOnce()) {
+            // Its screen came only once this channel was open, at an earlier drive (see watchForHeldScreen).
+            log.i("music goes over Bluetooth, but this car gave its screen only with the media channel open - opening it at once")
             openChannel(media.serviceId)
         } else {
             // Many cars switch their source to Android Auto the moment this channel opens, which
             // cut off the music playing over Bluetooth. It opens once the sound goes through myCar:
             // Automatic deciding so, or the driver choosing it (see CarAudio.request).
             log.i("music goes over Bluetooth for now: the media channel stays closed, so the car keeps its own source")
-            CarAudio.openSink = {
+            // Once, from whichever thread comes first: Automatic's choice, or a car holding its screen.
+            val once = java.util.concurrent.atomic.AtomicBoolean()
+            CarAudio.openSink = open@{
+                if (!once.compareAndSet(false, true)) return@open
                 CarAudio.openSink = null
                 log.i("the sound goes through myCar now: opening the media channel")
                 openChannel(media.serviceId)
             }
         }
     }
+
+    /** This session's say on a car that holds its screen back (see [watchForHeldScreen]); null with no media sink. */
+    @Volatile private var heldScreen: HeldScreen? = null
 
     /** The car's directions channel, where [DirectionsVoice] reads out each turn. */
     private fun startGuidanceChannel(serviceDiscoveryResponse: ByteArray) {
@@ -711,6 +755,13 @@ class MyCarRunner(
         vendorChannelId = gm.serviceId
         log.i("-> ChannelOpenRequest on GM's channel ${gm.serviceId}")
         openChannel(gm.serviceId)
+        // Gearslip 0.3.40 also opened a GM car's Bluetooth and Wi-Fi projection channels (the Bolt;
+        // what let it on was the phone's address). Here the Bluetooth one opens as for any car already
+        // paired, with the address written in Settings (CarBluetooth); the Wi-Fi projection one stays
+        // closed, only noted.
+        ServiceDiscovery.findWifiProjectionService(serviceDiscoveryResponse)?.let {
+            log.i("GM car: it also offers a Wi-Fi projection channel ($it) - left closed")
+        }
     }
 
     private fun onVendorMessage(messageId: Int, body: ByteArray) {
@@ -806,6 +857,21 @@ class MyCarRunner(
 
     private var lastSensorNight: Boolean? = null
 
+    /**
+     * The car's driving state, speed and gear as it said last, for the session report's end, with a
+     * line when it starts or stops moving: only each type's first event was in the log, and whether
+     * the car moved when its Wi-Fi went had to be guessed from the next session's start.
+     */
+    private var drive: SessionEnd.CarState? = null
+
+    private fun onDriveSensors(body: ByteArray) {
+        val before = drive
+        val now = SessionEnd.CarState.merge(before, body) ?: return
+        drive = now
+        SessionReport.car(now)
+        if (before?.moving != now.moving) log.i("car: ${now.describe()}")
+    }
+
     private fun onSensorMessage(messageId: Int, body: ByteArray) {
         when (messageId) {
             MSG_CHANNEL_OPEN_RESPONSE -> {
@@ -835,6 +901,7 @@ class MyCarRunner(
                 logSensorEvent(body)
                 onNightSensor(body)
                 CarDriving.onSensorEvent(body)
+                onDriveSensors(body)
             }
 
             // SensorError { required SensorType sensor_type = 1; required SensorErrorType sensor_error_type = 2; }
@@ -1020,11 +1087,8 @@ class MyCarRunner(
                     "${videoConfigs.getOrNull(selectedConfigIndex ?: -1)?.resolutionName ?: "?"} " +
                         "(head unit offered ${offered.size}), max_unacked=$maxUnacked",
                 )
-                // VideoFocusRequestNotification { mode = 2; reason = 3 }
-                val focus = Protobuf.varintField(2, VIDEO_FOCUS_PROJECTED.toLong()) +
-                    Protobuf.varintField(3, 1L)
-                send(MSG_VIDEO_FOCUS_REQUEST, focus, encrypted = true, channel = videoChannelId)
-                log.i("-> VideoFocusRequest(mode=PROJECTED)")
+                requestProjectedFocus()
+                watchForHeldScreen()
             }
 
             MSG_VIDEO_FOCUS_NOTIFICATION -> {
@@ -1050,6 +1114,8 @@ class MyCarRunner(
                     lastAckAt = SystemClock.elapsedRealtime()
                     ackLock.notifyAll()
                 }
+                // Not lastAckAt: a stalled window moves that on by itself.
+                SessionReport.heardFromCar()
                 if (framesSent <= 3 || framesSent % 60 == 0) {
                     log.i("<- MediaAck(ack=$acked) inFlight=$inFlight after $framesSent frames")
                 }
@@ -1066,22 +1132,11 @@ class MyCarRunner(
     //   -> Data (8-byte big-endian timestamp, then the H.264 access unit)
     //   <- Ack { session_id, ack }   - at most max_unacked frames may be outstanding
 
-    /**
-     * The offered config that best fills the car's screen: the smallest whose visible width
-     * reaches most of the touchscreen's, else the largest there is. Always taking the smallest
-     * put 800x480 on a 1540x720 Audi screen and stretched it. A car that gives no touchscreen
-     * size gets the largest up to 1080p: a car only offers sizes it can show, and the 2024 VW
-     * (touchscreen 0x0) blurred 800x480 across a 1080p screen.
-     */
+    /** The offered config that best fills the car's screen (see [ScreenFit.choose]). */
     private fun fitToScreen(offered: List<Int>): Int? {
-        val known = offered.filter { videoConfigs.getOrNull(it)?.pixelSize() != null }
-        fun pixels(idx: Int) = videoConfigs[idx].pixelCount()
-        if (touchWidth <= 0) {
-            return known.filter { pixels(it) <= 1920 * 1080 }.maxByOrNull(::pixels)
-                ?: known.minByOrNull(::pixels)
-        }
-        val wide = known.filter { (videoConfigs[it].visibleSize()?.first ?: 0) >= touchWidth * 8 / 10 }
-        return wide.minByOrNull(::pixels) ?: known.maxByOrNull(::pixels)
+        val choice = ScreenFit.choose(videoConfigs, offered, touchWidth, touchHeight)
+        if (choice.upright) log.i("upright touchscreen: only upright pictures considered")
+        return choice.index
     }
 
     private fun startVideoSource() {
@@ -1110,8 +1165,8 @@ class MyCarRunner(
             log.i("the car shows its own screen - Start waits until it hands the screen back")
         }
         // The car crops its margins off the frame, so keep the UI out of them unless a vehicle
-        // profile has its own tuned insets.
-        if (vehicleProfile?.insets.let { it == null || it == Insets.NONE }) {
+        // profile has its own tuned insets (all 0 too: the profile says the car shows the whole frame).
+        if (vehicleProfile?.insets == null) {
             val insets = config.marginInsets()
             CarEnvironment.setInsets(insets)
             if (insets != Insets.NONE) log.i("keeping the UI clear of the car's margins: $insets")
@@ -1251,6 +1306,39 @@ class MyCarRunner(
         }
     }
 
+    /** Asks the car for its screen; the answer comes to [onVideoFocus]. */
+    private fun requestProjectedFocus() {
+        // VideoFocusRequestNotification { mode = 2; reason = 3 }
+        val focus = Protobuf.varintField(2, VIDEO_FOCUS_PROJECTED.toLong()) +
+            Protobuf.varintField(3, 1L)
+        send(MSG_VIDEO_FOCUS_REQUEST, focus, encrypted = true, channel = videoChannelId)
+        log.i("-> VideoFocusRequest(mode=PROJECTED)")
+    }
+
+    /**
+     * Some older cars keep their own screen while the music channel is closed, which it is while the
+     * music goes over Bluetooth ([HeldScreen]). No screen [HeldScreen.WAIT_MS] after asking: the channel
+     * opens, and the screen is asked for again a moment later, in the same words. A car that gives its
+     * screen at once (the drives seen so far: within half a second) never gets here.
+     */
+    private fun watchForHeldScreen() {
+        val held = heldScreen ?: return
+        if (CarAudio.openSink == null) return
+        Thread({
+            try {
+                Thread.sleep(HeldScreen.WAIT_MS)
+                val open = CarAudio.openSink
+                if (!held.openNow(running && !stopped, videoStarted, open != null, SystemClock.elapsedRealtime()) || open == null) return@Thread
+                log.w("no screen from the car after ${HeldScreen.WAIT_MS / 1000}s - opening the music channel and asking again")
+                open()
+                Thread.sleep(HeldScreen.ASK_AGAIN_MS)
+                if (running && !stopped && !videoStarted) requestProjectedFocus()
+            } catch (e: InterruptedException) {
+                return@Thread
+            }
+        }, "mycar-held-screen").apply { isDaemon = true }.start()
+    }
+
     /** Whether the car is showing myCar; false while it shows its own interface. */
     @Volatile private var videoProjected = true
     /** The encoder's SPS/PPS, resent when the car hands its screen back. */
@@ -1269,6 +1357,17 @@ class MyCarRunner(
             if (!projected) return
             videoStarted = true
             CarFocus.request = ::requestNativeFocus
+            when (heldScreen?.screenCame(SystemClock.elapsedRealtime(), held = CarAudio.openSink != null)) {
+                HeldScreen.Seen.NEEDED -> log.i(
+                    "the screen came once the media channel was open - " +
+                        if (io.github.sirionero.mycar.audio.HeldScreenCars.neededAgain()) "remembered: this car's next drive opens it at once"
+                        else "noted: if it does again, this car's drives open it at once",
+                )
+                HeldScreen.Seen.NOT_NEEDED -> if (io.github.sirionero.mycar.audio.HeldScreenCars.notNeeded()) {
+                    log.i("the screen came with the media channel closed - this car doesn't need it open")
+                }
+                else -> Unit
+            }
             log.i("PHASE A COMPLETE - video focus granted; starting video source")
             startVideoSource()
             return
@@ -1279,6 +1378,7 @@ class MyCarRunner(
         }
         videoProjected = projected
         CarFocus.set(projected)
+        SessionReport.carOwnScreen(!projected)
         if (projected) {
             log.i("the car handed its screen back - restarting the stream")
             // Frames sent just before the car took over may never be acked.
@@ -1370,6 +1470,7 @@ class MyCarRunner(
         val now = SystemClock.elapsedRealtime()
         if (lastPingAt > 0) pingGap = maxOf(pingGap, now - lastPingAt)
         lastPingAt = now
+        SessionReport.heardFromCar(now)
     }
 
     private fun send(
@@ -1445,8 +1546,14 @@ class MyCarRunner(
         when (state) {
             State.WAIT_VERSION -> log.verdict(
                 "INCONCLUSIVE (no VersionRequest)",
-                "The head unit never opened the control channel. This is a connection problem, " +
-                    "not a certificate verdict - check that the accessory was actually claimed.",
+                // The accessory is the cable's: over Wi-Fi there is none to claim.
+                if (wireless) {
+                    "The car never started the session on its Wi-Fi. This is a connection problem, " +
+                        "not a certificate verdict."
+                } else {
+                    "The head unit never opened the control channel. This is a connection problem, " +
+                        "not a certificate verdict - check that the accessory was actually claimed."
+                },
             )
             State.TLS_HANDSHAKE -> log.verdict(
                 "LIKELY NOT VIABLE (dropped during TLS)",
@@ -1489,7 +1596,7 @@ class MyCarRunner(
                 } else if (wireless && pingGap > 0 && idle > maxOf(SILENCE_GIVE_UP_MS, pingGap * 4)) {
                     // The same for a car gone quiet mid-drive without closing the connection (its
                     // Wi-Fi still up). It pinged before, so this much silence means it's gone.
-                    giveUp("the car has said nothing for ${idle / 1000}s")
+                    giveUp("the car has said nothing for ${idle / 1000}s", silentS = idle / 1000)
                 }
                 // Over the cable a start that stalls, or a car that waits for a tap on its Android
                 // Auto, kept "connecting" for good: after a while Home says what to do. Only the

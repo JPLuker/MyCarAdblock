@@ -56,8 +56,13 @@ object MyCarPalette {
     val Positive = Color(0xFF32D46B)
     val Negative = Color(0xFFFF4D45)
     val Warning = Color(0xFFFFB020)
+    // Words in green or amber on a light surface, where the two above are too pale to read.
+    val PositiveOnLight = Color(0xFF137A3C)
+    val WarningOnLight = Color(0xFF995800)
     val Indigo = Color(0xFF6C63FF)
     val Graphite = Color(0xFF6B6B72)
+    /** The Jolly key's: a touch of magic, apart from every app's colour in the dock. */
+    val Violet = Color(0xFFA855F7)
 }
 
 /** Corner radii. App icons use [Icon] as a fraction of their side, the rest are fixed. */

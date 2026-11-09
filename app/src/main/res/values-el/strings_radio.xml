@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The car's own radio kept until the phone plays (CarSettings.radioFirst), with the sound through myCar.
+-->
+<resources>
+    <!-- Title of the setting: a choice on the car's Settings screen, a switch on the phone (Settings > Connection > Car audio). -->
+    <string name="car_settings_radio_first">Διατήρηση του ραδιοφώνου του αυτοκινήτου μέχρι να παίξει το τηλέφωνο</string>
+    <!-- On the car's Settings screen, under that choice. -->
+    <string name="car_settings_radio_first_note">Με τον ήχο μέσω του myCar, το ραδιόφωνο του αυτοκινήτου, ή ό,τι έπαιζε, συνεχίζει μέχρι να παίξει κάτι στο τηλέφωνο. Όταν είναι απενεργοποιημένο, το αυτοκίνητο περνά στο myCar, και σωπαίνει, μόλις συνδεθεί.</string>
+    <!-- On the phone, under the switch in Settings > Connection > Car audio. -->
+    <string name="settings_radio_first_detail">Με τον ήχο μέσω του myCar, το ραδιόφωνο του αυτοκινήτου συνεχίζει μέχρι να βάλετε κάτι να παίξει στο τηλέφωνο, αντί να σωπαίνει μόλις συνδεθεί το αυτοκίνητο</string>
+</resources>

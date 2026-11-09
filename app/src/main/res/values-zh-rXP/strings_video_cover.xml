@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">升起视频封面</string>
+    <string name="car_player_video_cover_off">降下视频封面</string>
+    <string name="car_player_video_cover_now_on">视频封面已升起，适用于带视频的船歌</string>
+    <string name="car_player_video_cover_now_off">封面下锚停泊</string>
+    <string name="car_settings_cover">船歌匣里的封面</string>
+    <string name="car_settings_cover_note">有些船歌带有一段循环播放的短视频，例如 Spotify 的 Canvas。选择“视频”后，海图旁的船歌匣会用它代替封面。封面上的按钮也能切换。</string>
+    <string name="music_video_cover">船上的视频封面</string>
+    <string name="music_video_cover_detail">在船上海图旁的船歌匣中，用部分船歌自带的循环短视频（Spotify 的 Canvas）代替封面。船上封面的按钮也能切换。每段视频会用掉几 MB 流量。</string>
+</resources>

@@ -42,6 +42,10 @@ class AppBridge(val packageName: String, private val label: String, private val 
     @Volatile private var checkedAt = 0L
     @Volatile private var there = false
 
+    /** When the app's bridge was last bound (elapsed clock), and whether its server's start was said since. */
+    @Volatile private var boundAt = 0L
+    @Volatile private var startSaid = false
+
     /** The hosts the app last turned down for good ([NOT_MYCAR], [NOT_OURS]): see [refusedForGood]. */
     @Volatile private var refused = emptySet<String>()
 
@@ -103,7 +107,16 @@ class AppBridge(val packageName: String, private val label: String, private val 
                 return socket
             }
             val detail = reply.readString().orEmpty()
-            log.w("the $label app turned down $host:$port ($code): $detail")
+            // The server on the phone itself is the app's own, which the binding has just woken: it turns
+            // myCar down for a few seconds while it starts, and myCar tries again. Said once, not a
+            // warning at each try; after STARTING_MS, as any other refusal.
+            val starting = code == NO_ANSWER && Bridges.onThePhone(host) && SystemClock.elapsedRealtime() - boundAt < STARTING_MS
+            if (!starting) {
+                log.w("the $label app turned down $host:$port ($code): $detail")
+            } else if (!startSaid) {
+                startSaid = true
+                log.i("the $label app's $server on this phone is still starting - myCar keeps trying")
+            }
             throw BridgeException(
                 said(
                     when (code) {
@@ -118,6 +131,7 @@ class AppBridge(val packageName: String, private val label: String, private val 
                         else -> Words.get(R.string.bridge_no_connection, detail)
                     },
                 ),
+                quiet = starting,
             )
         } catch (e: RemoteException) {
             throw BridgeException(said(Words.get(R.string.bridge_closed)), e)
@@ -182,6 +196,8 @@ class AppBridge(val packageName: String, private val label: String, private val 
                     binder = service
                     lock.notifyAll()
                 }
+                boundAt = SystemClock.elapsedRealtime()
+                startSaid = false
                 log.i("bound to the $label app's bridge")
             }
 
@@ -244,10 +260,15 @@ class AppBridge(val packageName: String, private val label: String, private val 
         private const val MARK = "\u0000"
 
         private const val BIND_WAIT_MS = 10_000L
+        /** After the binding, how long the app's own server on the phone may turn myCar down while it starts. */
+        private const val STARTING_MS = 30_000L
         private const val IDLE_MS = 5 * 60_000L
         private const val CHECK_EVERY_MS = 30_000L
     }
 }
 
-/** A connection through an app's bridge that couldn't be made, said in myCar's words. */
-class BridgeException(message: String, cause: Throwable? = null) : IOException(message, cause)
+/**
+ * A connection through an app's bridge that couldn't be made, said in myCar's words. [quiet]: the
+ * app's own server on the phone still starting, already said once in the log (see [AppBridge]).
+ */
+class BridgeException(message: String, cause: Throwable? = null, val quiet: Boolean = false) : IOException(message, cause)

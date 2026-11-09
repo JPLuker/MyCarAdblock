@@ -179,6 +179,16 @@ class CarPreviewActivity : ComponentActivity() {
         io.github.sirionero.mycar.car.MiniPlayerSetting.moveTo(
             io.github.sirionero.mycar.car.MiniPlace.parse(intent.getStringExtra("miniAt").orEmpty()),
         )
+        // --es pillAt 0.5,0: a call's pill starts there (0,0 top left, 1,1 bottom right); where it starts
+        // unmoved every other run, as a shot that dragged it leaves it where it was let go.
+        io.github.sirionero.mycar.car.CallPillSetting.moveTo(
+            io.github.sirionero.mycar.car.MiniPlace.parse(intent.getStringExtra("pillAt").orEmpty()),
+        )
+        // --es videoCover http://10.0.2.2:8003/canvas.mp4: that video as the cover of whatever plays, as if
+        // the car's music had video covers (the button on the cover shows); --ez videoCoverOn true: video
+        // covers on from the start, still every other run. Both set every run.
+        io.github.sirionero.mycar.car.VideoCoverPreview.url = intent.getStringExtra("videoCover")
+        io.github.sirionero.mycar.car.VideoCoverSetting.setOn(intent.getBooleanExtra("videoCoverOn", false))
         // --es carTheme LIGHT: the car's screen in that theme (PHONE, LIGHT, DARK); dark every other run.
         CarSettings.setAppTheme(
             intent.getStringExtra("carTheme")?.let { runCatching { io.github.sirionero.mycar.car.AppTheme.valueOf(it) }.getOrNull() }
@@ -188,6 +198,14 @@ class CarPreviewActivity : ComponentActivity() {
         // --es hideApps mycar:web,mycar:cinema: those off it.
         io.github.sirionero.mycar.car.HiddenApps.reset()
         intent.getStringExtra("hideApps")?.split(',')?.filter { it.isNotBlank() }?.forEach(io.github.sirionero.mycar.car.HiddenApps::hide)
+        // --es jolly say: the Jolly key set to a made-up command of that kind (see JollyPreview); nothing
+        // every other run, so a tap on it opens its chooser. --ez jollyKey false: off the dock.
+        io.github.sirionero.mycar.car.JollyPreview.set(
+            intent.getStringExtra("jolly"),
+            intent.getStringExtra("jollySay"),
+            intent.getStringExtra("jollyLang"),
+            intent.getBooleanExtra("jollyKey", true),
+        )
         // --ez webMusicPlay true: a music service's page presses its first "Play" a few seconds in (no
         // account plays here). Set every run.
         io.github.sirionero.mycar.car.WebMusicPreview.play = intent.getBooleanExtra("webMusicPlay", false)
@@ -258,11 +276,14 @@ class CarPreviewActivity : ComponentActivity() {
         val playerOnly = intent.getBooleanExtra("player", false)
         val wallpapersOnly = intent.getBooleanExtra("wallpapers", false)
         val hiddenAppsOnly = intent.getBooleanExtra("hiddenApps", false)
+        // --ez jollySettings true: the car settings' Jolly key alone, below the fold in the car's settings.
+        val jollySettingsOnly = intent.getBooleanExtra("jollySettings", false)
         p.start(imageReader.surface, w, h, dpi) {
             when {
                 playerOnly -> io.github.sirionero.mycar.car.PlayerPreview()
                 wallpapersOnly -> io.github.sirionero.mycar.car.WallpaperPickerPreview()
                 hiddenAppsOnly -> io.github.sirionero.mycar.car.HiddenAppsPreview()
+                jollySettingsOnly -> io.github.sirionero.mycar.car.JollySettingsPreview()
                 else -> CarUi()
             }
         }
@@ -293,6 +314,30 @@ class CarPreviewActivity : ComponentActivity() {
                 else MyCarLog.e("preview: no media to show the demo song in")
             }
             main.post(::tryDemo)
+        }
+        // --ez alert true: an app's alert across the top of the car's screen, as Waze asks whether a
+        // hazard is still there (see showDemoAlert), once the car UI is up.
+        if (intent.getBooleanExtra("alert", false)) main.postDelayed({ io.github.sirionero.mycar.car.showDemoAlert() }, 1_000)
+        // --ez fakeCall true: a call under way, picked up 1:23 ago, with no modem behind it (the call-bubble
+        // shots: its pill over every screen), once the car's services watch the phone. --es fakeCaller
+        // "<name>": who it's with ("" for a number alone). Set again a moment later: the phone's own first
+        // word, idle, can come after it.
+        if (intent.getBooleanExtra("fakeCall", false)) {
+            val name = (intent.getStringExtra("fakeCaller") ?: "Giulia Bianchi").ifBlank { null }
+            // On an emulator up for less than that, as soon as it started: a time before boot is "not known".
+            val since = (android.os.SystemClock.elapsedRealtime() - 83_000).coerceAtLeast(1)
+            var tries = 0
+            fun tryCall() {
+                if (io.github.sirionero.mycar.car.showFakeCall(name, "3471112233", since)) {
+                    MyCarLog.i("preview: a call under way")
+                    main.postDelayed({ io.github.sirionero.mycar.car.showFakeCall(name, "3471112233", since) }, 1_500)
+                } else if (++tries < 50) {
+                    main.postDelayed(::tryCall, 100)
+                } else {
+                    MyCarLog.e("preview: the car's services never watched the phone, no call to show")
+                }
+            }
+            main.postDelayed(::tryCall, 500)
         }
         // --es voiceLang it: the assistant in that language, as with its model on the phone (no model
         // runs here: the speech library is arm64 only). --ez voiceHelp true opens its help, --es

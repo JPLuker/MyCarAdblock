@@ -79,6 +79,7 @@ internal fun CarScreenSettings() {
     CarHomeSection()
     CarPagesSection()
     CarGridSection()
+    JollySection()
     CarLookSection()
     CarWallpaperSection()
     CarDriveSection()

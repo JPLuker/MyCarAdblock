@@ -5,6 +5,8 @@ import android.content.Context
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import io.github.sirionero.mycar.audio.CarAudio
+import io.github.sirionero.mycar.audio.CarSource
+import io.github.sirionero.mycar.audio.PausedForCar
 import io.github.sirionero.mycar.host.CarAppCatalog
 import io.github.sirionero.mycar.host.CarAppConnection
 import io.github.sirionero.mycar.host.KnownApps
@@ -168,6 +170,8 @@ object CarServices {
         Xonos.init(appContext)
         if (Xonos.enabled.value) XonosAccount.adoptIfUnset(appContext)
         CarAudio.consentWaits = ::xonosIsTheMusic
+        // Only a player's sound takes the car's speakers from its radio, not a map's voice or a page.
+        CarAudio.playerPlaying = ::aPlayerPlays
         // Connected through the drive too, like Plancia: ready when it's opened, and known to reach
         // Music Assistant or not before the drive's music is picked.
         xonosHeld = Xonos.enabled.value
@@ -179,27 +183,45 @@ object CarServices {
         // up took the phone's cores and storage at the very moment the car connected. Not at all when
         // the phone's own speech recognition does the listening.
         speechWarm.removeCallbacks(warmSpeech)
+        speechWarm.removeCallbacks(warmFinal)
         // Which models there are, at once: a command before the loading finds them, as before.
         io.github.sirionero.mycar.speech.SpeechModels.init(appContext)
         val phoneListens = CarSettings.systemSpeech.value && android.speech.SpeechRecognizer.isRecognitionAvailable(appContext)
-        if (!phoneListens) speechWarm.postDelayed(warmSpeech, SPEECH_WARM_AFTER_MS)
+        if (!phoneListens) {
+            speechWarm.postDelayed(warmSpeech, SPEECH_WARM_AFTER_MS)
+            speechWarm.postDelayed(warmFinal, FINAL_WARM_AFTER_MS)
+        }
     }
 
     private val speechWarm = android.os.Handler(android.os.Looper.getMainLooper())
-    private val warmSpeech = Runnable {
-        val app = context ?: return@Runnable
+    private val warmSpeech = Runnable { warmModels(final = false) }
+
+    /**
+     * The model that rereads the phrase (Parakeet: ~950 MB and seconds of every core) only once the
+     * drive has lasted a while: after many drives the car, switched off, made a session of 20-40 s
+     * that loaded it for nobody - 19 loads for 2 commands in three days. A command before then loads
+     * it at the press, if there's the memory for it (SpeechEngine).
+     */
+    private val warmFinal = Runnable { warmModels(final = true) }
+
+    private fun warmModels(final: Boolean) {
+        val app = context ?: return
         // The phone's preview of the car's screen alone (Settings, no car): no voice models for it.
-        if (phonePreview && !io.github.sirionero.mycar.SessionService.running) return@Runnable
+        if (phonePreview && !io.github.sirionero.mycar.SessionService.running) return
         io.github.sirionero.mycar.speech.SpeechEngine.warm(
             app,
             io.github.sirionero.mycar.speech.VoiceLanguages.effective(
                 app, CarSettings.systemSpeech.value && android.speech.SpeechRecognizer.isRecognitionAvailable(app),
             ),
+            final,
         )
     }
 
-    /** How long after the car connects the voice models start loading. */
+    /** How long after the car connects the live voice model (Kroko) starts loading. */
     private const val SPEECH_WARM_AFTER_MS = 20_000L
+
+    /** How long a drive lasts before the model that rereads the phrase loads ahead of a command. */
+    private const val FINAL_WARM_AFTER_MS = 120_000L
 
     /**
      * Xonos switched on or off on the phone in the middle of a drive: connected to Music Assistant
@@ -449,6 +471,18 @@ object CarServices {
             io.github.sirionero.mycar.MyCarLog.i("media: Autoplay waits for the car's Bluetooth music (or a cable), not to play on the phone's speaker")
             return
         }
+        // The car's last drive ended on its own source - the driver picked its radio and stayed there
+        // (see CarSource) - its music goes through myCar now, and the driver keeps the car's radio until
+        // the phone plays (radioFirst): the radio stays on, as a car radio comes back on the source it
+        // was left on. Without that choice the car is switched to myCar as the capture starts anyway, so
+        // leaving the music off only left it quiet, radio gone too. Over Bluetooth the car picks its
+        // source itself, as before.
+        if (autoplayAutoPicked && CarSettings.pipeAudio.value && CarSettings.radioFirst.value && CarSource.lastDriveOnCarSource()) {
+            autoplayPending = false
+            if (_musicStarting.value) expectMusic(false)
+            io.github.sirionero.mycar.MyCarLog.i("media: Autoplay: last drive ended on the car's own source - it stays on")
+            return
+        }
         // The assistant up (listening, answering): the drive's pick doesn't start the music over it. It
         // plays as the assistant closes (AutoplayWhenReady calls again then).
         if (autoplayAutoPicked && CarAssistant.state.value.phase != CarAssistant.Phase.IDLE) {
@@ -476,6 +510,45 @@ object CarServices {
 
     /** How long the drive's Autoplay waits for a Bluetooth output on the Bluetooth way. */
     private const val AUTOPLAY_BLUETOOTH_MS = 60_000L
+
+    /**
+     * A player really playing on the phone, whose sound takes the car's speakers from its radio (see
+     * [CarAudio.playerPlaying]): the car's music app, Cinema's film, a site open in Cinema or the
+     * browser open full screen, or any app's media session, read with the notification access the
+     * music asks for anyway. Not a map's voice, a page in a part of the Home or the assistant, which
+     * have no player. From the capture's thread: the sessions, a call to Android, are asked at most
+     * every half second.
+     */
+    private fun aPlayerPlays(): Boolean {
+        if (mediaOrNull()?.now?.value?.state == PlaybackState.STATE_PLAYING) return true
+        // Cinema's own player says whether its film plays. A site open in Cinema, or the browser full
+        // screen, has no player to ask: the driver opened it on the car's screen, so its sound - a video,
+        // a web radio - is theirs. Left out, it stayed silent after the radio for the rest of the drive:
+        // the phone muted by the capture, the car on its radio, its own GAIN starting nothing.
+        val film = CinemaNow.playing
+        if (film != null) {
+            if (film()) return true
+        } else if (CinemaNow.pause != null) {
+            return true
+        }
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - sessionsAskedAt < SESSIONS_EVERY_MS) return sessionsPlaying
+        sessionsAskedAt = now
+        val ctx = context ?: return false
+        sessionsPlaying = try {
+            ctx.getSystemService(MediaSessionManager::class.java)
+                .getActiveSessions(ComponentName(ctx, MyCarNotificationListener::class.java))
+                .any { it.playbackState?.state == PlaybackState.STATE_PLAYING }
+        } catch (e: SecurityException) {
+            // No notification access: the car's music app and Cinema are what myCar sees.
+            false
+        }
+        return sessionsPlaying
+    }
+
+    @Volatile private var sessionsAskedAt = 0L
+    @Volatile private var sessionsPlaying = false
+    private const val SESSIONS_EVERY_MS = 500L
 
     // --- start and stop ------------------------------------------------------------------
 
@@ -608,7 +681,13 @@ object CarServices {
      */
     private val SOUNDING = setOf(PlaybackState.STATE_PLAYING, PlaybackState.STATE_BUFFERING)
 
-    fun pausePhoneMedia(why: String = "the car left", keep: String? = null) {
+    /**
+     * [again]: a second look [REPAUSE_MS] later, while it says yes (see [pauseAgainLater]). For the
+     * car leaving and the car taking its own source; not for screen sharing, which keeps an app.
+     */
+    fun pausePhoneMedia(why: String = "the car left", keep: String? = null, again: (() -> Boolean)? = null) {
+        // Nothing paused for the car's moment on its speakers plays again after this.
+        pausedForCar.forget()
         val ctx = context ?: return
         val manager = ctx.getSystemService(MediaSessionManager::class.java)
         val listener = ComponentName(ctx, MyCarNotificationListener::class.java)
@@ -627,12 +706,158 @@ object CarServices {
         playing.forEach { runCatching { it.transportControls.pause() } }
         if (playing.isNotEmpty()) {
             io.github.sirionero.mycar.MyCarLog.i("media: paused ${playing.joinToString { it.packageName }}: $why")
+            if (again != null) pauseAgainLater(playing, why, again)
+        }
+    }
+
+    /**
+     * An app paused as the car left can start again by itself a moment later, out of the phone's
+     * speaker: Deezer did, after the car was switched off (Gearslip issue #39). Those of [paused]
+     * sounding again [REPAUSE_MS] later are paused once more - while [still] says so.
+     */
+    private fun pauseAgainLater(paused: List<android.media.session.MediaController>, why: String, still: () -> Boolean) {
+        repause.postDelayed({
+            // Only out of the phone's own speaker. With the car's Bluetooth music (or a cable) still
+            // there the car itself may have asked for it, and when that goes Android pauses the apps.
+            if (!still() || io.github.sirionero.mycar.audio.CarAudioRoute.musicOutsideThePhone()) return@postDelayed
+            val again = paused.filter { it.playbackState?.state in SOUNDING }
+            if (again.isEmpty()) return@postDelayed
+            again.forEach { runCatching { it.transportControls.pause() } }
+            io.github.sirionero.mycar.MyCarLog.i("media: paused ${again.joinToString { it.packageName }} again: it started by itself after $why")
+        }, REPAUSE_MS)
+    }
+
+    private val repause = android.os.Handler(android.os.Looper.getMainLooper())
+
+    /** How long after pausing for the car to look again for an app that started by itself. */
+    private const val REPAUSE_MS = 2_000L
+
+    /** For the second look after the car left: none once a new drive is under way (its own Autoplay decides). */
+    fun noDriveUnderWay(): Boolean = io.github.sirionero.mycar.SessionStatus.state.value.phase.let {
+        it != io.github.sirionero.mycar.SessionStatus.Phase.CONNECTING && it != io.github.sirionero.mycar.SessionStatus.Phase.PROJECTING
+    }
+
+    /**
+     * For the second look while the car is on its own source: none if the driver asks the music for
+     * anything meanwhile (▶ on the car's screen or wheel, by voice), counted from now.
+     */
+    fun noMusicAskedFromNow(): () -> Boolean {
+        val media = mediaOrNull() ?: return { true }
+        val mark = media.askMark()
+        return { !media.askedSince(mark) }
+    }
+
+    /**
+     * What [pausePhoneMediaForNow] paused, for [resumePhoneMedia]: the sessions (or, without
+     * notification access, the app myCar drives itself, paused through it), where the driver's asks of
+     * the music stood ([CarMedia.askMark]), and the car's music app then (another one picked since is
+     * the driver's choice).
+     */
+    private val pausedForCar = PausedForCar.Memory<android.media.session.MediaController> { it.sessionToken }
+
+    /**
+     * The car takes its speakers for a moment (AudioLink: a call on the car, its own voice or
+     * announcements) while the phone's music streams through myCar: what plays is paused, rather
+     * than playing on unheard, and remembered exactly, for [resumePhoneMedia] at the car's GAIN. Only
+     * what plays now: a player Android paused for a call itself resumes by itself after it.
+     * From the session's reading thread.
+     */
+    fun pausePhoneMediaForNow() {
+        val ctx = context ?: return
+        val media = mediaOrNull()
+        val mark = media?.askMark()
+        val app = _mediaApp.value?.component
+        val manager = ctx.getSystemService(MediaSessionManager::class.java)
+        val listener = ComponentName(ctx, MyCarNotificationListener::class.java)
+        val playing = try {
+            manager.getActiveSessions(listener).filter { it.playbackState?.state in SOUNDING }
+        } catch (e: SecurityException) {
+            null
+        }
+        if (playing == null) {
+            // No notification access: the app myCar itself is driving is all it can reach.
+            val own = media?.now?.value?.playing == true
+            if (own) {
+                media?.pauseForCar()
+                io.github.sirionero.mycar.MyCarLog.i("media: paused the music app while the car has the speakers for a moment")
+            }
+            pausedForCar.paused(emptyList(), own, mark, app)
+            return
+        }
+        playing.forEach { runCatching { it.transportControls.pause() } }
+        // With what an earlier moment of the car's paused, if it hasn't played again yet (PausedForCar.Memory).
+        pausedForCar.paused(playing, own = false, askMark = mark, app = app)
+        if (playing.isNotEmpty()) {
+            io.github.sirionero.mycar.MyCarLog.i("media: paused ${playing.joinToString { it.packageName }} while the car has the speakers for a moment")
+        }
+    }
+
+    /**
+     * The car gave its speakers back: what [pausePhoneMediaForNow] paused plays again - only that,
+     * only what is still paused, and not if the driver asked the music for anything or picked
+     * another music app meanwhile, or the drive ended (see [PausedForCar]). During a call, once it's over.
+     */
+    fun resumePhoneMedia() {
+        // What waits now, on the session's thread: a moment of the car's after this GAIN waits for its own.
+        val paused = pausedForCar.given() ?: return
+        repause.post { resumeWhenFree(paused, PausedForCar.CALL_CHECKS) }
+    }
+
+    private fun resumeWhenFree(paused: PausedForCar.Paused<android.media.session.MediaController>, waitsLeft: Int) {
+        // Forgotten (the drive ended, the radio, the car left), or the car took its speakers again
+        // since: the GAIN after that plays it.
+        if (!pausedForCar.waits(paused)) return
+        val media = mediaOrNull()
+        val mark = paused.askMark
+        val asked = (mark != null && media != null && media.askedSince(mark)) || _mediaApp.value?.component != paused.app
+        when (PausedForCar.atGain(paused = true, driverAsked = asked, inCall = inCall(), waitsLeft = waitsLeft)) {
+            PausedForCar.Then.WAIT -> {
+                if (waitsLeft == PausedForCar.CALL_CHECKS) {
+                    io.github.sirionero.mycar.MyCarLog.i("media: the car gave the speakers back during a call - the music waits for its end")
+                }
+                repause.postDelayed({ resumeWhenFree(paused, waitsLeft - 1) }, PausedForCar.CALL_CHECK_MS)
+                return
+            }
+            PausedForCar.Then.DROP -> {
+                if (!pausedForCar.done(paused)) return
+                val why = if (asked) "the driver asked it for something since" else "the call went on too long"
+                io.github.sirionero.mycar.MyCarLog.i("media: the music paused for the car stays paused: $why")
+                return
+            }
+            // Not if the car took its speakers again in the meantime.
+            PausedForCar.Then.PLAY -> if (!pausedForCar.done(paused)) return
+        }
+        if (paused.own && media != null && media.now.value.state == PlaybackState.STATE_PAUSED) {
+            media.playForCar()
+            io.github.sirionero.mycar.MyCarLog.i("media: resumed the music app: the car gave the speakers back")
+        }
+        val waiting = paused.players.filter { it.playbackState?.state == PlaybackState.STATE_PAUSED }
+        waiting.forEach { runCatching { it.transportControls.play() } }
+        if (waiting.isNotEmpty()) {
+            io.github.sirionero.mycar.MyCarLog.i("media: resumed ${waiting.joinToString { it.packageName }}: the car gave the speakers back")
+        }
+    }
+
+    /**
+     * A phone call is on (ringing, talking, on hold; a calling app's too, through Telecom). Not just
+     * "in communication": an app can leave the phone in that mode for good (see CarAudioRoute), and
+     * the music would never play again.
+     */
+    private fun inCall(): Boolean {
+        val ctx = context ?: return false
+        val telecom = ctx.checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE) == android.content.pm.PackageManager.PERMISSION_GRANTED &&
+            runCatching { ctx.getSystemService(android.telecom.TelecomManager::class.java)?.isInCall == true }.getOrDefault(false)
+        return telecom || when (ctx.getSystemService(android.media.AudioManager::class.java)?.mode) {
+            android.media.AudioManager.MODE_IN_CALL, android.media.AudioManager.MODE_RINGTONE -> true
+            else -> false
         }
     }
 
     /** The car went away: nothing should keep running for a screen that no longer exists. */
     fun shutdown() {
         if (holders == 0 || --holders > 0) return
+        // The drive's moment on the car's speakers ends with it: nothing plays again after.
+        pausedForCar.forget()
         context?.let { io.github.sirionero.mycar.notify.CarMotion.stop(it) }
         io.github.sirionero.mycar.call.CarCalls.stop()
         runCatching { nav.disconnect() }
@@ -654,7 +879,8 @@ object CarServices {
         io.github.sirionero.mycar.bridge.BridgeProxy.stop()
         // About 900 MB that nothing needs once the car's gone - and not loaded after it either.
         speechWarm.removeCallbacks(warmSpeech)
-        io.github.sirionero.mycar.speech.SpeechEngine.unload()
+        speechWarm.removeCallbacks(warmFinal)
+        io.github.sirionero.mycar.speech.SpeechEngine.unload("at the end of the drive")
         CarAudio.release()
         _mediaApp.value = null
         _mediaDecided.value = false

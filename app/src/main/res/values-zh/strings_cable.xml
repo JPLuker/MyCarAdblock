@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">手机正在充电，但汽车没有响应</string>
+    <string name="home_no_car_check">如果手机已连接到汽车，请检查：</string>
+    <string name="home_no_car_cable">使用能传输数据的数据线：有些线只能充电。</string>
+    <string name="home_no_car_always">Android 询问要打开哪个应用时，选择 myCar，然后点按“始终”。</string>
+    <string name="usb_c_graphene">GrapheneOS 可以关闭 USB-C 接口的数据传输，这时汽车只会把手机当作要充电的设备。在“设置 &gt; 安全和隐私 &gt; Exploit protection &gt; USB-C port”中，Charging-only 会把汽车挡在外面；选择 Charging-only when locked（默认）时，请在插入数据线时解锁手机。</string>
+
+    <string name="help_step_usb_c">在 GrapheneOS 上，让 USB-C 接口传输数据。</string>
+
+    <string name="setup_audio_auto_effect">每次行车时，myCar 会从下面两种方式中选一种：汽车能通过蓝牙播放手机音乐时用蓝牙，否则通过 myCar。</string>
+    <string name="setup_audio_bluetooth_effect">每次行车 Android 都不会询问，汽车的收音机也照常播放。只有汽车通过蓝牙接收手机音乐时，音乐才能传到车上：部分汽车通过蓝牙只接收通话。</string>
+    <string name="setup_audio_mycar_effect">汽车通过数据线或 WLAN 播放手机的声音。每次行车 Android 都会请求共享屏幕：点按一下即可接受。正是这项权限让 myCar 能转发其他应用的声音。</string>
+</resources>

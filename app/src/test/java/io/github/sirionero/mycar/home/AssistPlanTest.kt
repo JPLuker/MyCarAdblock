@@ -50,6 +50,38 @@ class AssistPlanTest {
 
     private val claudeAll = AssistPipeline("claude", "*", "conversation.claude")
 
+    // An Italian voice assistant whose agent Home Assistant no longer has (its integration removed or
+    // not loaded): Assist answers only "Intent recognition engine conversation.jarvis is not found".
+    private val jarvisIt = AssistPipeline("jarvis-it", "it", "conversation.jarvis")
+    private val agents = setOf("conversation.home_assistant", "conversation.claude")
+
+    @Test
+    fun `a pipeline whose agent Home Assistant doesn't have is left out`() {
+        assertEquals(AssistPlan.Run("home-it"), AssistPlan.of(listOf(homeEn, jarvisIt, homeIt), "jarvis-it", "it", agents))
+        assertEquals(AssistPlan.Run("claude"), AssistPlan.of(listOf(jarvisIt, claudeAll), "jarvis-it", "it", agents))
+    }
+
+    @Test
+    fun `with no other in the language, Home Assistant's own agent is asked in it`() {
+        assertEquals(AssistPlan.Process("conversation.home_assistant", "it"), AssistPlan.of(listOf(homeEn, jarvisIt), "jarvis-it", "it", agents))
+        // Only the missing one: Home Assistant's default agent.
+        assertEquals(AssistPlan.Process(null, "it"), AssistPlan.of(listOf(jarvisIt), "jarvis-it", "it", agents))
+    }
+
+    @Test
+    fun `agents not known, as before`() {
+        assertEquals(AssistPlan.Run("jarvis-it"), AssistPlan.of(listOf(homeEn, jarvisIt, homeIt), "jarvis-it", "it", null))
+    }
+
+    @Test
+    fun `Home Assistant's own agent, by either id, and a pipeline that names none are always there`() {
+        val old = AssistPipeline("old-it", "it", "homeassistant")
+        val none = AssistPipeline("none-it", "it", null)
+        val listed = setOf("conversation.claude")
+        assertEquals(listOf(homeIt, old, none), AssistPlan.usable(listOf(homeIt, old, none, jarvisIt), listed))
+        assertEquals(AssistPlan.Run("old-it"), AssistPlan.of(listOf(jarvisIt, old), "jarvis-it", "it", listed))
+    }
+
     @Test
     fun `a pipeline with a model speaks every language`() {
         // Home Assistant saves "*" for an agent that is a model (Claude, Gemini, ChatGPT, Ollama).

@@ -325,6 +325,8 @@ private class Playback(private val context: Context, private val media: CinemaMe
         private set
     var playing by mutableStateOf(false)
         private set
+    /** For the car's audio, from the capture's thread ([CinemaNow.playing]). */
+    private val playingHook = { playing && !released }
     var buffering by mutableStateOf(true)
         private set
     var problem by mutableStateOf<String?>(null)
@@ -343,6 +345,7 @@ private class Playback(private val context: Context, private val media: CinemaMe
 
     fun open() {
         CinemaNow.pause = pauseHook
+        CinemaNow.playing = playingHook
         player.setAudioAttributes(attributes)
         player.setOnPreparedListener { onPrepared() }
         player.setOnVideoSizeChangedListener { _, w, h ->
@@ -496,6 +499,7 @@ private class Playback(private val context: Context, private val media: CinemaMe
     fun release() {
         if (released) return
         if (CinemaNow.pause === pauseHook) CinemaNow.pause = null
+        if (CinemaNow.playing === playingHook) CinemaNow.playing = null
         leave()
         released = true
         main.removeCallbacks(autoRetry)

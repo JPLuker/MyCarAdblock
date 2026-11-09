@@ -173,6 +173,9 @@ Rispondi sempre in **italiano**.
   musicali web (`--es webMusic <id>`, `--ez webMusicPlay true`, `--es webMusicSearch <parole>`, solo debug):
   `music-<servizio>` (pagina, user agent, Widevine, Media Session nel log), `music-spotify-800x480`,
   `music-<servizio>-play`, `music-<servizio>-search`, `music-grid`.
+  0.7.4: `portrait-*` (schermi verticali, `shots: portrait`), `charging-no-car` (la scheda della carica su
+  Home: Home scorre solo sopra la scheda in fondo, il trascinamento parte dalla scheda di stato),
+  `setup-phone/04b-04d` (il passo dell'audio).
   Ogni esecuzione sovrascrive `ci/car-preview`: con più branch in CI, scaricarlo appena finisce.
 - Prova della release in CI: il workflow **Release check** (`.github/workflows/release-check.yml` +
   `.github/release-check.sh`, `.github/tailscale.sh`) installa una release pubblicata (o il branch
@@ -968,8 +971,9 @@ Tutti i token in un solo posto, `car/design/`:
   WebView dopo la manopola (`PlanciaWeb.dropFocus` dice "took it back" ma la parte esce lo stesso).
 - Condivisione schermo (`mirror/`): mentre il telefono è copiato in auto, `TouchRelayService`
   (accessibilità, già usato per i tocchi) aggiunge un pixel trasparente
-  `TYPE_ACCESSIBILITY_OVERLAY` con `screenOrientation = LANDSCAPE` (fisso, non sensore) che gira il
-  telefono in orizzontale; lo toglie a fine condivisione. I tocchi si mappano sulle dimensioni
+  `TYPE_ACCESSIBILITY_OVERLAY` con l'orientamento fisso (non sensore) della forma dell'immagine
+  dell'auto (orizzontale, o verticale per uno schermo più alto che largo, dalla 0.7.4) e
+  `FLAG_KEEP_SCREEN_ON`; lo toglie a fine condivisione (vedi "Condivisione schermo 0.7.4"). I tocchi si mappano sulle dimensioni
   reali del display (`Display.getRealSize`), non sulla finestra di myCar, che non riceve la rotazione.
 - **Rete di casa con Android 17** (0.5.12, `LocalNetwork.kt`, `ui/LocalNetworkAccess.kt`): myCar ha
   targetSdk 37, e Android 17 tiene un'app così fuori dalla rete di casa (IP privati, link-local,
@@ -1050,8 +1054,8 @@ Tutti i token in un solo posto, `car/design/`:
   (audio, condivisione schermo) chieste a telefono bloccato aspettano myCar aperta (`onResume`) e
   l'auto lo dice. Una domanda alla volta (`questionUp`): Android tiene una sola proiezione, e la
   seconda accettata chiudeva la prima. Durante la condivisione schermo la domanda dell'audio non
-  si fa (`MirrorService.sharing`, `CarAudio.askLater`) e la cattura fermata dalla condivisione
-  non riparte né richiede: a fine condivisione la chiede `CarUi`. Accanto alla mappa l'app musicale
+  si fa (`MirrorService.sharing`, `CarAudio.askLater`); dalla 0.7.4 la cattura segue la condivisione
+  sulla sua proiezione e finisce con lei, e la domanda la rifanno `sharingEnded` e `CarUi`. Accanto alla mappa l'app musicale
   prende il posto solo della scelta automatica del viaggio quando non si collega
   (`mediaAutoPicked`), mai di un'app scelta dal guidatore.
 - **Come è finito il processo di prima** (0.7, `LastExit.kt`): un crash nativo (motore web, grafica,
@@ -1094,7 +1098,8 @@ Tutti i token in un solo posto, `car/design/`:
   finale dopo Kroko, non insieme), mai dopo la fine del viaggio (`generation`: `unload()` fa scadere i
   caricamenti in attesa), e prima del primo comando (`warm`) il finale solo se resta memoria
   abbondante (`roomForFinal`: libera meno 5/4 del modello sopra 4 volte la soglia di Android e 2 GB).
-  Ogni caricamento scrive la memoria libera e l'heap nativo. L'anteprima dell'auto sul telefono, senza
+  Dalla 0.7.4 il finale si precarica solo dopo 2 minuti di viaggio, e alla pressione decide `SpeechRoom`
+  (vedi "Viaggio 0.7.4"). Ogni caricamento scrive la memoria libera e l'heap nativo. L'anteprima dell'auto sul telefono, senza
   viaggio, non li carica.
 - **Motore da Gearslip** (0.5.18, branch `fix/engine`): delle 116 modifiche di Gearslip dopo il fork
   (0.3.01 → 0.3.31) si portano solo quelle che non possono cambiare come si collega un'auto che oggi va
@@ -1119,7 +1124,8 @@ Tutti i token in un solo posto, `car/design/`:
   sempre 1.3: le auto che vanno sono state provate così); i controlli severi su frammenti, messaggi
   fuori stato e protobuf in arrivo; la fine della sessione sugli errori di protocollo 255/65535 (ora
   solo un nome nel log); la domanda delle casse prima di ogni indicazione (dc61607: una risposta di
-  focus in ritardo andrebbe al canale musica e lo farebbe partire); il canale PhoneStatus per gli
+  focus in ritardo andrebbe al canale musica e lo farebbe partire; portata nella 0.7.4 con le
+  protezioni di `FocusAnswers`, vedi "Radio dell'auto e casse"); il canale PhoneStatus per gli
   schermi dell'auto (f4b8391: due giorni di vita, possibili doppioni con le chiamate Bluetooth); i
   dati dell'auto alle app (b168eb7); il quadro strumenti video, il bitrate adattivo e lo schermo
   dalla misura sbagliata (sperimentali o con impostazioni nuove); la scelta dell'app musicale
@@ -1373,7 +1379,7 @@ Tutti i token in un solo posto, `car/design/`:
   audio; esperienza d'uso: schermo dell'auto, telefono, messaggi di collegamento), ogni punto verificato da
   uno scettico e nel codice, poi una revisione indipendente delle correzioni. Auto: durante una chiamata gli
   schermi (non la mappa) e la scheda dei messaggi stanno sotto la barra della chiamata (`callTop` in
-  `CarUi`, misurata); squillo che chiude assistente e lettura dei messaggi; una scelta nuova per "Accanto
+  `CarUi`, misurata; dalla 0.7.4 la barra è la pillola della chiamata e `callTop` non c'è più); squillo che chiude assistente e lettura dei messaggi; una scelta nuova per "Accanto
   alla mappa" riapre la colonna (`showSidePane`); la X del testo riporta il lettore; il tasto Indietro
   dell'auto risponde alle schede sopra tutto (`car/CardBack.kt`: slot propri, non il `backInterceptor` di
   HomePager); tastiera della pagina web in vista; Novità che non si chiude spegnendo l'interruttore;
@@ -1482,7 +1488,8 @@ Tutti i token in un solo posto, `car/design/`:
   gruppi: per collegarsi (certificato, myCar accesa se era spenta, Android Auto da spegnere o da
   tenere scegliendo myCar quando Android chiede), per il viaggio (chiamate, mappa e musica: un solo
   "Allow" con tutti i permessi in una richiesta; bloccati: "Open settings"), "More" facoltativi
-  (messaggi, calendario, notifiche, filtro chiamate, audio in auto, note d'uso). Un tasto grande
+  (messaggi, calendario, notifiche, filtro chiamate, note d'uso; l'audio in auto dalla 0.7.4 sta col
+  viaggio, vedi "Cavo e audio nella prima configurazione"). Un tasto grande
   fa sempre il prossimo passo. Lo stato si legge dal telefono ogni volta (`SetupSignals`;
   `SetupSteps` senza Android, `SetupStepsTest`): tornarci non cancella né azzera niente.
   `FirstSetup` ricorda solo Android Auto tenuto, passi saltati, permessi chiesti; all'uscita la
@@ -1546,6 +1553,193 @@ Tutti i token in un solo posto, `car/design/`:
   in "Aiuto e strumenti"); con un'auto collegata resta lì, spenta, e dice che si apre senza auto.
   Verificato (scatto `phone-settings`): anteprima in cima, gruppo, scelte, pagina aperta con le parti,
   formati, sfondi, Voce, nessun crash.
+- **0.7.4, dai log del 3, 6 e 7 novembre e dal forum di GrapheneOS** (richiesta dell'utente: "analizza i log e
+  guarda cosa si potrebbe migliorare", poi "resto ok" a tutte le proposte tranne l'interfaccia verticale).
+  Analisi: quattro letture in parallelo, ognuna con un verificatore; sette rami (`fix/wireless-start`,
+  `fix/drive`, `fix/radio`, `fix/setup-cable`, `fix/portrait`, `fix/mirror`, `fix/waze-hosts`), le parti
+  delicate (senza fili, viaggio, radio, condivisione) rilette da una revisione indipendente, uniti in
+  `release/v0.7.4-alpha`. Nei log nessuna caduta era colpa di myCar: le 26 fini della Golf erano l'auto che si
+  spegne (13), sessioni "fantasma" dello smartBox ad auto spenta (9), il riavvio dello smartBox all'avvio del
+  motore (2), una caduta in marcia con l'auto che tace per prima, un risveglio senza viaggio. Non provato in auto.
+- **Avvio senza fili più svelto e resoconto che dice come finisce un viaggio** (0.7.4, `fix/wireless-start`).
+  Un altro Wi-Fi del telefono nello stesso /24 dell'auto conta come la rete dell'auto presa a mano solo se non è
+  validato o ha il nome o il BSSID dell'InfoResponse (`wireless/CarNetwork.kt` + `CarNetworkTest`; il nome con un
+  `NetworkCallback(FLAG_INCLUDE_LOCATION_INFO)` d'ascolto, al massimo 400 ms e solo se un candidato c'è; un nome
+  nascosto non decide; una rete validata con un altro nome non si prova mai; se non si sa dire si alterna, col
+  primo tentativo sulla rete chiesta). Prima il Wi-Fi di casa 192.168.1.x passava per quello dello smartBox e
+  l'avvio perdeva 2,5 minuti (6/11 alle 07:46). Persa la rete dell'auto durante i tentativi TCP
+  (`TcpTries.afterLoss`): si va avanti solo sulla rete dell'auto presa a mano o dietro una VPN; un'auto che
+  richiede il Wi-Fi sullo stesso canale decide lei; col canale aperto 4 s di attesa; poi l'avvio ricomincia
+  subito. Porta vecchia (`TcpTries.stalePort`): canale chiuso prima dell'unione al Wi-Fi e porta rifiutata per
+  4 s, col Bluetooth dell'auto tornato almeno 10 s dopo, oppure per 5 s: si ricomincia per una porta nuova (7/11
+  alle 11:41: un minuto senza schermo a 43 km/h). Richiami (`KnockPlan`): primo tentativo fallito in meno di 1 s
+  e auto che non chiama il telefono, richiamo 3 s dopo l'arrivo del Bluetooth, poi ogni 2 s fino a 15 s, poi
+  ogni 8 s; un arrivo durante l'attesa sveglia il richiamo, mai prima di 3 s (questo smartBox chiude i canali
+  aperti subito dopo il suo arrivo); un arrivo durante una prima chiamata lenta conta (`firstArrival`); un
+  canale chiuso dall'auto entro 4 s senza i dati del Wi-Fi riporta il passo a 8 s per tutto l'avvio, e se
+  l'aveva aperto un richiamo veloce la ripartenza non si conta (`startOversLeft`). Resoconto (`SessionEnd` +
+  `SessionEndTest`; la categoria resta per UsageStats): "ended - the car switched off", "ended - the car went
+  silent (N s)", "FAILED - Wi-Fi dropped while driving", e righe last from the car, Wi-Fi, car Bluetooth audio,
+  car's own screen, car at the end. Nel log "car: moving/stopped" e "Bluetooth: … disconnected"; senza fili
+  niente consiglio del cavo nel VERDICT; `onLost` dice solo "the car's Wi-Fi went away". Da guardare: con
+  GrapheneOS e i controlli di connettività spenti ogni Wi-Fi risulta validato, e con il nome nascosto un Wi-Fi
+  dell'auto preso a mano diventa "non si sa" (proposta: il gateway uguale all'IP dell'auto).
+- **Viaggio 0.7.4** (`fix/drive`). Spotify Web: un Play che arriva mentre il Play paziente è ancora in prova non
+  fa più `acts++` e lascia andare i tentativi (`playTries`, al massimo 8 s senza un passo, `TRIES_GAP_MS`; mentre
+  la pagina si ricarica il Play resta in attesa come prima): sulla Golf i Play dell'autoradio (AVRCP), circa 8 s
+  dopo, fermavano i tentativi e la musica non partiva. Voce: Kroko a 20 s, il modello finale dopo 2 minuti di
+  viaggio (`FINAL_WARM_AFTER_MS`: le sessioni fantasma lo caricavano per niente, 19 volte per 2 usi). Alla
+  pressione la regola pura `speech/SpeechRoom.kt` + `SpeechRoomTest`: col margine di `roomForFinal` si carica;
+  in inglese senza margine restano le parole di Kroko (`car_voice_small_model`, una volta per viaggio sopra
+  "Listening…"); in una lingua che solo il finale sente (italiano) basta che dopo restino il doppio della soglia
+  di Android e almeno 1 GB (carica coi 2,5 GB del 6/11, non con gli 1,2-1,6 GB delle sere come quelle delle
+  cadute della 0.6.8/0.6.9), se no `Said.SHORT_OF_MEMORY`. A fine viaggio una riga per modello tolto. Sintesi
+  vocale: il log dice motore, motori installati, voce, risultato di setLanguage e dopo quanto arriva
+  `onStart`; una frase senza `onStart` entro 3 s (+10 ms a lettera, al massimo 8 s) resta scritta 5 s,
+  VoiceFocus si rilascia, il motore si ferma, l'auto lo dice una volta (`car_voice_silent`); setLanguage
+  fallito non toglie la voce. Sul telefono, Impostazioni > Voce, `ui/PhoneVoiceRow.kt`: "The phone has no
+  voice for <lingua>" col tasto per `com.android.settings.TTS_SETTINGS` (6/11: il telefono non ha una voce
+  italiana, -2 a ogni avvio). Home Assistant: `conversation/agent/list` una volta per collegamento,
+  `AssistPlan.usable` lascia fuori le pipeline con un agente che non c'è (quello di Home Assistant resta
+  sempre); `intent-not-supported` / `intent-agent-not-found` (arrivano come risposta d'errore di
+  `assist_pipeline/run`, non come evento: `HaClient` ne tiene il codice) → `Said.HOME_ASSISTANT_NO_AGENT`.
+  Stato all'auto: niente "paused" nella lettura del brano nuovo né entro 1,5 s da avanti/indietro
+  (`CarMedia.skippedAt`). Solo log: zeri della cattura solo con la musica che dice di suonare da 5 s
+  (`audio/SilentCapture.kt`), codec del campo 10 delle configurazioni, domanda dell'audio coi ms della
+  risposta, Xonos "connected after N s" (`xonos/ConnectWatch.kt`), chi manda play/pausa al lettore web, le
+  chiamate rifiutate dall'app per auto a fine sessione a livello I.
+- **Radio dell'auto e casse** (0.7.4, `fix/radio`; tester del forum: niente DAB+ con l'audio tramite myCar).
+  Non è la proiezione a togliere la radio: myCar chiedeva le casse appena Android diceva sì e mandava
+  silenzio per tutto il viaggio. Scelta «Keep the car's radio until the phone plays» (chiave
+  `car_radio_first`, spenta di predefinito; in auto dopo «Car audio», sul telefono in Connessione > Audio in
+  auto): accesa, la cattura parte senza chiedere le casse (`AudioLink.captureOn`, `awaitingFirstSound`) e le
+  chiede, con Start subito, al primo suono (300 ms) di un lettore che suona davvero, mandando prima i 300 ms
+  sentiti. «Lettore» (`CarServices.aPlayerPlays`): l'app musicale dell'auto in STATE_PLAYING, Cinema (il suo
+  lettore e i siti aperti; non il browser nelle parti della Home né Plancia) o una sessione PLAYING
+  (`MediaSessionManager`, con l'accesso alle notifiche, al massimo ogni 500 ms). Per tutti: dopo una LOSS
+  (`carSource`) il GAIN si chiede solo per un lettore, e una cattura ripartita non riprende le casse.
+  Autoplay (`audio/CarSource.kt`, preferenze `mycar_car_source`): una LOSS seguita da 60 s senza la musica del
+  telefono segna l'auto, e al viaggio dopo l'Autoplay non parte, **solo con la scelta accesa** (con la scelta
+  spenta la cattura riprende le casse comunque, e l'auto restava su myCar in silenzio: trovato dalla
+  revisione). Risposte, messaggi letti e bip vanno sul canale delle indicazioni anche con la cattura accesa ma
+  le casse non di myCar (`CarAudio.speakersOurs`, `CarAssistant.onPromptChannel`, `SpeechEngine.cueOnCar`).
+  **Portata dc61607** (scelta dell'utente: tolta dalle «Non portate»): prima di ogni annuncio, se la musica non
+  ha né ha chiesto le casse, GAIN_TRANSIENT_MAY_DUCK, risposta attesa fino a 500 ms, poi RELEASE
+  (`askForSpeakers`/`handBackSpeakers`, `DirectionsVoice.streamAsked`); protezioni in `audio/FocusAnswers.kt`:
+  un GAIN che la musica non ha chiesto non fa partire niente; nella finestra un GAIN mentre la musica aspetta il
+  suo va alla musica; una LOSS entro 1,5 s dal RELEASE con la musica chiesta o partita dopo si ignora; niente
+  RELEASE se intanto la musica ha chiesto (`focusLock`). La regola della 0.5.09 resta. `AudioLinkFocusTest`
+  (24). Da provare sulla Tayron: DAB+ scelto a metà viaggio (nel log "state=LOSS"; se è LOSS_TRANSIENT,
+  `HELD_SOUND_MS` dopo 20 s riprende le casse), una svolta e l'assistente sopra la radio, ▶ dopo la radio.
+- **Cavo e audio nella prima configurazione** (0.7.4, `fix/setup-cable`; dal forum: "troppi passi a mano col
+  cavo"). Su Home, col telefono che si carica da una porta USB (`ACTION_BATTERY_CHANGED` sticky,
+  `BATTERY_PLUGGED_USB`, solo con Home in vista) da 20 s senza un'auto arrivata a myCar né un viaggio, una
+  scheda "The phone is charging, but the car doesn't answer" (`ui/ChargingNoCarCard.kt`, regola pura
+  `setup/ChargingNoCar.kt` + `ChargingNoCarTest`): cavo che porta i dati, «Sempre» quando Android chiede quale
+  app aprire e, su GrapheneOS (`runsGrapheneOs`, da `UsageStats.osName`), la porta USB-C (Impostazioni >
+  Sicurezza e privacy > Exploit protection > USB-C port; i nomi di GrapheneOS sono solo in inglese) col tasto
+  per `ACTION_SECURITY_SETTINGS`. Conta come arrivata un viaggio, un avvio senza fili (`WirelessLink.busy`) o
+  un accessorio dato a myCar (`hasPermission`); un'auto arrivata su quel cavo la tiene via fino allo stacco.
+  Come collegarsi: «Sempre» la prima volta col cavo e, solo su GrapheneOS, il passo della porta USB-C. Prima
+  configurazione: "Car audio" esce da More e sta col viaggio (`ui/SetupAudioStep.kt`), sempre facoltativo,
+  Automatico predefinito, con cosa succede a ogni viaggio per ogni scelta e, se non è Bluetooth, il comando
+  adb di PROJECT_MEDIA (`PROJECT_MEDIA_COMMAND`). Da Android 15 il tasto della domanda di Android si chiama
+  "Condividi schermo", non "Avvia": l'aiuto ora dice di accettare la domanda con un tocco, senza nominarlo.
+  Scatti `setup-phone/04b-04d` e `charging-no-car` (`dumpsys battery set usb 1`, `--ez graphene true`).
+- **Schermi verticali** (0.7.4, `fix/portrait`; dal forum: un'auto con lo schermo verticale, e "No vehicle
+  profile matched" letto come un errore). Senza profilo l'immagine la sceglie `ScreenFit` (regola pura,
+  `ScreenFitTest`): con un touchscreen più alto che largo, se l'auto offre immagini verticali contano solo
+  quelle (la più piccola alta almeno l'80% del touchscreen, se no la più grande; "upright touchscreen: only
+  upright pictures considered"); col touchscreen 0x0 (Tayron) resta la regola di prima. I tocchi non si
+  scalano sul touchscreen: per un'auto verticale guardare nel primo log "config[i] = …" e "input service: …
+  touchscreen=…". Profili (`vehicles.json`): `insets` null se manca la chiave; tutti 0 vogliono dire nessun
+  margine. Il tasto spento di "Screen fit" dice "No saved profile: myCar uses the car's sizes". Anteprima:
+  `portrait-720x1280/`, `portrait-1080x1920/`, `portrait-split-<misura>/`, `portrait-pages-<misura>/`
+  (`shots: portrait`): myCar in verticale funziona, ma col lettore stretto accanto alla mappa. L'interfaccia
+  verticale (dock in basso) non è fatta: l'utente tiene l'interfaccia com'è.
+- **Condivisione schermo 0.7.4** (`fix/mirror`; dal forum, il confronto con ScreenOnAuto). Lo schermo del
+  telefono resta acceso: `FLAG_KEEP_SCREEN_ON` sulla finestra di `TouchRelayService` e, perché senza
+  l'accessibilità di myCar (spenta nei log dell'utente) quella finestra non c'è, un wake lock
+  `SCREEN_BRIGHT_WAKE_LOCK | ON_AFTER_RELEASE` di `MirrorService` per tutta la condivisione (vale per un'app
+  con un servizio in primo piano, verificato in AOSP 14-16 e nel bytecode di Android 17). Da Android 16 il blocco
+  del telefono chiude una proiezione con un display (`MediaProjectionStopController`): prima il timeout dello
+  schermo chiudeva la condivisione. Il telefono si gira come l'immagine dell'auto (più alta che larga →
+  verticale, se no orizzontale come prima: `PhoneMirror.upright`). La schermata delle app dice come si torna
+  (bande nere, un tasto dell'auto, Interrompi nella notifica) e, senza accessibilità, che il telefono resta in
+  verticale. **Musica durante la condivisione** (`audio/SharingHandOver.kt` + `SharingHandOverTest`): con la
+  cattura accesa, al tocco su Avvia la cattura passa alla proiezione della condivisione
+  (`AudioCaptureService.followSharing` → `follow(token)`: `AudioService.canProjectAudio` chiede solo che sia la
+  proiezione corrente, e la cattura non crea display), e finisce con lei (`sharingEnded`: pausa, smuto, Capture
+  OFF, la domanda torna); se il servizio si ferma a metà passaggio, `serviceEnds` chiama `captureStopped`
+  (trovato dalla revisione). Ripiego: la pausa di prima. Spotify Web si ferma comunque (la sua pagina va via
+  con lo schermo dell'auto). Non provato sul telefono: con l'audio tramite myCar, condividere un'app che suona
+  e cercare nel log "capturing on the screen sharing's projection".
+- **Waze modificata con Morphe** (0.7.4, `fix/waze-hosts`; dal forum). La patch "Allow Gearslip"
+  (VoltoxderEchte/waze-gearslip-morphe-patch) accetta solo gli host della sua opzione "Accepted hosts", di
+  predefinito solo Gearslip: per myCar si aggiunge
+  `;e477a4794b984927360e9ae4a31e87cb08a26c54e0e27e4334116d1c7cdccc31,io.github.sirionero.mycar`
+  (`*,io.github.sirionero.mycar.dev` per la build di prova) e si rifà la patch (README, "Some apps refuse
+  myCar"). Una copia rifirmata di un'app rotta (`KnownApps.modified`, oggi solo Waze) che rifiuta myCar prima
+  dell'handshake (anche i 10 s senza risposta: è così che rifiuta la Car App Library) è ricordata in
+  `host/PatchRefusals.kt` (pacchetto → `lastUpdateTime`, perché Morphe firma ogni copia con la stessa chiave):
+  X rossa e niente avvio automatico, ma la tessera la apre ancora; si dimentica al primo handshake accettato o
+  con un'altra copia. In auto il rifiuto dice cosa aggiungere (`car_host_modified_refused`). Non provato con una
+  Waze vera.
+- **Gearslip 0.3.32 → 0.3.40** (0.7.4, branch `fix/gearslip-0.3.40`): come per il "Motore da Gearslip",
+  riscritte a mano, una per commit, solo cose che non cambiano come si collega un'auto che oggi va. Portate: gli
+  avvisi delle app per auto (`car/CarAlerts.kt`, in alto al centro sopra ogni schermo, anche sopra la pillola
+  della chiamata, fino a due tasti, barra del tempo; scatti `alert*`); icone e `PhoneInfo` nella
+  ServiceDiscoveryRequest solo per le auto 1.0/1.1 (`DiscoveryRequest`, dalla 1.2 byte per byte come prima); la
+  sintesi vocale rifatta dentro il viaggio dopo 30 s senza risposta (`SpeechRestart`); la musica ripartita dopo
+  la fine del viaggio rimessa in pausa 2 s dopo, solo se suonerebbe dal telefono; like dall'icona (`AppButtons`,
+  Metrolist); Capitolo successivo di AntennaPod; alias Bluetooth (`shownName`); "--- Android ended this run" in
+  fondo al log dell'avvio caduto (pid nella prima riga); Clio V in CARS.md. Su richiesta dell'utente anche:
+  **schermo trattenuto** (`HeldScreen`, `HeldScreenCars`: canale della musica chiuso per il Bluetooth e nessuno
+  schermo 5 s dopo la richiesta → il canale si apre, dopo 1 s la stessa richiesta, motivo 1; l'auto è ricordata
+  solo se lo schermo arriva entro 5 s dall'apertura, per due viaggi di fila (`HeldScreen.TIMES` = 2: una volta
+  sola può essere un'auto lenta), e da allora il canale si apre subito); **indirizzo Bluetooth del telefono**
+  scritto a mano (Impostazioni > Connessione, `PhoneAddressRow`, chiave `phone_bluetooth_address`, vuoto di
+  predefinito: un'auto già abbinata riceve canale Bluetooth e PairingRequest con quell'indirizzo, senza
+  abbinamento; mai nel log; GM senza Wi-Fi projection); **tipo di canale Wi-Fi nella VersionResponse**
+  (`WirelessVersion`, solo all'auto che si è fermata dopo la nostra risposta, chiave
+  `channel_type:<indirizzo>`); **musica in pausa nel momento dell'auto**
+  (`AudioLink.onPausedForNow/onGivenBack`, `CarServices.pausePhoneMediaForNow/resumePhoneMedia`, regola
+  `PausedForCar`: con l'audio tramite myCar un LOSS_TRANSIENT sulle casse date alla musica in streaming mette in
+  pausa ciò che suona e il GAIN riprende solo quello ancora in pausa; niente se il guidatore ha chiesto qualcosa
+  o scelto un'altra app, dopo un LOSS o a fine viaggio; in chiamata aspetta la fine, al massimo mezz'ora; se
+  l'auto riprende le casse prima che la musica sia ripartita (un GAIN arrivato durante la chiamata) quello che
+  aspettava resta e riparte col GAIN dopo (`PausedForCar.Memory`); un'auto senza GAIN lascia la musica in pausa
+  finché il guidatore non preme play). Golf e Tayron: collegamento invariato (log: schermo entro 0,51 s, 51
+  VersionResponse seguite da StartRequest). Non provato in auto. Dal backlog va via «mettere in pausa Xonos
+  mentre l'auto tiene le casse per un momento».  ## 7. Per le novità  - Alerts from car apps show on the car
+  screen, such as Waze asking whether a hazard is still there. - When the car needs its speakers for a moment,
+  such as for a call, music playing through myCar pauses and picks up where it left off. - Cars that hold back
+  their screen, or need the phone's Bluetooth address (now under Settings > Connection), get another way to
+  connect. </agent-message>
+- **Pillola della chiamata in corso** (0.7.4, `feature/call-bubble`; richiesta dell'utente: "quando una chiamata
+  è in corso c'è una nuvoletta con la locandina della chiamata e il tasto per interrompere, un po' stile la
+  nuvoletta della musica, ma c'è sempre finché non interrompi la chiamata, qualsiasi schermata aperta ci sia";
+  `car/CallPill.kt`, regola pura `car/CallPillPlace.kt` + `CallPillPlaceTest`, chiave `car_call_pill_at`).
+  Finché la chiamata è in corso (fatta, presa, in attesa; mentre squilla resta la scheda a tutto schermo) una
+  pillola 296×64 dp sta sopra ogni schermo e sotto avvisi, schede e domande. Mostra la foto del contatto o
+  l'iniziale come il Telefono, il nome o il numero ("In chiamata" se non si sa), il tempo in verde
+  (`CallUiState.Active.since`, da quando il telefono va occupato; una chiamata già in corso quando myCar
+  comincia a guardare il telefono non ha tempo) e "Voce sul telefono" in ambra (`rememberCallOnPhone`; col tema
+  chiaro `PositiveOnLight`/`WarningOnLight`). Il tasto rosso chiude (`CarCalls.hangUp`, solo con
+  ANSWER_PHONE_CALLS), il resto apre il Telefono. Si sposta come il mini lettore (`dragAfterHold`, ma con
+  `tapAfterHold = false`: tenuta e lasciata non preme il tasto sotto, un tocco lento non chiude la chiamata). Il
+  posto si salva come frazione dello schermo accanto al dock: mai sotto il dock, sempre dentro i margini. Parte
+  in alto al centro, a destra della scheda della svolta e a sinistra dei tasti della mappa dove c'è posto, più
+  piccola dove non ci sta (`fitScale`, come il mini lettore). Ha preso il posto della barra in alto (`callTop`,
+  `LocalCallTop` tolti): gli schermi non scendono più. Il mini lettore le lascia il posto (`CallPillSpot`,
+  `CallPillPlace.miniApart`: il posto libero più vicino, fuori dai tasti della mappa; finita la chiamata torna
+  dov'era). Una chiamata fatta dall'auto (`placeCall` → `CarCalls.dialing`) ha il suo nome. Anteprima: `--ez
+  fakeCall true` (solo debug, `CallPreview.kt`), `--es fakeCaller`, `--es pillAt`, passi `knob:n`/`knob:ok` di
+  `PreviewScript`; scatti `call-bubble*` e `call-answer` ("call-bubble" li prende tutti). Verificato in CI
+  (0.7.4): pillola su mappa, griglia, Impostazioni, Telefono, 800x480 Normal ed Extra large, tema chiaro;
+  trascinata e salvata; il mini lettore che si sposta e torna; col modem dell'emulatore Rispondi, pillola e
+  tasto rosso che chiude davvero; la manopola che arriva al tasto rosso e lo preme. Non provato in auto, né con
+  la foto di un contatto.
 - Dipendenze approvate dall'utente: OkHttp e androidx.webkit (Plancia integrata), Media3 `session`
   e `common` (Xonos integrato: Apache 2.0, nessuna telemetria).
 - Sfondi "stile umbrelOS" ma **nostri**: le immagini di umbrelOS hanno una licenza non libera.
@@ -1604,9 +1798,9 @@ Tutti i token in un solo posto, `car/design/`:
 - **Comandi rapidi di Home Assistant** come widget nelle pagine (cancello, garage), sul
   collegamento di Plancia integrata (`HomeAssistant`).
 - **Xonos integrato, il resto**: server trovati in rete (mDNS `_mass._tcp`, `NsdFinder` di Xonos)
-  e primo account di un Music Assistant nuovo nelle impostazioni del telefono; mettere in pausa
-  Xonos mentre l'auto tiene le casse per un momento (LOSS_TRANSIENT), invece di perdere quei secondi.
-  Xonos e Plancia restano app a sé per Gearslip.
+  e primo account di un Music Assistant nuovo nelle impostazioni del telefono (la pausa mentre l'auto
+  tiene le casse per un momento c'è dalla 0.7.4: `PausedForCar`). Xonos e Plancia restano app a sé per
+  Gearslip.
 - **Spotify con Client ID personale**: Web API (PKCE) per libreria, salvati e ricerca nell'auto
   e per far suonare l'app Spotify del telefono; l'audio arriva via myCar o Bluetooth. Regole di
   Spotify da febbraio 2026: Premium del proprietario, massimo 5 utenti per Client ID, alcuni

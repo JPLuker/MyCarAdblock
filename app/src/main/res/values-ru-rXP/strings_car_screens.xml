@@ -32,7 +32,7 @@
     <string name="car_settings_web_page_default">DuckDuckGo (по умолчанию) — нажмите, чтобы взять курс на другую страницу</string>
     <string name="car_settings_web_page_note">Показывается в приложении «Браузер» со следующего открытия, а в браузере на ваших палубах — со следующего плавания.</string>
     <string name="car_settings_save_for_vehicle">Сохранить для этого корабля</string>
-    <string name="car_settings_no_vehicle_profile">Профиль корабля не найден</string>
+    <string name="car_settings_no_vehicle_profile">Профиль не в трюме: размеры от корабля</string>
 
     <string name="car_whatsnew_title">Свежая добыча в %1$s</string>
     <string name="car_whatsnew_got_it">Есть!</string>

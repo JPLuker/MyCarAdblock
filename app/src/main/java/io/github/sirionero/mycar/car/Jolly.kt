@@ -1,0 +1,306 @@
+package io.github.sirionero.mycar.car
+
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
+import androidx.annotation.StringRes
+import androidx.car.app.CarToast
+import io.github.sirionero.mycar.AppSettings
+import io.github.sirionero.mycar.MyCarLog
+import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.Words
+import io.github.sirionero.mycar.call.CallUiState
+import io.github.sirionero.mycar.call.CarCalls
+import io.github.sirionero.mycar.home.HaClient
+import io.github.sirionero.mycar.home.HomeAssistant
+import io.github.sirionero.mycar.speech.VoiceLanguage
+import io.github.sirionero.mycar.speech.VoiceLanguages
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
+
+/**
+ * The Jolly key's settings, the same in the car and on the phone: what it does ([action], null until
+ * the driver picks something) and whether the dock shows it at all ([shown], on to begin with).
+ */
+internal object JollySetting {
+    private const val KEY = "car_jolly"
+    private const val KEY_SHOWN = "car_jolly_shown"
+    private var app: Context? = null
+    private val actionFlow = MutableStateFlow<JollyAction?>(null)
+    private val shownFlow = MutableStateFlow(true)
+    val action: StateFlow<JollyAction?> = actionFlow.asStateFlow()
+    val shown: StateFlow<Boolean> = shownFlow.asStateFlow()
+
+    fun init(context: Context) {
+        val app = context.applicationContext.also { this.app = it }
+        actionFlow.value = JollyActions.parse(AppSettings.getString(app, KEY, ""))
+        shownFlow.value = AppSettings.getString(app, KEY_SHOWN, "true") != "false"
+    }
+
+    fun set(action: JollyAction?) {
+        actionFlow.value = action
+        Jolly.disarm()
+        app?.let { AppSettings.putString(it, KEY, action?.let(JollyActions::saved).orEmpty()) }
+    }
+
+    fun setShown(on: Boolean) {
+        shownFlow.value = on
+        app?.let { AppSettings.putString(it, KEY_SHOWN, on.toString()) }
+    }
+}
+
+/**
+ * What a tap on the Jolly key does: the command picked for it, run the way the rest of myCar runs
+ * the same thing - the dialer's call, the microphone's assistant on the phone, Plancia's connection to
+ * Home Assistant, the assistant's "navigate to", its commands, the app grid's apps. Nothing here
+ * types or needs reading: a call or a Home Assistant action is one tap, as a favourite is in Android
+ * Auto, and only opening a lock waits for a second one.
+ */
+internal object Jolly {
+    private val main = Handler(Looper.getMainLooper())
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val second = SecondTap(CONFIRM_MS)
+    private val armedFlow = MutableStateFlow(false)
+
+    /** A lock waits for its second tap: the key is lit meanwhile. */
+    val armed: StateFlow<Boolean> = armedFlow.asStateFlow()
+
+    /**
+     * The key tapped (on the main thread): the command runs, or with none picked yet the chooser
+     * opens. [entries] and [running]: the apps as the dock knows them, [frame] the car's picture.
+     */
+    fun tap(context: Context, navigator: CarNavigator, entries: List<Entry>, running: Map<String, RunningSlot>, frame: CarEnvironment.Frame) {
+        val action = JollySetting.action.value
+        if (action == null) {
+            navigator.jolly()
+            return
+        }
+        // A ringing call has the screen. One under way has the line and the microphone: another call,
+        // an assistant or a spoken answer would go over it.
+        val phoneCall = CarCalls.state.value
+        if (phoneCall is CallUiState.Ringing) return
+        if (phoneCall is CallUiState.Active && action.kind in BUSY_ON_A_CALL) {
+            toast(Words.get(R.string.jolly_after_call))
+            return
+        }
+        MyCarLog.i("jolly: ${action.kind.name.lowercase()}")
+        // The phone's own context, not the car screen's: an assistant started from that one would open on
+        // the car's display, which Android doesn't let it draw on.
+        val app = context.applicationContext
+        when (action) {
+            is JollyAction.Call -> call(app, action)
+            is JollyAction.Assistant -> talk(app, action.app)
+            is JollyAction.Home -> home(action)
+            is JollyAction.Navigate -> navigate(app, navigator, entries, frame, action)
+            is JollyAction.Say -> CarAssistant.runPhrase(action.phrase, language(action.lang))
+            is JollyAction.OpenApp -> open(navigator, entries, running, frame, action)
+        }
+    }
+
+    /** The second tap a lock waited for isn't coming: a new choice, or the chooser opened. */
+    fun disarm() {
+        second.disarm()
+        armedFlow.value = false
+    }
+
+    /** Through Telecom, as the dialer calls: the call's own card comes up on the car. */
+    private fun call(context: Context, action: JollyAction.Call) {
+        if (context.checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            toast(Words.get(R.string.dialer_permissions))
+            return
+        }
+        placeCall(context, action.number)
+    }
+
+    /**
+     * The phone's assistant, or an assistant app, woken listening as the microphone wakes it
+     * (PhoneAssistants: Gemini, Claude, Google...). It listens and answers on the phone, its voice in
+     * the car over Bluetooth. Locked, the phone is opened first, as for the microphone - or, with Home
+     * Assistant there to answer, myCar listens instead. One that won't start: myCar listens.
+     */
+    private fun talk(context: Context, app: String) {
+        val name = PhoneAssistants.label(context, app)
+        // myCar's own, or a message being read or answered, gives way: the driver asked for another.
+        if (CarAssistant.state.value.phase != CarAssistant.Phase.IDLE) CarAssistant.cancel()
+        CarAssistant.replyGivesWay()
+        if (AssistantUnlock.needed(context)) {
+            if (AssistantBrain.ready) {
+                MyCarLog.i("jolly: the phone is locked, myCar listens and Home Assistant answers")
+                toast(Words.get(R.string.assistant_locked_brain))
+                CarAssistant.listenHere()
+                return
+            }
+            AssistantUnlock.start(context, name) { talk(context, app) }
+            return
+        }
+        if (!PhoneAssistants.launch(context, app)) {
+            toast(Words.get(R.string.assistant_start_failed, name))
+            CarAssistant.listenHere()
+            return
+        }
+        toast(
+            if (app == PhoneAssistants.PHONE) Words.get(R.string.assistant_listening_on_phone)
+            else Words.get(R.string.assistant_app_listening_on_phone, name),
+        )
+    }
+
+    /** On the drive's connection to Home Assistant (Plancia inside myCar), with what came of it as a toast. */
+    private fun home(action: JollyAction.Home) {
+        if (!HomeAssistant.config.value.isComplete) {
+            toast(Words.get(R.string.jolly_home_not_set))
+            return
+        }
+        val (domain, service) = HomeActs.service(action.entity, action.act) ?: return
+        val client = HomeAssistant.live
+        if (client == null) {
+            toast(Words.get(R.string.jolly_home_offline))
+            return
+        }
+        if (HomeActs.confirms(action.act) && !confirmed(action.name)) return
+        scope.launch {
+            try {
+                client.command("call_service") {
+                    put("domain", domain)
+                    put("service", service)
+                    put("target", JSONObject().put("entity_id", action.entity))
+                }
+                MyCarLog.i("jolly: Home Assistant ran $domain.$service")
+                toast(Words.get(R.string.jolly_home_done, action.name))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Not its words in the log: they may name the house's things.
+                MyCarLog.w("jolly: Home Assistant didn't run $domain.$service (${e.javaClass.simpleName})")
+                toast(Words.get(R.string.jolly_home_failed, action.name, e.message.orEmpty()))
+            }
+        }
+    }
+
+    /** The first tap arms, a second within [CONFIRM_MS] goes ahead (see [SecondTap]). */
+    private fun confirmed(name: String): Boolean {
+        if (second.tap(SystemClock.uptimeMillis())) {
+            armedFlow.value = false
+            return true
+        }
+        armedFlow.value = true
+        toast(Words.get(R.string.jolly_confirm_unlock, name), CarToast.LENGTH_SHORT)
+        main.postDelayed({ if (!second.armed(SystemClock.uptimeMillis())) armedFlow.value = false }, CONFIRM_MS + 100)
+        return false
+    }
+
+    /**
+     * To the place written on the phone, with the map app myCar's assistant would use for "navigate
+     * to": the one used last, or the first. A map app already guiding takes the new place at once.
+     */
+    private fun navigate(context: Context, navigator: CarNavigator, entries: List<Entry>, frame: CarEnvironment.Frame, action: JollyAction.Navigate) {
+        scope.launch {
+            // The dock's apps, unless the phone's haven't been read yet this drive.
+            val apps = entries.takeIf { list -> list.any { it.template != null } }
+                ?: withContext(Dispatchers.IO) { LauncherCache.load(context) }
+            val maps = apps.filter { it.template?.isNavigation == true }
+            val map = maps.firstOrNull { it.componentId == CarSettings.lastNav.value } ?: maps.firstOrNull()
+            val template = map?.template
+            if (map == null || template == null) {
+                toast(Words.get(R.string.jolly_no_map))
+                return@launch
+            }
+            CarServices.connectNav(template, frame, action.place)
+            navigator.home()
+            toast(Words.get(R.string.jolly_navigating, action.name.ifBlank { action.place }, map.label))
+        }
+    }
+
+    /** As its icon on the grid or in the dock opens it: back to it if it's open. */
+    private fun open(navigator: CarNavigator, entries: List<Entry>, running: Map<String, RunningSlot>, frame: CarEnvironment.Frame, action: JollyAction.OpenApp) {
+        // Saved as the Plancia or Xonos app, or a music service's: the one that stands for it now, as a pin.
+        val shown = pinShown(action.id, entries)
+        val entry = entries.find { it.componentId == shown } ?: findEntry(action.id)
+        if (entry == null) {
+            toast(Words.get(R.string.jolly_app_gone, action.name.ifBlank { action.id }))
+            return
+        }
+        openApp(entry, entry.componentId?.let { running[it] }, navigator, frame)
+    }
+
+    /** The language a command was written in, as the assistant knows it; myCar's own for one it doesn't. */
+    private fun language(code: String): VoiceLanguage =
+        VoiceLanguage.entries.firstOrNull { it.code == code } ?: VoiceLanguages.phone()
+
+    private fun toast(text: String, duration: Int = CarToast.LENGTH_LONG) = CarToasts.show(this, text, duration)
+
+    /** What [action] does, in a few words in myCar's language: in the chooser, the settings, the toasts. */
+    fun title(context: Context, action: JollyAction): String = when (action) {
+        is JollyAction.Call -> Words.get(R.string.jolly_title_call, action.name)
+        is JollyAction.Assistant ->
+            if (action.app == PhoneAssistants.PHONE) Words.get(R.string.jolly_title_ai_phone)
+            else Words.get(R.string.jolly_title_ai, PhoneAssistants.label(context, action.app))
+        is JollyAction.Home -> Words.get(homeTitle(action.entity, action.act), action.name)
+        is JollyAction.Navigate -> Words.get(R.string.jolly_title_navigate, action.name.ifBlank { action.place })
+        is JollyAction.Say -> Words.get(R.string.jolly_title_say, action.phrase)
+        is JollyAction.OpenApp -> Words.get(R.string.jolly_title_app, action.name.ifBlank { action.id })
+    }
+
+    /** "Start …", "Turn … on or off", "Unlock …": what [act] does to [entity], with its name to fill in. */
+    @StringRes
+    fun homeTitle(entity: String, act: HomeAct): Int = when (act) {
+        HomeAct.RUN -> R.string.jolly_title_run
+        HomeAct.PRESS -> R.string.jolly_title_press
+        // A cover is a gate, a garage door or a blind: it opens and closes rather than going on and off.
+        HomeAct.TOGGLE -> if (HomeActs.domain(entity) == "cover") R.string.jolly_title_open_close else R.string.jolly_title_toggle
+        HomeAct.LOCK -> R.string.jolly_title_lock
+        HomeAct.UNLOCK -> R.string.jolly_title_unlock
+    }
+
+    /** What the Jolly key can do in Home Assistant, from [client]'s states, as its lists show it. */
+    suspend fun homeChoices(client: HaClient): List<HomeActs.Choice> {
+        val states = client.command("get_states") as? JSONArray ?: return emptyList()
+        return withContext(Dispatchers.Default) {
+            val things = (0 until states.length()).mapNotNull { i ->
+                val state = states.optJSONObject(i) ?: return@mapNotNull null
+                val entity = state.optString("entity_id").takeIf { it.isNotEmpty() } ?: return@mapNotNull null
+                entity to state.optJSONObject("attributes")?.optString("friendly_name").orEmpty()
+            }
+            HomeActs.choices(things)
+        }
+    }
+
+    /**
+     * The same from the phone's settings, on a connection of its own: the drive's isn't there without
+     * a car. The address at home first, then the one away; the last one's failure if neither answers.
+     */
+    suspend fun homeChoices(config: HomeAssistant.Config): List<HomeActs.Choice> {
+        var failure: Exception? = null
+        for (url in config.urls) {
+            val client = HomeAssistant.newClient()
+            try {
+                client.connect(url, config.token)
+                return homeChoices(client)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                failure = e
+            } finally {
+                client.close()
+            }
+        }
+        throw failure ?: IllegalStateException("no Home Assistant address")
+    }
+
+    /** What a call under way leaves no room for: another call, an assistant listening, an answer spoken. */
+    private val BUSY_ON_A_CALL = setOf(JollyKind.CALL, JollyKind.AI, JollyKind.SAY)
+
+    /** How long a lock waits for its second tap. */
+    private const val CONFIRM_MS = 3_000L
+}

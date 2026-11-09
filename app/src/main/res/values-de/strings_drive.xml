@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_voice_small_model">Das Telefon hat wenig Arbeitsspeicher: Der Assistent hört dich nur mit dem kleinen Modell und kann Namen falsch verstehen.</string>
+    <string name="car_voice_silent">Die Stimme des Telefons spricht nicht: Antworten werden nur angezeigt. Sieh unter Sprachsteuerung in den Einstellungen von myCar auf dem Telefon nach.</string>
+    <string name="phone_voice_missing_title">Das Telefon hat keine Stimme für %1$s</string>
+    <string name="phone_voice_missing_detail">Seine Sprachausgabe, %1$s, hat keine Stimme für %2$s: Im Auto zeigt der Assistent seine Antworten nur an. Füge diese Stimme hinzu oder installiere eine Sprachausgabe, die sie hat, und wähle sie dann in den Android-Einstellungen für die Sprachausgabe.</string>
+    <string name="phone_voice_silent_detail">Im Auto hat seine Sprachausgabe, %1$s, nicht zu sprechen begonnen: Der Assistent hat seine Antworten nur angezeigt. Prüfe die Stimme für %2$s in den Android-Einstellungen für die Sprachausgabe oder wähle dort eine andere.</string>
+    <string name="phone_voice_no_engine_detail">Das Telefon hat keine Sprachausgabe: Im Auto zeigt der Assistent seine Antworten nur an. Installiere eine mit einer Stimme für %1$s und wähle sie dann in den Android-Einstellungen für die Sprachausgabe.</string>
+    <string name="phone_voice_open_settings">Einstellungen der Sprachausgabe</string>
+</resources>

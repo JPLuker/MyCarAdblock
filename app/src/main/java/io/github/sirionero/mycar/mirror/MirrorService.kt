@@ -13,6 +13,7 @@ import android.media.projection.MediaProjectionManager
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.Words
@@ -59,6 +60,7 @@ class MirrorService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
+        keepScreenOn()
 
         // The session owns the encoder Surface, so it performs the swap once a token exists.
         Handler(Looper.getMainLooper()).post { PhoneMirror.onTokenReady?.invoke(media) }
@@ -68,10 +70,35 @@ class MirrorService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         started = false
+        runCatching { screenOn?.release() }
+        screenOn = null
         Handler(Looper.getMainLooper()).post {
+            // Before the sharing's projection stops: a capture of the phone's sound on it ends first.
+            io.github.sirionero.mycar.audio.AudioCaptureService.sharingEnded()
             PhoneMirror.end()
             PhoneMirror.onEnded?.invoke()
         }
+    }
+
+    private var screenOn: PowerManager.WakeLock? = null
+
+    /**
+     * Keeps the phone's screen on while the car shows it, until the sharing ends. A still screen
+     * went dark at the phone's timeout, and the car's picture with it: only the car's touches kept it
+     * awake, and without myCar's Accessibility there are none (with it, the window of
+     * [TouchRelayService] does the same). From Android 16 the lock that follows also ends the sharing.
+     * Taken just after the driver's Start, with the screen on: it keeps the screen on, never turns it
+     * on, and the power button still turns it off. Let go, the screen stays on for the usual timeout
+     * (ON_AFTER_RELEASE) instead of going dark the moment a long sharing ends.
+     */
+    @Suppress("DEPRECATION") // SCREEN_BRIGHT_WAKE_LOCK: still honoured, and a service has no window for FLAG_KEEP_SCREEN_ON
+    private fun keepScreenOn() {
+        if (screenOn != null) return
+        screenOn = runCatching {
+            getSystemService(PowerManager::class.java)
+                .newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE, "myCar:mirror")
+                .apply { setReferenceCounted(false); acquire() }
+        }.onFailure { MyCarLog.w("mirror: couldn't keep the phone's screen on: ${it.message}") }.getOrNull()
     }
 
     private fun notification(): Notification {

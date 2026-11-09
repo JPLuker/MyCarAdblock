@@ -73,10 +73,21 @@ object AssistantBrain {
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            MyCarLog.w("assistant: Home Assistant didn't answer: ${e.message}")
-            Reply(AssistantLanguage.answer("Home Assistant didn't answer."), false)
+            if (Assist.agentMissing(e)) {
+                // Home Assistant answered: its voice assistant names an agent it doesn't have. Not "didn't
+                // answer", which sounded like the network: what to set again, and where.
+                MyCarLog.w("assistant: Home Assistant's voice assistant can't find its conversation agent: ${e.message}")
+                Reply(AssistantLanguage.answer(NO_AGENT), false)
+            } else {
+                MyCarLog.w("assistant: Home Assistant didn't answer: ${e.message}")
+                Reply(AssistantLanguage.answer("Home Assistant didn't answer."), false)
+            }
         }
     }
+
+    /** Said when Home Assistant's voice assistant can't find its conversation agent (see Assist.agentMissing). */
+    private const val NO_AGENT =
+        "Home Assistant's voice assistant can't find its conversation agent. Choose it again in Home Assistant, under Settings, Voice assistants."
 
     /** A question within a few minutes of the last carries on with it ("and tomorrow?"). */
     private const val FOLLOW_ON_MS = 5 * 60_000L

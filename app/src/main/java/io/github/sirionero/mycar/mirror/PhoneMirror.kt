@@ -38,6 +38,12 @@ object PhoneMirror {
     private var frameWidth = 0
     private var frameHeight = 0
 
+    /** The car's picture is taller than wide: the phone is held upright there, not on its side. */
+    val upright: Boolean get() = uprightIn(frameWidth, frameHeight)
+
+    /** Whether a car picture of [width] x [height] holds the phone upright, rather than on its side. */
+    fun uprightIn(width: Int, height: Int): Boolean = height > width
+
     /**
      * Wired up by the session, which owns the encoder Surface and so is the only thing that
      * can swap what draws into it. All three are invoked on the main thread.
@@ -115,8 +121,8 @@ object PhoneMirror {
         }
         if (display != null) {
             MyCarLog.i("mirroring the phone into ${width}x$height")
-            // The car's screen is wide: the phone turns to match while it's shown there.
-            TouchRelayService.instance?.holdLandscape(true)
+            // The phone turns to the shape of the car's picture while it's shown there.
+            TouchRelayService.instance?.holdTurned(upright)
         }
     }
 
@@ -131,7 +137,7 @@ object PhoneMirror {
     }
 
     fun end() {
-        TouchRelayService.instance?.holdLandscape(false)
+        TouchRelayService.instance?.letTurn()
         runCatching { display?.release() }
         runCatching { media?.stop() }
         display = null

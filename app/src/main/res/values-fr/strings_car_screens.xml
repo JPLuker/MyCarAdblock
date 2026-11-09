@@ -67,7 +67,7 @@
     <string name="car_settings_saved_to">Enregistré pour %1$s</string>
     <string name="car_settings_save_failed">Échec de l’enregistrement</string>
     <string name="car_settings_save_for_vehicle">Enregistrer pour ce véhicule</string>
-    <string name="car_settings_no_vehicle_profile">Aucun profil de véhicule correspondant</string>
+    <string name="car_settings_no_vehicle_profile">Sans profil : dimensions données par la voiture</string>
 
     <string name="car_whatsnew_title">Nouveautés de la %1$s</string>
     <string name="car_whatsnew_show_after_updates">Afficher après les mises à jour</string>

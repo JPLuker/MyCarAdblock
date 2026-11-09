@@ -119,8 +119,6 @@ internal fun HomePager(onHome: Boolean, mapSplit: Boolean, mapPage: @Composable 
     val latest by rememberUpdatedState(pages)
     val mapIndex = pages.indexOfFirst { it.layout == PageLayout.MAP }.coerceAtLeast(0)
     val pager = rememberPagerState(initialPage = mapIndex) { pages.size }
-    // Under a call's banner: the driver's pages, the bar and the lists of their changing (not the map).
-    val callTop = LocalCallTop.current
     var editing by remember { mutableStateOf<Int?>(null) }
     var choosing by remember { mutableStateOf<Int?>(null) }
     // The list of layouts for the page being changed.
@@ -239,7 +237,6 @@ internal fun HomePager(onHome: Boolean, mapSplit: Boolean, mapPage: @Composable 
                         editing = page.id
                         choosing = slot
                     },
-                    modifier = Modifier.padding(top = callTop),
                 )
             }
         }
@@ -278,9 +275,9 @@ internal fun HomePager(onHome: Boolean, mapSplit: Boolean, mapPage: @Composable 
                     follow = latest.firstOrNull { it.layout == PageLayout.MAP }?.id
                 },
                 onDone = { editing = null },
-                modifier = Modifier.align(Alignment.TopCenter).padding(top = callTop).padding(MyCarSpace.S),
+                modifier = Modifier.align(Alignment.TopCenter).padding(MyCarSpace.S),
             )
-            if (choosingLayout) Box(Modifier.fillMaxSize().padding(top = callTop)) {
+            if (choosingLayout) {
                 LayoutChooser(
                     edited.layout,
                     onChoose = { layout ->
@@ -291,17 +288,15 @@ internal fun HomePager(onHome: Boolean, mapSplit: Boolean, mapPage: @Composable 
                 )
             }
             choosing?.let { slot ->
-                Box(Modifier.fillMaxSize().padding(top = callTop)) {
-                    ContentChooser(
-                        edited,
-                        slot,
-                        onChoose = { content ->
-                            HomePages.save(latest.withSlot(edited.id, slot, content))
-                            choosing = null
-                        },
-                        onClose = { choosing = null },
-                    )
-                }
+                ContentChooser(
+                    edited,
+                    slot,
+                    onChoose = { content ->
+                        HomePages.save(latest.withSlot(edited.id, slot, content))
+                        choosing = null
+                    },
+                    onClose = { choosing = null },
+                )
             }
         }
     }
@@ -312,7 +307,7 @@ internal class WebTile(val onHold: () -> Unit, val keyboard: MutableState<(@Comp
 
 /** One of the driver's pages: its parts, and under them, the page's whole width, the browser's keyboard. */
 @Composable
-private fun DriverPage(page: HomePage, inView: Boolean, editing: Boolean, onEdit: () -> Unit, onChoose: (Int) -> Unit, modifier: Modifier = Modifier) {
+private fun DriverPage(page: HomePage, inView: Boolean, editing: Boolean, onEdit: () -> Unit, onChoose: (Int) -> Unit) {
     val entries = rememberAllEntries()
     val keyboard = remember { mutableStateOf<(@Composable () -> Unit)?>(null) }
     // A page runs one car app, in the first part that holds one; the list of choices keeps it so.
@@ -320,7 +315,7 @@ private fun DriverPage(page: HomePage, inView: Boolean, editing: Boolean, onEdit
     val part: @Composable (Int, Modifier) -> Unit = { slot, modifier ->
         PagePart(page.slots[slot], entries, inView, inView && slot == runner, editing, onEdit, { onChoose(slot) }, keyboard, modifier)
     }
-    Column(modifier.fillMaxSize()) {
+    Column(Modifier.fillMaxSize()) {
         // The parts are panels raised off the wallpaper (see Panels.kt), the same gap round them as between them.
         Box(Modifier.weight(1f).fillMaxWidth().padding(PageGap)) {
             when (page.layout) {

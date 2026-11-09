@@ -33,6 +33,9 @@ internal object AssistantUnlock {
     /** When [AssistantUnlockActivity] last had the phone opened, for the start it then asks for. */
     @Volatile private var openedAt = 0L
 
+    /** What starts once the phone is open: the microphone's assistant, or the Jolly key's. */
+    @Volatile private var next: () -> Unit = { CarAssistant.start() }
+
     /** The phone is locked or asleep: the assistant would start where nobody can talk to it. */
     fun needed(context: Context): Boolean {
         // Just opened for this very touch: the lock may take a moment longer to say it's gone.
@@ -45,8 +48,12 @@ internal object AssistantUnlock {
         return locked || asleep
     }
 
-    /** Opens the phone, then starts the chosen assistant through [CarAssistant] once more. */
-    fun start(context: Context, name: String) {
+    /**
+     * Opens the phone, then starts the chosen assistant through [CarAssistant] once more - or, for the
+     * Jolly key's, [then].
+     */
+    fun start(context: Context, name: String, then: () -> Unit = { CarAssistant.start() }) {
+        next = then
         // Whether opening takes the driver's face, finger or PIN, rather than nothing.
         if (context.getSystemService(KeyguardManager::class.java)?.isDeviceLocked == true) {
             CarToasts.show(this, Words.get(R.string.assistant_unlock_to_start, name), CarToast.LENGTH_LONG)
@@ -71,7 +78,7 @@ internal object AssistantUnlock {
     internal fun opened() {
         main.postDelayed({
             openedAt = SystemClock.uptimeMillis()
-            CarAssistant.start()
+            next()
         }, LOCK_GONE_MS)
     }
 

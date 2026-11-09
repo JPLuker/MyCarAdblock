@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_host_modified_refused">Эта копия %1$s изменена, но не принимает myCar. В Morphe, патч «Allow Gearslip», параметр «Accepted hosts»: добавьте в конце «;» и %2$s, затем пропатчьте %1$s заново.</string>
+</resources>

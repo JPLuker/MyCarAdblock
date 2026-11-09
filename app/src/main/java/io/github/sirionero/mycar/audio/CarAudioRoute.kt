@@ -239,14 +239,18 @@ object CarAudioRoute {
         val callback = object : AudioDeviceCallback() {
             override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>) {
                 _bluetoothOut.value = anyBluetoothOut()
+                SessionReport.carMusicBluetooth(bluetoothMusic())
             }
 
             override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>) {
                 _bluetoothOut.value = anyBluetoothOut()
+                SessionReport.carMusicBluetooth(bluetoothMusic())
             }
         }
         outputs = callback
         _bluetoothOut.value = anyBluetoothOut()
+        // For the session report's end: the car's Bluetooth music going is a car switching off.
+        SessionReport.carMusicBluetooth(bluetoothMusic())
         audio?.registerAudioDeviceCallback(callback, main)
     }
 
@@ -280,6 +284,12 @@ object CarAudioRoute {
         if (Build.VERSION.SDK_INT >= 33) types += AudioDeviceInfo.TYPE_BLE_BROADCAST
         return manager.getDevices(AudioManager.GET_DEVICES_OUTPUTS).any { it.type in types }
     }
+
+    /**
+     * Right now, an output for music other than the phone itself ([anyBluetoothOut]): music started
+     * now doesn't come out of the phone's speaker. For CarServices' second pause after the car left.
+     */
+    fun musicOutsideThePhone(): Boolean = audio != null && anyBluetoothOut()
 
     /** A Bluetooth music output that may be the car: any, unless the car named another address. */
     private fun bluetoothMusic(): Boolean {

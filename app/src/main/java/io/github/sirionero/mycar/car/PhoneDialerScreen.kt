@@ -128,7 +128,8 @@ internal fun placeCall(context: Context, number: String) {
     }
     runCatching {
         context.getSystemService(TelecomManager::class.java).placeCall(Uri.fromParts("tel", number, null), Bundle())
-    }.onFailure { MyCarLog.e("calls: couldn't place the call", it) }
+    }.onSuccess { io.github.sirionero.mycar.call.CarCalls.dialing(context, number) }
+        .onFailure { MyCarLog.e("calls: couldn't place the call", it) }
 }
 
 /** A call another car screen wants to place - a number on a place page - waiting on the driver. */

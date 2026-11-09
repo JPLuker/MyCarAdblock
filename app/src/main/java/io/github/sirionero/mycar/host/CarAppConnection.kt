@@ -98,6 +98,9 @@ class CarAppConnection(private val context: Context) {
     private var binding: ServiceConnection? = null
     private var component: ComponentName? = null
 
+    /** The app has taken myCar as its host (the handshake went through); a refusal comes before it. */
+    private var hostAccepted = false
+
     /** Whose icon the header shows for the standard app-icon action. */
     val appPackage: String? get() = component?.packageName
 
@@ -124,6 +127,7 @@ class CarAppConnection(private val context: Context) {
         frameHeight = height
         frameDensity = densityDpi
         component = app.component
+        hostAccepted = false
         pendingDestination = destination
         destinationOnceRunning = null
         update { Status(phase = Phase.BINDING, app = app.label) }
@@ -233,12 +237,13 @@ class CarAppConnection(private val context: Context) {
     private fun disconnect(keepLocation: Boolean) {
         main.removeCallbacks(handshakeTimeout)
         clearToasts()
-        lent?.let { sendSurfaceDestroyed(it) }
+        // The app is let go of right after: its library may turn these down, its session closing.
+        lent?.let { sendSurfaceDestroyed(it, leaving = true) }
         lent = null
         val carApp = this.carApp
         if (carApp != null) {
-            runCatching { carApp.onAppPause(noop("onAppPause")) }
-            runCatching { carApp.onAppStop(noop("onAppStop")) }
+            runCatching { carApp.onAppPause(noop("onAppPause", leaving = true)) }
+            runCatching { carApp.onAppStop(noop("onAppStop", leaving = true)) }
         }
         if (holdsLocation && !keepLocation) {
             holdsLocation = false
@@ -291,6 +296,7 @@ class CarAppConnection(private val context: Context) {
         appManager = null
         navigationManager = null
         surfaceCallback = null
+        hostAccepted = false
         update { it.copy(phase = Phase.HANDSHAKE, detail = "bound, asking for app info", surfaceRequested = false, surfaceAttached = false) }
         MyCarLog.i("host: bound; requesting app info")
         main.removeCallbacks(handshakeTimeout)
@@ -331,6 +337,8 @@ class CarAppConnection(private val context: Context) {
     private fun onHandshakeAccepted() {
         val app = carApp ?: return
         MyCarLog.i("host: handshake accepted; creating the app")
+        hostAccepted = true
+        component?.packageName?.let { PatchRefusals.forget(context, it) }
         val intent = pendingDestination?.let { autoRoute.arm(); navigateIntent(it) }
             ?: Intent(Intent.ACTION_MAIN).setComponent(component)
         if (pendingDestination != null) destinationOnceRunning = null
@@ -615,14 +623,14 @@ class CarAppConnection(private val context: Context) {
         update { it.copy(surfaceAttached = true) }
     }
 
-    private fun sendSurfaceDestroyed(surface: Lent) {
+    private fun sendSurfaceDestroyed(surface: Lent, leaving: Boolean = false) {
         val callback = surfaceCallback ?: return
         val container = runCatching {
             Bundleable.create(
                 SurfaceContainer(surface.surface, surface.width, surface.height, surface.dpi)
             )
         }.getOrNull() ?: return
-        runCatching { callback.onSurfaceDestroyed(container, noop("onSurfaceDestroyed")) }
+        runCatching { callback.onSurfaceDestroyed(container, noop("onSurfaceDestroyed", leaving)) }
         MyCarLog.i("host: took the surface back")
     }
 
@@ -703,8 +711,19 @@ class CarAppConnection(private val context: Context) {
         }
 
         override fun sendLocation(location: Location?) = Unit
-        override fun showAlert(alert: Bundleable?) = Unit
-        override fun dismissAlert(alertId: Int) = Unit
+
+        /** Waze asking whether a hazard is still there: shown on the car's screen (CarAlerts). */
+        override fun showAlert(alert: Bundleable?) {
+            val shown = runCatching { alert?.get() as? androidx.car.app.model.Alert }
+                .onFailure { MyCarLog.w("host: couldn't read an alert: ${it.message}") }
+                .getOrNull() ?: return
+            main.post { if (toastOwner === owner) io.github.sirionero.mycar.car.CarAlerts.show(owner, shown) }
+        }
+
+        override fun dismissAlert(alertId: Int) {
+            main.post { io.github.sirionero.mycar.car.CarAlerts.dismiss(owner, alertId) }
+        }
+
         override fun openMicrophone(request: Bundleable?): Bundleable? = null
     }
 
@@ -854,9 +873,14 @@ class CarAppConnection(private val context: Context) {
             .onFailure { fail(Phase.REJECTED, Words.get(R.string.car_host_threw, name, it.javaClass.simpleName, "${it.message}")) }
     }
 
-    private fun noop(name: String) = object : IOnDoneCallback.Stub() {
+    /**
+     * An answer nothing waits for. [leaving]: sent as the app is let go of (the drive or the app
+     * ending), when the app's library turning it down is expected - not a warning then.
+     */
+    private fun noop(name: String, leaving: Boolean = false) = object : IOnDoneCallback.Stub() {
         override fun onSuccess(response: Bundleable?) = Unit
-        override fun onFailure(response: Bundleable?) = MyCarLog.w("host: $name failed")
+        override fun onFailure(response: Bundleable?) =
+            if (leaving) MyCarLog.i("host: $name failed - the app was being let go") else MyCarLog.w("host: $name failed")
     }
 
     /**
@@ -901,11 +925,27 @@ class CarAppConnection(private val context: Context) {
         clearToasts()
         _trip.value = null
         MyCarLog.e("host: $detail")
-        update { it.copy(phase = phase, detail = detail) }
+        val shown = noteModifiedRefusal(phase) ?: detail
+        update { it.copy(phase = phase, detail = shown) }
+    }
+
+    /**
+     * A modified copy of an app that refuses myCar on its own (Waze, re-signed by Morphe) that said
+     * no before taking myCar as its host: patched for something else, or with hosts that leave myCar
+     * out. Counted as broken again (see [PatchRefusals]), and the car says what to add to the patch.
+     */
+    private fun noteModifiedRefusal(phase: Phase): String? {
+        if (phase != Phase.REJECTED || hostAccepted) return null
+        val pkg = component?.packageName ?: return null
+        if (!KnownApps.modified(context, pkg)) return null
+        PatchRefusals.remember(context, pkg)
+        MyCarLog.w("host: $pkg is a modified copy and refused myCar - marked broken until it accepts myCar or is installed again")
+        return Words.get(R.string.car_host_modified_refused, _status.value.app ?: pkg, PatchRefusals.hostsEntry(context))
     }
 
     private fun clearToasts() {
         CarToasts.clear(toastOwner)
+        io.github.sirionero.mycar.car.CarAlerts.clear(toastOwner)
         toastOwner = Any()
     }
 

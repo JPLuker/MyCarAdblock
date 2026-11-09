@@ -179,6 +179,7 @@ fun SettingsScreen(
                     }
                     SettingsPage.VOICE -> {
                         AssistantSection()
+                        PhoneVoiceSection()
                         VoiceModelSection()
                     }
                     SettingsPage.MUSIC -> MusicSettings()
@@ -321,6 +322,8 @@ private fun ConnectionSection() {
         )
         SettingsDivider()
         WirelessAutoRow()
+        SettingsDivider()
+        PhoneAddressRow()
     }
 }
 
@@ -382,6 +385,7 @@ private fun HelpSection(onOpenHelp: () -> Unit, onOpenLogs: () -> Unit) {
 @Composable
 private fun CarAudioSection() {
     val route by CarSettings.audioRoute.collectAsState()
+    val radioFirst by CarSettings.radioFirst.collectAsState()
     SettingsSection(
         stringResource(R.string.settings_audio_title),
         footer = if (route != AudioRoute.BLUETOOTH) {
@@ -404,6 +408,13 @@ private fun CarAudioSection() {
             AudioRoute.CAR_LINK, route, stringResource(R.string.settings_audio_mycar),
             stringResource(R.string.settings_audio_mycar_detail),
         )
+        SettingsDivider()
+        // The car's setting of the same name, next to its audio route there too.
+        SwitchRow(
+            stringResource(R.string.car_settings_radio_first),
+            radioFirst,
+            stringResource(R.string.settings_radio_first_detail),
+        ) { CarSettings.setRadioFirst(it) }
     }
 }
 

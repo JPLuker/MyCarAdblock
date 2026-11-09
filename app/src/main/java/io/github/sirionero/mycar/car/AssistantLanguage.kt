@@ -150,6 +150,7 @@ internal enum class Said(pattern: String) {
     // Home Assistant's Assist, for what isn't one of myCar's commands (AssistantBrain).
     DONE("""Done\."""),
     HOME_ASSISTANT_SILENT("""Home Assistant didn't answer\."""),
+    HOME_ASSISTANT_NO_AGENT("""Home Assistant's voice assistant can't find its conversation agent\. Choose it again in Home Assistant, under Settings, Voice assistants\."""),
     // The microphone and the speech engine.
     NEEDS_MIC("""Needs the microphone permission\."""),
     AFTER_CALL("""Voice commands work once the call ends\."""),
@@ -162,6 +163,7 @@ internal enum class Said(pattern: String) {
     MODEL_NOT_DOWNLOADED("""Download a voice model in myCar's settings on the phone first\."""),
     MIC_SILENCED("""The phone's microphone is silenced\. Unlock the phone and try again\."""),
     MIC_UNAVAILABLE("""The microphone isn't available right now\."""),
+    SHORT_OF_MEMORY("""The phone is short of memory for the voice model right now\."""),
     // Messages read aloud and answered.
     MISSED_CALL_FROM("""Missed call from (.+)\."""),
     WANT_TO_REPLY("""Do you want to reply\?"""),

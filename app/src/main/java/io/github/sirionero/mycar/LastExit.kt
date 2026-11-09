@@ -47,7 +47,33 @@ internal object LastExit {
         val shown = recent.take(5)
         if (recent.size > shown.size) MyCarLog.i("last exit: ${recent.size - shown.size} earlier endings not shown")
         shown.reversed().forEach(::tellOne)
+        // At the end of the run's own log too, for myCar's own process.
+        shown.filter { it.processName == own }.forEach(::endTheRun)
         prefs.edit().putLong(TOLD, exits.maxOf { it.timestamp }).apply()
+    }
+
+    /**
+     * The ending also at the foot of the log of the run it ended, the one a driver shares after a
+     * drive that went wrong (Logs, the earlier ones): there it just stopped. Only for those its own
+     * log can't tell - a native crash, an ANR, Android's memory limit for apps, Android closing myCar
+     * for using too much - and Android closing it for memory or with a signal while it was in use
+     * (on screen, or with a drive's service): left in the background, that's only Android making room.
+     * Only in a log that names the process (MyCarLog.endPastRun), which then counts as crashed.
+     */
+    private fun endTheRun(exit: ApplicationExitInfo) {
+        val inUse = exit.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_PERCEPTIBLE
+        val untold = exit.description.orEmpty().contains("MemoryLimiter") || when (exit.reason) {
+            ApplicationExitInfo.REASON_CRASH_NATIVE, ApplicationExitInfo.REASON_ANR,
+            ApplicationExitInfo.REASON_EXCESSIVE_RESOURCE_USAGE -> true
+            ApplicationExitInfo.REASON_LOW_MEMORY, ApplicationExitInfo.REASON_SIGNALED -> inUse
+            else -> false
+        }
+        if (!untold) return
+        val stamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date(exit.timestamp))
+        MyCarLog.endPastRun(
+            exit.pid, exit.timestamp,
+            "${MyCarLog.ENDED} ${reasonName(exit.reason)} at $stamp" + exit.description?.let { ": $it" }.orEmpty(),
+        )
     }
 
     private fun tellOne(exit: ApplicationExitInfo) {

@@ -49,6 +49,7 @@ import io.github.sirionero.mycar.AppSettings
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.audio.AudioRoute
 import io.github.sirionero.mycar.ui.CertSummary
+import io.github.sirionero.mycar.webmusic.WebMusic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -69,8 +70,11 @@ fun CarSettingsScreen() {
     val bluetoothWarning by CarSettings.bluetoothWarning.collectAsState()
     val locationWarning by CarSettings.locationWarning.collectAsState()
     val autoplay by CarSettings.autoplay.collectAsState()
+    val radioFirst by CarSettings.radioFirst.collectAsState()
     val playerSize by CarSettings.playerSize.collectAsState()
     val miniPlayer by MiniPlayerSetting.on.collectAsState()
+    val videoCover by VideoCoverSetting.on.collectAsState()
+    val webMusicOn by WebMusic.on.collectAsState()
     val theme by CarSettings.appTheme.collectAsState()
     val uiTheme by CarSettings.uiTheme.collectAsState()
     val experimentalFeatures by CarSettings.experimentalFeaturesEnabled.collectAsState()
@@ -111,6 +115,21 @@ fun CarSettingsScreen() {
             playerSize,
         ) { CarSettings.setPlayerSize(it) }
 
+        // With a music service in the car whose songs can have a video cover (Spotify Web): the cover
+        // in the player beside the map, as the button on the cover sets it.
+        if (WebMusic.CATALOG.any { it.id in webMusicOn && it.videoCovers.isNotEmpty() }) {
+            ChoiceRow(
+                stringResource(R.string.car_settings_cover),
+                listOf(false to stringResource(R.string.car_settings_cover_still), true to stringResource(R.string.car_settings_cover_video)),
+                videoCover,
+            ) { VideoCoverSetting.setOn(it) }
+            Text(
+                stringResource(R.string.car_settings_cover_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
         ChoiceRow(
             stringResource(R.string.car_settings_mini_player),
             listOf(false to stringResource(R.string.common_off), true to stringResource(R.string.common_on)),
@@ -120,6 +139,8 @@ fun CarSettingsScreen() {
         HomePagesSettings()
 
         HiddenAppsSettings()
+
+        JollyCarSettings()
 
         ChoiceRow(
             stringResource(R.string.car_settings_size),
@@ -188,6 +209,16 @@ fun CarSettingsScreen() {
         ) { CarSettings.setAudioRoute(it) }
         Text(
             stringResource(R.string.car_settings_car_audio_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        ChoiceRow(
+            stringResource(R.string.car_settings_radio_first),
+            listOf(false to stringResource(R.string.common_off), true to stringResource(R.string.common_on)),
+            radioFirst,
+        ) { CarSettings.setRadioFirst(it) }
+        Text(
+            stringResource(R.string.car_settings_radio_first_note),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -266,7 +297,7 @@ fun CarSettingsScreen() {
 private val ROOMY_CHOICE = 110.dp
 
 @Composable
-private fun <T> ChoiceRow(title: String, options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit) {
+internal fun <T> ChoiceRow(title: String, options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
         // Too narrow for each name whole (six choices at Extra large broke "Browse/r"): wider choices

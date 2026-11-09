@@ -50,6 +50,23 @@ class WebMusicService(
     val firstPlay: List<String> = emptyList(),
     /** Its own app on the phone, which the car's app grid can leave out for this one ([WebMusic.hideApp]). */
     val appPackage: String? = null,
+    /**
+     * Where its songs' video covers come from (Spotify's Canvas): the starts of the addresses of the
+     * <video> its page shows for the song in play. myCar's player can show that video in place of the
+     * cover; none for a service without them.
+     */
+    val videoCovers: List<String> = emptyList(),
+    /**
+     * The prop of its page's own component that plays the song's video cover where that component gets
+     * the video's address (Spotify's Canvas player: canvasUrl), as React keeps it: its <video> plays
+     * through the service's own video player and has no such address. Null to read only the <video>.
+     */
+    val videoCoverProp: String? = null,
+    /**
+     * A component given such an address with this prop at this value is a preview of another song, never
+     * the cover of the one in play (Spotify's cards play a Canvas on hover: playbackType loopOnHover).
+     */
+    val videoCoverPreview: Pair<String, String>? = null,
 ) {
     class Bar(
         val playPause: String,
@@ -112,6 +129,12 @@ object WebMusic {
             "[data-testid=\"global-nav-bar\"] { padding-left: $BACK_ROOM !important; }",
         search = "https://open.spotify.com/search/{q}",
         firstPlay = listOf("[data-testid=\"top-result-card\"] [data-testid=\"play-button\"]", "[data-testid=\"tracklist-row\"] button"),
+        // Its Canvas: the muted loop its Now playing view shows in place of the cover, from its canvas
+        // CDN. Its Canvas player gets the address as canvasUrl and plays it by file id through Spotify's
+        // own video player (seen in its web player's script, November 2026).
+        videoCovers = listOf("https://canvaz.scdn.co/"),
+        videoCoverProp = "canvasUrl",
+        videoCoverPreview = "playbackType" to "loopOnHover",
     )
 
     private val AMAZON = listOf("com", "de", "co.uk", "it", "fr", "es", "ca", "com.br", "com.mx", "co.jp", "in", "com.au")
