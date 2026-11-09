@@ -649,6 +649,35 @@ Tutti i token in un solo posto, `car/design/`:
   (`CarNavigator.sidePanel` parte da `CONTROLS`), come nella vecchia barra in basso; la X lo
   chiude per il viaggio, un tocco sul brano nel dock lo riporta o lo toglie, tenerlo premuto apre
   il player a tutto schermo. Non nasconderlo dietro gesti poco scopribili.
+- **Riquadri rialzati** (0.7.4, `design/raised-panels`; richiesta dell'utente: "le plance che si dividono sono
+  troppo squadrate, i riquadri siano tipo nuvolette rialzate dallo sfondo sotto"; `car/design/Panels.kt`, valori
+  in `MyCarDesign.kt`): negli schermi divisi ogni riquadro è un pannello rialzato sopra lo sfondo
+  (`Modifier.raisedPanel()`, `PanelShape`): angoli da 24 dp (`MyCarRadius.Panel`), 8 dp di sfondo fra i pannelli
+  e attorno (`MyCarSpace.Panel`), un'ombra corta disegnata solo fuori dal pannello, 2 dp più in basso
+  (`MyCarLift`: 8 dp, 0,5 sul tema scuro, 0,2 sul chiaro; niente sfocatura) e un bordo di luce in alto. Dove: la
+  Home con qualcosa accanto alla mappa (mappa e colonna; la mappa da sola resta da bordo a bordo; `HomePager`
+  disegna lo sfondo anche dietro la pagina della mappa divisa, `mapSplit`) e tutte le parti delle pagine (la
+  parte vuota e la copertura della modifica hanno la forma ma non l'ombra). Stessa impaginazione di prima. Il
+  pannello della colonna sta alla densità dello schermo, fuori dalla dimensione del lettore (`sideScaleFor`
+  riceve lo spazio senza i margini). **Angoli**: la superficie di un'app (SurfaceView) è un livello sotto la
+  finestra visto dal buco che la vista apre, e il buco segue il ritaglio arrotondato: niente da ridipingere
+  (verificato in CI). Le pagine web sì (`coverCorners`: Plancia e browser), perché con Vulkan il WebView riceve
+  solo il rettangolo del ritaglio: sopra i loro angoli `wallpaperOutside` ridipinge lo sfondo allineato allo
+  schermo (stesso orologio degli sfondi animati). Il video della copertina sta nel pannello del lettore,
+  arrotondato dal suo ritaglio. **Ombra negli angoli**: gradiente fra due cerchi (`RadialGradient` di API 31) a
+  tre colori; con il radiale a quattro colori SwiftShader disegnava puntini scuri dove finisce l'ombra e
+  l'emulatore della CI cadeva al primo disegno della Home divisa (7 corse su 9; con tre colori una caduta sola
+  in 6 corse, la causa non è dimostrata). Con un sfondo animato i margini fra i pannelli si muovono: più
+  fotogrammi da mandare al video. Gli angoli tagliati della mappa (meno di 24 dp) non prendono tocchi.
+  **Manopola**: l'anello in un angolo di un pannello prende l'angolo del pannello (`PanelCornersNode`). Scatti
+  `split-800x480`, `split-xs-800x480`, `split-1920x1080`, `split-light`, `split-waves`, `split-none`,
+  `pages-light`. Per `home.png`: a 1920x720 il pannello del lettore va da x 1347 a 1908 e da y 12 a 708 (asse x
+  1627,5); il badge copre anche i 12 px di sfondo a destra e in basso. Annullare la Car preview automatica (un
+  push su `design/**` fa partire tutti gli scatti, più di 120 minuti) pubblica comunque un `ci/car-preview`
+  vuoto (Publish `if: always()`): i risultati sovrascritti si recuperano con l'API `activity` del ramo (`GET
+  /repos/SirioNero/MyCar/activity?ref=refs/heads/ci/car-preview`) e `git fetch origin <sha>`. Da guardare: la
+  pillola della chiamata, al suo posto di partenza, su una pagina del guidatore copre l'intestazione della parte
+  destra ("Coming up"); si sposta tenendola premuta.
 - **Dimensioni**: Extra small 83%, Small 90%, Normal, Large 125%, Extra large 150% (scala la
   densità di tutta la UI dell'auto, `CarSettings.scale`).
 - **Player in stile telefono recente** (0.5.09): comandi semplici senza bottoni sotto
