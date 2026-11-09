@@ -1,5 +1,6 @@
 package io.github.sirionero.mycar.car
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +41,15 @@ import io.github.sirionero.mycar.audio.CarAudio
  */
 @Composable
 internal fun MusicNotReaching(playing: Boolean, modifier: Modifier = Modifier) {
+    musicNotReaching(playing)?.let { MusicNotReaching(it, modifier) }
+}
+
+/**
+ * What [MusicNotReaching] says now; null while the music reaches the car, or needs no question: for a
+ * player that makes room for it (the video cover's button gives it its place).
+ */
+@Composable
+internal fun musicNotReaching(playing: Boolean): Int? {
     val capture by CarAudio.capture.collectAsState()
     val pipe by CarSettings.pipeAudio.collectAsState()
     val blocked by CarAudio.micBlocked.collectAsState()
@@ -55,15 +65,22 @@ internal fun MusicNotReaching(playing: Boolean, modifier: Modifier = Modifier) {
         }
     }
     // myCar's own music (Xonos) needs no question: it reaches the car all the same.
-    if (!playing || !pipe || CarAudio.consentWaits()) return
-    val title = when {
+    if (!playing || !pipe || CarAudio.consentWaits()) return null
+    return when {
         capture == CarAudio.Capture.DENIED && blocked -> R.string.settings_mic_blocked_title
         capture == CarAudio.Capture.DENIED -> R.string.audio_not_reaching_title
         // "Open myCar" only when it isn't open: with the question on the phone's screen, it just isn't reaching.
         capture == CarAudio.Capture.ASKING && waitedLong ->
             if (waitsForMyCar) R.string.activity_toast_open_for_music else R.string.audio_not_reaching_title
-        else -> return
+        else -> null
     }
+}
+
+/** The warning itself, saying [title] (from [musicNotReaching]). */
+@Composable
+internal fun MusicNotReaching(@StringRes title: Int, modifier: Modifier = Modifier) {
+    val capture by CarAudio.capture.collectAsState()
+    val blocked by CarAudio.micBlocked.collectAsState()
     // Only a "no" can be asked again from here: the microphone blocked is the phone's settings, and
     // a question waiting is answered on the phone.
     val canAsk = capture == CarAudio.Capture.DENIED && !blocked

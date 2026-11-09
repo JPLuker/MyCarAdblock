@@ -3,19 +3,26 @@ package io.github.sirionero.mycar.car
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.provider.ContactsContract
 import androidx.annotation.StringRes
 import androidx.car.app.CarToast
 import io.github.sirionero.mycar.AppSettings
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.SessionService
 import io.github.sirionero.mycar.Words
 import io.github.sirionero.mycar.call.CallUiState
 import io.github.sirionero.mycar.call.CarCalls
 import io.github.sirionero.mycar.home.HaClient
+import io.github.sirionero.mycar.home.HaException
 import io.github.sirionero.mycar.home.HomeAssistant
+import io.github.sirionero.mycar.home.Seen
+import io.github.sirionero.mycar.home.stateOrNull
+import io.github.sirionero.mycar.home.watchEntity
 import io.github.sirionero.mycar.speech.VoiceLanguage
 import io.github.sirionero.mycar.speech.VoiceLanguages
 import kotlinx.coroutines.CancellationException
@@ -25,8 +32,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -71,11 +80,19 @@ internal object JollySetting {
 internal object Jolly {
     private val main = Handler(Looper.getMainLooper())
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    private val second = SecondTap(CONFIRM_MS)
-    private val armedFlow = MutableStateFlow(false)
+    private val second = SecondTap(CONFIRM_MS, CONFIRM_MIN_MS)
+    private val repeats = RepeatGuard(REPEAT_QUIET_MS)
+    /** A lock waits for its second tap, a Home Assistant command runs (a lock until it says it's done). */
+    private var asking = false
+    private var working = false
+    private val litFlow = MutableStateFlow(false)
 
-    /** A lock waits for its second tap: the key is lit meanwhile. */
-    val armed: StateFlow<Boolean> = armedFlow.asStateFlow()
+    /** Lit while a lock waits for its second tap, and while a Home Assistant command runs. */
+    val lit: StateFlow<Boolean> = litFlow.asStateFlow()
+
+    private fun relight() {
+        litFlow.value = asking || working
+    }
 
     /**
      * The key tapped (on the main thread): the command runs, or with none picked yet the chooser
@@ -85,6 +102,12 @@ internal object Jolly {
         val action = JollySetting.action.value
         if (action == null) {
             navigator.jolly()
+            return
+        }
+        // The car's preview in the phone's settings, with no drive: what the key does, not the call
+        // made or the garage door opened.
+        if (CarServices.phonePreview && !SessionService.running) {
+            toast(Words.get(R.string.jolly_preview_only, title(context, action)))
             return
         }
         // A ringing call has the screen. One under way has the line and the microphone: another call,
@@ -100,28 +123,55 @@ internal object Jolly {
         // the car's display, which Android doesn't let it draw on.
         val app = context.applicationContext
         when (action) {
-            is JollyAction.Call -> call(app, action)
+            is JollyAction.Call -> call(app, navigator, action)
             is JollyAction.Assistant -> talk(app, action.app)
             is JollyAction.Home -> home(action)
             is JollyAction.Navigate -> navigate(app, navigator, entries, frame, action)
             is JollyAction.Say -> CarAssistant.runPhrase(action.phrase, language(action.lang))
-            is JollyAction.OpenApp -> open(navigator, entries, running, frame, action)
+            is JollyAction.OpenApp -> open(app, navigator, entries, running, frame, action)
         }
     }
 
     /** The second tap a lock waited for isn't coming: a new choice, or the chooser opened. */
     fun disarm() {
         second.disarm()
-        armedFlow.value = false
+        asking = false
+        relight()
     }
 
-    /** Through Telecom, as the dialer calls: the call's own card comes up on the car. */
-    private fun call(context: Context, action: JollyAction.Call) {
+    /**
+     * Through Telecom, as the dialer calls: the call's own card comes up on the car. The number as the
+     * contacts have it now: changed or gone there, the key asks again rather than call an old one.
+     */
+    private fun call(context: Context, navigator: CarNavigator, action: JollyAction.Call) {
         if (context.checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             toast(Words.get(R.string.dialer_permissions))
             return
         }
-        placeCall(context, action.number)
+        scope.launch {
+            if (withContext(Dispatchers.IO) { stillInContacts(context, action.name, action.number) } == false) {
+                MyCarLog.i("jolly: the number chosen isn't in the contacts any more - asking again")
+                toast(Words.get(R.string.jolly_call_gone, action.name))
+                navigator.jolly()
+                return@launch
+            }
+            placeCall(context, action.number)
+        }
+    }
+
+    /** Whether [number] is still [name]'s in the contacts; null where that can't be told (no permission). */
+    private fun stillInContacts(context: Context, name: String, number: String): Boolean? {
+        if (context.checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) return null
+        return runCatching {
+            context.contentResolver.query(
+                Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number)),
+                arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME), null, null, null,
+            )?.use { cursor ->
+                var found = false
+                while (!found && cursor.moveToNext()) found = cursor.getString(0) == name
+                found
+            }
+        }.getOrNull()
     }
 
     /**
@@ -142,7 +192,12 @@ internal object Jolly {
                 CarAssistant.listenHere()
                 return
             }
-            AssistantUnlock.start(context, name) { talk(context, app) }
+            // Android not letting myCar light the phone: the key, not the microphone, to tap again.
+            AssistantUnlock.start(
+                context, name,
+                then = { talk(context, app) },
+                retry = Words.get(R.string.jolly_unlock_then_touch, Words.get(R.string.jolly_name)),
+            )
             return
         }
         if (!PhoneAssistants.launch(context, app)) {
@@ -156,7 +211,12 @@ internal object Jolly {
         )
     }
 
-    /** On the drive's connection to Home Assistant (Plancia inside myCar), with what came of it as a toast. */
+    /**
+     * On the drive's connection to Home Assistant (Plancia inside myCar), with what came of it as a toast.
+     * Home Assistant answers "done" even for a thing it doesn't have or can't reach, so the thing's state
+     * is asked first (missing or unavailable: nothing is sent), and a lock is watched until it says it did
+     * it (or, after [LOCK_WAIT_MS], how it was left).
+     */
     private fun home(action: JollyAction.Home) {
         if (!HomeAssistant.config.value.isComplete) {
             toast(Words.get(R.string.jolly_home_not_set))
@@ -168,35 +228,106 @@ internal object Jolly {
             toast(Words.get(R.string.jolly_home_offline))
             return
         }
+        // The same command again while it runs, or a moment after: the same press twice, let go.
+        val key = "${action.entity}/${action.act.id}"
+        if (repeats.busy(key, SystemClock.uptimeMillis())) {
+            MyCarLog.i("jolly: $domain.$service still running - the tap let go")
+            return
+        }
         if (HomeActs.confirms(action.act) && !confirmed(action.name)) return
+        if (!repeats.start(key, SystemClock.uptimeMillis())) return
+        working = true
+        relight()
         scope.launch {
             try {
-                client.command("call_service") {
-                    put("domain", domain)
-                    put("service", service)
-                    put("target", JSONObject().put("entity_id", action.entity))
-                }
-                MyCarLog.i("jolly: Home Assistant ran $domain.$service")
-                toast(Words.get(R.string.jolly_home_done, action.name))
+                val outcome = client.watchEntity(action.entity) { seen -> runWatched(client, action, domain, service, seen) }
+                    // A Home Assistant too old to say one thing's state: the command alone, as before.
+                    ?: run {
+                        callService(client, domain, service, action.entity)
+                        HomeOutcome.DONE
+                    }
+                MyCarLog.i("jolly: Home Assistant $domain.$service - ${outcome.name.lowercase()}")
+                toast(Words.get(outcome.text, action.name))
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 // Not its words in the log: they may name the house's things.
                 MyCarLog.w("jolly: Home Assistant didn't run $domain.$service (${e.javaClass.simpleName})")
                 toast(Words.get(R.string.jolly_home_failed, action.name, e.message.orEmpty()))
+            } finally {
+                repeats.end(key, SystemClock.uptimeMillis())
+                working = false
+                relight()
             }
         }
     }
 
-    /** The first tap arms, a second within [CONFIRM_MS] goes ahead (see [SecondTap]). */
-    private fun confirmed(name: String): Boolean {
-        if (second.tap(SystemClock.uptimeMillis())) {
-            armedFlow.value = false
-            return true
+    /** What came of a Home Assistant command, as the car says it (each text takes the thing's name). */
+    private enum class HomeOutcome(@StringRes val text: Int) {
+        DONE(R.string.jolly_home_done),
+        MISSING(R.string.jolly_home_missing),
+        UNAVAILABLE(R.string.jolly_home_unavailable),
+        JAMMED(R.string.jolly_lock_jammed),
+        STILL_LOCKED(R.string.jolly_lock_still_locked),
+        STILL_UNLOCKED(R.string.jolly_lock_still_unlocked),
+        NO_NEWS(R.string.jolly_lock_no_news),
+    }
+
+    /** The command, sent only to a thing that's there and reachable; a lock then watched (see [HomeChecks]). */
+    private suspend fun runWatched(client: HaClient, action: JollyAction.Home, domain: String, service: String, seen: StateFlow<Seen>): HomeOutcome {
+        val first = withTimeoutOrNull(STATE_MS) { seen.first { it != Seen.Waiting } }
+            ?: throw HaException(Words.get(R.string.ha_not_answering), HaException.Reason.NO_RESPONSE)
+        when (HomeChecks.before(first.stateOrNull)) {
+            HomeChecks.Before.MISSING -> return HomeOutcome.MISSING
+            HomeChecks.Before.UNAVAILABLE -> return HomeOutcome.UNAVAILABLE
+            HomeChecks.Before.GO -> Unit
         }
-        armedFlow.value = true
+        callService(client, domain, service, action.entity)
+        if (action.act != HomeAct.LOCK && action.act != HomeAct.UNLOCK) return HomeOutcome.DONE
+        val last = withTimeoutOrNull(LOCK_WAIT_MS) { seen.first { HomeChecks.settled(action.act, it.stateOrNull) } } ?: seen.value
+        return when (HomeChecks.after(action.act, last.stateOrNull)) {
+            HomeChecks.After.DONE -> HomeOutcome.DONE
+            HomeChecks.After.JAMMED -> HomeOutcome.JAMMED
+            HomeChecks.After.STILL_LOCKED -> HomeOutcome.STILL_LOCKED
+            HomeChecks.After.STILL_UNLOCKED -> HomeOutcome.STILL_UNLOCKED
+            HomeChecks.After.NO_NEWS -> HomeOutcome.NO_NEWS
+        }
+    }
+
+    private suspend fun callService(client: HaClient, domain: String, service: String, entity: String) {
+        client.command("call_service") {
+            put("domain", domain)
+            put("service", service)
+            put("target", JSONObject().put("entity_id", entity))
+        }
+    }
+
+    /**
+     * The first tap arms, a second between [CONFIRM_MIN_MS] and [CONFIRM_MS] later goes ahead (see
+     * [SecondTap]); one sooner, a double tap made before the question could be read, does nothing.
+     */
+    private fun confirmed(name: String): Boolean {
+        when (second.tap(SystemClock.uptimeMillis())) {
+            SecondTap.Tap.GO -> {
+                asking = false
+                relight()
+                return true
+            }
+            SecondTap.Tap.TOO_SOON -> {
+                MyCarLog.i("jolly: the second tap came too soon - still asking")
+                return false
+            }
+            SecondTap.Tap.ARMED -> Unit
+        }
+        asking = true
+        relight()
         toast(Words.get(R.string.jolly_confirm_unlock, name), CarToast.LENGTH_SHORT)
-        main.postDelayed({ if (!second.armed(SystemClock.uptimeMillis())) armedFlow.value = false }, CONFIRM_MS + 100)
+        main.postDelayed({
+            if (!second.armed(SystemClock.uptimeMillis())) {
+                asking = false
+                relight()
+            }
+        }, CONFIRM_MS + 100)
         return false
     }
 
@@ -223,15 +354,20 @@ internal object Jolly {
     }
 
     /** As its icon on the grid or in the dock opens it: back to it if it's open. */
-    private fun open(navigator: CarNavigator, entries: List<Entry>, running: Map<String, RunningSlot>, frame: CarEnvironment.Frame, action: JollyAction.OpenApp) {
-        // Saved as the Plancia or Xonos app, or a music service's: the one that stands for it now, as a pin.
-        val shown = pinShown(action.id, entries)
-        val entry = entries.find { it.componentId == shown } ?: findEntry(action.id)
-        if (entry == null) {
-            toast(Words.get(R.string.jolly_app_gone, action.name.ifBlank { action.id }))
-            return
+    private fun open(context: Context, navigator: CarNavigator, entries: List<Entry>, running: Map<String, RunningSlot>, frame: CarEnvironment.Frame, action: JollyAction.OpenApp) {
+        scope.launch {
+            // Just after the start the phone's apps may not have been read yet: read them, as navigate()
+            // does, rather than say the app is gone.
+            if (LauncherCache.entries == null) withContext(Dispatchers.IO) { LauncherCache.load(context) }
+            // Saved as the Plancia or Xonos app, or a music service's: the one that stands for it now, as a pin.
+            val shown = pinShown(action.id, entries)
+            val entry = entries.find { it.componentId == shown } ?: findEntry(shown) ?: findEntry(action.id)
+            if (entry == null) {
+                toast(Words.get(R.string.jolly_app_gone, action.name.ifBlank { action.id }))
+                return@launch
+            }
+            openApp(entry, entry.componentId?.let { running[it] }, navigator, frame)
         }
-        openApp(entry, entry.componentId?.let { running[it] }, navigator, frame)
     }
 
     /** The language a command was written in, as the assistant knows it; myCar's own for one it doesn't. */
@@ -279,6 +415,8 @@ internal object Jolly {
     /**
      * The same from the phone's settings, on a connection of its own: the drive's isn't there without
      * a car. The address at home first, then the one away; the last one's failure if neither answers.
+     * A token refused isn't tried on the other address: each refusal counts towards Home Assistant
+     * banning the phone (ip_ban), and the token is the same there.
      */
     suspend fun homeChoices(config: HomeAssistant.Config): List<HomeActs.Choice> {
         var failure: Exception? = null
@@ -291,6 +429,7 @@ internal object Jolly {
                 throw e
             } catch (e: Exception) {
                 failure = e
+                if (e is HaException && e.reason in REFUSED) break
             } finally {
                 client.close()
             }
@@ -298,9 +437,20 @@ internal object Jolly {
         throw failure ?: IllegalStateException("no Home Assistant address")
     }
 
+    /** Home Assistant saying no to the token or the access: the same at any address. */
+    private val REFUSED = setOf(HaException.Reason.INVALID_TOKEN, HaException.Reason.ACCESS_DENIED)
+
     /** What a call under way leaves no room for: another call, an assistant listening, an answer spoken. */
     private val BUSY_ON_A_CALL = setOf(JollyKind.CALL, JollyKind.AI, JollyKind.SAY)
 
-    /** How long a lock waits for its second tap. */
+    /** How long a lock waits for its second tap, and how long at least: time to read the question. */
     private const val CONFIRM_MS = 3_000L
+    private const val CONFIRM_MIN_MS = 700L
+
+    /** How long after a Home Assistant command a tap on the key is still that same press. */
+    private const val REPEAT_QUIET_MS = 1_000L
+
+    /** How long Home Assistant has to say a thing's state, and a lock to say it did what it was told. */
+    private const val STATE_MS = 5_000L
+    private const val LOCK_WAIT_MS = 10_000L
 }

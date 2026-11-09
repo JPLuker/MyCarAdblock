@@ -40,6 +40,43 @@ class SongVideoTest {
     }
 
     @Test
+    fun rapidSkipsDontCarryTheOldVideo() {
+        val rule = SongVideo()
+        rule.next("A", "va", 0)
+        assertEquals("", rule.next("B", "va", 5_000))
+        assertEquals("", rule.next("C", "va", 6_000))
+        assertEquals("", rule.next("D", "va", 7_000))
+        assertEquals("vd", rule.next("D", "vd", 8_000))
+    }
+
+    @Test
+    fun aMomentAheadOnlyOnce() {
+        // Taken for the song after as a moment ahead, it isn't new again for the songs after that.
+        val rule = SongVideo()
+        rule.next("A", "va", 0)
+        assertEquals("va", rule.next("B", "va", 1_000))
+        assertEquals("", rule.next("C", "va", 2_500))
+        assertEquals("", rule.next("D", "va", 3_000))
+    }
+
+    @Test
+    fun nextThenBackGivesTheVideoBack() {
+        val rule = SongVideo()
+        rule.next("A", "va", 0)
+        assertEquals("", rule.next("B", "va", 60_000))
+        assertEquals("va", rule.next("A", "va", 63_000))
+    }
+
+    @Test
+    fun theOldVideoCountsAgainAfterAWhile() {
+        val rule = SongVideo()
+        rule.next("A", "va", 0)
+        assertEquals("", rule.next("B", "va", 60_000))
+        assertEquals("", rule.next("B", "va", 60_000 + SongVideo.STALE_MS - 1))
+        assertEquals("va", rule.next("B", "va", 60_000 + SongVideo.STALE_MS))
+    }
+
+    @Test
     fun letGoThenShownAgainIsThisSongs() {
         // The same video for two songs in a row (one uploaded for both): once the page has shown none
         // in between, it's this song's.

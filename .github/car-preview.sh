@@ -216,6 +216,10 @@ EXTRA="$CANVAS" shoot video-cover 1920 720 240 "$WAIT;$WAIT;1405,54;$WAIT;$WAIT;
 EXTRA="$CANVAS" shoot video-cover-800x480 800 480 160 "$WAIT;$WAIT;612,36;$WAIT;$WAIT;764,36;$WAIT"
 EXTRA="$CANVAS --ez videoCoverOn true --ez moving true" shoot video-cover-moving 1920 720 240 "$WAIT;$WAIT;$WAIT;1405,54;$WAIT"
 EXTRA="--es webMusic spotify --ez webMusicKey false" shoot video-cover-spotify 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT"
+# The music not reaching the car (--ez musicNotReaching true, debug only: through myCar, Android's question
+# turned down) with video covers possible, the car's screen at Extra large: the warning beside the X, where
+# its "Ask again" can be read and touched, and no video cover button meanwhile (it was pushed under the glass).
+EXTRA="$CANVAS --es carScale 1.5 --ez musicNotReaching true" shoot video-cover-not-reaching 1920 720 240 "$WAIT;$WAIT;$WAIT"
 case " ${ONLY:-video-cover} " in *" video-cover"*)
     echo "--- video cover ---"
     grep -h "video cover\|preview: demo" previews/video-cover*/log.txt previews/video-cover*/stream.txt 2>/dev/null | cut -c1-300 | head -30 || true
@@ -647,7 +651,7 @@ esac
 # - jolly-800x480: Home with the key and two slots above it (the user's Golf), then a tap: its command
 #   "what time is it" as if said - the assistant shows it and answers; then held: the chooser, its kinds
 #   in two rows.
-# - jolly-1920x720: nothing chosen yet, so the tap opens the chooser.
+# - jolly-1920x720: nothing chosen yet, so the tap opens the chooser; a second tap on the lit key closes it.
 # - jolly-choose: the chooser from a long press ("Assistant command" lit, what the key does now), that
 #   kind's list (the key's own command, then the ready-made ones), "Read my messages" chosen: back
 #   Home with the car saying what the key does now.
@@ -676,11 +680,12 @@ JOLLY_ROW_1="1032,186"     # the lines of a kind's list, 80 dp apart
 JOLLY_ROW_2="1032,306"
 case " ${ONLY:-} " in *" jolly "*)
     ONLY="$ONLY jolly-800x480 jolly-1920x720 jolly-choose jolly-say-it jolly-light jolly-large-800x480 jolly-xl-800x480"
-    ONLY="$ONLY jolly-ai jolly-navigate jolly-apps jolly-contacts jolly-home jolly-unlock jolly-it-800x480 jolly-de jolly-en-XP"
+    ONLY="$ONLY jolly-ai jolly-navigate jolly-apps jolly-contacts jolly-home jolly-unlock jolly-lock jolly-lock-stuck"
+    ONLY="$ONLY jolly-it-800x480 jolly-de jolly-en-XP"
     ONLY="$ONLY jolly-settings jolly-phone jolly-ru-800x480 jolly-el-800x480 jolly-pt-XP-800x480" ;;
 esac
 EXTRA="--es jolly say" shoot jolly-800x480 800 480 160 "$WAIT;$JOLLY_KEY_800;$WAIT;$WAIT;$JOLLY_KEY_800,long;$WAIT"
-shoot jolly-1920x720 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT"
+shoot jolly-1920x720 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT;$JOLLY_KEY;$WAIT"
 EXTRA="--es jolly say" shoot jolly-choose 1920 720 240 "$WAIT;$JOLLY_KEY,long;$JOLLY_TILE_SAY;$JOLLY_ROW_2;$WAIT"
 EXTRA="--es jolly say --es jollySay 'che ore sono' --es jollyLang it" shoot jolly-say-it 1920 720 240 "$WAIT;$JOLLY_KEY;$WAIT;$WAIT"
 EXTRA="--es jolly say --es carTheme LIGHT" shoot jolly-light 1920 720 240 "$WAIT;$JOLLY_KEY,long;$WAIT"
@@ -726,7 +731,11 @@ esac
 # With the run's own Home Assistant: a script, a button and a switch of its own (made here, as the
 # install has none), then the chooser's Home Assistant list from the drive's connection, the script
 # chosen, and the key running it ("Jolly test: done"). Then a lock that isn't there: the first tap
-# asks for a second, the second one goes - and Home Assistant says no.
+# asks for a second, the second one goes, and the car says Home Assistant doesn't have it (nothing is
+# sent). Then a lock that's a state alone (written with the REST API, no device behind it): in
+# jolly-lock a second tap 300 ms after the first does nothing, a third at 1.6 s goes, and when the
+# "lock" says unlocked a couple of seconds later (the REST API again) the car says it's done; in
+# jolly-lock-stuck it never does, and 10 s after the second tap the car says it's still locked.
 if [ -n "${HA_TOKEN:-}" ]; then
     case " ${ONLY:-jolly-home} " in *" jolly-home "*)
         curl -sf -X POST "http://localhost:8123/api/config/script/config/jolly_test" -H "Authorization: Bearer $HA_TOKEN" \
@@ -746,12 +755,31 @@ for i, (kind, name) in enumerate([("input_button", "Garage"), ("input_boolean", 
 HELPERS
         ;;
     esac
+    lock_state() {  # lock_state <state>: lock.jolly_door as a lock would report it, a state alone
+        curl -sf -X POST "http://localhost:8123/api/states/lock.jolly_door" -H "Authorization: Bearer $HA_TOKEN" \
+            -H 'Content-Type: application/json' -d "{\"state\":\"$1\",\"attributes\":{\"friendly_name\":\"Jolly door\"}}" >/dev/null ||
+            echo "jolly: lock state $1 not written"
+    }
     HA="--es haUrl http://10.0.2.2:8123 --es haToken $HA_TOKEN"
     EXTRA="$HA" shoot jolly-home 1920 720 240 "$WAIT;$WAIT;$JOLLY_KEY;$JOLLY_TILE_HOME;$JOLLY_ROW_1;$JOLLY_KEY;$WAIT"
     EXTRA="$HA --es jolly unlock" shoot jolly-unlock 1920 720 240 "$WAIT;$WAIT;$JOLLY_KEY;$JOLLY_KEY;$WAIT"
-    case " ${ONLY:-jolly-home} " in *" jolly-home "*)
+    case " ${ONLY:-jolly-lock} " in *" jolly-lock "*)
+        lock_state locked
+        # The key (72,444) tapped by a script, for the timing: at 12 s, 300 ms later, 1.6 s after the first.
+        EXTRA="$HA --es jolly unlock --es jollyHome lock.jolly_door --es script 'wait:12000;tap:72,444;wait:300;tap:72,444;wait:1200;tap:72,444;wait:1500;snap:waiting;wait:2500;snap:after'" \
+            shoot jolly-lock 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT" "sleep 11; lock_state unlocked"
+        ;;
+    esac
+    case " ${ONLY:-jolly-lock-stuck} " in *" jolly-lock-stuck "*)
+        lock_state locked
+        EXTRA="$HA --es jolly unlock --es jollyHome lock.jolly_door" shoot jolly-lock-stuck 1920 720 240 \
+            "$WAIT;$WAIT;$WAIT;$WAIT;$JOLLY_KEY;$JOLLY_KEY;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+        ;;
+    esac
+    case " ${ONLY:-jolly-home} " in *" jolly-home "*|*" jolly-unlock "*|*" jolly-lock "*|*" jolly-lock-stuck "*)
         echo "--- the Jolly key and Home Assistant ---"
-        grep -h "jolly\|plancia: connected" previews/jolly-home/log.txt previews/jolly-unlock/log.txt 2>/dev/null || echo "jolly-home: nothing in the log" ;;
+        grep -h "jolly\|plancia: connected\|preview: step" previews/jolly-home/log.txt previews/jolly-unlock/log.txt \
+            previews/jolly-lock/log.txt previews/jolly-lock-stuck/log.txt 2>/dev/null || echo "jolly-home: nothing in the log" ;;
     esac
 else
     echo "--- no Home Assistant: the Jolly key's Home Assistant shots left out ---"

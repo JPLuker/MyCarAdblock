@@ -51,6 +51,10 @@
     <!-- %1$s: the app's name -->
     <string name="jolly_title_app">Abrir %1$s</string>
 
+    <!-- Car, the key's assistant with the phone locked, when Android doesn't let myCar light the phone
+         (myCar off under Accessibility): as the microphone's "Unlock the phone, then touch the microphone
+         again". %1$s: jolly_name -->
+    <string name="jolly_unlock_then_touch">Desbloqueie o telefone e toque no botão %1$s de novo</string>
     <!-- Car and phone, a contact with several numbers, under the name. %1$d: how many -->
     <plurals name="jolly_numbers">
         <item quantity="one">%1$d número</item>
@@ -84,6 +88,17 @@
     <string name="jolly_home_done">%1$s: feito</string>
     <!-- %1$s: the thing's name in Home Assistant, %2$s: why, in Home Assistant's own words -->
     <string name="jolly_home_failed">%1$s não funcionou: %2$s</string>
+    <!-- Home Assistant doesn't have the thing (any more): nothing was sent. %1$s: its name there -->
+    <string name="jolly_home_missing">%1$s não está no Home Assistant. Mantenha o botão pressionado para escolher outra coisa.</string>
+    <!-- Home Assistant can't reach the thing now (its state is "unavailable"): nothing was sent -->
+    <string name="jolly_home_unavailable">%1$s não está disponível no Home Assistant agora.</string>
+    <!-- A lock, after the key's command: it says it's stuck -->
+    <string name="jolly_lock_jammed">%1$s: a fechadura está emperrada.</string>
+    <!-- A lock still as it was 10 seconds after being told to open, or to close -->
+    <string name="jolly_lock_still_locked">%1$s: a fechadura continua trancada.</string>
+    <string name="jolly_lock_still_unlocked">%1$s: a fechadura continua destrancada.</string>
+    <!-- A lock still on its way, or silent, 10 seconds after the command -->
+    <string name="jolly_lock_no_news">%1$s ainda não disse se funcionou.</string>
     <!-- A lock, at the first tap. %1$s: its name in Home Assistant -->
     <string name="jolly_confirm_unlock">Destrancar %1$s? Toque no botão de novo em até 3 segundos.</string>
     <!-- %1$s: the place's name or the place, %2$s: the map app -->
@@ -91,6 +106,12 @@
     <string name="jolly_no_map">Não há nenhum app de mapas no telefone.</string>
     <!-- %1$s: the app's name -->
     <string name="jolly_app_gone">%1$s não está mais no telefone. Mantenha o botão pressionado para escolher outra coisa.</string>
+    <!-- The contact's number chosen for the key isn't theirs in the contacts any more: the chooser opens.
+         %1$s: the contact's name -->
+    <string name="jolly_call_gone">%1$s não tem mais esse número nos contatos: escolha de novo.</string>
+    <!-- A tap on the key in the car's preview in the phone's settings, with no drive: what it would do there,
+         rather than doing it. %1$s: one of the jolly_title_* above -->
+    <string name="jolly_preview_only">No carro, este botão faz: %1$s</string>
     <!-- A call, an assistant or a command while on a call -->
     <string name="jolly_after_call">Isso precisa esperar o fim da chamada.</string>
 
@@ -108,8 +129,8 @@
     <!-- Title of the list of kinds -->
     <string name="settings_jolly_kind">O que o botão deve fazer?</string>
     <string name="settings_jolly_footer">Uma chamada, um assistente, algo no Home Assistant, um lugar, um comando ou um app, a um toque. No carro, mantenha o botão pressionado para mudar por lá também.</string>
-    <!-- In the list of contacts, without the permission, over an Allow button -->
-    <string name="settings_jolly_contacts_permission">O myCar precisa ler seus contatos para listá-los.</string>
+    <!-- In the list of contacts, without the permission, over an Allow button (which asks for both) -->
+    <string name="settings_jolly_contacts_permission">Para listar seus contatos e ligar para eles do carro, o myCar precisa ler seus contatos e fazer chamadas.</string>
     <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
     <string name="settings_jolly_place">Endereço ou lugar</string>
     <string name="settings_jolly_place_name">Nome no carro (opcional)</string>

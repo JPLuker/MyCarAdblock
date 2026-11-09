@@ -51,6 +51,10 @@
     <!-- %1$s: the app's name -->
     <string name="jolly_title_app">Открыть: %1$s</string>
 
+    <!-- Car, the key's assistant with the phone locked, when Android doesn't let myCar light the phone
+         (myCar off under Accessibility): as the microphone's "Unlock the phone, then touch the microphone
+         again". %1$s: jolly_name -->
+    <string name="jolly_unlock_then_touch">Разблокируйте телефон и снова нажмите кнопку %1$s</string>
     <!-- Car and phone, a contact with several numbers, under the name. %1$d: how many -->
     <plurals name="jolly_numbers">
         <item quantity="one">%1$d номер</item>
@@ -86,6 +90,17 @@
     <string name="jolly_home_done">%1$s: готово</string>
     <!-- %1$s: the thing's name in Home Assistant, %2$s: why, in Home Assistant's own words -->
     <string name="jolly_home_failed">%1$s: не получилось (%2$s)</string>
+    <!-- Home Assistant doesn't have the thing (any more): nothing was sent. %1$s: its name there -->
+    <string name="jolly_home_missing">%1$s: этого нет в Home Assistant. Удерживайте кнопку, чтобы выбрать другое.</string>
+    <!-- Home Assistant can't reach the thing now (its state is "unavailable"): nothing was sent -->
+    <string name="jolly_home_unavailable">%1$s: сейчас недоступно в Home Assistant.</string>
+    <!-- A lock, after the key's command: it says it's stuck -->
+    <string name="jolly_lock_jammed">%1$s: замок заклинило.</string>
+    <!-- A lock still as it was 10 seconds after being told to open, or to close -->
+    <string name="jolly_lock_still_locked">%1$s: замок всё ещё заперт.</string>
+    <string name="jolly_lock_still_unlocked">%1$s: замок всё ещё открыт.</string>
+    <!-- A lock still on its way, or silent, 10 seconds after the command -->
+    <string name="jolly_lock_no_news">%1$s: пока неизвестно, получилось ли.</string>
     <!-- A lock, at the first tap. %1$s: its name in Home Assistant -->
     <string name="jolly_confirm_unlock">Отпереть: %1$s? Нажмите кнопку ещё раз в течение 3 секунд.</string>
     <!-- %1$s: the place's name or the place, %2$s: the map app -->
@@ -93,6 +108,12 @@
     <string name="jolly_no_map">На телефоне нет приложения карт.</string>
     <!-- %1$s: the app's name -->
     <string name="jolly_app_gone">%1$s больше нет на телефоне. Удерживайте кнопку, чтобы выбрать другое.</string>
+    <!-- The contact's number chosen for the key isn't theirs in the contacts any more: the chooser opens.
+         %1$s: the contact's name -->
+    <string name="jolly_call_gone">%1$s: этого номера больше нет в контактах. Выберите заново.</string>
+    <!-- A tap on the key in the car's preview in the phone's settings, with no drive: what it would do there,
+         rather than doing it. %1$s: one of the jolly_title_* above -->
+    <string name="jolly_preview_only">В автомобиле эта кнопка делает: %1$s</string>
     <!-- A call, an assistant or a command while on a call -->
     <string name="jolly_after_call">Это подождёт до конца звонка.</string>
 
@@ -110,8 +131,8 @@
     <!-- Title of the list of kinds -->
     <string name="settings_jolly_kind">Что должна делать кнопка?</string>
     <string name="settings_jolly_footer">Звонок, помощник, что-то в Home Assistant, место, команда или приложение в одно нажатие. В автомобиле удерживайте кнопку, чтобы изменить это и там.</string>
-    <!-- In the list of contacts, without the permission, over an Allow button -->
-    <string name="settings_jolly_contacts_permission">myCar нужен доступ к вашим контактам, чтобы показать их.</string>
+    <!-- In the list of contacts, without the permission, over an Allow button (which asks for both) -->
+    <string name="settings_jolly_contacts_permission">Чтобы показать ваши контакты и звонить им из автомобиля, myCar нужен доступ к контактам и звонкам.</string>
     <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
     <string name="settings_jolly_place">Адрес или место</string>
     <string name="settings_jolly_place_name">Название в автомобиле (необязательно)</string>

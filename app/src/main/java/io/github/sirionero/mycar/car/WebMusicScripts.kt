@@ -229,12 +229,13 @@ internal object WebMusicScripts {
 
   // The song's video cover: the address of the video the page shows for the song from one of the VIDEO
   // addresses - its <video>'s own, or the one the page's own component playing it was given - the one
-  // most on screen if there are a few; '' with none. Never in the way of what plays: whatever goes
-  // wrong here, no video cover.
-  function videoCover() {
-    if (!VIDEO.length) return '';
+  // most on screen if there are a few; '' with none, and while the car shows still covers (myCar's
+  // __mycarVideoCovers). [song]: the song in play, by its words. Never in the way of what plays:
+  // whatever goes wrong here, no video cover.
+  function videoCover(song) {
+    if (!VIDEO.length || window.__mycarVideoCovers !== true) return '';
     try {
-      return videoIn(document.getElementsByTagName('video')) || (VIDEO_PROP ? videoInTree() : '');
+      return videoIn(document.getElementsByTagName('video')) || (VIDEO_PROP ? videoInTree(song) : '');
     } catch (e) {
       return '';
     }
@@ -292,11 +293,13 @@ internal object WebMusicScripts {
   }
   // Out of sight (the car shows the map) the page may not load the video at all: then the component
   // that would play it, found in React's record of the whole page - the one most on screen. Looked
-  // through at most every TREE_MS.
-  var treeAt = 0, treeBest = '', TREE_MS = 5000, TREE_MAX = 60000;
-  function videoInTree() {
+  // through at most every TREE_MS; a new song at once, then every TREE_SOON_MS for a while, as its
+  // player comes.
+  var treeAt = 0, treeBest = '', treeSong = null, songAt = 0, TREE_MS = 5000, TREE_SOON_MS = 1000, TREE_MAX = 60000;
+  function videoInTree(song) {
     var now = Date.now();
-    if (now - treeAt < TREE_MS) return treeBest;
+    if (song !== treeSong) { treeSong = song; songAt = now; treeAt = 0; }
+    if (now - treeAt < (now - songAt < 10000 ? TREE_SOON_MS : TREE_MS)) return treeBest;
     treeAt = now;
     treeBest = '';
     // React's roots: from the top of the page down to the first elements React drew.
@@ -372,7 +375,7 @@ internal object WebMusicScripts {
       position: Math.round(at),
       duration: Math.round(duration),
       seek: typeof handlers.seekto === 'function',
-      video: videoCover()
+      video: videoCover(title + '\n' + artist)
     };
   }
 

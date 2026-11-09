@@ -1,24 +1,60 @@
-myCar 0.7.3-alpha: Xonos inside myCar gets the engine of Xonos 0.1.55.
+myCar 0.7.4-alpha: the Jolly key, a bubble for calls, raised panels, the car's radio kept, faster wireless start-ups, and what Gearslip 0.3.32-0.3.40 brought that is safe for the cars that already work.
 
-## Xonos inside myCar
-- **The engine of Xonos 0.1.55**, compared file by file with the Xonos app (Music Assistant, Sendspin, the player) and brought over, keeping what is myCar's own: the music straight into the car's channel, the bridge to the Xonos app, its settings.
-- **Skips.** Next and previous already went straight to the song. Now next does so also right after an album or playlist starts, while the car still shows only that song and repeat is off: until now it used Music Assistant's own next there, which starts a second later. With repeat all, next from the last song goes to the first one. With Music Assistant on the phone, quick taps on a service that plays one stream at a time are gathered for a quarter of a second instead of 0.4.
-- **The car's menu** waits for Music Assistant when the car opens it, instead of showing empty folders that the car doesn't ask for again. An artist opens without loading all its songs first: "All tracks" loads when you open it (with Spotify it cost about three requests per album). Long lists come in parts, and a search asks again each time.
-- **Music Assistant on your phone**, inside the Xonos app: since Xonos 0.1.55 it stops by itself when nothing uses it any more, and stays on while myCar holds the Xonos app's bridge, which myCar does for the whole drive. If it has stopped, the bridge starts it again (6 seconds on a phone, about 12 in the emulator), and meanwhile playing, skipping and picking a song wait up to a minute (the car's menu 45 seconds), instead of saying it isn't connected. If you pause while Play waits, the music doesn't start and no error shows. Starting a long playlist gets 3 minutes with that server, 1 minute with others.
-- **Steadier.** A sound decoder that breaks down is replaced. The sign-in is renewed before it expires (Music Assistant 2.10 makes it last a year). Spotify left busy in Music Assistant by a stream nobody hears any more is freed, when no other player is using it (with an admin account). From away, the home address gets 3 seconds before the remote one is tried (still up to 10 seconds when it goes through the Xonos app's bridge). With Music Assistant 2.10.8 or later Sendspin uses its newer format, and a Music Assistant that turns the player down (one that accepts only encrypted players) is asked again every 5 minutes instead of every few seconds.
+## New
+- **Jolly key**, in the dock above the microphone. One tap does what you choose: call a contact (its usual number first), talk to an AI (the phone's assistant or an assistant app), run something in Home Assistant (a script, a scene, a button, a switch, a light, a gate or a lock; unlocking wants a second tap within 3 seconds; myCar first checks that the thing is there and available, and for a lock it waits up to 10 seconds to tell you it's locked or unlocked), go to a place with the car's map app, give myCar's assistant a command as if you said it ("read my messages", "play Radio Deejay on Spotify"), or open an app. Hold it to choose again, in the car or on the phone in Settings > Car screen. Until you choose, a tap asks. It takes one place of the dock's apps (on an 800x480 screen, 2 places instead of 3; at Extra large it isn't there): turn it off in the same settings and the dock is exactly as before. A real Android widget can't sit on a key (it's another app's piece of screen, and its buttons open on the phone): the Home Assistant, call and command choices cover what such widgets are mostly for.
+- **A bubble for a call under way.** Instead of the band along the top that pushed every screen down, a call that is under way (placed, picked up or on hold) is a small bubble over whatever the car shows, from the map to Cinema, until it ends: the photo of who you're talking to (or their initial), how long it has lasted, whether its voice stays on the phone, and a red button that hangs up. A tap opens the Phone; held, it lifts and goes anywhere you drag it, and stays there for the next calls. The mini player over the map moves out of its way. A ringing call still has the card over the whole screen.
+- **Video cover** (Spotify Web): songs with a short looping video (Spotify's Canvas) can show it in the player beside the map in place of the still cover, also while driving, if you want it. A button on the cover switches it on the first time, and it stays so until you press it again; the same choice is in the car's settings and on the phone, under Music. Each video is downloaded once (the last 12 are kept) and uses a few megabytes of data; it plays muted, only while the music plays and the player is in view. If no video shows, open Spotify's page once, its Now playing view, and pick the Canvas view (Canvas must be on in Spotify's settings too). It relies on how Spotify's web player works today: if Spotify changes it, the still cover simply stays.
+- **Raised panels.** The split screens (map and music, an app beside the map, the pages beside the map) are no longer square blocks side by side: each part is a soft rounded panel raised above the wallpaper, with a light edge and a shadow, in the dark and the light theme. The knob's focus ring follows their corners.
 
-## Fixed after the review of the port
-- With the sound through myCar, a car switched off during a network drop, or during a phone call, no longer makes the music start again from the phone's speaker, in your pocket, when the network comes back or the call ends.
-- A pause pressed while a song you picked in the car is still starting is kept: before, the music started anyway (the same happens in the Xonos app 0.1.55). A call that begins and ends while it is starting no longer leaves the music stopped, and a pause made then doesn't come undone after a network drop.
-- If the Xonos app moved to another Music Assistant, or took its own off the phone, myCar no longer waits for a server that won't start for it, and the Xonos app takes Xonos's place in the car for the drive.
-- **The car stuck on an old title.** After you picked an album or a playlist in the car, the car could keep showing its name (no progress bar, lyrics looked up for the album) instead of the song playing, until the next song; the same could happen with the previous song after two quick skips. It came from Media3 1.11: for older controllers such as the car it loads the artwork of what is shown, and when the next song has no artwork it doesn't cancel that load, which then put the old title back. Now every song has artwork: songs without a cover show Xonos's song icon, as the menu already did.
+## Wireless start-up (from your logs)
+- **A home Wi-Fi like the car's** (addresses in the same range, 192.168.1.x for example) no longer passes for the car's network: myCar tries it only if it isn't validated or has the name the car gave. Before, the start-up could lose two and a half minutes there.
+- **The car's adapter restarting**: when the car's Wi-Fi goes away during the first connection, or the car keeps refusing an old port after its Bluetooth comes back, myCar starts over at once instead of trying for a minute without a picture.
+- **Calling the adapter again**: when the first call fails at once and the car doesn't call the phone, myCar calls again 3 seconds after the car's Bluetooth arrives, then every 2 seconds up to 15, then every 8.
+- **The session report** says how a drive ended: "the car switched off", "the car went silent (N s)", or "Wi-Fi dropped while driving", with the last thing the car said, its Wi-Fi, its Bluetooth audio and its own screen.
 
-## In Android's logcat
-- The lines of Xonos's engine (tag Xonos) no longer hold song names, artists, searches, user, player or server names, addresses, tokens or the server's error texts: only what kind of thing it was. The test build keeps everything. myCar's own log, the one you share from the phone, is separate: it never had Xonos's lines, and a few of its own (the bridge, the Xonos app taking Xonos's place) still name the server's address.
+## The car's radio (DAB+, FM)
+- **New "Keep the car's radio until the phone plays"** (off by default; in the car after "Car audio", on the phone in Connection > Car audio). With the sound through myCar, myCar no longer asks for the car's speakers as soon as Android says yes: the car stays on its own radio until something really plays on the phone (the car's music app, Cinema, or any app that says it is playing), and the first 300 ms you would have missed are sent first.
+- **The radio stays chosen**: after you switch to the car's radio, only a player gets the speakers back. A map's voice, a web page or the assistant no longer take them, and Autoplay doesn't start at the next drive in a car that you keep on its radio (with the new choice on).
+- **Turns, answers, messages read aloud and the listening beep** go on the car's announcement channel even while the car plays its radio, and before each announcement myCar asks the car to lower its sound for a moment and gives it back after, as Android Auto does.
+- **The car taking the speakers for a moment** (its own voice, a traffic announcement, an assistant over Bluetooth): with the sound through myCar the phone's music pauses and starts again when the car gives the speakers back, instead of playing on unheard. It stays paused if you paused, chose a song or another app meanwhile, and waits for the end of a call.
+
+## On the drive
+- **Spotify Web** starts at the start of a drive even when the car's radio presses Play again while the page is still trying (on a Golf the second Play stopped the tries).
+- **The phone's voice**: when the text-to-speech engine doesn't start speaking, myCar shows the answer for 5 seconds, gives the music back and tells you once. On the phone, Settings > Voice says which voice is missing and opens Android's text-to-speech settings. A failed language change no longer leaves the assistant mute.
+- **The big voice model** loads only after 2 minutes of driving, and when you press the microphone only if the phone has the memory for it: otherwise in English the assistant uses its small model (the car tells you once), in Italian it says the phone is short of memory.
+- **Home Assistant's voice assistant**: a pipeline whose conversation agent no longer exists is left out, and if Home Assistant still says the agent is missing, myCar tells you what to fix.
+- The car no longer shows "paused" for a moment while the next song loads, or right after next and previous.
+
+## Screen sharing
+- The phone's screen stays on for the whole sharing (before, its timeout ended the sharing on Android 16 and later), and the phone turns the way the car's picture is.
+- With the sound through myCar the music keeps playing in the car during the sharing, without a second question.
+- The car tells you how to get back to myCar: the black bands around the phone, a button of the car, or Stop in the notification.
+
+## Cable and first setup
+- When the phone charges from a USB port for 20 seconds and no car answers, Home says what to check: a cable that carries data, "Always" when Android asks which app to open and, on GrapheneOS, the USB-C port setting (Settings > Security & privacy > Exploit protection > USB-C port).
+- In the first setup, "Car audio" moves next to the drive's steps, with what each choice does at every drive and, if it isn't Bluetooth, the one-time adb command that spares you Android's question. The help no longer names Android's button, which is "Share screen" from Android 15.
+
+## Upright screens
+- A car whose touchscreen is taller than wide gets an upright picture when it offers one. myCar works upright, with the player beside the map narrower; the interface itself stays as it is.
+- Screen fit, without a saved profile, says "No saved profile: myCar uses the car's sizes" instead of "No vehicle profile matched", which read like an error.
+
+## Waze modified with Morphe
+- The "Allow Gearslip" patch accepts only the hosts in its "Accepted hosts" option. A modified Waze that refuses myCar now gets a red X and doesn't start by itself, and the car tells you what to add to that option (the line is also in the README, "Some apps refuse myCar"). It is forgotten as soon as Waze accepts myCar, or with another copy.
+
+## From Gearslip 0.3.32-0.3.40
+Only what can't change how a car that works today connects:
+- **Alerts from car apps** on the car's screen, over any screen (Waze asks whether a hazard is still there), with their buttons and countdown.
+- **Older Hyundai cars** (protocol 1.0/1.1, 2017-2018) that stopped at the start get the icons and ids they wait for; every other car gets the request it gets today.
+- **Spoken turns** come back when the text-to-speech engine didn't start, also in the middle of a drive.
+- **Music that starts again by itself** after the drive is paused again 2 seconds later.
+- **Metrolist's like button** lights up when only its icon changes; **AntennaPod** gets its Next chapter button in the car.
+- **The name you gave your car** in Bluetooth settings, in the list and in the messages.
+- **Cars that keep their screen black** with the music on Bluetooth (the Mitsubishi Mirage 2024): myCar opens the music channel 5 seconds after asking for the screen, and after two drives like that, at once.
+- **Toyota head units** that stopped before a wireless start get the Wi-Fi channel type they wait for, only after stopping once without it.
+- **The phone's Bluetooth address**, written by hand in Settings > Connection, for the cars that want it (Chevrolet Bolt, Honda Civic 2020).
+- The log says how Android ended a start, also at the end of that start's log. Renault Clio V 2019-2024 (Easy Link) joins the cars that work.
+- Not brought over: protocol 1.7, the strict checks on incoming messages, ending the session on protocol errors, the PhoneStatus channel, the car's data to apps, the video cluster, the adaptive bitrate, and the launcher mode.
 
 ## Checked
-- Built and unit-tested in CI. On the Android 17 emulator: Xonos inside myCar connects to Music Assistant 2.10.8, browses and plays an album, through the Xonos app's bridge too; with Music Assistant on the phone (Xonos 0.1.55 built from its tag) myCar wakes the Xonos app, gets "still starting" and tries again by itself, and connects through the bridge about 12 seconds later. The release-signed build, left out of a real Tailscale, connects to Home Assistant and Music Assistant through the Plancia and Xonos apps' bridges.
-- Not tried in a car, nor on a phone with Spotify through Soloist.
-
-## If you skipped 0.7.2
-- 0.7.2 made Autoplay wait for the car's Bluetooth music, up to a minute, instead of playing on the phone's speaker in your pocket.
+- Built and unit-tested in CI. In the Android emulator: the call bubble with a real call on the emulator's modem (answered, moved, ended with the red button and with the knob), the Jolly key and its choices in several languages and at 800x480 (a script and a lock with its second tap on a real Home Assistant, a place sent to Vela Maps), the video cover with a test video (fade, loop, crop, while moving), the raised panels at 800x480, 1920x720 and 1920x1080, light and dark and over the moving wallpapers, the upright screens, the charging card and the setup, the radio choice, Waze's alert.
+- Not tried in a car: everything here waits for your drives. With the radio choice on, look in the log for "state=LOSS" when you pick DAB+, and tell me if the car keeps its radio.

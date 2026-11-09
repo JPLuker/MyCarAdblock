@@ -108,7 +108,7 @@ internal object JollyActions {
         }
     }
 
-    /** [encode] undone; null for a "%" not followed by two hex digits. */
+    /** [encode] undone; null for a "%" not followed by two hex digits ("%+1" isn't: toIntOrNull would take it). */
     private fun decode(text: String): String? {
         if ('%' !in text) return text
         val out = StringBuilder(text.length)
@@ -121,8 +121,10 @@ internal object JollyActions {
                 continue
             }
             if (i + 3 > text.length) return null
-            val code = text.substring(i + 1, i + 3).toIntOrNull(16) ?: return null
-            out.append(code.toChar())
+            val high = Character.digit(text[i + 1], 16)
+            val low = Character.digit(text[i + 2], 16)
+            if (high < 0 || low < 0) return null
+            out.append((high * 16 + low).toChar())
             i += 3
         }
         return out.toString()
@@ -176,7 +178,11 @@ internal object HomeActs {
         }
     }
 
-    /** Opening a lock waits for a second tap on the key: the one thing here that lets someone in. */
+    /**
+     * Opening a lock waits for a second tap on the key. A gate or a garage door (a cover, toggled) lets
+     * someone in too, and opens with one tap on purpose: that's what the driver arriving home has the
+     * key for.
+     */
     fun confirms(act: HomeAct): Boolean = act == HomeAct.UNLOCK
 
     /** One line of the Jolly's list of Home Assistant's things. */
@@ -197,21 +203,64 @@ internal object HomeActs {
 }
 
 /**
- * The second tap a command that lets someone in waits for (see [HomeActs.confirms]): the first tap
- * arms it, a second within [windowMs] goes ahead. A tap after that arms it afresh.
+ * What Home Assistant's word on a thing means for the Jolly key: before its command, and after a lock's.
+ * Home Assistant answers "done" to a command even for a thing it doesn't have or can't reach (it skips
+ * it without a word), so the key looks at the thing's state rather than at that answer.
  */
-internal class SecondTap(private val windowMs: Long = 3_000) {
+internal object HomeChecks {
+    enum class Before { GO, MISSING, UNAVAILABLE }
+
+    /**
+     * [state] before the command; null where Home Assistant doesn't have the thing. "unavailable": the
+     * device can't be reached, and the command would be skipped. "unknown" goes ahead: a scene or a
+     * button never used yet, or a gate without a sensor, which still do what they're told.
+     */
+    fun before(state: String?): Before = when (state) {
+        null -> Before.MISSING
+        "unavailable" -> Before.UNAVAILABLE
+        else -> Before.GO
+    }
+
+    enum class After { DONE, JAMMED, STILL_LOCKED, STILL_UNLOCKED, NO_NEWS }
+
+    /** A lock's [state] after [act]: done, jammed, still as it was, or not there yet (on its way, or silent). */
+    fun after(act: HomeAct, state: String?): After = when {
+        state == "jammed" -> After.JAMMED
+        act == HomeAct.UNLOCK && state in OPEN -> After.DONE
+        act == HomeAct.LOCK && state == "locked" -> After.DONE
+        act == HomeAct.UNLOCK && state == "locked" -> After.STILL_LOCKED
+        act == HomeAct.LOCK && state in OPEN -> After.STILL_UNLOCKED
+        else -> After.NO_NEWS
+    }
+
+    /** Whether the wait for a lock is over: it did it, or it's jammed. */
+    fun settled(act: HomeAct, state: String?): Boolean = after(act, state).let { it == After.DONE || it == After.JAMMED }
+
+    /** A lock that's open: unlocked, or with its latch open too where it can. */
+    private val OPEN = setOf("unlocked", "open")
+}
+
+/**
+ * The second tap a command that lets someone in waits for (see [HomeActs.confirms]): the first tap
+ * arms it, a second between [minMs] and [windowMs] later goes ahead. One sooner is a double tap made
+ * before the question could be read, or a finger that bounced: it's let go, and the question stays.
+ * A tap after the window arms it afresh.
+ */
+internal class SecondTap(private val windowMs: Long = 3_000, private val minMs: Long = 700) {
+    enum class Tap { ARMED, TOO_SOON, GO }
+
     private var armedAt: Long? = null
 
-    /** True when this tap at [now] (uptime ms) goes ahead; false when it only arms. */
-    fun tap(now: Long): Boolean {
+    /** What this tap at [now] (uptime ms) does: arms, goes ahead, or nothing (too soon after the first). */
+    fun tap(now: Long): Tap {
         val at = armedAt
-        if (at != null && now - at in 0..windowMs) {
+        if (at != null && now - at in 0 until minMs) return Tap.TOO_SOON
+        if (at != null && now - at in minMs..windowMs) {
             armedAt = null
-            return true
+            return Tap.GO
         }
         armedAt = now
-        return false
+        return Tap.ARMED
     }
 
     /** Whether a tap at [now] would go ahead. */
@@ -219,5 +268,33 @@ internal class SecondTap(private val windowMs: Long = 3_000) {
 
     fun disarm() {
         armedAt = null
+    }
+}
+
+/**
+ * One Home Assistant command of the Jolly key's at a time, and not again at once: a tap while it runs,
+ * or within [quietMs] after, is the same press made twice (a garage door toggled twice opens and then
+ * stops halfway). Keyed by what the command does, so another one isn't held up.
+ */
+internal class RepeatGuard(private val quietMs: Long = 1_000) {
+    private var running: String? = null
+    private var last: String? = null
+    private var endedAt = 0L
+
+    /** Whether a tap at [now] (uptime ms) for [key] is that same press again. */
+    fun busy(key: String, now: Long): Boolean = running == key || (last == key && now - endedAt in 0 until quietMs)
+
+    /** [key] starts at [now], unless [busy]: then false. */
+    fun start(key: String, now: Long): Boolean {
+        if (busy(key, now)) return false
+        running = key
+        return true
+    }
+
+    /** [key] has finished at [now]: quiet for a moment more. */
+    fun end(key: String, now: Long) {
+        if (running == key) running = null
+        last = key
+        endedAt = now
     }
 }

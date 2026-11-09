@@ -1740,6 +1740,92 @@ Tutti i token in un solo posto, `car/design/`:
   trascinata e salvata; il mini lettore che si sposta e torna; col modem dell'emulatore Rispondi, pillola e
   tasto rosso che chiude davvero; la manopola che arriva al tasto rosso e lo preme. Non provato in auto, né con
   la foto di un contatto.
+- **Il tasto Jolly** (0.7.4, `feature/jolly`; richiesta dell'utente: "un magic tasto, da preimpostare sopra a
+  quello del microfono, dove puoi selezionare un comando veloce che preferisci"; `car/Jolly.kt`,
+  `car/JollyScreen.kt`, `car/JollyAction.kt` + `JollyActionTest`, `ui/JollySettings.kt`, testi
+  `strings_jolly.xml`): nel dock, sopra il microfono, un tasto fisso della stessa misura (`sym_auto_awesome` su
+  una tessera viola, `MyCarPalette.Violet`) che fa con un tocco il comando scelto. Il nome è una stringa sola
+  (`jolly_name`: "Jolly" in tutte le lingue, "Jolly Roger" in piratesco), gli altri testi lo prendono come
+  segnaposto. Sta in fondo alla parte centrale del dock (`JollyRoom` = 64 + 8 dp): le app perdono un posto (Golf
+  800x480 da 3 a 2, Tayron da 5 a 4); dove non resterebbe nemmeno la mappa (800x480 a Extra large) non c'è.
+  Spento ("Jolly key", chiave `car_jolly_shown`, in auto e sul telefono in Schermo dell'auto) il dock è come
+  prima: lo spazio sopra il microfono è passato da 8 a 6 dp e i 2 dp si tolgono dalla parte centrale. Tocco: il
+  comando (chiave `car_jolly`), o la scelta se non c'è; tenuto premuto: la scelta (`CarScreen.Jolly`: sei
+  riquadri, poi l'elenco del tipo). Tipi: chiamare un contatto (`placeCall`); parlare con un'IA
+  (`PhoneAssistants.launch` come il microfono, col telefono bloccato `AssistantUnlock.start(…, then)` o, con
+  Home Assistant pronto, myCar ascolta da sé, `CarAssistant.listenHere()`); Home Assistant (solo con Plancia
+  configurata in myCar, sul collegamento del viaggio: script e scene `turn_on`, pulsanti `press`, interruttori,
+  luci e cancelli `toggle`, serrature `lock`/`unlock`; aprire una serratura vuole un secondo tocco fra 0,7 e 3 s
+  dal primo, `SecondTap`; allarmi no; prima del comando myCar legge lo stato di quella sola cosa,
+  `home/EntityWatch.kt` con `subscribe_entities` + `entity_ids`: mancante o `unavailable` non manda niente e lo
+  dice, `unknown` va avanti perché è lo stato normale di scene, pulsanti e cancelli senza sensore; una serratura
+  si aspetta fino a 10 s, `locked`/`unlocked`/`open` o `jammed`, poi "still locked" o "hasn't said"; lo stesso
+  comando non riparte mentre gira e per 1 s dopo, `RepeatGuard`; regole in `HomeChecks` + test; un Home
+  Assistant senza `entity_ids` riceve solo il comando, come prima); andare a un posto scritto sul telefono
+  (`CarServices.connectNav`, come il «portami a» dell'assistente); un comando dell'assistente come se fosse
+  detto (`CarAssistant.runPhrase` → `heard()`, nella lingua in cui è scritto, `written`, solo per la sua risposta;
+  quattro pronti per lingua, che `JollyActionTest` fa capire ai frasari); aprire un'app della griglia. In auto
+  non si scrive niente. Nell'anteprima dell'auto sul telefono, senza viaggio, il tasto dice solo cosa farebbe.
+  Al tocco "Chiama" ricontrolla con `PhoneLookup` che il numero sia ancora di un contatto con quel nome, se no
+  riapre la scelta. Col telefono bloccato e lo sblocco negato l'auto dice di ritoccare il tasto Jolly; il
+  microfono lascia cadere un assistente del Jolly che aspetta lo sblocco (`AssistantUnlock.dropJolly`). La
+  lingua di un comando scritto vale solo per la sua risposta (`CarAssistant.forgetWritten`). Durante lo squillo
+  il tasto tace; in chiamata chiamata, IA e comando aspettano. Il comando si salva come "type=…&chiave=valore"
+  (%XX per % & = e controlli); quello che la versione non conosce vale come nessuna scelta. Un widget vero di
+  Android su un tasto non si può (va ospitato e disegnato intero, le sue azioni sono dell'altra app): lo coprono
+  Home Assistant, chiamata e comando. La manopola si ferma anche sul tasto (fra microfono e mappa):
+  `call-bubble-knob` arriva al tasto rosso della pillola al settimo giro; altri scatti che contano i giri della
+  manopola nel dock vanno contati così. Anteprima `--es jolly <call|ai|home|unlock|navigate|say|app>`, `--es
+  jollySay`/`jollyLang`, `--ez jollyKey false`, `--ez jollySettings true`; scatti `jolly-*` (`shots: jolly`, con
+  Home Assistant; `jolly-lock` e `jolly-lock-stuck` con una serratura finta scritta con l'API REST, `--es
+  jollyHome`). Verificato in CI (0.7.4): tasto e microfono a 800x480 e 1920x720, Large ed Extra large, scelta in
+  9 lingue e in piratesco, comando scritto risposto (anche in italiano), assistenti, app, contatti (anche sul
+  telefono), cose di un Home Assistant vero, script eseguito, serratura col secondo tocco (troppo presto
+  ignorato, poi "done"; una che resta chiusa: "still locked" dopo 10 s; una che non c'è: lo dice), posto passato
+  a Vela. Una revisione indipendente ha trovato 13 punti, tutti corretti tranne il tasto acceso di predefinito
+  (voluto dall'utente). Non provato con un telefono e un'auto veri. Idee per dopo: dettare posto o comando a
+  macchina ferma, più tasti o un Jolly per auto, lo stato di Home Assistant sul tasto, "portami a casa" dalla
+  zona home, una sequenza di azioni.
+- **Copertina video** (0.7.4, `feature/video-cover`; richiesta dell'utente: "se attivo Spotify Web, la
+  possibilità di scelta fra locandina fissa e locandina video", poi "un video anche in marcia, se abilitato; lo
+  attiva la prima volta un tasto nel lettore condiviso, poi resta così finché non lo ritocca"). Dove la musica
+  dell'auto può avere copertine video (Spotify Web, `WebMusicService.videoCovers`), un tasto in alto a sinistra
+  sulla copertina del lettore accanto alla mappa (`car/VideoCover.kt`, `VideoCoverButton`, simbolo
+  `sym_motion_play`, bianco quando è acceso) le accende e le spegne; la scelta resta (chiave `car_video_cover`,
+  ferma di predefinito), anche in Impostazioni dell'auto ("Cover in the player", accanto alla dimensione del
+  lettore, solo con Spotify Web acceso) e sul telefono (Musica → Spotify, "Video cover"). Nessuna regola di
+  marcia (decisione dell'utente). Accesa, un brano con la sua Canvas la mostra al posto della copertina:
+  `MediaPlayer` su `TextureView` come Cinema, muto, in loop, tagliato dal centro come la copertina (`CoverCrop`
+  + test), da una copia nella cache (`VideoCoverFiles`: scaricata una volta, solo col lettore in vista, la
+  musica accesa e la copertina video accesa; un brano saltato o il lettore fuori vista interrompono il download,
+  `runInterruptible`; le ultime 12, massimo 20 MB; un errore di rete si riprova dopo 30 s, un errore HTTP o un
+  file che non si riproduce dopo 10 minuti), sotto la copertina ferma che sfuma al primo fotogramma; in pausa
+  con la musica e fuori vista (`LocalPlayerInView`), via quando non si vede, una alla volta. Vetro dei tasti,
+  mini lettore e dock tengono la copertina ferma. Il lettore a tutto schermo di Spotify Web è la sua pagina
+  (`WebMusicScreen`): lì la Canvas è quella di Spotify, `MediaScreen` non c'entra. Da dove viene: lo script
+  della pagina (`WebMusicScripts.videoCover`, che cerca solo con `window.__mycarVideoCovers` acceso:
+  `WebMusicPage` lo mette all'inizio di ogni pagina e quando cambia l'impostazione) manda l'indirizzo con lo
+  stato (`WebPlayerState.videoUrl`, solo da `https://canvaz.scdn.co/`). Il lettore web di Spotify (letto dal
+  runner, novembre 2026; `.github/spotify-canvas.py` nello scatto `video-cover-spotify` ne scrive i fatti nel
+  log del job, mai pezzi del codice di Spotify) suona la Canvas col suo lettore video per id del file (`<video>`
+  su `blob:`), e il componente riceve l'indirizzo come prop `canvasUrl`: lo script lo legge da React, dal
+  `<video>` su fino al componente e, fuori vista se il video non è caricato, cercando in tutto l'albero al
+  massimo ogni 5 s e su al massimo 60.000 nodi; tiene il più in vista e mai un'anteprima (`playbackType`
+  `loopOnHover`). Al cambio di brano l'albero si rilegge subito, poi ogni secondo per 10 s. `SongVideo` + test:
+  il video che la pagina mostra ancora dal brano prima non conta (salvo se la pagina lo mostrava da meno di 2 s
+  prima del cambio), ricorda il suo brano (Avanti→Indietro lo ridà) e dopo 10 s non conta più come vecchio. Dopo
+  un errore il video non si riavvia (`onError` ferma `start()`). Mentre c'è l'avviso «Music isn't reaching the
+  car» (accanto alla X, come prima) il tasto video non compare. Nel Now playing view di Spotify la Canvas c'è
+  solo nella vista "Canvas" (artwork/canvas/hero/video/lyrics): va scelta una volta nella pagina. Se Spotify
+  cambia questi interni resta la copertina ferma, senza errori. Nel log "with a video cover" e "video cover:
+  playing, WxH"; l'indirizzo solo nella build di prova. Anteprima: `--es videoCover`, `--ez videoCoverOn` (solo
+  debug), `--ez musicNotReaching true` (l'avviso della musica che non arriva), scatti `video-cover`,
+  `video-cover-800x480`, `video-cover-moving`, `video-cover-not-reaching` (Extra large), `video-cover-spotify`
+  (Canvas finta di ffmpeg a `10.0.2.2:8003`). Verificato in CI: tasto, dissolvenza, loop, taglio, angoli, mini
+  lettore fermo, in marcia. Una revisione indipendente ha trovato 7 punti: 6 corretti nel codice; il settimo
+  erano estratti degli script di Spotify pubblicati per sbaglio dalle prime sonde su `ci/car-preview`, ancora
+  serviti da 4 commit non più raggiungibili (solo il supporto di GitHub può toglierli: l'utente decide dopo il
+  rilascio). Non provato con un account Spotify né in auto.
 - Dipendenze approvate dall'utente: OkHttp e androidx.webkit (Plancia integrata), Media3 `session`
   e `common` (Xonos integrato: Apache 2.0, nessuna telemetria).
 - Sfondi "stile umbrelOS" ma **nostri**: le immagini di umbrelOS hanno una licenza non libera.
