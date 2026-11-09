@@ -229,10 +229,11 @@ internal object WebMusicScripts {
 
   // The song's video cover: the address of the video the page shows for the song from one of the VIDEO
   // addresses - its <video>'s own, or the one the page's own component playing it was given - the one
-  // most on screen if there are a few; '' with none. [song]: the song in play, by its words. Never in
-  // the way of what plays: whatever goes wrong here, no video cover.
+  // most on screen if there are a few; '' with none, and while the car shows still covers (myCar's
+  // __mycarVideoCovers). [song]: the song in play, by its words. Never in the way of what plays:
+  // whatever goes wrong here, no video cover.
   function videoCover(song) {
-    if (!VIDEO.length) return '';
+    if (!VIDEO.length || window.__mycarVideoCovers !== true) return '';
     try {
       return videoIn(document.getElementsByTagName('video')) || (VIDEO_PROP ? videoInTree(song) : '');
     } catch (e) {

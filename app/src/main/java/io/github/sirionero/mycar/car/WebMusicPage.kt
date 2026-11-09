@@ -129,6 +129,8 @@ internal class WebMusicPage(
     /** The room for myCar's Back last given to the page, in its CSS pixels (see [fit]). */
     private var backRoom = 0
     private var widthScript: ScriptHandler? = null
+    /** Whether the car shows video covers, for the page's script, from the start of each page ([tellVideoCovers]). */
+    private var videoScript: ScriptHandler? = null
     private var probed = false
     private var pressedPlay = false
 
@@ -184,6 +186,8 @@ internal class WebMusicPage(
     init {
         // The car's size setting: the page lays out wider or narrower.
         scope.launch { CarSettings.scale.drop(1).collect { web?.let { w -> if (w.width > 0) fit(w.width) } } }
+        // Video covers turned on or off (the button on the cover): the page looks for them only while on.
+        scope.launch { VideoCoverSetting.on.drop(1).collect { on -> web?.let { tellVideoCovers(it, on) } } }
     }
 
     /** Puts the page in [frame], the place on screen it shows in now; the last asked wins. */
@@ -527,11 +531,25 @@ internal class WebMusicPage(
         } else {
             MyCarLog.w("music: this web engine can't run the page's script: myCar's player won't follow ${service.name}")
         }
+        videoScript = null
+        tellVideoCovers(webView, VideoCoverSetting.on.value)
         // Moved to a wider or narrower place: laid out again at that width.
         webView.addOnLayoutChangeListener { _, left, _, right, _, oldLeft, _, oldRight, _ ->
             if (right - left > 0 && right - left != oldRight - oldLeft) fit(right - left)
         }
         return webView
+    }
+
+    /**
+     * Whether the car shows video covers, said to the page's script ([WebMusicScripts], videoCover): it
+     * looks for the song's video only while they're on. From the start of each page, and at once to this one.
+     */
+    private fun tellVideoCovers(w: WebView, on: Boolean) {
+        if (service.videoCovers.isEmpty()) return
+        val js = "window.__mycarVideoCovers = $on;"
+        runCatching { videoScript?.remove() }
+        videoScript = runCatching { WebViewCompat.addDocumentStartJavaScript(w, js, service.origins.toSet()) }.getOrNull()
+        w.evaluateJavascript(js, null)
     }
 
     private fun onMessage(raw: String?) {
