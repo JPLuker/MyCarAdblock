@@ -50,9 +50,9 @@ internal object AssistantUnlock {
 
     /**
      * Opens the phone, then starts the chosen assistant through [CarAssistant] once more - or, for the
-     * Jolly key's, [then].
+     * Jolly key's, [then], with [retry] what the car says when Android won't light the phone.
      */
-    fun start(context: Context, name: String, then: () -> Unit = { CarAssistant.start() }) {
+    fun start(context: Context, name: String, then: () -> Unit = { CarAssistant.start() }, retry: String? = null) {
         next = then
         // Whether opening takes the driver's face, finger or PIN, rather than nothing.
         if (context.getSystemService(KeyguardManager::class.java)?.isDeviceLocked == true) {
@@ -68,7 +68,7 @@ internal object AssistantUnlock {
         // Android refuses a screen from the background without a word: if none came, say so.
         main.postDelayed({
             MyCarLog.w("assistant: Android didn't let myCar light the phone - is myCar on under Accessibility?")
-            CarToasts.show(this, Words.get(R.string.assistant_unlock_then_touch), CarToast.LENGTH_LONG)
+            CarToasts.show(this, retry ?: Words.get(R.string.assistant_unlock_then_touch), CarToast.LENGTH_LONG)
         }, watching, SHOWN_WITHIN_MS)
     }
 

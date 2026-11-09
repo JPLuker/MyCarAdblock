@@ -185,7 +185,12 @@ internal object Jolly {
                 CarAssistant.listenHere()
                 return
             }
-            AssistantUnlock.start(context, name) { talk(context, app) }
+            // Android not letting myCar light the phone: the key, not the microphone, to tap again.
+            AssistantUnlock.start(
+                context, name,
+                then = { talk(context, app) },
+                retry = Words.get(R.string.jolly_unlock_then_touch, Words.get(R.string.jolly_name)),
+            )
             return
         }
         if (!PhoneAssistants.launch(context, app)) {

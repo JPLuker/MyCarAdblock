@@ -51,6 +51,10 @@
     <!-- %1$s: the app's name -->
     <string name="jolly_title_app">%1$s öffnen</string>
 
+    <!-- Car, the key's assistant with the phone locked, when Android doesn't let myCar light the phone
+         (myCar off under Accessibility): as the microphone's "Unlock the phone, then touch the microphone
+         again". %1$s: jolly_name -->
+    <string name="jolly_unlock_then_touch">Entsperre das Telefon und tippe dann noch einmal auf die %1$s-Taste</string>
     <!-- Car and phone, a contact with several numbers, under the name. %1$d: how many -->
     <plurals name="jolly_numbers">
         <item quantity="one">%1$d Nummer</item>
