@@ -589,18 +589,20 @@ esac
 
 # A call under way (car/CallPill.kt): its pill over every screen until it ends, a call picked up 1:23 ago
 # with no modem behind it (--ez fakeCall true, debug only). Over the map, the app grid and the car's
-# Settings; held and dragged to the bottom left, where it stays; a tap on it opens the Phone. At 800x480,
-# Normal and Extra large (drawn smaller), light. Over the mini player: the column's X brings it out, the pill
-# dragged onto its corner moves it up, and the pill dragged away lets it back. Then the emulator's modem
-# rings, myCar's Answer takes the call (the pill), and the pill's red button ends it. "call-bubble" in the
-# workflow's shots takes them all. At 1920x720 (240 dpi) the pill starts 810-1254 px across, 18-114 down.
+# Settings, each given a wait (the emulator draws a new screen slowly); held and dragged to the bottom
+# left, where it stays; a tap on it opens the Phone. At 800x480, Normal and Extra large (drawn smaller);
+# light. Over the mini player: the column's X brings it out, the pill dragged onto its corner moves it up,
+# and the pill dragged away lets it back. Then the emulator's modem rings, myCar's Answer takes the call
+# (the pill), and the pill's red button ends it. "call-bubble" in the workflow's shots takes them all.
+# At 1920x720 (240 dpi) the pill starts 810-1254 px across, 18-114 down.
 case " ${ONLY:-} " in *" call-bubble "*)
     ONLY="$ONLY call-bubble-800x480 call-bubble-xl-800x480 call-bubble-light call-bubble-mini call-answer" ;;
 esac
-EXTRA="--ez fakeCall true" shoot call-bubble 1920 720 240 "$WAIT;$GRID_BUTTON;$(at settings);900,66,drag,400,640;450,640;$WAIT"
+EXTRA="--ez fakeCall true" shoot call-bubble 1920 720 240 \
+    "$WAIT;$GRID_BUTTON;$WAIT;$(at settings);$WAIT;900,66,drag,400,640;$WAIT;450,640;$WAIT"
 EXTRA="--ez fakeCall true" shoot call-bubble-800x480 800 480 160 "$WAIT;48,436;$WAIT"
 EXTRA="--ez fakeCall true --es carScale 1.5" shoot call-bubble-xl-800x480 800 480 160 "$WAIT;72,414;$WAIT"
-EXTRA="--ez fakeCall true --es carTheme LIGHT" shoot call-bubble-light 1920 720 240 "$WAIT;$GRID_BUTTON;$WAIT"
+EXTRA="--ez fakeCall true --es carTheme LIGHT" shoot call-bubble-light 1920 720 240 "$WAIT;$GRID_BUTTON;$WAIT;$(at settings);$WAIT"
 EXTRA="--ez fakeCall true --ez demoSong true" shoot call-bubble-mini 1920 720 240 \
     "$WAIT;1866,54;$WAIT;900,66,drag,1700,700;$WAIT;1550,654,drag,900,300;$WAIT"
 # The ringing card's Answer is 1068-1176 px across, 444-579 down (with or without its Bluetooth line);
