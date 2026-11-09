@@ -31,6 +31,7 @@ import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.car.design.MyCarPalette
 import io.github.sirionero.mycar.car.design.MyCarSize
 import io.github.sirionero.mycar.cinema.SiteIcons
+import io.github.sirionero.mycar.webmusic.SongVideo
 import io.github.sirionero.mycar.webmusic.WebMusic
 import io.github.sirionero.mycar.webmusic.WebMusicPlayer
 import io.github.sirionero.mycar.webmusic.WebMusicService
@@ -159,6 +160,9 @@ internal class WebMusicPage(
     /** When the page last started loading: a press that waited for it is tried until [BOOT_MS] after. */
     private var startedAt = 0L
     private var wasPlaying = false
+
+    /** Which video cover the song in play has: not one the page still shows from the song before. */
+    private val songVideo = SongVideo()
 
     /** A voice search under way, until its first Play is pressed or isn't found. */
     private var searching = false
@@ -541,7 +545,7 @@ internal class WebMusicPage(
     }
 
     private fun report(o: JSONObject) {
-        val state = WebPlayerState(
+        val said = WebPlayerState(
             title = o.optString("title").take(MAX_TEXT),
             artist = o.optString("artist").take(MAX_TEXT),
             album = o.optString("album").take(MAX_TEXT),
@@ -552,13 +556,18 @@ internal class WebMusicPage(
             at = SystemClock.elapsedRealtime(),
             canSeek = o.optBoolean("seek"),
         )
+        // The song's video cover (Spotify's Canvas): only from the service's own video addresses, and
+        // never in the log but in debug builds (its address says which song it is).
+        val video = o.optString("video").takeIf { url -> url.length < MAX_URL && service.videoCovers.any { url.startsWith(it) } }.orEmpty()
+        val state = said.copy(videoUrl = songVideo.next(said.key, if (said.hasTrack) video else ""))
         val before = WebMusicPlayer.state(service.id).value
-        if (state.key != before.key || state.playing != before.playing) {
+        if (state.key != before.key || state.playing != before.playing || state.videoUrl.isEmpty() != before.videoUrl.isEmpty()) {
             // What the page says, without its words: whether there's a song, and if it plays.
             MyCarLog.i(
                 "music: ${service.id} says: " + (if (state.hasTrack) "a song" else "no song") +
                     (if (state.playing) ", playing" else ", not playing") +
                     (if (state.artUrl.isNotEmpty()) ", with its cover" else "") +
+                    (if (state.videoUrl.isNotEmpty()) ", with a video cover" + (if (BuildConfig.DEBUG) " (${state.videoUrl})" else "") else "") +
                     (if (state.durationMs > 0) ", ${state.durationMs / 1000} s long" else ""),
             )
         }

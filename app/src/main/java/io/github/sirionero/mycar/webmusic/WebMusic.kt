@@ -50,6 +50,12 @@ class WebMusicService(
     val firstPlay: List<String> = emptyList(),
     /** Its own app on the phone, which the car's app grid can leave out for this one ([WebMusic.hideApp]). */
     val appPackage: String? = null,
+    /**
+     * Where its songs' video covers come from (Spotify's Canvas): the starts of the addresses of the
+     * <video> its page shows for the song in play. myCar's player can show that video in place of the
+     * cover; none for a service without them.
+     */
+    val videoCovers: List<String> = emptyList(),
 ) {
     class Bar(
         val playPause: String,
@@ -112,6 +118,8 @@ object WebMusic {
             "[data-testid=\"global-nav-bar\"] { padding-left: $BACK_ROOM !important; }",
         search = "https://open.spotify.com/search/{q}",
         firstPlay = listOf("[data-testid=\"top-result-card\"] [data-testid=\"play-button\"]", "[data-testid=\"tracklist-row\"] button"),
+        // Its Canvas: the muted loop its Now playing view shows over the cover, from its canvas CDN.
+        videoCovers = listOf("https://canvaz.scdn.co/"),
     )
 
     private val AMAZON = listOf("com", "de", "co.uk", "it", "fr", "es", "ca", "com.br", "com.mx", "co.jp", "in", "com.au")

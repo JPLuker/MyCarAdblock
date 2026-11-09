@@ -17,6 +17,8 @@ internal object WebMusicScripts {
      *   engine has none (seen in the car preview): then a stand-in, there before the page's scripts,
      *   takes what they say. Where the page says nothing there, its media elements and its player
      *   bar ([WebMusicService.bar]) stand in;
+     * - the song's video cover, where the service has them ([WebMusicService.videoCovers]): the
+     *   address of the <video> its page shows for the song (Spotify's Canvas), never the video itself;
      * - `__mycarMusicAct(action, seconds)`: a button from the car, through the page's own handler as
      *   a computer's media key would, or else the service's own button on the page.
      */
@@ -29,6 +31,7 @@ internal object WebMusicScripts {
                 .toString()
         } ?: "null"
         return SETUP.replace("__MYCAR_BAR__", bar).replace("__MYCAR_CSS__", JSONObject.quote(service.css))
+            .replace("__MYCAR_VIDEO__", org.json.JSONArray(service.videoCovers).toString())
     }
 
     private const val SETUP = """
@@ -39,6 +42,9 @@ internal object WebMusicScripts {
   // The service's own player bar, by data-testid (or null), and its own CSS.
   var BAR = __MYCAR_BAR__;
   var CSS = __MYCAR_CSS__;
+  // Where the song's video cover comes from, by the start of its address (Spotify's Canvas: the muted
+  // loop its Now playing view shows over the cover); none for most services.
+  var VIDEO = __MYCAR_VIDEO__;
 
   var style = document.createElement('style');
   style.textContent = CSS;
@@ -212,6 +218,35 @@ internal object WebMusicScripts {
     return absolute(best);
   }
 
+  // The song's video cover: the address of the <video> the page shows from one of the VIDEO addresses,
+  // the biggest on screen if there are a few (the song before's may still be going away); '' with none.
+  function videoCover() {
+    if (!VIDEO.length) return '';
+    var best = '', area = -1;
+    function look(el) {
+      var src = String(el.currentSrc || el.src || '');
+      if (!src && el.querySelector) {
+        var source = el.querySelector('source[src]');
+        src = source ? String(source.src || '') : '';
+      }
+      for (var i = 0; i < VIDEO.length; i++) {
+        if (src.indexOf(VIDEO[i]) !== 0) continue;
+        var r = el.getBoundingClientRect();
+        if (r.width * r.height > area) { area = r.width * r.height; best = src; }
+        return;
+      }
+    }
+    // Never in the way of what plays: whatever goes wrong here, no video cover. Only the page's own
+    // videos: one it took away (the song before's) stays paused out of it.
+    try {
+      var shown = document.getElementsByTagName('video');
+      for (var i = 0; i < shown.length; i++) look(shown[i]);
+    } catch (e) {
+      return '';
+    }
+    return best.length < 2000 ? best : '';
+  }
+
   function snapshot() {
     var meta = session && session.metadata;
     var widget = BAR && byTestId(BAR.widget);
@@ -252,7 +287,8 @@ internal object WebMusicScripts {
       remote: remote,
       position: Math.round(at),
       duration: Math.round(duration),
-      seek: typeof handlers.seekto === 'function'
+      seek: typeof handlers.seekto === 'function',
+      video: videoCover()
     };
   }
 
@@ -298,7 +334,7 @@ internal object WebMusicScripts {
     var s;
     try { s = snapshot(); } catch (e) { return; }
     var now = Date.now();
-    var key = [s.title, s.artist, s.album, s.art, s.playing, s.remote, s.duration, s.seek].join('\n');
+    var key = [s.title, s.artist, s.album, s.art, s.playing, s.remote, s.duration, s.seek, s.video].join('\n');
     var expected = lastPosition + (lastPlaying ? now - lastAt : 0);
     if (key === last && Math.abs(s.position - expected) < 2500) return;
     last = key;

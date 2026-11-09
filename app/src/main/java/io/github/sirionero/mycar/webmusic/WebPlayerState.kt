@@ -7,6 +7,11 @@ data class WebPlayerState(
     val album: String = "",
     /** The cover, an https address; empty without one. */
     val artUrl: String = "",
+    /**
+     * The song's video cover (Spotify's Canvas: a short muted loop), the one its page shows, from the
+     * service's own video addresses ([WebMusicService.videoCovers]); empty without one.
+     */
+    val videoUrl: String = "",
     val playing: Boolean = false,
     val positionMs: Long = 0,
     /** 0 while unknown. */
