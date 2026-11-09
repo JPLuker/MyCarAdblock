@@ -453,10 +453,12 @@ object CarServices {
             return
         }
         // The car's last drive ended on its own source - the driver picked its radio and stayed there
-        // (see CarSource) - and its music goes through myCar now: the radio stays on, as a car radio
-        // comes back on the source it was left on, until the phone plays. Over Bluetooth the car picks
-        // its source itself, as before.
-        if (autoplayAutoPicked && CarSettings.pipeAudio.value && CarSource.lastDriveOnCarSource()) {
+        // (see CarSource) - its music goes through myCar now, and the driver keeps the car's radio until
+        // the phone plays (radioFirst): the radio stays on, as a car radio comes back on the source it
+        // was left on. Without that choice the car is switched to myCar as the capture starts anyway, so
+        // leaving the music off only left it quiet, radio gone too. Over Bluetooth the car picks its
+        // source itself, as before.
+        if (autoplayAutoPicked && CarSettings.pipeAudio.value && CarSettings.radioFirst.value && CarSource.lastDriveOnCarSource()) {
             autoplayPending = false
             if (_musicStarting.value) expectMusic(false)
             io.github.sirionero.mycar.MyCarLog.i("media: Autoplay: last drive ended on the car's own source - it stays on")
