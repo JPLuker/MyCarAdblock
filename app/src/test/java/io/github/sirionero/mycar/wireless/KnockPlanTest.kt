@@ -68,4 +68,16 @@ class KnockPlanTest {
         // Closed 11 s on: the adapter gave up on the phone's Wi-Fi, not a first contact.
         assertFalse(KnockPlan.closedEarly(openedAt = 10_000, closedAt = 21_000, gotWifiDetails = false))
     }
+
+    @Test
+    fun `a quick call's channel closed at first contact costs no start-over - on the first start-up too`() {
+        // The first start-up has all three: given one back, the start-over that follows leaves three.
+        assertEquals(4, KnockPlan.startOversLeft(left = 3, quickChannel = true, startsOver = true, overPending = false))
+        assertEquals(2, KnockPlan.startOversLeft(left = 1, quickChannel = true, startsOver = true, overPending = false))
+        // A channel the first call or the usual step opened pays as before.
+        assertEquals(3, KnockPlan.startOversLeft(left = 3, quickChannel = false, startsOver = true, overPending = false))
+        // A tap doesn't start over by itself; a start-over already on its way isn't taken twice.
+        assertEquals(3, KnockPlan.startOversLeft(left = 3, quickChannel = true, startsOver = false, overPending = false))
+        assertEquals(2, KnockPlan.startOversLeft(left = 2, quickChannel = true, startsOver = true, overPending = true))
+    }
 }

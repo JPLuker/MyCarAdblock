@@ -46,4 +46,15 @@ internal object KnockPlan {
     /** A channel the car closed at its first contact: this soon after it opened, before its Wi-Fi details. */
     fun closedEarly(openedAt: Long, closedAt: Long, gotWifiDetails: Boolean): Boolean =
         !gotWifiDetails && closedAt - openedAt < EARLY_CLOSE_MS
+
+    /**
+     * The start-overs [left] once a channel the car closed at its first contact is over, before the
+     * start-over that follows takes one. A channel a quick call opened ([quickChannel]) gives that one
+     * back, in a start-up that starts over by itself ([startsOver]) with no start-over on its way yet
+     * ([overPending]). Not capped at the full count: the start-over takes it again at once, and capped,
+     * the first start-up - where it happens most - paid all the same. Once a start-up and its
+     * start-overs at most: no quick calls follow an early closing.
+     */
+    fun startOversLeft(left: Int, quickChannel: Boolean, startsOver: Boolean, overPending: Boolean): Int =
+        if (quickChannel && startsOver && !overPending) left + 1 else left
 }

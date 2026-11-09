@@ -370,8 +370,9 @@ object WirelessLink {
                     )
                 }
                 slowKnocks = true
-                if (quickChannel && retryFor != mine && retriesLeft < AUTO_RETRIES) {
-                    retriesLeft++
+                val left = KnockPlan.startOversLeft(retriesLeft, quickChannel, startsOver = autoStart, overPending = retryFor == mine)
+                if (left != retriesLeft) {
+                    retriesLeft = left
                     log.i("auto-connect: a quick call opened that channel - its start-over isn't counted")
                 }
             }
