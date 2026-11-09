@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Jolly key in pirate speak (see values/strings_jolly.xml): its name is the Jolly Roger, the key a flag
+  on the mast. Safety, errors and the ready-made commands (which the assistant reads) stay as in the language.
+-->
+<resources>
+    <!-- The key's name, in the dock's description, the car's settings and the phone's: the wildcard card that
+         can be anything. The same word in every language (in pirate speak "Jolly Roger"); the other texts take
+         it as a placeholder, so a new name is one line per language. -->
+    <string name="jolly_name">Jolly Roger</string>
+    <!-- Car, the chooser (the key held, or tapped with nothing chosen): under the tiles of the kinds. %1$s: jolly_name -->
+    <string name="jolly_choose_intro">A tap on the flag does what you pick here; hold the flag to come back. On the phone too: Rigging > Helm > %1$s.</string>
+    <!-- Car, the chooser and the car's Settings: what the key does now. %1$s: one of the jolly_title_* below -->
+    <string name="jolly_now">Flying now: %1$s</string>
+    <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->
+    <string name="jolly_kind_call">Hail a mate</string>
+    <string name="jolly_kind_ai">Parley with an AI</string>
+    <string name="jolly_kind_navigate">Set a course</string>
+    <!-- A phrase myCar's assistant understands, run as if it had been said -->
+    <string name="jolly_kind_say">Order for the parrot</string>
+    <string name="jolly_kind_app">Board an app</string>
+    <!-- What the key does, in the chooser, the settings and the toasts. %1$s: the contact's name -->
+    <string name="jolly_title_call">Hail %1$s</string>
+    <!-- %1$s: an assistant app's name (Gemini, Claude…) -->
+    <string name="jolly_title_ai">Parley with %1$s</string>
+    <!-- The phone's own assistant, whichever it is -->
+    <string name="jolly_title_ai_phone">Parley with the phone\'s parrot</string>
+    <!-- %1$s: the place's name ("Home"), or the place as written -->
+    <string name="jolly_title_navigate">Course for %1$s</string>
+    <!-- %1$s: the app's name -->
+    <string name="jolly_title_app">Board %1$s</string>
+    <!-- Car and phone, under the list of assistants -->
+    <string name="jolly_ai_note">It listens and answers on the phone, and its voice comes aboard only over Bluetooth. With the phone locked it starts once you unlock it, or, with Home Assistant set up in myCar, myCar listens and Home Assistant answers.</string>
+    <!-- Car, the chooser: a place is written on the phone. %1$s: jolly_name -->
+    <string name="jolly_navigate_on_phone">Ports are written on the phone: Rigging > Helm > %1$s.</string>
+    <!-- Car, the chooser, under the ready-made commands. %1$s: jolly_name -->
+    <string name="jolly_say_on_phone">Any other order: write it on the phone, in Rigging > Helm > %1$s.</string>
+    <!-- %1$s: the place's name or the place, %2$s: the map app -->
+    <string name="jolly_navigating">Sailing for %1$s with %2$s</string>
+    <!-- The car's Settings and the phone's (Settings > Car screen): the On/Off choice, a switch on the phone. %1$s: jolly_name -->
+    <string name="car_settings_jolly_key">%1$s on the mast</string>
+    <!-- Car's Settings: the button that opens the chooser -->
+    <string name="car_settings_jolly_choose">Give it its orders</string>
+    <string name="car_settings_jolly_none">No orders yet: a tap on the flag asks.</string>
+    <!-- Phone, Settings > Car screen, the key's section: under the switch -->
+    <string name="settings_jolly_key_detail">On the mast, above the ship\'s parrot: one tap does what you choose here</string>
+    <!-- The row that opens the kinds; under it, what the key does -->
+    <string name="settings_jolly_action">Its orders</string>
+    <string name="settings_jolly_none">No orders yet: aboard, a tap on the flag asks</string>
+    <!-- Title of the list of kinds -->
+    <string name="settings_jolly_kind">What orders for the flag?</string>
+    <string name="settings_jolly_footer">A hail, a parrot, something in Home Assistant, a port, an order or an app, one tap away. Hold the flag aboard to change it there.</string>
+    <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
+    <string name="settings_jolly_place">Address or port</string>
+    <string name="settings_jolly_place_name">Its name aboard (optional)</string>
+    <string name="settings_jolly_place_note">It sails to the ship\'s chart app as you write it, as when you tell myCar\'s parrot where to go.</string>
+    <!-- A command: the field, and a note under the ready-made ones -->
+    <string name="settings_jolly_phrase">Order</string>
+    <string name="settings_jolly_phrase_note">Write it as you would say it to myCar\'s parrot, in myCar\'s tongue: “play Radio Deejay on Spotify”, “open the gate”. Aboard, the flag shows it and the parrot answers.</string>
+</resources>
