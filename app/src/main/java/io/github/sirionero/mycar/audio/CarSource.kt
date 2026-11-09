@@ -8,10 +8,11 @@ import io.github.sirionero.mycar.MyCarLog
 /**
  * Whether a car's last drive ended on the car's own source: the driver picked its radio (the car
  * took its speakers back for good, a LOSS) and the phone's music didn't come back to the car for a
- * minute after. Kept for each car, as its audio route is ([CarRoutes]): the next drive's Autoplay
- * leaves the radio on, as a car radio comes back on the source it was left on. A LOSS less than a
- * minute before the drive ends is the car switching off, not a choice. Forgotten as soon as the
- * phone's music reaches the car again.
+ * minute after. Kept for each car, as its audio route is ([CarRoutes]): with the car's radio kept
+ * until the phone plays (CarSettings.radioFirst), the next drive's Autoplay leaves the radio on, as a
+ * car radio comes back on the source it was left on. A LOSS less than a minute before the drive
+ * ends is the car switching off, not a choice. Forgotten as soon as the phone's music reaches the
+ * car again.
  */
 internal object CarSource {
 
@@ -32,7 +33,7 @@ internal object CarSource {
         // Another car since (the drive ended and a new one began): this one's LOSS didn't settle.
         if (car != CarRoutes.car) return@Runnable
         prefs()?.edit()?.putBoolean(car, true)?.apply()
-        MyCarLog.i("audio: a minute on the car's own source - the next drive's Autoplay leaves it on")
+        MyCarLog.i("audio: a minute on the car's own source - remembered for the next drive's Autoplay")
     }
 
     fun init(context: Context) {
