@@ -15,7 +15,11 @@ import org.junit.Test
  * driver picks it or keeps it until the phone plays, is left alone by anything but a player.
  */
 class AudioLinkFocusTest {
-    /** What myCar sent, in order: "start", "stop" and "data" on the sink, "focus:<type>" to the car. */
+    /**
+     * What myCar sent, in order: "start", "stop" and "data" on the sink, "focus:<type>" to the car. The
+     * directions add to it from their own thread: while they may, it's read with its own synchronized
+     * calls (contains), not iterated: an iterator that meets their add throws ConcurrentModificationException.
+     */
     private val sent: MutableList<String> = Collections.synchronizedList(mutableListOf())
     private var takenBack = 0
     private var musicTold = 0
@@ -85,7 +89,7 @@ class AudioLinkFocusTest {
     private fun asking(guidance: AudioLink, answered: () -> Unit) {
         var asked = false
         val thread = Thread { asked = guidance.askForSpeakers() }.apply { start() }
-        while (sent.none { it == "focus:$MAY_DUCK" }) Thread.sleep(1)
+        while (!sent.contains("focus:$MAY_DUCK")) Thread.sleep(1)
         answered()
         thread.join(2_000)
         assertTrue(asked)
@@ -305,7 +309,7 @@ class AudioLinkFocusTest {
         media.play(1_600, loud = false)
         val guidance = guidance(media)
         val thread = Thread { guidance.askForSpeakers() }.apply { start() }
-        while (sent.none { it == "focus:$MAY_DUCK" }) Thread.sleep(1)
+        while (!sent.contains("focus:$MAY_DUCK")) Thread.sleep(1)
         // A player after the pause: the music asks for the speakers and waits for the car's word.
         media.play(400, loud = true)
         FocusAnswers.route(GAIN, media, guidance)
