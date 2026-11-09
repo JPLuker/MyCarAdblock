@@ -198,6 +198,9 @@ if [ -z "${ONLY:-}" ] || [[ " $ONLY " == *" video-cover"* ]]; then
     # cloud session can't): for fitting the page's script (WebMusicScripts, videoCover) when Spotify changes.
     mkdir -p previews/video-cover-spotify
     timeout 180 python3 .github/spotify-canvas.py > previews/video-cover-spotify/spotify-canvas.txt 2>&1 || true
+    # In the job's log too: ci/car-preview is the last run's, whichever branch it was.
+    echo "--- Spotify's Canvas in its web player's scripts ---"
+    cut -c1-6000 previews/video-cover-spotify/spotify-canvas.txt | head -150
 fi
 CANVAS="--ez demoSong true --es videoCover http://10.0.2.2:8003/canvas.mp4"
 EXTRA="$CANVAS" shoot video-cover 1920 720 240 "$WAIT;$WAIT;1405,54;$WAIT;$WAIT;1866,54;$WAIT"
