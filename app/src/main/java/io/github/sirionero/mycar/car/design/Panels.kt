@@ -19,6 +19,11 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.node.LayoutAwareModifierNode
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.node.TraversableNode
+import androidx.compose.ui.node.requireDensity
 
 /*
  * The panels of a split screen - the map and what sits beside it, the parts of a Home page - as soft
@@ -47,11 +52,43 @@ fun Modifier.raisedPanel(coverCorners: Boolean = false): Modifier = composed {
     val dark = MaterialTheme.colorScheme.background.luminance() < 0.5f
     drawBehind { drawPanelShadow(MyCarRadius.Panel.toPx(), dark) }
         .then(if (coverCorners) Modifier.groundOutside() else Modifier)
+        .then(PanelCornersElement)
         .clip(PanelShape)
         .drawWithContent {
             drawContent()
             drawPanelRim(MyCarRadius.Panel.toPx(), dark)
         }
+}
+
+/**
+ * Where a raised panel is and how round its corners are, for what's inside it: the knob's ring
+ * (car/FocusRing.kt) round a button in one of its corners follows the panel's rounder corner there,
+ * which would otherwise cut the ring off. Found with findNearestAncestor([Key]).
+ */
+internal class PanelCornersNode : Modifier.Node(), TraversableNode, LayoutAwareModifierNode {
+    override val traverseKey: Any get() = Key
+
+    /** The panel on screen, once placed. */
+    var coordinates: LayoutCoordinates? = null
+        private set
+
+    /** Its corners' radius in pixels, at its own density. */
+    var radiusPx = 0f
+        private set
+
+    override fun onPlaced(coordinates: LayoutCoordinates) {
+        this.coordinates = coordinates
+        radiusPx = with(requireDensity()) { MyCarRadius.Panel.toPx() }
+    }
+
+    companion object Key
+}
+
+private object PanelCornersElement : ModifierNodeElement<PanelCornersNode>() {
+    override fun create() = PanelCornersNode()
+    override fun update(node: PanelCornersNode) = Unit
+    override fun hashCode() = javaClass.hashCode()
+    override fun equals(other: Any?) = other === this
 }
 
 /** What lies under the panels, over this element's content outside [PanelShape]: see [raisedPanel]. */

@@ -281,9 +281,9 @@ internal fun WidgetCard(
                 scaleX = scale
                 scaleY = scale
             }
-            // The panel's rim stands for the glass's own.
+            // The panel's rim, its own or the one round it, stands for the glass's own.
             .then(if (raised) Modifier.raisedPanel() else Modifier.clip(shape))
-            .then(if (glass) Modifier.glassPanel(shape, surface.copy(alpha = 0.62f), rim = !raised) else Modifier.background(surface))
+            .then(if (glass) Modifier.glassPanel(shape, surface.copy(alpha = 0.62f), rim = false) else Modifier.background(surface))
             .combinedClickable(
                 interactionSource = source,
                 indication = LocalIndication.current,
