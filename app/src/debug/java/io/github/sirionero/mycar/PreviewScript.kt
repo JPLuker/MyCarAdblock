@@ -42,6 +42,8 @@ import kotlin.random.Random
  *   rebuild                      the car's screen made again, as with a new encoder
  *   demo                         the made-up song again in the car's player, its music app kept
  *   key:code                     a key of the car pressed and let go (CarKeys)
+ *   knob:n                       the car's knob turned n clicks (negative: back), as CarKeys.onRotate;
+ *                                knob:ok presses it (the focused button's click)
  *   unfocus                      the focus taken from the view that has it (a web view after a tap)
  *   focusweb                     the focus given to the web view in sight, as a tap in it can
  *   snap:name                    the picture now, as name.png
@@ -218,6 +220,23 @@ internal class PreviewScript(
                 onMain {
                     io.github.sirionero.mycar.car.CarKeys.onKey(code, down = true, longPress = false)
                     io.github.sirionero.mycar.car.CarKeys.onKey(code, down = false, longPress = false)
+                }
+            }
+            // Straight to the car's screen, as MyCarActivity's focus sink does in a drive (the preview has none).
+            "knob" -> {
+                MyCarLog.i("preview: step $n: knob ${args[0]}")
+                onMain {
+                    if (args[0] == "ok") {
+                        projector.dispatchKey(android.view.KeyEvent.KEYCODE_DPAD_CENTER, true)
+                        projector.dispatchKey(android.view.KeyEvent.KEYCODE_DPAD_CENTER, false)
+                    } else {
+                        val turns = args[0].toInt()
+                        val code = if (turns > 0) android.view.KeyEvent.KEYCODE_TAB else io.github.sirionero.mycar.car.CarKeys.KEYCODE_SHIFT_TAB
+                        repeat(kotlin.math.abs(turns)) {
+                            projector.dispatchKey(code, true)
+                            projector.dispatchKey(code, false)
+                        }
+                    }
                 }
             }
             "snap" -> {

@@ -596,7 +596,7 @@ esac
 # (the pill), and the pill's red button ends it. "call-bubble" in the workflow's shots takes them all.
 # At 1920x720 (240 dpi) the pill starts 810-1254 px across, 18-114 down.
 case " ${ONLY:-} " in *" call-bubble "*)
-    ONLY="$ONLY call-bubble-800x480 call-bubble-xl-800x480 call-bubble-light call-bubble-mini call-answer" ;;
+    ONLY="$ONLY call-bubble-800x480 call-bubble-xl-800x480 call-bubble-light call-bubble-mini call-bubble-knob call-answer" ;;
 esac
 EXTRA="--ez fakeCall true" shoot call-bubble 1920 720 240 \
     "$WAIT;$GRID_BUTTON;$WAIT;$(at settings);$WAIT;900,66,drag,400,640;$WAIT;450,640;$WAIT"
@@ -605,6 +605,11 @@ EXTRA="--ez fakeCall true --es carScale 1.5" shoot call-bubble-xl-800x480 800 48
 EXTRA="--ez fakeCall true --es carTheme LIGHT" shoot call-bubble-light 1920 720 240 "$WAIT;$GRID_BUTTON;$WAIT;$(at settings);$WAIT"
 EXTRA="--ez fakeCall true --ez demoSong true" shoot call-bubble-mini 1920 720 240 \
     "$WAIT;1866,54;$WAIT;900,66,drag,1700,700;$WAIT;1550,654,drag,900,300;$WAIT"
+# The car's knob (a script, see PreviewScript: knob:n turns it, knob:ok presses it): one turn back with
+# nothing focused lands on the last thing on the screen, the pill's red button; a turn on, a turn back
+# and a press end the call ("calls: there was no call to end" in the log, for the made-up one).
+EXTRA="--ez fakeCall true --es script 'wait:7000;snap:knob-0;knob:-1;wait:1200;snap:knob-1;knob:-1;wait:1200;snap:knob-2;knob:1;wait:800;knob:ok;wait:1500;snap:knob-3'" \
+    shoot call-bubble-knob 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
 # The ringing card's Answer is 1068-1176 px across, 444-579 down (with or without its Bluetooth line);
 # the pill's red button 1158-1254 across.
 shoot call-answer 1920 720 240 "$WAIT;$WAIT;1122,510;$WAIT;$WAIT;1206,66;$WAIT;$WAIT" "adb emu gsm call 3339876543"
