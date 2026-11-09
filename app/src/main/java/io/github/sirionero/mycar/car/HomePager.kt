@@ -213,7 +213,8 @@ internal fun HomePager(onHome: Boolean, mapSplit: Boolean, mapPage: @Composable 
         // map sharing its page shows it round the panels. Not under another screen: a moving one went on
         // being drawn there for nobody.
         val wallpaper = rememberWallpaper()
-        if (onHome && wallpaper != null && (pager.currentPage != mapIndex || pager.isScrollInProgress || mapSplit)) {
+        val wallBehindMap = mapSplit && "wall" !in io.github.sirionero.mycar.car.design.panelsOff
+        if (onHome && wallpaper != null && (pager.currentPage != mapIndex || pager.isScrollInProgress || wallBehindMap)) {
             WallpaperBackground(wallpaper, Modifier.matchParentSize())
         }
         HorizontalPager(
@@ -227,7 +228,7 @@ internal fun HomePager(onHome: Boolean, mapSplit: Boolean, mapPage: @Composable 
             val page = pages.getOrNull(index) ?: return@HorizontalPager
             val inView = onHome && pager.settledPage == index
             if (page.layout == PageLayout.MAP) {
-                val ground = if (mapSplit) Modifier else Modifier.background(MaterialTheme.colorScheme.background)
+                val ground = if (wallBehindMap) Modifier else Modifier.background(MaterialTheme.colorScheme.background)
                 Box(Modifier.fillMaxSize().then(ground)) { mapPage(inView) }
             } else {
                 DriverPage(
