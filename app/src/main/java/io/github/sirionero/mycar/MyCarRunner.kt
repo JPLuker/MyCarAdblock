@@ -57,6 +57,8 @@ class MyCarRunner(
     private val closeTransport: (() -> Unit)? = null,
     /** Whether a car accepted this certificate before (see [CertRotation.acceptedBefore]). */
     private val certAcceptedBefore: (CertProvider.Identity) -> Boolean = { false },
+    /** myCar's icon as 32, 64 and 128 px PNGs, for a car on protocol 1.0 or 1.1 ([DiscoveryRequest], [PhoneIcons]). */
+    private val phoneIcons: () -> List<ByteArray> = { emptyList() },
 ) {
     private val log = MyCarLog.tagged("PROTO")
 
@@ -353,6 +355,8 @@ class MyCarRunner(
         val minor = ((body[2].toInt() and 0xFF) shl 8) or (body[3].toInt() and 0xFF)
         log.i("<- VersionRequest: head unit speaks $major.$minor")
         SessionReport.protocolVersion(major, minor)
+        carMajor = major
+        carMinor = minor
 
         // Always 1.3, on purpose. Every car that accepts myCar was tested this way, 1.5 units
         // included. Echoing the car's own version was tried too: a 4.3 unit rejected the
@@ -502,11 +506,22 @@ class MyCarRunner(
         runCatching { onCertVerdict(identity, v) }.onFailure { log.e("the certificate's verdict went unhandled", it) }
     }
 
+    /** The protocol version the car's VersionRequest named, for [sendServiceDiscoveryRequest]. */
+    private var carMajor = 0
+    private var carMinor = 0
+
     private fun sendServiceDiscoveryRequest() {
-        val body = Protobuf.stringField(4, "myCar") + // label_text
-            Protobuf.stringField(5, Build.MODEL)        // device_name
+        // A car on 1.0 or 1.1 also gets myCar's icon and an id for this connection, as a phone with
+        // Android Auto sends them: without, it never answered. Every other car, the same as ever.
+        val old = DiscoveryRequest.wantsIcons(carMajor, carMinor)
+        val icons = if (old) runCatching(phoneIcons).getOrDefault(emptyList()) else emptyList()
+        val id = if (old) java.util.UUID.randomUUID().toString() else null
+        val body = DiscoveryRequest.body("myCar", Build.MODEL, icons, id)
         send(MSG_SERVICE_DISCOVERY_REQUEST, body, encrypted = true)
-        log.i("-> ServiceDiscoveryRequest (encrypted)")
+        log.i(
+            "-> ServiceDiscoveryRequest (encrypted)" +
+                if (old) ", with ${icons.size} icons and an id for this connection, for a car on $carMajor.$carMinor (${body.size} bytes)" else "",
+        )
     }
 
     private fun onServiceDiscoveryResponse(body: ByteArray) {

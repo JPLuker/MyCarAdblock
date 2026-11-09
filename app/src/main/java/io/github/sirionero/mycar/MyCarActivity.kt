@@ -749,6 +749,7 @@ class MyCarActivity : ComponentActivity(), Projection {
             vehicleProfileFor = { info -> VehicleProfiles.find(VehicleProfiles.load(this), info) },
             onCertVerdict = { identity, verdict -> CertRotation.report(applicationContext, identity, verdict) },
             certAcceptedBefore = { CertRotation.acceptedBefore(applicationContext, it) },
+            phoneIcons = { PhoneIcons.pngs(applicationContext) },
         )
         this.runner = runner
         worker = runSession(runner)
@@ -816,6 +817,7 @@ class MyCarActivity : ComponentActivity(), Projection {
             onCertVerdict = { identity, verdict -> CertRotation.report(applicationContext, identity, verdict) },
             certAcceptedBefore = { CertRotation.acceptedBefore(applicationContext, it) },
             closeTransport = { socket.close() },
+            phoneIcons = { PhoneIcons.pngs(applicationContext) },
         )
         this.runner = runner
         worker = runSession(runner)
