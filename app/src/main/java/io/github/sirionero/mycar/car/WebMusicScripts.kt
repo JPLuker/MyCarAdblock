@@ -18,7 +18,8 @@ internal object WebMusicScripts {
      *   takes what they say. Where the page says nothing there, its media elements and its player
      *   bar ([WebMusicService.bar]) stand in;
      * - the song's video cover, where the service has them ([WebMusicService.videoCovers]): the
-     *   address of the <video> its page shows for the song (Spotify's Canvas), never the video itself;
+     *   address of the <video> its page shows for the song (Spotify's Canvas), or the one its own
+     *   component playing that <video> was given ([WebMusicService.videoCoverProp]); never the video;
      * - `__mycarMusicAct(action, seconds)`: a button from the car, through the page's own handler as
      *   a computer's media key would, or else the service's own button on the page.
      */
@@ -32,6 +33,7 @@ internal object WebMusicScripts {
         } ?: "null"
         return SETUP.replace("__MYCAR_BAR__", bar).replace("__MYCAR_CSS__", JSONObject.quote(service.css))
             .replace("__MYCAR_VIDEO__", org.json.JSONArray(service.videoCovers).toString())
+            .replace("__MYCAR_VIDEO_PROP__", JSONObject.quote(service.videoCoverProp.orEmpty()))
     }
 
     private const val SETUP = """
@@ -45,6 +47,9 @@ internal object WebMusicScripts {
   // Where the song's video cover comes from, by the start of its address (Spotify's Canvas: the muted
   // loop its Now playing view shows over the cover); none for most services.
   var VIDEO = __MYCAR_VIDEO__;
+  // And where the page's own component playing it gets its address, as React keeps it (Spotify's Canvas
+  // player: canvasUrl): its <video> plays through the service's own video player, with no such address.
+  var VIDEO_PROP = __MYCAR_VIDEO_PROP__;
 
   var style = document.createElement('style');
   style.textContent = CSS;
@@ -223,18 +228,36 @@ internal object WebMusicScripts {
   function videoCover() {
     if (!VIDEO.length) return '';
     var best = '', area = -1;
+    function ours(src) {
+      for (var i = 0; i < VIDEO.length; i++) if (src.indexOf(VIDEO[i]) === 0) return true;
+      return false;
+    }
+    // The address the page's own component showing this <video> was given: from the element up to the
+    // nearest one React drew, then up its components, as React keeps them.
+    function given(el) {
+      for (var node = el, hops = 0; node && hops < 6; node = node.parentElement, hops++) {
+        var keys = Object.keys(node);
+        for (var k = 0; k < keys.length; k++) {
+          if (keys[k].indexOf('__reactFiber$') !== 0) continue;
+          for (var f = node[keys[k]], up = 0; f && up < 12; f = f.return, up++) {
+            var props = f.memoizedProps;
+            if (props && typeof props[VIDEO_PROP] === 'string') return props[VIDEO_PROP];
+          }
+          return '';
+        }
+      }
+      return '';
+    }
     function look(el) {
       var src = String(el.currentSrc || el.src || '');
       if (!src && el.querySelector) {
         var source = el.querySelector('source[src]');
         src = source ? String(source.src || '') : '';
       }
-      for (var i = 0; i < VIDEO.length; i++) {
-        if (src.indexOf(VIDEO[i]) !== 0) continue;
-        var r = el.getBoundingClientRect();
-        if (r.width * r.height > area) { area = r.width * r.height; best = src; }
-        return;
-      }
+      if (!ours(src) && VIDEO_PROP) src = given(el);
+      if (!ours(src)) return;
+      var r = el.getBoundingClientRect();
+      if (r.width * r.height > area) { area = r.width * r.height; best = src; }
     }
     // Never in the way of what plays: whatever goes wrong here, no video cover. Only the page's own
     // videos: one it took away (the song before's) stays paused out of it.

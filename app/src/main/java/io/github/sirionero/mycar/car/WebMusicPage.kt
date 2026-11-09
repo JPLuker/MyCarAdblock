@@ -559,7 +559,7 @@ internal class WebMusicPage(
         // The song's video cover (Spotify's Canvas): only from the service's own video addresses, and
         // never in the log but in debug builds (its address says which song it is).
         val video = o.optString("video").takeIf { url -> url.length < MAX_URL && service.videoCovers.any { url.startsWith(it) } }.orEmpty()
-        val state = said.copy(videoUrl = songVideo.next(said.key, if (said.hasTrack) video else ""))
+        val state = said.copy(videoUrl = songVideo.next(said.key, if (said.hasTrack) video else "", said.at))
         val before = WebMusicPlayer.state(service.id).value
         if (state.key != before.key || state.playing != before.playing || state.videoUrl.isEmpty() != before.videoUrl.isEmpty()) {
             // What the page says, without its words: whether there's a song, and if it plays.

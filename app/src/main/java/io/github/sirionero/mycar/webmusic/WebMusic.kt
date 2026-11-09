@@ -56,6 +56,12 @@ class WebMusicService(
      * cover; none for a service without them.
      */
     val videoCovers: List<String> = emptyList(),
+    /**
+     * The prop of its page's own component that plays the song's video cover where that component gets
+     * the video's address (Spotify's Canvas player: canvasUrl), as React keeps it: its <video> plays
+     * through the service's own video player and has no such address. Null to read only the <video>.
+     */
+    val videoCoverProp: String? = null,
 ) {
     class Bar(
         val playPause: String,
@@ -118,8 +124,11 @@ object WebMusic {
             "[data-testid=\"global-nav-bar\"] { padding-left: $BACK_ROOM !important; }",
         search = "https://open.spotify.com/search/{q}",
         firstPlay = listOf("[data-testid=\"top-result-card\"] [data-testid=\"play-button\"]", "[data-testid=\"tracklist-row\"] button"),
-        // Its Canvas: the muted loop its Now playing view shows over the cover, from its canvas CDN.
+        // Its Canvas: the muted loop its Now playing view shows in place of the cover, from its canvas
+        // CDN. Its Canvas player gets the address as canvasUrl and plays it by file id through Spotify's
+        // own video player (seen in its web player's script, November 2026).
         videoCovers = listOf("https://canvaz.scdn.co/"),
+        videoCoverProp = "canvasUrl",
     )
 
     private val AMAZON = listOf("com", "de", "co.uk", "it", "fr", "es", "ca", "com.br", "com.mx", "co.jp", "in", "com.au")
