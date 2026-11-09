@@ -116,8 +116,6 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
     val latest by rememberUpdatedState(pages)
     val mapIndex = pages.indexOfFirst { it.layout == PageLayout.MAP }.coerceAtLeast(0)
     val pager = rememberPagerState(initialPage = mapIndex) { pages.size }
-    // Under a call's banner: the driver's pages, the bar and the lists of their changing (not the map).
-    val callTop = LocalCallTop.current
     var editing by remember { mutableStateOf<Int?>(null) }
     var choosing by remember { mutableStateOf<Int?>(null) }
     // The list of layouts for the page being changed.
@@ -234,7 +232,6 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
                         editing = page.id
                         choosing = slot
                     },
-                    modifier = Modifier.padding(top = callTop),
                 )
             }
         }
@@ -273,9 +270,9 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
                     follow = latest.firstOrNull { it.layout == PageLayout.MAP }?.id
                 },
                 onDone = { editing = null },
-                modifier = Modifier.align(Alignment.TopCenter).padding(top = callTop).padding(MyCarSpace.S),
+                modifier = Modifier.align(Alignment.TopCenter).padding(MyCarSpace.S),
             )
-            if (choosingLayout) Box(Modifier.fillMaxSize().padding(top = callTop)) {
+            if (choosingLayout) {
                 LayoutChooser(
                     edited.layout,
                     onChoose = { layout ->
@@ -286,17 +283,15 @@ internal fun HomePager(onHome: Boolean, mapPage: @Composable (inView: Boolean) -
                 )
             }
             choosing?.let { slot ->
-                Box(Modifier.fillMaxSize().padding(top = callTop)) {
-                    ContentChooser(
-                        edited,
-                        slot,
-                        onChoose = { content ->
-                            HomePages.save(latest.withSlot(edited.id, slot, content))
-                            choosing = null
-                        },
-                        onClose = { choosing = null },
-                    )
-                }
+                ContentChooser(
+                    edited,
+                    slot,
+                    onChoose = { content ->
+                        HomePages.save(latest.withSlot(edited.id, slot, content))
+                        choosing = null
+                    },
+                    onClose = { choosing = null },
+                )
             }
         }
     }

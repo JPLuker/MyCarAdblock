@@ -7,12 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
@@ -30,7 +27,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -42,27 +38,16 @@ import io.github.sirionero.mycar.car.design.MyCarPalette
 import io.github.sirionero.mycar.call.CarCalls
 
 /**
- * Sits above whatever the car is showing while a call is ringing or under way. Ringing takes the
- * whole screen, because nothing else matters more right now; an active call is a band along the
- * top, with who it is and a button to end it.
+ * Sits above whatever the car is showing while a call rings: it takes the whole screen, because
+ * nothing else matters more right now. Once under way, the call is a pill over every screen
+ * instead, with who it is and a button to end it (see CallPill).
  */
 @Composable
-fun CallOverlay(modifier: Modifier = Modifier) {
+fun CallOverlay() {
     val state by CarCalls.state.collectAsState()
     val context = LocalContext.current.applicationContext
-
-    when (val s = state) {
-        // Covers the box regardless of where the caller aligned it, so the alignment below is
-        // only ever felt by the active-call banner, which is the one that isn't full-screen.
-        is CallUiState.Ringing -> IncomingCall(s, onAnswer = { CarCalls.answer(context) }, onDecline = CarCalls::decline)
-        is CallUiState.Active -> ActiveCallBanner(
-            s,
-            canHangUp = CarCalls.canEndCalls(context),
-            onHangUp = { CarCalls.hangUp(context) },
-            modifier = modifier,
-        )
-        CallUiState.None -> {}
-    }
+    val ringing = state as? CallUiState.Ringing ?: return
+    IncomingCall(ringing, onAnswer = { CarCalls.answer(context) }, onDecline = CarCalls::decline)
 }
 
 @Composable
@@ -119,7 +104,7 @@ private fun IncomingCall(s: CallUiState.Ringing, onAnswer: () -> Unit, onDecline
 }
 
 /** Who's calling: the name, or the number as the phone writes it ("333 123 4567", not "3331234567"). */
-private fun Caller.shown(): String =
+internal fun Caller.shown(): String =
     name ?: number.takeIf { it.isNotBlank() }?.let { PhoneNumberUtils.formatNumber(it, io.github.sirionero.mycar.AppLanguage.country()) ?: it } ?: label
 
 @Composable
@@ -135,52 +120,5 @@ private fun CallButton(icon: ImageVector, label: String, color: Color, enabled: 
         )
         Spacer(Modifier.height(8.dp))
         Text(label, style = MaterialTheme.typography.labelLarge)
-    }
-}
-
-@Composable
-private fun ActiveCallBanner(
-    s: CallUiState.Active,
-    canHangUp: Boolean,
-    onHangUp: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        color = MaterialTheme.colorScheme.tertiaryContainer,
-        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Row(
-            Modifier.padding(start = 20.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(ImageVector.vectorResource(R.drawable.sym_call), contentDescription = null, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(8.dp))
-            Column(Modifier.weight(1f)) {
-                Text(
-                    s.caller?.let { stringResource(R.string.call_on_call_with, it.shown()) } ?: stringResource(R.string.call_on_call),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                // The voice never comes over USB: without Bluetooth it stays on the phone.
-                if (rememberCallOnPhone(active = true)) {
-                    Text(
-                        stringResource(R.string.call_on_phone),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MyCarPalette.Warning,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
-            if (canHangUp) {
-                Spacer(Modifier.width(12.dp))
-                GsButton(onClick = onHangUp, tone = GsTone.Danger, modifier = Modifier.heightIn(min = 64.dp)) {
-                    Text(stringResource(R.string.call_end))
-                }
-            }
-        }
     }
 }

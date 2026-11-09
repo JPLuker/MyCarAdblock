@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A call under way on the car's screen (car/CallPill.kt): a pill over every screen until the call
+  ends, with who the call is with, how long it has gone on and a red button that ends it. Read at a
+  glance while driving: keep these short.
+-->
+<resources>
+    <!-- Read out for the pill's photo and name: a tap there opens the car's Phone app ("Phone", car_apps_phone) -->
+    <string name="call_pill_open_phone">Open the Phone</string>
+    <!-- On the pill after the call's time ("1:23 · Voice on the phone"), when the call's voice stays on the
+         phone's earpiece or speaker: the phone has no Bluetooth link to the car for calls. A few words -->
+    <string name="call_pill_voice_on_phone">Voice on the phone</string>
+</resources>
