@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">Телефон заряжается, но корабль не отвечает</string>
+    <string name="home_no_car_check">Если он пришвартован к кораблю, проверьте:</string>
+    <string name="home_no_car_always">Когда Android спросит, какое приложение открыть, выберите myCar и нажмите «Всегда» — и штурвал перейдёт к myCar.</string>
+
+    <string name="setup_audio_auto_effect">В каждом плавании myCar выбирает один из двух способов ниже: Bluetooth, если корабль так принимает песни с телефона, иначе через myCar.</string>
+    <string name="setup_audio_bluetooth_effect">Android ничего не спрашивает в каждом плавании, и радио на борту продолжает играть. Песни с телефона попадают на борт, только если корабль принимает их по Bluetooth: некоторые корабли принимают по нему только звонки.</string>
+    <string name="setup_audio_mycar_effect">Корабль воспроизводит звук телефона по кабелю или Wi-Fi. В каждом плавании Android просит разрешить показ экрана: достаточно одного нажатия. Именно это разрешение позволяет myCar передавать звук других ваших приложений.</string>
+</resources>

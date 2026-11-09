@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">Le téléphone charge, mais la voiture ne répond pas</string>
+    <string name="home_no_car_check">S’il est branché à la voiture, vérifiez :</string>
+    <string name="home_no_car_cable">Utilisez un câble qui transmet les données : certains ne font que charger.</string>
+    <string name="home_no_car_always">Quand Android demande quelle app ouvrir, choisissez myCar et appuyez sur Toujours.</string>
+    <string name="usb_c_graphene">GrapheneOS peut couper les données du port USB-C, et la voiture ne voit alors qu’un téléphone à charger. Dans Paramètres &gt; Sécurité et confidentialité &gt; Exploit protection &gt; USB-C port, Charging-only laisse la voiture dehors ; avec Charging-only when locked, le réglage par défaut, déverrouillez le téléphone en le branchant.</string>
+
+    <string name="help_step_usb_c">Sous GrapheneOS, laissez passer les données par le port USB-C.</string>
+
+    <string name="setup_audio_auto_effect">À chaque trajet, myCar choisit l’une des deux options ci-dessous : le Bluetooth si votre voiture reçoit ainsi la musique du téléphone, sinon via myCar.</string>
+    <string name="setup_audio_bluetooth_effect">Aucune demande d’Android à chaque trajet, et la radio de la voiture reste allumée. La musique du téléphone n’arrive dans la voiture que si celle-ci la reçoit par le Bluetooth : certaines voitures n’acceptent que les appels par ce biais.</string>
+    <string name="setup_audio_mycar_effect">La voiture diffuse le son du téléphone, par le câble ou le Wi-Fi. À chaque trajet, Android demande de partager l’écran : un appui suffit pour accepter. C’est cette autorisation qui permet à myCar de transmettre le son de vos autres apps.</string>
+</resources>

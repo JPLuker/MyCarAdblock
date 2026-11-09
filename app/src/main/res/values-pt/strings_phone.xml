@@ -28,14 +28,14 @@
     <string name="help_in_the_car">No carro</string>
     <string name="help_sound_through_mycar">Som pelo myCar</string>
     <string name="help_step_connect">Conecte pelo cabo ou sem fio.</string>
-    <string name="help_step_connect_detail">O myCar abre sozinho quando o carro se conecta. Para usar sem fio, pareie primeiro o telefone com o carro e depois toque em Conectar sem fio na tela inicial.</string>
+    <string name="help_step_connect_detail">O myCar abre sozinho quando o carro se conecta. Na primeira vez com o cabo, o Android pergunta qual app abrir: escolha o myCar e toque em Sempre. Para usar sem fio, pareie primeiro o telefone com o carro e depois toque em Conectar sem fio na tela inicial.</string>
     <string name="help_step_pair">Pareie pelo Bluetooth para as chamadas.</string>
     <string name="help_step_pair_detail">As chamadas tocam pelo carro depois que o telefone e o carro estiverem pareados. O myCar oferece o pareamento na primeira vez que você conectar o cabo.</string>
     <string name="help_step_screening">Recuse chamadas desconhecidas antes que toquem.</string>
     <string name="help_step_screening_detail">Defina o myCar como seu app de identificador de chamadas e spam. Sem isso, o carro continua mostrando todas as chamadas, e você atende ou recusa por lá.</string>
     <string name="help_set_up">Configurar</string>
     <string name="help_step_audio_prompt">Acabe com a pergunta de áudio a cada viagem.</string>
-    <string name="help_step_audio_prompt_detail">Conecte o telefone a um computador com a depuração USB ativada e execute isto uma vez. Se pular, você toca em Iniciar a cada viagem.</string>
+    <string name="help_step_audio_prompt_detail">Conecte o telefone a um computador com a depuração USB ativada e execute isto uma vez. Se pular, você aceita a pergunta do Android com um toque a cada viagem.</string>
     <string name="help_step_notifications">Mantenha as notificações legíveis.</string>
     <string name="help_step_notifications_detail">O Android esconde o conteúdo das notificações enquanto compartilha o áudio. Execute isto também, e o myCar desfaz isso só enquanto a música vai para o carro.</string>
     <string name="help_tap_to_copy">Toque para copiar</string>

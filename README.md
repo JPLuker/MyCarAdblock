@@ -247,11 +247,16 @@ behind it all — still or moving.
   connects by itself when it starts, with the phone in your pocket (Settings > Connection >
   Connect wirelessly by itself). A start that fails tries again by itself, and after a drive
   myCar keeps listening for the car for a while, so a short stop reconnects.
+- **With the cable on GrapheneOS,** the USB-C port has to let data through, or the car sees
+  only a phone to charge: in Settings > Security & privacy > Exploit protection > USB-C port,
+  Charging-only keeps the car out, and with Charging-only when locked, the default, unlock the
+  phone when you plug it in. When the phone charges but no car answers, Home says what to check.
 - **Setup is one list.** First launch shows what's needed to connect and what the drive
   needs, with a tick on what's done and one button for the next step: get the certificates,
-  then allow calls, map and music in one go. "Take me back to the initial setup", in How to
-  connect, opens the same list later, with nothing deleted or reset. A help screen inside the
-  car answers anything setup didn't cover.
+  then allow calls, map and music in one go. Car audio sits beside them, with what each way
+  means at every drive: Android's question, the car's radio. "Take me back to the initial
+  setup", in How to connect, opens the same list later, with nothing deleted or reset. A help
+  screen inside the car answers anything setup didn't cover.
 - **Templated apps work.** myCar renders all 16 template types that the Car App
   Library defines, and it draws its own keyboard for search, sign-in, and text fields.
 - **It works with [LIVI](https://github.com/f-io/LIVI),** the open-source head unit
@@ -281,9 +286,9 @@ behind it all — still or moving.
   again". myCar never reads the screen; capturing playback is the only way an ordinary app can
   pass another app's audio along.
 - **myCar needs no adb, root, or Shizuku.** Every feature relies on an ordinary
-  Android permission or an on-device consent dialog. For sound through myCar, setup offers two
-  optional adb commands: one removes the audio dialog for good, and the other keeps
-  notifications visible while audio plays.
+  Android permission or an on-device consent dialog. For sound through myCar, How to connect
+  has two optional adb commands: one removes the audio dialog for good, and the other keeps
+  notifications visible while audio plays. Setup's car audio step shows the first one too.
 - **Updates come from GitHub.** Once a day, myCar checks this repository's latest
   release. When a new version is out, it downloads the APK, checks it against GitHub's
   SHA-256, and installs it through Android's own installer. Turn off automatic checks in

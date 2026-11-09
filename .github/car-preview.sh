@@ -915,6 +915,15 @@ scroll_to() {
     done
     echo "setup-phone: $1 never came into sight"; return 1
 }
+# The same, back up the list.
+scroll_back_to() {
+    local i
+    for i in 1 2 3 4 5 6 7 8; do
+        has_text "$1" && return 0
+        adb shell input swipe 160 260 160 380 400; sleep 1
+    done
+    echo "setup-phone: $1 never came back into sight"; return 1
+}
 # The phone's Settings: the car preview first at the top (opened, and back), then "Car screen" - the
 # car's settings on the phone - with a choice's dialog, a page of Home opened out with its layouts
 # and what a part can show, the rest of the group scrolled through, and the voice assistant in
@@ -1036,6 +1045,45 @@ phone_music() {
 }
 phone_music
 
+# Home's card when the phone charges from a USB port and no car comes (ui/ChargingNoCarCard.kt):
+# the emulator's battery set to charge from USB, no card at first, the card after the 20 s wait
+# (scrolled into sight), gone once "unplugged". --ez graphene true (debug only) adds GrapheneOS's
+# USB-C lines, here and in How to connect, whose step is shot too. Before setup-phone, which wipes
+# myCar's data.
+charging_no_car() {
+    case " ${ONLY:-charging-no-car} " in *" charging-no-car "*) ;; *) return ;; esac
+    local d=previews/charging-no-car
+    mkdir -p $d
+    adb shell am force-stop "$PKG"
+    adb logcat -c
+    adb shell dumpsys battery unplug
+    adb shell dumpsys battery set usb 1
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen home --ez graphene true >/dev/null
+    sleep 5; adb exec-out screencap -p > $d/01-plugged.png
+    sleep 20; adb exec-out screencap -p > $d/02-after-20s.png
+    # Home scrolls only above its bottom card (What's new, How to connect): the swipe starts on the
+    # status card, inside the part that scrolls.
+    adb shell input swipe 160 420 160 120 400; sleep 1.5; adb exec-out screencap -p > $d/03-card.png
+    adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1
+    adb shell cat /sdcard/ui.xml | grep -qF "The phone is charging" && echo "charging-no-car: card shown" || echo "charging-no-car: no card"
+    adb shell dumpsys battery set usb 0
+    sleep 3; adb exec-out screencap -p > $d/04-unplugged.png
+    adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1
+    adb shell cat /sdcard/ui.xml | grep -qF "The phone is charging" && echo "charging-no-car: card still there unplugged" || echo "charging-no-car: gone unplugged"
+    adb shell dumpsys battery reset
+    adb shell am force-stop "$PKG"
+    adb shell am start -n "$PKG/io.github.sirionero.mycar.MyCarActivity" --es screen help --ez graphene true >/dev/null
+    sleep 4
+    scroll_to "On GrapheneOS, let the USB-C port carry data." && adb exec-out screencap -p > $d/05-help.png
+    adb shell input swipe 160 520 160 220 400; sleep 1.5; adb exec-out screencap -p > $d/06-help.png
+    adb logcat -d -s myCar > $d/log.txt
+    adb logcat -d -b crash > $d/crash.txt 2>&1
+    echo "--- charging, no car ---"
+    grep -h "home: charging" $d/log.txt || echo "charging-no-car: nothing in the log"
+    grep -h "FATAL\|AndroidRuntime" $d/crash.txt || echo "charging-no-car: no crash"
+}
+charging_no_car
+
 setup_phone() {
     case " ${ONLY:-setup-phone} " in *" setup-phone "*) ;; *) return ;; esac
     local d=previews/setup-phone i
@@ -1062,6 +1110,15 @@ setup_phone() {
         tap_match "permission_allow_foreground_only_button" || tap_match "permission_allow_button" || break
     done
     sleep 3; adb exec-out screencap -p > $d/04-after-allow.png
+    # Car audio, with the drive's steps: each way with what it means at every drive, and through
+    # myCar the command that stops Android's question. Then Automatic again, the default.
+    if scroll_to "Car audio"; then
+        adb exec-out screencap -p > $d/04b-audio.png
+        scroll_to "Through myCar" && tap_text "Through myCar"; sleep 1.5
+        adb exec-out screencap -p > $d/04c-audio-mycar.png
+        scroll_to "Tap to copy" && adb exec-out screencap -p > $d/04d-audio-command.png
+        scroll_back_to "Automatic" && tap_text "Automatic"; sleep 1
+    fi
     tap_text "Done"; sleep 3; adb exec-out screencap -p > $d/05-home.png
     tap_text "How to connect"; sleep 3; adb exec-out screencap -p > $d/06-help.png
     tap_text "Take me back to the initial setup"; sleep 3; adb exec-out screencap -p > $d/07-return.png

@@ -119,6 +119,8 @@ fun HomeScreen(
                     StatusCard(status)
                     if (!live) CertNoticeCard(onOpenHelp = onOpenHelp, onOpenSettings = onOpenCertificate)
                     if (!live) SetupLeftCard(onOpenSetup)
+                    // Composed during a drive too: a car that came on this cable keeps it away until unplugged.
+                    ChargingNoCarCard()
                     if (live) BluetoothMissingCard()
                     if (live) AudioDeniedCard()
                     VoiceDownloadCard()

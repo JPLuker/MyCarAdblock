@@ -28,14 +28,14 @@
     <string name="help_in_the_car">En el coche</string>
     <string name="help_sound_through_mycar">Sonido a través de myCar</string>
     <string name="help_step_connect">Conecta el cable o conéctate sin cable.</string>
-    <string name="help_step_connect_detail">myCar se abre solo cuando el coche se conecta. Para conectar sin cable, vincula primero el teléfono con el coche y luego toca Conectar sin cable en Inicio.</string>
+    <string name="help_step_connect_detail">myCar se abre solo cuando el coche se conecta. La primera vez con cable, Android pregunta qué app abrir: elige myCar y toca Siempre. Para conectar sin cable, vincula primero el teléfono con el coche y luego toca Conectar sin cable en Inicio.</string>
     <string name="help_step_pair">Vincula por Bluetooth para las llamadas.</string>
     <string name="help_step_pair_detail">Las llamadas suenan en el coche una vez que tu teléfono y el coche están vinculados. myCar te ofrece vincularlos la primera vez que conectas el cable.</string>
     <string name="help_step_screening">Rechaza las llamadas desconocidas antes de que suenen.</string>
     <string name="help_step_screening_detail">Configura myCar como tu app de identificación de llamadas y spam. Sin esto, el coche sigue mostrando todas las llamadas, y las contestas o rechazas desde allí.</string>
     <string name="help_set_up">Configurar</string>
     <string name="help_step_audio_prompt">Evita la pregunta del audio en cada viaje.</string>
-    <string name="help_step_audio_prompt_detail">Conecta el teléfono a un ordenador con la depuración por USB activada y ejecuta esto una vez. Si no lo haces, tocarás Empezar cada vez que salgas.</string>
+    <string name="help_step_audio_prompt_detail">Conecta el teléfono a un ordenador con la depuración por USB activada y ejecuta esto una vez. Si no lo haces, aceptarás la pregunta de Android con un toque cada vez que salgas.</string>
     <string name="help_step_notifications">Mantén las notificaciones legibles.</string>
     <string name="help_step_notifications_detail">Android oculta lo que dicen las notificaciones mientras comparte el audio. Ejecuta también esto, y myCar lo quita solo mientras la música va al coche.</string>
     <string name="help_tap_to_copy">Toca para copiar</string>
