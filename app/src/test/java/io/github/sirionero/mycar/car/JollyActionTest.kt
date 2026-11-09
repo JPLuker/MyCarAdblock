@@ -59,6 +59,11 @@ class JollyActionTest {
         // A broken escape spoils the line.
         assertNull(JollyActions.parse("type=navigate&place=50%"))
         assertNull(JollyActions.parse("type=navigate&place=5%G0"))
+        // A sign is no hex digit, though a number reader would take it.
+        assertNull(JollyActions.parse("type=navigate&place=a%+1"))
+        assertNull(JollyActions.parse("type=navigate&place=a%-1"))
+        assertEquals(JollyAction.Navigate("a&b"), JollyActions.parse("type=navigate&place=a%26b"))
+        assertEquals(JollyAction.Navigate("a=b"), JollyActions.parse("type=navigate&place=a%3db"))
     }
 
     @Test
@@ -138,23 +143,79 @@ class JollyActionTest {
     }
 
     @Test
-    fun theSecondTapComesWithinThreeSeconds() {
-        val tap = SecondTap(3_000)
+    fun theSecondTapComesWithinThreeSecondsButNotAtOnce() {
+        val tap = SecondTap(3_000, 700)
         assertFalse(tap.armed(1_000))
-        assertFalse(tap.tap(1_000))
-        assertTrue(tap.armed(3_900))
-        assertTrue(tap.tap(3_900))
+        assertEquals(SecondTap.Tap.ARMED, tap.tap(1_000))
+        // A double tap, or a finger that bounced: let go, and the question stays.
+        assertEquals(SecondTap.Tap.TOO_SOON, tap.tap(1_150))
+        assertEquals(SecondTap.Tap.TOO_SOON, tap.tap(1_699))
+        assertTrue(tap.armed(1_699))
+        assertEquals(SecondTap.Tap.GO, tap.tap(1_700))
         // Gone ahead: the next tap arms again.
-        assertFalse(tap.armed(4_000))
-        assertFalse(tap.tap(4_000))
+        assertFalse(tap.armed(1_800))
+        assertEquals(SecondTap.Tap.ARMED, tap.tap(1_800))
+        assertEquals(SecondTap.Tap.GO, tap.tap(4_800))
         // Too late: it arms afresh, and the one after goes.
-        assertFalse(tap.armed(7_001))
-        assertFalse(tap.tap(7_001))
-        assertTrue(tap.tap(7_500))
-        assertFalse(tap.tap(8_000))
+        assertEquals(SecondTap.Tap.ARMED, tap.tap(5_000))
+        assertFalse(tap.armed(8_001))
+        assertEquals(SecondTap.Tap.ARMED, tap.tap(8_001))
+        assertEquals(SecondTap.Tap.GO, tap.tap(9_000))
+        assertEquals(SecondTap.Tap.ARMED, tap.tap(9_500))
         tap.disarm()
-        assertFalse(tap.armed(8_100))
-        assertFalse(tap.tap(8_100))
+        assertFalse(tap.armed(9_600))
+        assertEquals(SecondTap.Tap.ARMED, tap.tap(9_600))
+    }
+
+    @Test
+    fun aHomeAssistantCommandDoesntRunTwiceAtOnce() {
+        val guard = RepeatGuard(1_000)
+        assertTrue(guard.start("cover.garage/toggle", 1_000))
+        // Tapped again while it runs, and just after: the same press twice.
+        assertFalse(guard.start("cover.garage/toggle", 1_200))
+        assertTrue(guard.busy("cover.garage/toggle", 9_000))
+        guard.end("cover.garage/toggle", 9_000)
+        assertFalse(guard.start("cover.garage/toggle", 9_500))
+        assertFalse(guard.start("cover.garage/toggle", 9_999))
+        assertTrue(guard.start("cover.garage/toggle", 10_000))
+        guard.end("cover.garage/toggle", 10_100)
+        // Another command isn't held up by it.
+        assertTrue(guard.start("script.gate/run", 10_200))
+        assertFalse(guard.busy("cover.garage/toggle", 11_100))
+    }
+
+    @Test
+    fun homeAssistantsWordOnAThingBeforeItsCommand() {
+        assertEquals(HomeChecks.Before.MISSING, HomeChecks.before(null))
+        assertEquals(HomeChecks.Before.UNAVAILABLE, HomeChecks.before("unavailable"))
+        assertEquals(HomeChecks.Before.GO, HomeChecks.before("off"))
+        assertEquals(HomeChecks.Before.GO, HomeChecks.before("locked"))
+        // A scene or a button never used yet, a gate without a sensor: they still work.
+        assertEquals(HomeChecks.Before.GO, HomeChecks.before("unknown"))
+        assertEquals(HomeChecks.Before.GO, HomeChecks.before("2026-11-09T19:35:55+00:00"))
+    }
+
+    @Test
+    fun aLockSaysWhetherItDidIt() {
+        val open = HomeAct.UNLOCK
+        val close = HomeAct.LOCK
+        assertEquals(HomeChecks.After.DONE, HomeChecks.after(open, "unlocked"))
+        assertEquals(HomeChecks.After.DONE, HomeChecks.after(open, "open"))
+        assertEquals(HomeChecks.After.STILL_LOCKED, HomeChecks.after(open, "locked"))
+        assertEquals(HomeChecks.After.NO_NEWS, HomeChecks.after(open, "unlocking"))
+        assertEquals(HomeChecks.After.JAMMED, HomeChecks.after(open, "jammed"))
+        assertEquals(HomeChecks.After.DONE, HomeChecks.after(close, "locked"))
+        assertEquals(HomeChecks.After.STILL_UNLOCKED, HomeChecks.after(close, "unlocked"))
+        assertEquals(HomeChecks.After.NO_NEWS, HomeChecks.after(close, "locking"))
+        assertEquals(HomeChecks.After.JAMMED, HomeChecks.after(close, "jammed"))
+        assertEquals(HomeChecks.After.NO_NEWS, HomeChecks.after(close, "unavailable"))
+        assertEquals(HomeChecks.After.NO_NEWS, HomeChecks.after(close, null))
+        // The wait ends when it did it or got stuck, not while it's on its way.
+        assertTrue(HomeChecks.settled(open, "unlocked"))
+        assertTrue(HomeChecks.settled(open, "jammed"))
+        assertFalse(HomeChecks.settled(open, "locked"))
+        assertFalse(HomeChecks.settled(open, "unlocking"))
+        assertFalse(HomeChecks.settled(close, "unlocked"))
     }
 
     /**

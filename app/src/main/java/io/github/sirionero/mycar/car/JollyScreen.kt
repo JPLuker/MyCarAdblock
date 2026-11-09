@@ -238,7 +238,11 @@ private fun ContactsPick(current: JollyAction?, person: String?, onPerson: (Stri
         }
         Column(verticalArrangement = Arrangement.spacedBy(MyCarSpace.M)) {
             Note(stringResource(R.string.dialer_permissions))
-            GsButton(tone = GsTone.Tonal, onClick = { PermissionActivity.ask(context, CALL_PERMISSIONS) }) {
+            GsButton(
+                tone = GsTone.Tonal,
+                onClick = { PermissionActivity.ask(context, CALL_PERMISSIONS) },
+                modifier = Modifier.height(MyCarSize.TouchTarget),
+            ) {
                 Text(stringResource(R.string.dialer_ask_on_phone))
             }
         }
