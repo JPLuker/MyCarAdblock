@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Jolly key (car/Jolly.kt, car/JollyScreen.kt, ui/JollySettings.kt): a key in the car's dock, above
+  the microphone, that does one thing the driver picked with a single tap - a call, an assistant on the
+  phone, something in Home Assistant, a place, a command for myCar's assistant, an app. Held, it opens
+  its chooser on the car; on the phone it's in Settings > Car screen.
+-->
+<resources>
+    <!-- The key's name, in the dock's description, the car's settings and the phone's: the wildcard card that
+         can be anything. The same word in every language (in pirate speak "Jolly Roger"); the other texts take
+         it as a placeholder, so a new name is one line per language. -->
+    <string name="jolly_name">Jolly</string>
+    <!-- What the key does: its description in the dock, and the car's word after a choice. %1$s: jolly_name,
+         %2$s: what it does (one of the jolly_title_* below) -->
+    <string name="jolly_does">%1$s: %2$s</string>
+
+    <!-- Car, the chooser (the key held, or tapped with nothing chosen): under the tiles of the kinds. %1$s: jolly_name -->
+    <string name="jolly_choose_intro">Ένα πάτημα στο κουμπί κάνει ό,τι επιλέξετε εδώ· κρατήστε το πατημένο για να επιστρέψετε. Και στο τηλέφωνο: Ρυθμίσεις > Οθόνη αυτοκινήτου > %1$s.</string>
+    <!-- Car, the chooser and the car's Settings: what the key does now. %1$s: one of the jolly_title_* below -->
+    <string name="jolly_now">Τώρα: %1$s</string>
+
+    <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->
+    <string name="jolly_kind_call">Κλήση επαφής</string>
+    <string name="jolly_kind_ai">Συνομιλία με AI</string>
+    <string name="jolly_kind_home">Home Assistant</string>
+    <string name="jolly_kind_navigate">Μετάβαση κάπου</string>
+    <!-- A phrase myCar's assistant understands, run as if it had been said -->
+    <string name="jolly_kind_say">Εντολή στον βοηθό</string>
+    <string name="jolly_kind_app">Ανοίξτε εφαρμογή</string>
+
+    <!-- What the key does, in the chooser, the settings and the toasts. %1$s: the contact's name -->
+    <string name="jolly_title_call">Κλήση: %1$s</string>
+    <!-- %1$s: an assistant app's name (Gemini, Claude…) -->
+    <string name="jolly_title_ai">Συνομιλία με %1$s</string>
+    <!-- The phone's own assistant, whichever it is -->
+    <string name="jolly_title_ai_phone">Συνομιλία με τον βοηθό του τηλεφώνου</string>
+    <!-- Home Assistant: %1$s is the thing's name there. A script or a scene -->
+    <string name="jolly_title_run">Εκκίνηση: %1$s</string>
+    <!-- A button -->
+    <string name="jolly_title_press">Πάτημα: %1$s</string>
+    <!-- A switch, a light -->
+    <string name="jolly_title_toggle">Άναμμα ή σβήσιμο: %1$s</string>
+    <!-- A gate, a garage door, a blind -->
+    <string name="jolly_title_open_close">Άνοιγμα ή κλείσιμο: %1$s</string>
+    <string name="jolly_title_lock">Κλείδωμα: %1$s</string>
+    <string name="jolly_title_unlock">Ξεκλείδωμα: %1$s</string>
+    <!-- %1$s: the place's name ("Home"), or the place as written -->
+    <string name="jolly_title_navigate">Προορισμός: %1$s</string>
+    <!-- A command for myCar's assistant, in the language's quotes. %1$s: the command as written -->
+    <string name="jolly_title_say">«%1$s»</string>
+    <!-- %1$s: the app's name -->
+    <string name="jolly_title_app">Άνοιγμα: %1$s</string>
+
+    <!-- Car and phone, a contact with several numbers, under the name. %1$d: how many -->
+    <plurals name="jolly_numbers">
+        <item quantity="one">%1$d αριθμός</item>
+        <item quantity="other">%1$d αριθμοί</item>
+    </plurals>
+    <!-- Car and phone, under the list of assistants -->
+    <string name="jolly_ai_note">Ακούει και απαντά στο τηλέφωνο, και η φωνή του φτάνει στο αυτοκίνητο μόνο μέσω Bluetooth. Με κλειδωμένο τηλέφωνο ξεκινά μόλις το ξεκλειδώσετε, ή, με το Home Assistant ρυθμισμένο στο myCar, ακούει το myCar και απαντά το Home Assistant.</string>
+    <!-- Car (also as a toast when the key is tapped) and phone: Home Assistant isn't set up in myCar -->
+    <string name="jolly_home_not_set">Ρυθμίστε πρώτα το Plancia στο τηλέφωνο: Ρυθμίσεις > Plancia.</string>
+    <!-- Car: Home Assistant can't be reached now (also as a toast when the key is tapped) -->
+    <string name="jolly_home_offline">Το Home Assistant δεν είναι συνδεδεμένο αυτή τη στιγμή.</string>
+    <!-- Car and phone, while the list comes -->
+    <string name="jolly_home_loading">Ρωτάω το Home Assistant…</string>
+    <string name="jolly_home_none">Το Home Assistant δεν έχει τίποτα που να μπορεί να κάνει το κουμπί: ούτε σενάρια, ούτε σκηνές, κουμπιά, διακόπτες, φώτα, πόρτες ή κλειδαριές.</string>
+    <!-- Car and phone, under a list with locks in it -->
+    <string name="jolly_home_unlock_note">Για ξεκλείδωμα, το κουμπί περιμένει δεύτερο πάτημα μέσα σε 3 δευτερόλεπτα.</string>
+    <!-- Car, the chooser: a place is written on the phone. %1$s: jolly_name -->
+    <string name="jolly_navigate_on_phone">Τα μέρη γράφονται στο τηλέφωνο: Ρυθμίσεις > Οθόνη αυτοκινήτου > %1$s.</string>
+    <!-- Car, the chooser, under the ready-made commands. %1$s: jolly_name -->
+    <string name="jolly_say_on_phone">Οποιαδήποτε άλλη εντολή: γράψτε την στο τηλέφωνο, στις Ρυθμίσεις > Οθόνη αυτοκινήτου > %1$s.</string>
+
+    <!-- Ready-made commands, offered in the car and on the phone. Each is said to myCar's assistant as it's
+         written here, so in every language it must be a phrase the assistant understands (see the help of
+         car/AssistantXxx.kt; JollyActionTest checks them). No pirate versions: the assistant wouldn't follow. -->
+    <string name="jolly_say_messages">Διάβασε τα μηνύματα</string>
+    <string name="jolly_say_arrival">Πότε φτάνουμε;</string>
+    <string name="jolly_say_call_back">Πάρε πίσω</string>
+    <string name="jolly_say_weather">Τι καιρό κάνει;</string>
+
+    <!-- Car, toasts when the key is tapped. %1$s: the thing's name in Home Assistant -->
+    <string name="jolly_home_done">%1$s: έγινε</string>
+    <!-- %1$s: the thing's name in Home Assistant, %2$s: why, in Home Assistant's own words -->
+    <string name="jolly_home_failed">%1$s: απέτυχε (%2$s)</string>
+    <!-- A lock, at the first tap. %1$s: its name in Home Assistant -->
+    <string name="jolly_confirm_unlock">Ξεκλείδωμα: %1$s; Πατήστε ξανά το κουμπί μέσα σε 3 δευτερόλεπτα.</string>
+    <!-- %1$s: the place's name or the place, %2$s: the map app -->
+    <string name="jolly_navigating">Προς %1$s με %2$s</string>
+    <string name="jolly_no_map">Δεν υπάρχει εφαρμογή χαρτών στο τηλέφωνο.</string>
+    <!-- %1$s: the app's name -->
+    <string name="jolly_app_gone">Το %1$s δεν υπάρχει πια στο τηλέφωνο. Κρατήστε πατημένο το κουμπί για να επιλέξετε κάτι άλλο.</string>
+    <!-- A call, an assistant or a command while on a call -->
+    <string name="jolly_after_call">Αυτό θα περιμένει να τελειώσει η κλήση.</string>
+
+    <!-- The car's Settings and the phone's (Settings > Car screen): the On/Off choice, a switch on the phone. %1$s: jolly_name -->
+    <string name="car_settings_jolly_key">Κουμπί %1$s</string>
+    <!-- Car's Settings: the button that opens the chooser -->
+    <string name="car_settings_jolly_choose">Επιλέξτε τι κάνει</string>
+    <string name="car_settings_jolly_none">Δεν έχει επιλεγεί τίποτα ακόμη: ένα πάτημα στο κουμπί ρωτάει.</string>
+
+    <!-- Phone, Settings > Car screen, the key's section: under the switch -->
+    <string name="settings_jolly_key_detail">Στο Dock, πάνω από το μικρόφωνο: ένα πάτημα κάνει ό,τι επιλέξετε εδώ</string>
+    <!-- The row that opens the kinds; under it, what the key does -->
+    <string name="settings_jolly_action">Τι κάνει</string>
+    <string name="settings_jolly_none">Τίποτα ακόμη: στο αυτοκίνητο, ένα πάτημα στο κουμπί ρωτάει</string>
+    <!-- Title of the list of kinds -->
+    <string name="settings_jolly_kind">Τι να κάνει το κουμπί;</string>
+    <string name="settings_jolly_footer">Μια κλήση, ένας βοηθός, κάτι στο Home Assistant, ένα μέρος, μια εντολή ή μια εφαρμογή, με ένα πάτημα. Στο αυτοκίνητο, κρατήστε πατημένο το κουμπί για να το αλλάξετε κι εκεί.</string>
+    <!-- In the list of contacts, without the permission, over an Allow button -->
+    <string name="settings_jolly_contacts_permission">Το myCar χρειάζεται να διαβάσει τις επαφές σας για να τις εμφανίσει.</string>
+    <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
+    <string name="settings_jolly_place">Διεύθυνση ή μέρος</string>
+    <string name="settings_jolly_place_name">Όνομα στο αυτοκίνητο (προαιρετικό)</string>
+    <string name="settings_jolly_place_note">Πηγαίνει στην εφαρμογή χαρτών του αυτοκινήτου όπως το γράφετε, όπως όταν λέτε στον βοηθό του myCar πού να πάτε.</string>
+    <!-- A command: the field, and a note under the ready-made ones -->
+    <string name="settings_jolly_phrase">Εντολή</string>
+    <string name="settings_jolly_phrase_note">Γράψτε την όπως θα τη λέγατε στον βοηθό του myCar, στη γλώσσα του myCar: «βάλε Radio Deejay στο Spotify», «άνοιξε την καγκελόπορτα». Στο αυτοκίνητο το κουμπί τη δείχνει και ο βοηθός απαντά.</string>
+    <!-- Home Assistant didn't give its list. %1$s: why, in its own words -->
+    <string name="settings_jolly_home_failed">Το Home Assistant δεν απάντησε: %1$s</string>
+</resources>

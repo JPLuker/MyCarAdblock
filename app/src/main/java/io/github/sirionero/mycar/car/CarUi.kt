@@ -390,6 +390,7 @@ fun CarUi() {
                                     CarScreen.Dashboard -> CarDashboardScreen()
                                     CarScreen.Weather -> WeatherScreen()
                                     CarScreen.VehicleData -> VehicleDataScreen()
+                                    CarScreen.Jolly -> JollyScreen()
                                     is CarScreen.Notifications -> NotificationsScreen(screen.replyTo)
                                     is CarScreen.Messages -> MessagesScreen(screen.packageName)
                                     is CarScreen.App -> CarApps.find(screen.id)?.content?.invoke()

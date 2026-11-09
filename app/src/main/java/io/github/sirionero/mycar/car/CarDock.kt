@@ -85,12 +85,13 @@ import java.util.Date
 /**
  * The dock: a fixed column down the left edge, beside every screen. The clock sits on top - tap it
  * for the dashboard, with the calendar, the weather and the notifications - then the apps that
- * matter right now, and at the bottom the voice assistant, with the app grid button under it.
+ * matter right now, and at the bottom the Jolly key, the voice assistant and the app grid button.
  *
  * The middle shows, most useful first: the next turn while the map is out of sight, the map, the
  * song playing, the pinned apps and whatever else is open. What doesn't fit on a short screen
  * waits on the app grid. The assistant isn't one of them: it stays put just above the grid button,
- * however many apps there are, so it never moves or drops out. Every slot is a
+ * however many apps there are, so it never moves or drops out; the Jolly key (see [Jolly]) the same
+ * just above it, unless the dock is too short to keep the map too. Every slot is a
  * [MyCarSize.TouchTarget] square.
  */
 @Composable
@@ -112,6 +113,7 @@ internal fun CarDock(navigator: CarNavigator, modifier: Modifier = Modifier) {
     val mediaPhase by media.phase.collectAsState()
     val now by media.now.collectAsState()
     val mediaShown = mediaPhase == CarMedia.Phase.READY && now.isActive
+    val jollyOn by JollySetting.shown.collectAsState()
 
     // A pinned app that's also open keeps its pinned place, marked with a dot. The map has its own
     // slot, and the media app's is the song playing, so neither shows twice. A pin saved as the
@@ -151,7 +153,12 @@ internal fun CarDock(navigator: CarNavigator, modifier: Modifier = Modifier) {
                     entry.componentId?.let { id -> add(DockSlot(id) { DockApp(entry, running, navigator, frame) }) }
                 }
             }
-            val fit = ((maxHeight + DockGap) / (MyCarSize.TouchTarget + DockGap)).toInt().coerceAtLeast(0)
+            // The Jolly key at the foot of this room, just above the microphone, with the gap the slots
+            // had above the microphone: one slot fewer for the apps. Not where that would leave no slot
+            // at all (800x480 at Extra large): the map keeps its place. Hidden, the room is as it was.
+            val jolly = jollyOn && maxHeight - JollyRoom >= MyCarSize.TouchTarget
+            val room = maxHeight - (if (jolly) JollyRoom else MyCarSpace.S - DockGap)
+            val fit = ((room + DockGap) / (MyCarSize.TouchTarget + DockGap)).toInt().coerceAtLeast(0)
             val songShown = mediaShown && slots.take(fit).any { it.key == "media" }
             SideEffect { navigator.dockShowsSong = songShown }
             Column(
@@ -160,8 +167,11 @@ internal fun CarDock(navigator: CarNavigator, modifier: Modifier = Modifier) {
             ) {
                 slots.take(fit).forEach { slot -> key(slot.key) { slot.content() } }
             }
+            if (jolly) {
+                Box(Modifier.align(Alignment.BottomCenter)) { DockJolly(navigator, entries, running, frame) }
+            }
         }
-        Spacer(Modifier.height(MyCarSpace.S))
+        Spacer(Modifier.height(DockGap))
         DockAssistant()
         Spacer(Modifier.height(DockGap))
         // The dock's foot: the app grid, and from the grid back to the map beside the music.
@@ -194,6 +204,9 @@ private class DockSlot(val key: String, val content: @Composable () -> Unit)
 
 private val DockGap = 6.dp
 private val DockGlyph = 30.dp
+
+/** The Jolly key and the gap above it, at the foot of the dock's middle. */
+private val JollyRoom = MyCarSize.TouchTarget + MyCarSpace.S
 
 /**
  * One dock slot, a [MyCarSize.TouchTarget] square (wider for the clock): lit while its screen is
@@ -418,6 +431,30 @@ private fun DockAssistant() {
     val active = state.phase != CarAssistant.Phase.IDLE
     DockItem(selected = active, onClick = { CarAssistant.start() }, description = stringResource(R.string.car_dock_assistant)) {
         Icon(painterResource(R.drawable.sym_mic), contentDescription = null, modifier = Modifier.size(DockGlyph))
+    }
+}
+
+/**
+ * The Jolly key: the one command the driver picked for it (see [Jolly]), a tap away; held, the chooser,
+ * which a tap opens too while nothing is picked. Lit while the chooser is up, or while a lock waits
+ * for its second tap.
+ */
+@Composable
+private fun DockJolly(navigator: CarNavigator, entries: List<Entry>, running: Map<String, RunningSlot>, frame: CarEnvironment.Frame) {
+    val action by JollySetting.action.collectAsState()
+    val armed by Jolly.armed.collectAsState()
+    val context = LocalContext.current
+    val name = stringResource(R.string.jolly_name)
+    DockItem(
+        selected = armed || navigator.current == CarScreen.Jolly,
+        onClick = { Jolly.tap(context, navigator, entries, running, frame) },
+        description = action?.let { stringResource(R.string.jolly_does, name, Jolly.title(context, it)) } ?: name,
+        onLongClick = {
+            Jolly.disarm()
+            navigator.jolly()
+        },
+    ) {
+        GlassTile(MyCarPalette.Violet, R.drawable.sym_auto_awesome, MyCarSize.DockIcon, glyphSize = DockGlyph)
     }
 }
 

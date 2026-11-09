@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Jolly key in pirate speak (see values/strings_jolly.xml): its name is the Jolly Roger, the key a flag
+  on the mast. Safety, errors and the ready-made commands (which the assistant reads) stay as in the language.
+-->
+<resources>
+    <!-- The key's name, in the dock's description, the car's settings and the phone's: the wildcard card that
+         can be anything. The same word in every language (in pirate speak "Jolly Roger"); the other texts take
+         it as a placeholder, so a new name is one line per language. -->
+    <string name="jolly_name">Jolly Roger</string>
+    <!-- Car, the chooser (the key held, or tapped with nothing chosen): under the tiles of the kinds. %1$s: jolly_name -->
+    <string name="jolly_choose_intro">Un tocco sulla bandiera fa quello che scegli qui; tienila premuta per tornarci. Anche sul telefono: Timone > Schermo di bordo > %1$s.</string>
+    <!-- Car, the chooser and the car's Settings: what the key does now. %1$s: one of the jolly_title_* below -->
+    <string name="jolly_now">Sventola ora: %1$s</string>
+    <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->
+    <string name="jolly_kind_call">Chiama un compare</string>
+    <string name="jolly_kind_ai">Interroga l\'oracolo</string>
+    <string name="jolly_kind_navigate">Fai rotta</string>
+    <!-- A phrase myCar's assistant understands, run as if it had been said -->
+    <string name="jolly_kind_say">Ordine di bordo</string>
+    <string name="jolly_kind_app">Abborda un\'app</string>
+    <!-- What the key does, in the chooser, the settings and the toasts. %1$s: the contact's name -->
+    <string name="jolly_title_call">Chiama a rapporto %1$s</string>
+    <!-- %1$s: an assistant app's name (Gemini, Claude…) -->
+    <string name="jolly_title_ai">Parlamenta con %1$s</string>
+    <!-- The phone's own assistant, whichever it is -->
+    <string name="jolly_title_ai_phone">Parlamenta col pappagallo del telefono</string>
+    <!-- %1$s: the place's name ("Home"), or the place as written -->
+    <string name="jolly_title_navigate">Rotta per %1$s</string>
+    <!-- %1$s: the app's name -->
+    <string name="jolly_title_app">Abborda %1$s</string>
+    <!-- Car and phone, under the list of assistants -->
+    <string name="jolly_ai_note">Ascolta e risponde sul telefono, e la sua voce arriva a bordo solo via Bluetooth. Col telefono bloccato parte quando lo sblocchi, oppure, con Home Assistant configurato in myCar, ascolta myCar e risponde Home Assistant.</string>
+    <!-- Car, the chooser: a place is written on the phone. %1$s: jolly_name -->
+    <string name="jolly_navigate_on_phone">I porti si scrivono sul telefono: Timone > Schermo di bordo > %1$s.</string>
+    <!-- Car, the chooser, under the ready-made commands. %1$s: jolly_name -->
+    <string name="jolly_say_on_phone">Un altro ordine: scrivilo sul telefono, nel Timone > Schermo di bordo > %1$s.</string>
+    <!-- %1$s: the place's name or the place, %2$s: the map app -->
+    <string name="jolly_navigating">Rotta su %1$s con %2$s</string>
+    <!-- The car's Settings and the phone's (Settings > Car screen): the On/Off choice, a switch on the phone. %1$s: jolly_name -->
+    <string name="car_settings_jolly_key">%1$s sul molo</string>
+    <!-- Car's Settings: the button that opens the chooser -->
+    <string name="car_settings_jolly_choose">Dagli i suoi ordini</string>
+    <string name="car_settings_jolly_none">Ancora nessun ordine: un tocco sulla bandiera te lo chiede.</string>
+    <!-- Phone, Settings > Car screen, the key's section: under the switch -->
+    <string name="settings_jolly_key_detail">Sul molo, sopra il pappagallo di bordo: un tocco fa quello che scegli qui</string>
+    <!-- The row that opens the kinds; under it, what the key does -->
+    <string name="settings_jolly_action">I suoi ordini</string>
+    <string name="settings_jolly_none">Ancora nessun ordine: a bordo, un tocco sulla bandiera te lo chiede</string>
+    <!-- Title of the list of kinds -->
+    <string name="settings_jolly_kind">Che ordini per la bandiera?</string>
+    <string name="settings_jolly_footer">Una chiamata, un pappagallo, qualcosa di Home Assistant, un porto, un ordine o un\'app, a un tocco. A bordo tieni premuta la bandiera per cambiarla anche lì.</string>
+    <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
+    <string name="settings_jolly_place">Indirizzo o porto</string>
+    <string name="settings_jolly_place_name">Nome a bordo (facoltativo)</string>
+    <string name="settings_jolly_place_note">Va all\'app di mappe di bordo così come lo scrivi, come quando dici al pappagallo di myCar dove fare rotta.</string>
+    <!-- A command: the field, and a note under the ready-made ones -->
+    <string name="settings_jolly_phrase">Ordine</string>
+    <string name="settings_jolly_phrase_note">Scrivilo come lo diresti al pappagallo di myCar, nella lingua di myCar: «metti Radio Deejay su Spotify», «apri il cancello». A bordo la bandiera lo mostra e il pappagallo risponde.</string>
+</resources>
