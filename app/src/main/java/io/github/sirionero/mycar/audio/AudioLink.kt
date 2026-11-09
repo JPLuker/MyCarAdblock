@@ -53,6 +53,11 @@ class AudioLink(
     private var quietBytes = 0L
     private var soundBytes = 0L
     private var armed = false
+    /**
+     * The car is on its own source this drive: the driver picked it (a LOSS). Only a player playing
+     * takes the speakers back ([listenForPlayback]), not a capture started again ([captureOn]).
+     */
+    @Volatile private var carSource = false
     /** The car keeps its radio until the phone plays ([captureOn]): a player's first sound starts the stream. */
     @Volatile private var awaitingFirstSound = false
     /** While [awaitingFirstSound]: the last [PREROLL_MS] heard, a ring sent right after Start (see [firstSound]). */
@@ -94,11 +99,14 @@ class AudioLink(
 
     /**
      * The capture is on, with the phone's sound to send: the speakers are asked for at once
-     * ([start]), as before - unless [radioFirst], the driver's choice to keep the car's radio until
-     * the phone plays. Then a player's first sound asks for them ([listenForPlayback]).
+     * ([start]), as before - unless the car is on its own source. The driver picked it this drive
+     * (a LOSS): a capture started again (the audio server, the end of screen sharing, "Ask again")
+     * took the radio away with nothing playing. Or [radioFirst], the driver's choice to keep the
+     * car's radio until the phone plays. Then a player's sound asks for them ([listenForPlayback]).
      */
     override fun captureOn(radioFirst: Boolean) {
         when {
+            carSource -> MyCarLog.i("$tag: the car is on its own source - its speakers wait for the phone to play")
             radioFirst && !started && !focusRequested && !heldBack -> {
                 if (!awaitingFirstSound) MyCarLog.i("$tag: the car keeps its own source until the phone plays")
                 awaitingFirstSound = true
@@ -236,7 +244,10 @@ class AudioLink(
                 hold()
             }
             else -> {
+                val had = started || focusRequested || heldBack
                 stop()
+                // The car is on its own source now: a capture started again doesn't take it back.
+                if (had && state == FOCUS_STATE_LOSS) carSource = true
                 // Another source has the speakers for good: the phone's music shouldn't play on to no one.
                 if (ours && state == FOCUS_STATE_LOSS) onTakenBack()
             }
@@ -316,6 +327,7 @@ class AudioLink(
         armed = false
         // The car's speakers are the phone's again.
         awaitingFirstSound = false
+        carSource = false
         MyCarLog.i("$tag: -> Start(session=$sessionId, config=$configIndex) - streaming ${sampleRate}Hz x$channels")
     }
 
@@ -458,9 +470,10 @@ class AudioLink(
      * a media app starts. A car still busy says so, and the next ask waits for the next quiet
      * spell and the sound after it. Timed by the audio itself, which the capture delivers as it plays.
      *
+     * Only for a player really playing: a map's voice, a web page or the assistant's answer, also
+     * captured, used to take the speakers from the radio the driver chose, and kept them with silence.
      * With the car keeping its radio until the phone plays ([awaitingFirstSound]), a player's first
-     * sound asks and starts at once ([firstSound]); a map's voice, a web page or the assistant's
-     * answer, also captured, doesn't.
+     * sound asks and starts at once ([firstSound]).
      */
     private fun listenForPlayback(pcm: ByteArray, size: Int) {
         if (awaitingFirstSound) keepPreroll(pcm, size) else if (preroll != null) dropPreroll()
@@ -487,7 +500,7 @@ class AudioLink(
             if (aPlayerPlays()) firstSound()
             return
         }
-        if (!armed) return
+        if (!armed || !aPlayerPlays()) return
         armed = false
         focusRequested = true
         runCatching { sendControl(MSG_FOCUS_REQUEST, Protobuf.varintField(1, FOCUS_GAIN.toLong())) }

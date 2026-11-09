@@ -9,8 +9,8 @@ import org.junit.Test
 /**
  * How the media sink follows the car's audio focus. A car that takes the speakers for a call, or
  * for the phone's assistant over Bluetooth, gives them back with GAIN; myCar used to let go of its
- * focus there, and the music never came back for the rest of the drive. The car's radio, kept until
- * the phone plays, is left alone by anything but a player.
+ * focus there, and the music never came back for the rest of the drive. The car's radio, once the
+ * driver picks it or keeps it until the phone plays, is left alone by anything but a player.
  */
 class AudioLinkFocusTest {
     /** What myCar sent, in order: "start", "stop" and "data" on the sink, "focus:<type>" to the car. */
@@ -171,6 +171,46 @@ class AudioLinkFocusTest {
         playing = true
         link.play(100, loud = true)
         assertEquals(listOf("focus:$GAIN_REQUEST", "start"), sent.take(2))
+    }
+
+    @Test
+    fun `after the radio, sound that isn't a player's doesn't take the speakers back`() {
+        val link = streaming()
+        link.onFocus(LOSS)
+        sent.clear()
+        playing = false
+        link.play(1_600, loud = false)
+        link.play(3_000, loud = true)
+        assertEquals(emptyList<String>(), sent)
+        // A player starting under it: then it asks.
+        playing = true
+        link.play(100, loud = true)
+        assertEquals(listOf("focus:$GAIN_REQUEST"), sent)
+    }
+
+    @Test
+    fun `a capture started again after the radio doesn't take the speakers back`() {
+        val link = streaming()
+        link.onFocus(LOSS)
+        sent.clear()
+        // The audio server restarted, screen sharing ended, "Ask again": stopped, then on again.
+        link.stop()
+        link.captureOn(radioFirst = false)
+        assertEquals(emptyList<String>(), sent)
+        // Still, a player playing after a pause takes them back, asking first.
+        link.play(1_600, loud = false)
+        link.play(400, loud = true)
+        assertEquals(listOf("focus:$GAIN_REQUEST"), sent)
+    }
+
+    @Test
+    fun `without the radio picked, a capture started again takes the speakers as before`() {
+        val link = streaming()
+        link.stop()
+        assertEquals(listOf("stop", "focus:$RELEASE"), sent)
+        sent.clear()
+        link.captureOn(radioFirst = false)
+        assertEquals(listOf("focus:$GAIN_REQUEST", "start"), sent)
     }
 
     private companion object {
