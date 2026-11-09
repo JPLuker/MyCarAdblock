@@ -200,6 +200,7 @@ class CarPreviewActivity : ComponentActivity() {
             intent.getStringExtra("jollySay"),
             intent.getStringExtra("jollyLang"),
             intent.getBooleanExtra("jollyKey", true),
+            intent.getStringExtra("jollyHome"),
         )
         // --ez webMusicPlay true: a music service's page presses its first "Play" a few seconds in (no
         // account plays here). Set every run.
