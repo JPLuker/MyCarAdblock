@@ -39,7 +39,10 @@ object PhoneMirror {
     private var frameHeight = 0
 
     /** The car's picture is taller than wide: the phone is held upright there, not on its side. */
-    val upright: Boolean get() = frameHeight > frameWidth
+    val upright: Boolean get() = uprightIn(frameWidth, frameHeight)
+
+    /** Whether a car picture of [width] x [height] holds the phone upright, rather than on its side. */
+    fun uprightIn(width: Int, height: Int): Boolean = height > width
 
     /**
      * Wired up by the session, which owns the encoder Surface and so is the only thing that

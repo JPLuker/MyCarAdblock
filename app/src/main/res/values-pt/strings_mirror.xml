@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_phone_apps_way_back">Para voltar ao myCar: toque nas faixas pretas em volta do telefone, aperte um botão do carro (Início, Voltar, Mídia…) ou toque em Parar na notificação do telefone.</string>
+    <string name="car_phone_apps_upright">Até lá, o telefone também fica na vertical em vez de girar para preencher a tela do carro.</string>
+</resources>
