@@ -330,6 +330,20 @@ fun OnContentRefreshDelegate?.refresh() {
         .onFailure { MyCarLog.w("host: could not request a refresh: ${it.message}") }
 }
 
+/** An alert left the screen without the app taking it down: its time ran out, or the driver closed it. */
+fun androidx.car.app.model.AlertCallbackDelegate?.cancel(reason: Int) {
+    val delegate = this ?: return
+    runCatching { delegate.sendCancel(reason, doneCallback("an alert's cancel")) }
+        .onFailure { MyCarLog.w("host: could not cancel an alert: ${it.message}") }
+}
+
+/** An alert left the screen another way: a newer one took its place, the app took it down, or a tap. */
+fun androidx.car.app.model.AlertCallbackDelegate?.dismissed() {
+    val delegate = this ?: return
+    runCatching { delegate.sendDismiss(doneCallback("an alert's dismiss")) }
+        .onFailure { MyCarLog.w("host: could not dismiss an alert: ${it.message}") }
+}
+
 private fun doneCallback(label: String) = object : OnDoneCallback {
     // onSuccess is annotated nullable and onFailure isn't - the asymmetry is real.
     override fun onSuccess(response: Bundleable?) = Unit

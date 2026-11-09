@@ -407,6 +407,9 @@ fun CarUi() {
                             }
                         }
                         CarToastOverlay(Modifier.align(Alignment.BottomCenter))
+                        // An app's alert (Waze: is the hazard still there?) across the top of any
+                        // screen: under a call's banner and question, which come first.
+                        CarAlertOverlay(Modifier.align(Alignment.TopCenter).padding(top = callTop))
                         // A page's dropdown (see WebSelect): under a call's question, and its sheet under a call's banner.
                         WebSelectSheet(Modifier.padding(top = callTop))
                         CallPromptOverlay()

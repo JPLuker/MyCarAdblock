@@ -560,6 +560,18 @@ EXTRA="--ez wallpapers true" shoot wallpapers 1920 720 240 "$WAIT;$WAIT"
 EXTRA="--ez player true" shoot player 1920 720 240 "$WAIT"
 EXTRA="--ez player true" shoot player-800x480 800 480 160 "$WAIT"
 
+# An app's alert across the top of the car's screen (CarAlerts; --ez alert true puts up one like
+# Waze's question about a hazard, 12 s long, with a blue button and a neutral one). At 1920x720
+# "Still there" is tapped, at 800x480 its time runs out, and once with the light theme. The log
+# says what the app was told.
+EXTRA="--ez alert true" shoot alert 1920 720 240 "$WAIT;800,200;$WAIT"
+EXTRA="--ez alert true" shoot alert-800x480 800 480 160 "$WAIT;$WAIT;$WAIT;$WAIT;$WAIT"
+EXTRA="--ez alert true --es carTheme LIGHT" shoot alert-light 1920 720 240 "$WAIT"
+case " ${ONLY:-alert} " in *" alert "*|*" alert-800x480 "*)
+    echo "--- alert: the button tapped and the time run out, as the app was told ---"
+    grep -h "alert" previews/alert/log.txt previews/alert-800x480/log.txt 2>/dev/null | cut -c1-200 | head -20 || echo "alert: nothing" ;;
+esac
+
 # An incoming call from an unknown number, rung on the emulator's modem once the car UI is up.
 shoot call 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT" "adb emu gsm call 3331234567"
 adb emu gsm cancel 3331234567
