@@ -98,6 +98,9 @@ class CarAppConnection(private val context: Context) {
     private var binding: ServiceConnection? = null
     private var component: ComponentName? = null
 
+    /** The app has taken myCar as its host (the handshake went through); a refusal comes before it. */
+    private var hostAccepted = false
+
     /** Whose icon the header shows for the standard app-icon action. */
     val appPackage: String? get() = component?.packageName
 
@@ -124,6 +127,7 @@ class CarAppConnection(private val context: Context) {
         frameHeight = height
         frameDensity = densityDpi
         component = app.component
+        hostAccepted = false
         pendingDestination = destination
         destinationOnceRunning = null
         update { Status(phase = Phase.BINDING, app = app.label) }
@@ -291,6 +295,7 @@ class CarAppConnection(private val context: Context) {
         appManager = null
         navigationManager = null
         surfaceCallback = null
+        hostAccepted = false
         update { it.copy(phase = Phase.HANDSHAKE, detail = "bound, asking for app info", surfaceRequested = false, surfaceAttached = false) }
         MyCarLog.i("host: bound; requesting app info")
         main.removeCallbacks(handshakeTimeout)
@@ -331,6 +336,8 @@ class CarAppConnection(private val context: Context) {
     private fun onHandshakeAccepted() {
         val app = carApp ?: return
         MyCarLog.i("host: handshake accepted; creating the app")
+        hostAccepted = true
+        component?.packageName?.let { PatchRefusals.forget(context, it) }
         val intent = pendingDestination?.let { autoRoute.arm(); navigateIntent(it) }
             ?: Intent(Intent.ACTION_MAIN).setComponent(component)
         if (pendingDestination != null) destinationOnceRunning = null
@@ -901,7 +908,22 @@ class CarAppConnection(private val context: Context) {
         clearToasts()
         _trip.value = null
         MyCarLog.e("host: $detail")
-        update { it.copy(phase = phase, detail = detail) }
+        val shown = noteModifiedRefusal(phase) ?: detail
+        update { it.copy(phase = phase, detail = shown) }
+    }
+
+    /**
+     * A modified copy of an app that refuses myCar on its own (Waze, re-signed by Morphe) that said
+     * no before taking myCar as its host: patched for something else, or with hosts that leave myCar
+     * out. Counted as broken again (see [PatchRefusals]), and the car says what to add to the patch.
+     */
+    private fun noteModifiedRefusal(phase: Phase): String? {
+        if (phase != Phase.REJECTED || hostAccepted) return null
+        val pkg = component?.packageName ?: return null
+        if (!KnownApps.modified(context, pkg)) return null
+        PatchRefusals.remember(context, pkg)
+        MyCarLog.w("host: $pkg is a modified copy and refused myCar - marked broken until it accepts myCar or is installed again")
+        return Words.get(R.string.car_host_modified_refused, _status.value.app ?: pkg, PatchRefusals.hostsEntry(context))
     }
 
     private fun clearToasts() {

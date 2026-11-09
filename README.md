@@ -261,7 +261,11 @@ behind it all — still or moving.
   through myCar's own player, but its sound reaches the car only over Bluetooth: it won't let
   another app pass it along. Spotify inside myCar reaches the car either way. Apps that list
   trusted hosts by package and signing certificate need to add myCar to that list; see
-  [docs/BUILDING_APPS.md](docs/BUILDING_APPS.md).
+  [docs/BUILDING_APPS.md](docs/BUILDING_APPS.md). Waze modified with Morphe accepts myCar once
+  its "Allow Gearslip" patch lists it: in the patch's "Accepted hosts" option, add a `;` and
+  `e477a4794b984927360e9ae4a31e87cb08a26c54e0e27e4334116d1c7cdccc31,io.github.sirionero.mycar`
+  after Gearslip's entry (`*,io.github.sirionero.mycar.dev` for myCar's debug build), then patch
+  Waze again. A modified Waze that refuses myCar gets a red X, and the car says what to add.
 - **myCar can't be installed next to Gearslip.** Both define the permission that car apps
   look for, and Android lets only one signing key define it. Uninstall Gearslip first.
 - **Calls use the car's Bluetooth,** as they do in Android Auto. Pair the phone with the

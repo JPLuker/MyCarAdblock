@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_host_modified_refused">这个 %1$s 是修改过的副本，但不接受 myCar。在 Morphe 中，补丁“Allow Gearslip”的选项“Accepted hosts”：在末尾加上“;”和 %2$s，然后重新为 %1$s 打补丁。</string>
+</resources>
