@@ -204,6 +204,10 @@ EXTRA="$CANVAS" shoot video-cover 1920 720 240 "$WAIT;$WAIT;1405,54;$WAIT;$WAIT;
 EXTRA="$CANVAS" shoot video-cover-800x480 800 480 160 "$WAIT;$WAIT;612,36;$WAIT;$WAIT;764,36;$WAIT"
 EXTRA="$CANVAS --ez videoCoverOn true --ez moving true" shoot video-cover-moving 1920 720 240 "$WAIT;$WAIT;$WAIT;1405,54;$WAIT"
 EXTRA="--es webMusic spotify --ez webMusicKey false" shoot video-cover-spotify 1920 720 240 "$WAIT;$WAIT;$WAIT;$WAIT"
+# The music not reaching the car (--ez musicNotReaching true, debug only: through myCar, Android's question
+# turned down) with video covers possible, the car's screen at Extra large: the warning beside the X, where
+# its "Ask again" can be read and touched, and no video cover button meanwhile (it was pushed under the glass).
+EXTRA="$CANVAS --es carScale 1.5 --ez musicNotReaching true" shoot video-cover-not-reaching 1920 720 240 "$WAIT;$WAIT;$WAIT"
 case " ${ONLY:-video-cover} " in *" video-cover"*)
     echo "--- video cover ---"
     grep -h "video cover\|preview: demo" previews/video-cover*/log.txt previews/video-cover*/stream.txt 2>/dev/null | cut -c1-300 | head -30 || true

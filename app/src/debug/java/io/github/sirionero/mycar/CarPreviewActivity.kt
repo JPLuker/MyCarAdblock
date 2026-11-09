@@ -291,10 +291,19 @@ class CarPreviewActivity : ComponentActivity() {
         // --ez demoSong true: a made-up song "plays", once CarUi has started the car's services, so
         // Home shows the player beside the real map (see showDemoSong).
         if (intent.getBooleanExtra("demoSong", false)) {
+            // --ez musicNotReaching true: the music goes through myCar and Android's question was turned
+            // down, so the player says the music isn't reaching the car ("Ask again").
+            val notReaching = intent.getBooleanExtra("musicNotReaching", false)
             var tries = 0
             fun tryDemo() {
-                if (io.github.sirionero.mycar.car.showDemoSong(this)) MyCarLog.i("preview: demo song playing")
-                else if (++tries < 50) main.postDelayed(::tryDemo, 100)
+                if (io.github.sirionero.mycar.car.showDemoSong(this)) {
+                    MyCarLog.i("preview: demo song playing")
+                    if (notReaching) {
+                        CarSettings.useCarLink(true)
+                        CarAudio.denied()
+                        MyCarLog.i("preview: the music through myCar, Android's question turned down")
+                    }
+                } else if (++tries < 50) main.postDelayed(::tryDemo, 100)
                 else MyCarLog.e("preview: no media to show the demo song in")
             }
             main.post(::tryDemo)
