@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">Το τηλέφωνο φορτίζει, αλλά το αυτοκίνητο δεν απαντά</string>
+    <string name="home_no_car_check">Αν είναι συνδεδεμένο στο αυτοκίνητο, ελέγξτε:</string>
+    <string name="home_no_car_cable">Χρησιμοποιήστε καλώδιο που μεταφέρει δεδομένα: μερικά μόνο φορτίζουν.</string>
+    <string name="home_no_car_always">Όταν το Android ρωτήσει ποια εφαρμογή να ανοίξει, επιλέξτε το myCar και πατήστε «Πάντα».</string>
+    <string name="usb_c_graphene">Το GrapheneOS μπορεί να κλείσει τα δεδομένα στη θύρα USB-C, και τότε το αυτοκίνητο βλέπει μόνο ένα τηλέφωνο για φόρτιση. Στις Ρυθμίσεις &gt; Ασφάλεια και απόρρητο &gt; Exploit protection &gt; USB-C port, το Charging-only αφήνει το αυτοκίνητο απέξω· με το Charging-only when locked, την προεπιλογή, ξεκλειδώστε το τηλέφωνο όταν το συνδέετε.</string>
+</resources>

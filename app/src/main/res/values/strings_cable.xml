@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The cable and the car audio on the phone: Home's card when the phone charges from a USB port and
+  no car answers (ui/ChargingNoCarCard.kt), GrapheneOS's USB-C port in that card and in "How to
+  connect" (ui/HelpScreen.kt), and the car audio step of the setup list (ui/SetupAudioStep.kt).
+  "Always", "Settings" and "Security & privacy" are Android's words: use the ones Android shows in
+  your language. "Exploit protection", "USB-C port", "Charging-only" and "Charging-only when
+  locked" are GrapheneOS's, which shows them in English on every phone: keep them in English.
+-->
+<resources>
+    <!-- Home: a quiet card when the phone has been charging from a USB port for 20 s, no car has come to myCar and no drive is under way. A computer or a charger looks the same, so it only says what to check -->
+    <string name="home_no_car_title">The phone is charging, but the car doesn\'t answer</string>
+    <!-- Above the things to check, one per line -->
+    <string name="home_no_car_check">If it\'s plugged into the car, check:</string>
+    <string name="home_no_car_cable">Use a cable that carries data: some only charge.</string>
+    <!-- "Always": Android's button when it asks which app to open for the car -->
+    <string name="home_no_car_always">When Android asks which app to open, choose myCar and tap Always.</string>
+    <!-- Only on GrapheneOS: in the card above and in "How to connect", with a button that opens Android's Security & privacy. Settings and Security & privacy as Android names them in your language; Exploit protection, USB-C port, Charging-only and Charging-only when locked in English, as GrapheneOS shows them on every phone -->
+    <string name="usb_c_graphene">GrapheneOS can turn off data on the USB-C port, and then the car sees only a phone to charge. In Settings &gt; Security &amp; privacy &gt; Exploit protection &gt; USB-C port, Charging-only keeps the car out; with Charging-only when locked, the default, unlock the phone when you plug it in.</string>
+</resources>

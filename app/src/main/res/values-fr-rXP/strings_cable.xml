@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">Le téléphone charge, mais le navire ne répond pas à l’appel</string>
+    <string name="home_no_car_check">S’il est amarré au navire, vérifiez :</string>
+    <string name="home_no_car_always">Quand Android demande quelle app ouvrir, choisissez myCar et appuyez sur Toujours : myCar prend la barre.</string>
+</resources>

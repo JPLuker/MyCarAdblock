@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">Il telefono si carica, ma la nave non risponde all\'appello</string>
+    <string name="home_no_car_check">Se è ormeggiato alla nave, controlla:</string>
+    <string name="home_no_car_always">Quando Android chiede quale app aprire, scegli myCar e tocca Sempre: il timone passa a myCar.</string>
+</resources>

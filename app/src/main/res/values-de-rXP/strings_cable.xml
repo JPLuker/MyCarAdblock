@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">Das Telefon lädt, aber das Schiff antwortet nicht</string>
+    <string name="home_no_car_check">Wenn es am Schiff festgemacht ist, prüfe:</string>
+    <string name="home_no_car_always">Wenn Android fragt, welche App sich öffnen soll, wähle myCar und tippe auf „Immer“: Dann übernimmt myCar das Ruder.</string>
+</resources>

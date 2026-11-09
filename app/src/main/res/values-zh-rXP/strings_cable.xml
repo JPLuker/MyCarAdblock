@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">手机正在充电，但船没有回应</string>
+    <string name="home_no_car_check">如果手机已系泊在船上，请检查：</string>
+    <string name="home_no_car_always">Android 询问要打开哪个应用时，选择 myCar，然后点按“始终”，让 myCar 掌舵。</string>
+</resources>

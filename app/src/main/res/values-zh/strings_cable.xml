@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">手机正在充电，但汽车没有响应</string>
+    <string name="home_no_car_check">如果手机已连接到汽车，请检查：</string>
+    <string name="home_no_car_cable">使用能传输数据的数据线：有些线只能充电。</string>
+    <string name="home_no_car_always">Android 询问要打开哪个应用时，选择 myCar，然后点按“始终”。</string>
+    <string name="usb_c_graphene">GrapheneOS 可以关闭 USB-C 接口的数据传输，这时汽车只会把手机当作要充电的设备。在“设置 &gt; 安全和隐私 &gt; Exploit protection &gt; USB-C port”中，Charging-only 会把汽车挡在外面；选择 Charging-only when locked（默认）时，请在插入数据线时解锁手机。</string>
+</resources>

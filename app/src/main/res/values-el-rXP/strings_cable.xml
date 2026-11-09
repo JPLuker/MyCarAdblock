@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">Το τηλέφωνο φορτίζει, αλλά το καράβι δεν απαντά</string>
+    <string name="home_no_car_check">Αν είναι δεμένο στο καράβι, ελέγξτε:</string>
+    <string name="home_no_car_always">Όταν το Android ρωτήσει ποια εφαρμογή να ανοίξει, επιλέξτε το myCar και πατήστε «Πάντα», και το πηδάλιο το παίρνει το myCar.</string>
+</resources>

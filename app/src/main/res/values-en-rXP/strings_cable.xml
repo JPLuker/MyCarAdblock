@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">The phone is charging, but the ship doesn\'t answer the hail</string>
+    <string name="home_no_car_check">If it\'s moored to the ship, check:</string>
+    <string name="home_no_car_always">When Android asks which app to open, choose myCar and tap Always: myCar takes the helm.</string>
+</resources>

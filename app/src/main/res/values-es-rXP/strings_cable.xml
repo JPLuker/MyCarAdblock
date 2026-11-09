@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">El teléfono se está cargando, pero el barco no responde</string>
+    <string name="home_no_car_check">Si está amarrado al barco, comprueba:</string>
+    <string name="home_no_car_always">Cuando Android pregunte qué app abrir, elige myCar y toca Siempre: myCar toma el timón.</string>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">Il telefono si carica, ma l\'auto non risponde</string>
+    <string name="home_no_car_check">Se è collegato all\'auto, controlla:</string>
+    <string name="home_no_car_cable">Usa un cavo che trasmette anche i dati: alcuni servono solo a caricare.</string>
+    <string name="home_no_car_always">Quando Android chiede quale app aprire, scegli myCar e tocca Sempre.</string>
+    <string name="usb_c_graphene">GrapheneOS può spegnere i dati sulla porta USB-C, e allora l\'auto vede solo un telefono da caricare. In Impostazioni &gt; Sicurezza e privacy &gt; Exploit protection &gt; USB-C port, con Charging-only l\'auto resta fuori; con Charging-only when locked, quella predefinita, sblocca il telefono quando lo colleghi.</string>
+</resources>

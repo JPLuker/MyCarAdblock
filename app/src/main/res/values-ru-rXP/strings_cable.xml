@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">Телефон заряжается, но корабль не отвечает</string>
+    <string name="home_no_car_check">Если он пришвартован к кораблю, проверьте:</string>
+    <string name="home_no_car_always">Когда Android спросит, какое приложение открыть, выберите myCar и нажмите «Всегда» — и штурвал перейдёт к myCar.</string>
+</resources>
