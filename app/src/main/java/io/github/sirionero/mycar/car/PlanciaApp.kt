@@ -53,6 +53,7 @@ import io.github.sirionero.mycar.Words
 import io.github.sirionero.mycar.car.design.MyCarRadius
 import io.github.sirionero.mycar.car.design.MyCarSize
 import io.github.sirionero.mycar.car.design.MyCarSpace
+import io.github.sirionero.mycar.car.design.raisedPanel
 import io.github.sirionero.mycar.car.theme.GsIconButton
 import io.github.sirionero.mycar.home.Dashboard
 import io.github.sirionero.mycar.home.HaConnection
@@ -353,19 +354,23 @@ internal fun PlanciaPart(runs: Boolean, onHold: () -> Unit, modifier: Modifier) 
         return
     }
     MenuOpensFullScreen(web)
-    Column(modifier.clip(RoundedCornerShape(MyCarRadius.Card))) {
+    // The web page may not keep to the panel's clip (see raisedPanel): its corners are painted over.
+    Column(modifier.raisedPanel(coverCorners = true)) {
         TileBar("Plancia", onBack = { web?.goBack() }, onHold = onHold)
         PlanciaView(Modifier.weight(1f).fillMaxWidth())
     }
 }
 
-/** Plancia beside the map, under a bar with its name and Close, as an app chosen for that place. */
+/**
+ * Plancia beside the map, under a bar with its name and Close, as an app chosen for that place. The
+ * panel it sits in rounds it (see raisedPanel).
+ */
 @Composable
 internal fun PlanciaPane(modifier: Modifier) {
     val navigator = LocalCarNavigator.current
     val web = LocalPlanciaWeb.current
     MenuOpensFullScreen(web)
-    Column(modifier.clip(RoundedCornerShape(MyCarRadius.Card))) {
+    Column(modifier) {
         Surface(
             color = MaterialTheme.colorScheme.surfaceContainerLow,
             contentColor = MaterialTheme.colorScheme.onSurface,

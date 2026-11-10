@@ -67,7 +67,7 @@
     <string name="car_settings_saved_to">Αποθηκεύτηκε για το %1$s</string>
     <string name="car_settings_save_failed">Η αποθήκευση απέτυχε</string>
     <string name="car_settings_save_for_vehicle">Αποθήκευση για αυτό το όχημα</string>
-    <string name="car_settings_no_vehicle_profile">Κανένα προφίλ για αυτό το όχημα</string>
+    <string name="car_settings_no_vehicle_profile">Χωρίς προφίλ: διαστάσεις από το αυτοκίνητο</string>
 
     <string name="car_whatsnew_title">Τι νέο υπάρχει στην %1$s</string>
     <string name="car_whatsnew_show_after_updates">Εμφάνιση μετά από ενημερώσεις</string>

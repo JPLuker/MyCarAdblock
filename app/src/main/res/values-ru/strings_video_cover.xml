@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">Включить видеообложку</string>
+    <string name="car_player_video_cover_off">Выключить видеообложку</string>
+    <string name="car_player_video_cover_now_on">Видеообложка включена — для треков, у которых она есть</string>
+    <string name="car_player_video_cover_now_off">Обычная обложка</string>
+    <string name="car_settings_cover">Обложка в плеере</string>
+    <string name="car_settings_cover_still">Статичная</string>
+    <string name="car_settings_cover_video">Видео</string>
+    <string name="car_settings_cover_note">У некоторых треков есть короткое зацикленное видео, как Canvas в Spotify. С вариантом «Видео» плеер рядом с картой показывает его вместо обложки. Кнопка на обложке тоже это переключает.</string>
+    <string name="music_video_cover">Видеообложка</string>
+    <string name="music_video_cover_detail">В плеере автомобиля рядом с картой — короткое зацикленное видео, которое есть у некоторых треков (Canvas в Spotify), вместо обложки. Кнопка на обложке в автомобиле тоже это переключает. Каждое видео — несколько мегабайт трафика.</string>
+</resources>

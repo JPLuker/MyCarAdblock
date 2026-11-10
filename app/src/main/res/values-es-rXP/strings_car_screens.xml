@@ -31,7 +31,7 @@
     <string name="car_settings_web_page_note">La muestra la app Navegador desde la próxima vez que se abra, y un navegador en tus cubiertas desde la próxima travesía.</string>
     <string name="car_settings_saved_to">En el cofre de %1$s</string>
     <string name="car_settings_save_for_vehicle">Al cofre para este barco</string>
-    <string name="car_settings_no_vehicle_profile">Ningún perfil de barco coincide</string>
+    <string name="car_settings_no_vehicle_profile">Nada en el cofre: usa las medidas del barco</string>
 
     <string name="car_whatsnew_title">Nuevo botín de la %1$s</string>
     <string name="car_whatsnew_got_it">¡Recibido!</string>

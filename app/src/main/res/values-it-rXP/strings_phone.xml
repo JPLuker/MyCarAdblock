@@ -23,11 +23,11 @@
     <string name="help_see_full_list">Srotola l\'elenco completo</string>
     <string name="help_in_the_car">A bordo</string>
     <string name="help_step_connect">Attacca il cavo, o abborda senza fili.</string>
-    <string name="help_step_connect_detail">myCar si apre da sola quando la nave si collega. Per il senza fili, prima accoppia il telefono con la nave, poi tocca «Abborda senza fili» in porto.</string>
+    <string name="help_step_connect_detail">myCar si apre da sola quando la nave si collega. La prima volta col cavo, Android chiede quale app aprire: scegli myCar e tocca Sempre. Per il senza fili, prima accoppia il telefono con la nave, poi tocca «Abborda senza fili» in porto.</string>
     <string name="help_step_screening">Respingi le chiamate sconosciute prima che squillino.</string>
     <string name="help_set_up">Prepara</string>
     <string name="help_step_audio_prompt">Niente più domanda per l\'audio a ogni traversata.</string>
-    <string name="help_step_audio_prompt_detail">Collega il telefono a un computer con il debug USB attivo ed esegui questo comando una volta. Se lo salti, tocchi Avvia ogni volta che salpi.</string>
+    <string name="help_step_audio_prompt_detail">Collega il telefono a un computer con il debug USB attivo ed esegui questo comando una volta. Se lo salti, accetti con un tocco la domanda di Android ogni volta che salpi.</string>
     <string name="help_step_notifications_detail">Android nasconde il testo delle notifiche mentre condivide l\'audio. Esegui anche questo comando, e myCar toglie quel limite solo mentre la musica va a bordo.</string>
 
     <string name="cert_notice_switched_text">Da ora myCar usa %1$s. Ricollegati all\'auto: ricollega il cavo o abborda senza fili.</string>

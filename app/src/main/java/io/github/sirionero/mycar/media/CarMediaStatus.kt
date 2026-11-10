@@ -2,6 +2,7 @@ package io.github.sirionero.mycar.media
 
 import android.graphics.Bitmap
 import android.media.session.PlaybackState
+import android.os.SystemClock
 import io.github.sirionero.mycar.BuildConfig
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.Protobuf
@@ -59,17 +60,26 @@ class CarMediaStatus(
     }
 
     private fun tick() {
-        val now = CarServices.mediaOrNull()?.now?.value
+        val media = CarServices.mediaOrNull()
+        val now = media?.now?.value
         val active = now != null && now.isActive
         val state = when {
             !active -> STATE_STOPPED
             now!!.state == PlaybackState.STATE_PAUSED -> STATE_PAUSED
             else -> STATE_PLAYING
         }
-        if (active) sendTrack(now!!)
+        val newTrack = active && sendTrack(now!!)
         // Nothing to say while stopped, beyond saying so once.
         if (state == STATE_STOPPED && sentState == STATE_STOPPED) return
         if (state == STATE_PAUSED && sentState == STATE_PAUSED) return
+        // Between two songs a web player says "not playing" for a moment (Spotify Web: 0.1-1 s), and
+        // the car showed "paused" for a second at each one. Not in the read that sent the new song,
+        // nor just after a skip: a pause that lasts reaches the car a moment later.
+        if (state == STATE_PAUSED && sentState == STATE_PLAYING &&
+            (newTrack || SystemClock.elapsedRealtime() - (media?.skippedAt ?: 0L) < SKIP_HOLD_MS)
+        ) {
+            return
+        }
         val source = CarServices.mediaApp.value?.label ?: "myCar"
         val seconds = if (active) (now!!.currentPosition() / 1000).coerceAtLeast(0) else 0
         sendOnChannel(
@@ -85,12 +95,13 @@ class CarMediaStatus(
         sentState = state
     }
 
-    private fun sendTrack(now: NowPlaying) {
+    /** Sends the song when it isn't the one the car has; true when it was sent now. */
+    private fun sendTrack(now: NowPlaying): Boolean {
         // The cover by its size and address, not by the Bitmap: each read of the app's metadata is a
         // new Bitmap, and every playback state change sent the same cover to the car again.
         val cover = now.art?.let { "${it.width}x${it.height}" }
         val key = "${now.title}\u0000${now.artist}\u0000${now.album}\u0000${now.durationMs}\u0000$cover\u0000${now.artUri}"
-        if (key == sentTrack) return
+        if (key == sentTrack) return false
         sentTrack = key
         var body = Protobuf.stringField(1, now.title) +
             Protobuf.stringField(2, now.artist) +
@@ -100,6 +111,7 @@ class CarMediaStatus(
         sendOnChannel(MSG_METADATA, body)
         // The song's name only in the debug build: the log is shared for help.
         MyCarLog.i("media status: -> track" + if (BuildConfig.DEBUG) " \"${now.title}\" by ${now.artist.ifBlank { "?" }}" else "")
+        return true
     }
 
     /** Album art as a small PNG: car screens show it at thumbnail size, and the link is shared with video. */
@@ -111,6 +123,8 @@ class CarMediaStatus(
 
     companion object {
         private const val TICK_MS = 1_000L
+        /** After a skip, a pause this short is the app between two songs, not one to show (see [tick]). */
+        private const val SKIP_HOLD_MS = 1_500L
         private const val ART_PX = 256
         private const val MSG_CHANNEL_OPEN_RESPONSE = 8
         private const val MSG_STATUS = 32769

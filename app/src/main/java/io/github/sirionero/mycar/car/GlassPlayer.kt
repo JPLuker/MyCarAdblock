@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -34,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInParent
@@ -74,7 +75,10 @@ import io.github.sirionero.mycar.media.NowPlaying
  * lower part on a pane of frosted glass - the same cover, blurred, under a dark tint - and a tap
  * anywhere else on the cover opens the full media screen. Drawn in the dark scheme whatever the
  * app theme, since it all sits on a picture. With no cover, the column takes the app's colour and
- * shows its icon instead.
+ * shows its icon instead. Where the car's music can have video covers (Spotify Web), a button on the
+ * cover turns them on: a song with one shows it in place of the cover (see VideoCover.kt). The panel
+ * it sits in rounds it, the video too (see raisedPanel): beside the map that panel is drawn at the
+ * screen's own density, this player at the size chosen for it.
  */
 @Composable
 internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp: String? = null) {
@@ -90,6 +94,14 @@ internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp:
     var pane by remember { mutableStateOf(Rect.Zero) }
     val paneShape = RoundedCornerShape(MyCarRadius.Sheet)
     val paneCorner = with(LocalDensity.current) { MyCarRadius.Sheet.toPx() }
+    // The song's video in place of the cover (Spotify's Canvas), where the car's music can have one
+    // and the driver turned it on: under the cover, which gives way once its first picture is drawn.
+    val videoMusic = rememberVideoCoverService()
+    val videoPossible = videoMusic != null || VideoCoverPreview.url != null
+    val videoOn by VideoCoverSetting.on.collectAsState()
+    val videoUrl = if (videoPossible && videoOn) rememberVideoCover(videoMusic) else null
+    val video = remember(videoUrl) { videoUrl?.let(::VideoCover) }
+    val still = rememberStillCoverAlpha(video)
 
     MyCarCarTheme(dark = true) {
         // See-through buttons: glass, not solid discs, behind the controls on the pane.
@@ -101,9 +113,17 @@ internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp:
         // ring kept, which MaterialTheme would swap for its plain ripple.
         val ring = LocalIndication.current
         MaterialTheme(colorScheme = scheme) { CompositionLocalProvider(LocalContentColor provides Color.White, LocalIndication provides ring) {
-            Box(modifier.clip(RoundedCornerShape(MyCarRadius.Card)).background(ground)) {
+            Box(modifier.background(ground)) {
+                // Paused out of sight and with the music: each picture of it is a new frame to send the car.
+                if (video != null) key(video) { VideoCoverView(video, running = LocalPlayerInView.current && now.playing, modifier = Modifier.fillMaxSize()) }
                 if (cover != null) {
-                    Image(cover, null, Modifier.fillMaxSize().clickable { navigator.media() }, contentScale = ContentScale.Crop)
+                    Image(
+                        cover,
+                        null,
+                        // The touch and the focus ring outside the fading layer: seen over the video too.
+                        Modifier.fillMaxSize().clickable { navigator.media() }.graphicsLayer { alpha = still() },
+                        contentScale = ContentScale.Crop,
+                    )
                     Image(
                         cover,
                         null,
@@ -120,7 +140,7 @@ internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp:
                     )
                 } else {
                     Box(
-                        Modifier.fillMaxSize().clickable { navigator.media() }.padding(bottom = NO_COVER_LIFT),
+                        Modifier.fillMaxSize().clickable { navigator.media() }.graphicsLayer { alpha = still() }.padding(bottom = NO_COVER_LIFT),
                         contentAlignment = Alignment.Center,
                     ) {
                         AppIcon(appIcon, null, NO_COVER_ICON)
@@ -135,7 +155,10 @@ internal fun GlassDockedPlayer(now: NowPlaying, modifier: Modifier, startingApp:
                     size = 52.dp, iconSize = 24.dp, shape = CircleShape,
                 )
                 // Music that can't reach the car (Android's question turned down): says so, and asks again.
-                MusicNotReaching(now.playing, Modifier.align(Alignment.TopStart).padding(start = 10.dp, top = 10.dp, end = 72.dp))
+                val notReaching = musicNotReaching(now.playing)
+                notReaching?.let { MusicNotReaching(it, Modifier.align(Alignment.TopStart).padding(start = 10.dp, top = 10.dp, end = 72.dp)) }
+                // The video cover's button gives way to it: lower down, under the glass, it couldn't be read or touched.
+                if (videoPossible && notReaching == null) VideoCoverButton(Modifier.align(Alignment.TopStart).zIndex(1f).padding(10.dp))
                 Column(
                     Modifier
                         .align(Alignment.BottomCenter)

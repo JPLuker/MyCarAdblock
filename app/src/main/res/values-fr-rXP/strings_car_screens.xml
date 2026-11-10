@@ -37,7 +37,7 @@
     <string name="car_settings_web_page_default">DuckDuckGo (par défaut) : appuyez pour mettre le cap sur une autre page</string>
     <string name="car_settings_web_page_note">Affichée par l’app Navigateur à sa prochaine ouverture, et par un navigateur sur vos ponts à la prochaine traversée.</string>
     <string name="car_settings_save_for_vehicle">Enregistrer pour ce navire</string>
-    <string name="car_settings_no_vehicle_profile">Aucun profil de navire correspondant</string>
+    <string name="car_settings_no_vehicle_profile">Rien en cale : dimensions données par le navire</string>
 
     <string name="car_whatsnew_title">Butin de la %1$s</string>
     <string name="car_whatsnew_show_after_updates">Dévoiler après chaque mise à jour</string>

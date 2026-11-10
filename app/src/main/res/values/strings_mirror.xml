@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Screen sharing: the phone's own screen shown on the car's (car/PhoneAppsScreen.kt, mirror/). Shown
+  on a car's display and read at a glance.
+-->
+<resources>
+    <!-- Under the title of Screen sharing, above the phone's apps to show in the car: the ways back from the
+         phone's screen to myCar's own. The black bands are the empty sides of the car's picture around the
+         phone's; Home, Back and Media are buttons some cars have; "Stop" is the button on the phone's
+         notification while its screen is shared (service_notification_stop) -->
+    <string name="car_phone_apps_way_back">Back to myCar: tap the black bands around the phone, press a button on the car (Home, Back, Media…) or tap Stop in the phone\'s notification.</string>
+    <!-- Under "Touch is off. Enable myCar under Settings > Accessibility on the phone." (car_phone_apps_touch_off),
+         on a car whose screen is wider than tall: without myCar under Accessibility the phone isn't turned
+         on its side either -->
+    <string name="car_phone_apps_upright">Until then, the phone also stays upright instead of turning to fill the car\'s screen.</string>
+</resources>

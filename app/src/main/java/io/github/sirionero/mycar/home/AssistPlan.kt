@@ -19,15 +19,33 @@ sealed interface AssistPlan {
          * For a driver speaking [language] ("it"): the [preferred] pipeline if it speaks it, else
          * another one that does, as set up there (an Italian one with Claude, say). With none, the
          * preferred pipeline's agent is asked in the driver's language: Home Assistant's own agent
-         * knows dozens, while its English pipeline understood no Italian at all.
+         * knows dozens, while its English pipeline understood no Italian at all. With the [agents]
+         * Home Assistant has (null: not known), a pipeline whose agent isn't among them is left out
+         * (see [usable]).
          */
-        fun of(pipelines: List<AssistPipeline>, preferred: String?, language: String): AssistPlan {
+        fun of(pipelines: List<AssistPipeline>, preferred: String?, language: String, agents: Set<String>? = null): AssistPlan {
+            val kept = usable(pipelines, agents)
             // "*": a pipeline whose agent is a model (Claude, Gemini, ChatGPT...) speaks every language.
             fun speaks(p: AssistPipeline) = p.language == "*" || p.language.substringBefore('-').equals(language, ignoreCase = true)
-            val speaking = pipelines.filter(::speaks)
+            val speaking = kept.filter(::speaks)
             (speaking.firstOrNull { it.id == preferred } ?: speaking.firstOrNull())?.let { return Run(it.id) }
-            val main = pipelines.firstOrNull { it.id == preferred } ?: pipelines.firstOrNull()
+            val main = kept.firstOrNull { it.id == preferred } ?: kept.firstOrNull()
             return Process(main?.agent, language)
+        }
+
+        /**
+         * The pipelines whose conversation agent Home Assistant has, of the [agents] it lists
+         * (conversation/agent/list; null: not known, all of them). One whose agent is gone - the
+         * integration removed or renamed, or not loaded (a key expired, the model's server off) - only
+         * ever answers "Intent recognition engine … is not found". Home Assistant's own agent is always
+         * there, also by its old id, and so is a pipeline that names none.
+         */
+        fun usable(pipelines: List<AssistPipeline>, agents: Set<String>?): List<AssistPipeline> {
+            if (agents == null) return pipelines
+            return pipelines.filter { p -> p.agent == null || p.agent in HOME_ASSISTANT_AGENTS || p.agent in agents }
         }
     }
 }
+
+/** Home Assistant's own conversation agent, and the id it had before it was an entity. */
+private val HOME_ASSISTANT_AGENTS = setOf("conversation.home_assistant", "homeassistant")

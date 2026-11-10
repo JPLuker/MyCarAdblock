@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import io.github.sirionero.mycar.R
+import io.github.sirionero.mycar.car.design.MyCarSpace
 import io.github.sirionero.mycar.mirror.PhoneApp
 import io.github.sirionero.mycar.mirror.PhoneApps
 import io.github.sirionero.mycar.mirror.PhoneMirror
@@ -44,8 +46,8 @@ import kotlinx.coroutines.withContext
  * Starts a phone app on the car screen.
  *
  * Picking one hands the whole frame over to the mirror, so this screen is the last thing
- * myCar draws until mirroring stops - either from the notification on the phone, or by
- * tapping the black bars beside the mirrored picture.
+ * myCar draws until mirroring stops - from the notification on the phone, a key of the car
+ * (see CarKeys), or by tapping the black bars around the mirrored picture.
  */
 @Composable
 fun PhoneAppsScreen() {
@@ -56,6 +58,14 @@ fun PhoneAppsScreen() {
 
     Column(Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 12.dp)) {
         ScreenHeader(stringResource(R.string.car_phone_apps_title))
+        Spacer(Modifier.height(MyCarSpace.S))
+        // Said before an app is picked: once the car shows the phone, nothing of myCar's is left on it
+        // to say so, and a car that crops its picture's edges can hide the bars meant for a tap.
+        Text(
+            stringResource(R.string.car_phone_apps_way_back),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         Spacer(Modifier.height(12.dp))
         if (!TouchRelayService.enabled) {
             TouchRelayWarning()
@@ -83,6 +93,7 @@ fun PhoneAppsScreen() {
 @Composable
 private fun TouchRelayWarning() {
     val context = LocalContext.current
+    val frame by CarEnvironment.frame.collectAsState()
     Surface(
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.errorContainer,
@@ -95,11 +106,14 @@ private fun TouchRelayWarning() {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Icon(Icons.Filled.Warning, contentDescription = null)
-            Text(
-                stringResource(R.string.car_phone_apps_touch_off),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(1f),
-            )
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(MyCarSpace.XS)) {
+                Text(stringResource(R.string.car_phone_apps_touch_off), style = MaterialTheme.typography.bodyMedium)
+                // The same service turns the phone to the car's picture: on a wide one it would stand
+                // small in the middle, between two bars.
+                if (!PhoneMirror.uprightIn(frame.width, frame.height)) {
+                    Text(stringResource(R.string.car_phone_apps_upright), style = MaterialTheme.typography.bodyMedium)
+                }
+            }
             GsButton(onClick = { PhoneApps.openAccessibilitySettings(context) }) { Text(stringResource(R.string.common_open)) }
         }
     }

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Jolly key in pirate speak (see values/strings_jolly.xml): its name is the Jolly Roger, the key a flag
+  on the mast. Safety, errors and the ready-made commands (which the assistant reads) stay as in the language.
+-->
+<resources>
+    <!-- The key's name, in the dock's description, the car's settings and the phone's: the wildcard card that
+         can be anything. The same word in every language (in pirate speak "Jolly Roger"); the other texts take
+         it as a placeholder, so a new name is one line per language. -->
+    <string name="jolly_name">Jolly Roger</string>
+    <!-- Car, the chooser (the key held, or tapped with nothing chosen): under the tiles of the kinds. %1$s: jolly_name -->
+    <string name="jolly_choose_intro">点一下旗帜，就会执行你在这里选的操作；长按旗帜可回到这里。也可以在手机上选择：舵轮 > 船上屏幕 > %1$s。</string>
+    <!-- Car, the chooser and the car's Settings: what the key does now. %1$s: one of the jolly_title_* below -->
+    <string name="jolly_now">正在飘扬：%1$s</string>
+    <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->
+    <string name="jolly_kind_call">呼叫水手</string>
+    <string name="jolly_kind_ai">与AI谈判</string>
+    <string name="jolly_kind_navigate">设定航向</string>
+    <!-- A phrase myCar's assistant understands, run as if it had been said -->
+    <string name="jolly_kind_say">给鹦鹉的命令</string>
+    <string name="jolly_kind_app">跳帮应用</string>
+    <!-- What the key does, in the chooser, the settings and the toasts. %1$s: the contact's name -->
+    <string name="jolly_title_call">向%1$s喊话</string>
+    <!-- %1$s: an assistant app's name (Gemini, Claude…) -->
+    <string name="jolly_title_ai">和%1$s谈判</string>
+    <!-- The phone's own assistant, whichever it is -->
+    <string name="jolly_title_ai_phone">和手机的鹦鹉谈判</string>
+    <!-- %1$s: the place's name ("Home"), or the place as written -->
+    <string name="jolly_title_navigate">驶向%1$s</string>
+    <!-- %1$s: the app's name -->
+    <string name="jolly_title_app">跳帮%1$s</string>
+    <!-- Car and phone, under the list of assistants -->
+    <string name="jolly_ai_note">它在手机上聆听和回答，声音只能通过蓝牙传上船。手机锁屏时，它会在你解锁后启动；如果在 myCar 中设置了 Home Assistant，则由 myCar 聆听、Home Assistant 回答。</string>
+    <!-- Car, the chooser: a place is written on the phone. %1$s: jolly_name -->
+    <string name="jolly_navigate_on_phone">港口要在手机上填写：舵轮 > 船上屏幕 > %1$s。</string>
+    <!-- Car, the chooser, under the ready-made commands. %1$s: jolly_name -->
+    <string name="jolly_say_on_phone">其他命令：请在手机上填写，位置是舵轮 > 船上屏幕 > %1$s。</string>
+    <!-- %1$s: the place's name or the place, %2$s: the map app -->
+    <string name="jolly_navigating">正在用%2$s驶向%1$s</string>
+    <!-- The car's Settings and the phone's (Settings > Car screen): the On/Off choice, a switch on the phone. %1$s: jolly_name -->
+    <string name="car_settings_jolly_key">桅杆上的%1$s</string>
+    <!-- Car's Settings: the button that opens the chooser -->
+    <string name="car_settings_jolly_choose">下达命令</string>
+    <string name="car_settings_jolly_none">尚无命令：点一下旗帜就会询问。</string>
+    <!-- Phone, Settings > Car screen, the key's section: under the switch -->
+    <string name="settings_jolly_key_detail">挂在桅杆上、随船鹦鹉的上方：点一下即执行你在这里选的操作</string>
+    <!-- The row that opens the kinds; under it, what the key does -->
+    <string name="settings_jolly_action">命令</string>
+    <string name="settings_jolly_none">尚无命令：在船上点一下旗帜就会询问</string>
+    <!-- Title of the list of kinds -->
+    <string name="settings_jolly_kind">要给旗帜下什么命令？</string>
+    <string name="settings_jolly_footer">打电话、唤起鹦鹉、Home Assistant 里的操作、驶向某个港口、一条命令或一个应用，一点即达。在船上长按旗帜也能更改。</string>
+    <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
+    <string name="settings_jolly_place">地址或港口</string>
+    <string name="settings_jolly_place_name">船上显示的名称（可选）</string>
+    <string name="settings_jolly_place_note">会按你填写的内容发给船上的海图应用，就像你告诉 myCar 的鹦鹉要驶向哪里一样。</string>
+    <!-- A command: the field, and a note under the ready-made ones -->
+    <string name="settings_jolly_phrase">命令</string>
+    <string name="settings_jolly_phrase_note">按你对 myCar 的鹦鹉说话的方式来写，用 myCar 的语言：“用Spotify播放Radio Deejay”、“打开大门”。在船上，旗帜会显示这条命令，并由鹦鹉回答。</string>
+</resources>

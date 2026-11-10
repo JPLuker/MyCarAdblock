@@ -20,7 +20,7 @@
     <string name="help_see_full_list">Судовой реестр</string>
     <string name="help_in_the_car">На борту</string>
     <string name="help_step_connect">Подключите кабель или возьмите корабль на абордаж без кабеля.</string>
-    <string name="help_step_connect_detail">myCar открывается сам, когда корабль подключается. Для абордажа без кабеля сначала выполните сопряжение телефона с кораблём, затем нажмите «Абордаж без кабеля» в гавани.</string>
+    <string name="help_step_connect_detail">myCar открывается сам, когда корабль подключается. В первый раз при подключении кабелем Android спросит, какое приложение открыть: выберите myCar и нажмите «Всегда». Для абордажа без кабеля сначала выполните сопряжение телефона с кораблём, затем нажмите «Абордаж без кабеля» в гавани.</string>
     <string name="help_step_screening">Отражайте неизвестные звонки до того, как они зазвонят.</string>
     <string name="help_set_up">Снарядить</string>
     <string name="help_step_audio_prompt">Долой вопрос о звуке в каждой поездке.</string>

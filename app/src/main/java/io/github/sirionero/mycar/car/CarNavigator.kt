@@ -36,6 +36,9 @@ sealed interface CarScreen {
 
     /** [replyTo] is a notification key to open straight into its reply pane. */
     data class Notifications(val replyTo: String? = null) : CarScreen
+
+    /** What the Jolly key in the dock does, to choose: held, or tapped with nothing chosen yet. */
+    data object Jolly : CarScreen
     data class App(val id: String) : CarScreen
 }
 
@@ -210,6 +213,8 @@ class CarNavigator(startId: String) {
     fun weather() { push(CarScreen.Weather, "Weather") }
 
     fun vehicleData() { push(CarScreen.VehicleData, "Vehicle data") }
+
+    fun jolly() { push(CarScreen.Jolly, "Jolly") }
 
     fun messages(packageName: String, label: String) { push(CarScreen.Messages(packageName), label) }
 

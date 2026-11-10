@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">Il telefono si carica, ma la nave non risponde all\'appello</string>
+    <string name="home_no_car_check">Se è ormeggiato alla nave, controlla:</string>
+    <string name="home_no_car_always">Quando Android chiede quale app aprire, scegli myCar e tocca Sempre: il timone passa a myCar.</string>
+
+    <string name="setup_audio_auto_effect">A ogni traversata myCar sceglie una delle due qui sotto: il Bluetooth quando la tua nave riceve così le ballate del telefono, altrimenti tramite myCar.</string>
+    <string name="setup_audio_bluetooth_effect">Nessuna domanda di Android a ogni traversata, e la radio di bordo resta accesa. Le ballate del telefono arrivano a bordo solo se la nave le riceve dal Bluetooth: alcune navi lo usano solo per le chiamate.</string>
+    <string name="setup_audio_mycar_effect">La nave riproduce l\'audio del telefono, col cavo o in Wi-Fi. A ogni traversata Android chiede di condividere lo schermo: basta un tocco per accettare. È grazie a questo permesso che myCar può passare a bordo l\'audio delle altre app.</string>
+</resources>

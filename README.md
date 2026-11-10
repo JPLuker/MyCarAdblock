@@ -247,11 +247,16 @@ behind it all — still or moving.
   connects by itself when it starts, with the phone in your pocket (Settings > Connection >
   Connect wirelessly by itself). A start that fails tries again by itself, and after a drive
   myCar keeps listening for the car for a while, so a short stop reconnects.
+- **With the cable on GrapheneOS,** the USB-C port has to let data through, or the car sees
+  only a phone to charge: in Settings > Security & privacy > Exploit protection > USB-C port,
+  Charging-only keeps the car out, and with Charging-only when locked, the default, unlock the
+  phone when you plug it in. When the phone charges but no car answers, Home says what to check.
 - **Setup is one list.** First launch shows what's needed to connect and what the drive
   needs, with a tick on what's done and one button for the next step: get the certificates,
-  then allow calls, map and music in one go. "Take me back to the initial setup", in How to
-  connect, opens the same list later, with nothing deleted or reset. A help screen inside the
-  car answers anything setup didn't cover.
+  then allow calls, map and music in one go. Car audio sits beside them, with what each way
+  means at every drive: Android's question, the car's radio. "Take me back to the initial
+  setup", in How to connect, opens the same list later, with nothing deleted or reset. A help
+  screen inside the car answers anything setup didn't cover.
 - **Templated apps work.** myCar renders all 16 template types that the Car App
   Library defines, and it draws its own keyboard for search, sign-in, and text fields.
 - **It works with [LIVI](https://github.com/f-io/LIVI),** the open-source head unit
@@ -261,7 +266,11 @@ behind it all — still or moving.
   through myCar's own player, but its sound reaches the car only over Bluetooth: it won't let
   another app pass it along. Spotify inside myCar reaches the car either way. Apps that list
   trusted hosts by package and signing certificate need to add myCar to that list; see
-  [docs/BUILDING_APPS.md](docs/BUILDING_APPS.md).
+  [docs/BUILDING_APPS.md](docs/BUILDING_APPS.md). Waze modified with Morphe accepts myCar once
+  its "Allow Gearslip" patch lists it: in the patch's "Accepted hosts" option, add a `;` and
+  `e477a4794b984927360e9ae4a31e87cb08a26c54e0e27e4334116d1c7cdccc31,io.github.sirionero.mycar`
+  after Gearslip's entry (`*,io.github.sirionero.mycar.dev` for myCar's debug build), then patch
+  Waze again. A modified Waze that refuses myCar gets a red X, and the car says what to add.
 - **myCar can't be installed next to Gearslip.** Both define the permission that car apps
   look for, and Android lets only one signing key define it. Uninstall Gearslip first.
 - **Calls use the car's Bluetooth,** as they do in Android Auto. Pair the phone with the
@@ -277,9 +286,9 @@ behind it all — still or moving.
   again". myCar never reads the screen; capturing playback is the only way an ordinary app can
   pass another app's audio along.
 - **myCar needs no adb, root, or Shizuku.** Every feature relies on an ordinary
-  Android permission or an on-device consent dialog. For sound through myCar, setup offers two
-  optional adb commands: one removes the audio dialog for good, and the other keeps
-  notifications visible while audio plays.
+  Android permission or an on-device consent dialog. For sound through myCar, How to connect
+  has two optional adb commands: one removes the audio dialog for good, and the other keeps
+  notifications visible while audio plays. Setup's car audio step shows the first one too.
 - **Updates come from GitHub.** Once a day, myCar checks this repository's latest
   release. When a new version is out, it downloads the APK, checks it against GitHub's
   SHA-256, and installs it through Android's own installer. Turn off automatic checks in

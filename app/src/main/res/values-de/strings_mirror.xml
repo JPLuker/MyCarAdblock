@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_phone_apps_way_back">Zurück zu myCar: Tippe auf die schwarzen Balken um das Telefon, drücke eine Taste des Autos (Home, Zurück, Medien …) oder tippe in der Benachrichtigung des Telefons auf Stopp.</string>
+    <string name="car_phone_apps_upright">Bis dahin bleibt das Telefon außerdem hochkant, statt sich zu drehen und den Bildschirm des Autos zu füllen.</string>
+</resources>

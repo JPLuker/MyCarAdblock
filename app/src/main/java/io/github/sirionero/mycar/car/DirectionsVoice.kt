@@ -2,6 +2,7 @@ package io.github.sirionero.mycar.car
 
 import android.content.Context
 import android.os.Bundle
+import android.os.SystemClock
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import androidx.annotation.PluralsRes
@@ -24,7 +25,9 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.math.PI
 import kotlin.math.roundToInt
+import kotlin.math.sin
 
 /**
  * Spoken turn-by-turn on the car's directions channel (the GUIDANCE audio sink).
@@ -43,9 +46,12 @@ object DirectionsVoice {
     private enum class Stage { FAR, PREPARED, DONE }
 
     private var appContext: Context? = null
-    private var tts: TextToSpeech? = null
+    @Volatile private var tts: TextToSpeech? = null
     @Volatile private var ttsReady = false
     @Volatile private var ttsFailed = false
+    /** When the engine was last made (elapsed clock), and which one it is: an older one's answer counts for nothing. */
+    @Volatile private var ttsStartedAt = 0L
+    private var engineNumber = 0
     /** The language the voice was last set to, so it's set again only when myCar's changes. */
     @Volatile private var voiceIn: Locale? = null
     private val pending = ConcurrentHashMap<String, CountDownLatch>()
@@ -62,15 +68,28 @@ object DirectionsVoice {
 
     fun init(context: Context) {
         // Started again, at the next drive, after a start that failed (no engine on the phone yet,
-        // or the engine updating just then): otherwise no turn was spoken until myCar's process went.
-        if (tts != null && !ttsFailed) return
+        // or the engine updating just then) or never answered: otherwise no turn was spoken until
+        // myCar's process went. Inside a drive, the turns do it ([restartIfDue]).
+        if (tts != null && !SpeechRestart.due(ttsReady, ttsFailed, ttsStartedAt, SystemClock.elapsedRealtime())) return
+        appContext = context.applicationContext
+        start()
+    }
+
+    /** Makes the phone's engine, the first time or anew; on the main thread. */
+    private fun start() {
         tts?.shutdown()
         voiceIn = null
-        appContext = context.applicationContext
+        ttsReady = false
+        ttsFailed = false
+        ttsStartedAt = SystemClock.elapsedRealtime()
+        val mine = ++engineNumber
         tts = TextToSpeech(appContext) { status ->
-            ttsReady = status == TextToSpeech.SUCCESS
-            ttsFailed = !ttsReady
-            if (ttsFailed) MyCarLog.w("guidance: text-to-speech didn't start (status $status) - trying again next drive")
+            // An engine made again meanwhile: what this one says is no news of it.
+            if (mine == engineNumber) {
+                ttsReady = status == TextToSpeech.SUCCESS
+                ttsFailed = !ttsReady
+                if (ttsFailed) MyCarLog.w("guidance: text-to-speech didn't start (status $status) - trying again later")
+            }
         }.apply {
             setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) {}
@@ -240,7 +259,7 @@ object DirectionsVoice {
         val engine = tts ?: return
         val context = appContext ?: return
         val sink = link ?: return
-        if (!ttsReady) {
+        if (restartIfDue() || !ttsReady) {
             MyCarLog.w("guidance: text-to-speech isn't ready, $what went unspoken")
             return
         }
@@ -259,9 +278,10 @@ object DirectionsVoice {
             pending.remove(utterance)
             refusedNow = true
             // The engine went away mid-drive (updated in the background: Android never binds it
-            // again): made anew at the next drive. Not for a text too long for any engine.
+            // again): made anew at a later turn ([restartIfDue]) or the next drive. Not for a text
+            // too long for any engine.
             if (text.length < TextToSpeech.getMaxSpeechInputLength()) {
-                MyCarLog.w("guidance: text-to-speech refused to speak - starting it again next drive")
+                MyCarLog.w("guidance: text-to-speech refused to speak - it will be started again")
                 ttsFailed = true
             }
             return
@@ -279,8 +299,24 @@ object DirectionsVoice {
         }
         // Cut while it was being made (Cancel, the microphone): nothing to start on the car's channel.
         if (!going()) return
-        stream(sink, pcm, going)
+        streamAsked(sink, pcm, going)
         MyCarLog.i("guidance: spoke $what (${pcm.size / (2 * sink.channels) * 1000 / sink.sampleRate} ms)")
+    }
+
+    /**
+     * [stream], with the car's speakers asked for around it when they aren't myCar's - the radio, the
+     * phone's Bluetooth music, the radio kept until the phone plays: the car lowers its own source
+     * under the words and brings it back after, as with Android Auto (see AudioLink.askForSpeakers).
+     * With the music myCar's, the car mixes the words into it as before.
+     */
+    private fun streamAsked(sink: AudioLink, pcm: ByteArray, going: () -> Boolean) {
+        val asked = sink.askForSpeakers()
+        try {
+            // Not cut while the car answered.
+            if (going()) stream(sink, pcm, going)
+        } finally {
+            if (asked) sink.handBackSpeakers()
+        }
     }
 
     /**
@@ -312,6 +348,74 @@ object DirectionsVoice {
                 main.post { done(cut, refused) }
             }
         }
+        return true
+    }
+
+    /**
+     * The assistant's listening cue on the car's channel for spoken prompts, for when the phone's own
+     * sound doesn't reach the car (see CarAssistant): played, and waited for up to [CUE_WAIT_MS]. A
+     * turn being said keeps the channel longer: the cue is skipped then, not heard over the driver.
+     * False when the car gave no such channel: the cue sounds on the phone as before.
+     */
+    fun cueForAssistant(): Boolean {
+        val sink = link ?: return false
+        val turn = cueTurn.incrementAndGet()
+        val done = CountDownLatch(1)
+        speaker.execute {
+            try {
+                if (turn == cueTurn.get() && link === sink) {
+                    streamAsked(sink, cue(sink.sampleRate, sink.channels), going = { turn == cueTurn.get() })
+                }
+            } catch (e: Exception) {
+                MyCarLog.w("guidance: could not play the listening cue: ${e.message}")
+            } finally {
+                done.countDown()
+            }
+        }
+        if (!runCatching { done.await(CUE_WAIT_MS, TimeUnit.MILLISECONDS) }.getOrDefault(false)) {
+            cueTurn.incrementAndGet()
+            MyCarLog.i("guidance: the channel was busy - no listening cue")
+        }
+        return true
+    }
+
+    /** The cue on the car's channel now; any other number, it's over or skipped. */
+    private val cueTurn = java.util.concurrent.atomic.AtomicInteger()
+
+    /**
+     * The phone's listening beep (Android's general beep: 400 and 1200 Hz for 35 ms) at the channel's
+     * rate, after a moment of quiet for the car to lower its own source, faded in and out so it
+     * doesn't click.
+     */
+    private fun cue(rate: Int, channels: Int): ByteArray {
+        val lead = rate * CUE_LEAD_MS / 1000
+        val tone = rate * CUE_TONE_MS / 1000
+        val fade = maxOf(1, rate * CUE_FADE_MS / 1000)
+        val out = ByteBuffer.allocate((lead + tone) * channels * 2).order(ByteOrder.LITTLE_ENDIAN)
+        repeat(lead * channels) { out.putShort(0) }
+        for (i in 0 until tone) {
+            val t = i.toDouble() / rate
+            val edge = minOf(1.0, minOf(i, tone - 1 - i).toDouble() / fade)
+            val v = (sin(2 * PI * 400 * t) + sin(2 * PI * 1200 * t)) / 2 * CUE_LEVEL * edge
+            val s = (v * Short.MAX_VALUE).roundToInt().toShort()
+            repeat(channels) { out.putShort(s) }
+        }
+        return out.array()
+    }
+
+    /**
+     * The engine made again when it can't speak and its last start has had its time ([SpeechRestart]):
+     * a start that never answered or said no, an engine that refused (updated in the background).
+     * On the speaker's thread; the engine is made on the main one. True while it's being made: this
+     * turn goes unspoken, the next ones not.
+     */
+    private fun restartIfDue(): Boolean {
+        if (!SpeechRestart.due(ttsReady, ttsFailed, ttsStartedAt, SystemClock.elapsedRealtime())) return false
+        // Marked here, at once: the next turn neither starts it a second time nor speaks with the one going.
+        ttsStartedAt = SystemClock.elapsedRealtime()
+        ttsReady = false
+        MyCarLog.i("guidance: starting text-to-speech again")
+        main.post(::start)
         return true
     }
 
@@ -437,6 +541,12 @@ object DirectionsVoice {
     private const val PREPARE_AT_METERS = 1_000
     private const val LEAD_MS = 100L
     private const val SYNTH_TIMEOUT_S = 10L
+    /** The listening cue: how long the assistant waits for it at most, its quiet lead, the beep, its fades, its level. */
+    private const val CUE_WAIT_MS = 1_500L
+    private const val CUE_LEAD_MS = 100
+    private const val CUE_TONE_MS = 35
+    private const val CUE_FADE_MS = 3
+    private const val CUE_LEVEL = 0.5
     /** The roundabout's exits, as directions_roundabout_exit says them. */
     private val ORDINALS = listOf(
         R.string.directions_ordinal_1, R.string.directions_ordinal_2, R.string.directions_ordinal_3, R.string.directions_ordinal_4,

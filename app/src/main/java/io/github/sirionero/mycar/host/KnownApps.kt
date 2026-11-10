@@ -69,13 +69,19 @@ object KnownApps {
         "com.generalmagic.magicearth",       // Magic Earth: never gets past connecting
     )
 
+    /** Broken, unless it's a modified copy ([modified]) that hasn't turned myCar down ([PatchRefusals]). */
     fun isBroken(context: Context, packageName: String): Boolean =
-        packageName in broken && !patched(context, packageName)
+        packageName in broken && (!patched(context, packageName) || PatchRefusals.refused(context, packageName))
+
+    /** A copy of a broken app signed by someone other than its publisher: modified, maybe to accept other hosts. */
+    fun modified(context: Context, packageName: String): Boolean =
+        packageName in broken && patched(context, packageName)
 
     /**
      * The certificate each broken app's own publisher signs it with. A copy signed with another
-     * key has been patched to accept Gearslip, like Waze with the waze-gearslip Morphe patch, and
-     * works.
+     * key has been patched, often to accept other hosts, like Waze with the waze-gearslip Morphe
+     * patch, and counts as working until it refuses myCar. The car's words for that refusal speak
+     * of Waze's patch (CarAppConnection): another app here needs its own.
      */
     private val officialSigners = mapOf(
         "com.waze" to "03637f6c5d8f604e6fdb79a6ffbfa578de4e318f8da22fc6106665247f8807d7",

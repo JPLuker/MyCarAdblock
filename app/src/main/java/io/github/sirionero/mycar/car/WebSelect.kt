@@ -146,7 +146,7 @@ internal object WebSelect {
  * then Done. Under a call's question, over everything else.
  */
 @Composable
-internal fun WebSelectSheet(modifier: Modifier = Modifier) {
+internal fun WebSelectSheet() {
     val ask by WebSelect.asked.collectAsState()
     val a = ask ?: return
     val scheme = MaterialTheme.colorScheme
@@ -163,7 +163,7 @@ internal fun WebSelectSheet(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
     ) {
         Column(
-            modifier
+            Modifier
                 .widthIn(max = 560.dp)
                 .fillMaxSize()
                 .padding(MyCarSpace.L)

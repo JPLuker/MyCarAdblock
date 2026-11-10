@@ -28,14 +28,14 @@
     <string name="help_in_the_car">在车上</string>
     <string name="help_sound_through_mycar">通过 myCar 传输声音</string>
     <string name="help_step_connect">插上数据线，或无线连接。</string>
-    <string name="help_step_connect_detail">汽车连接后，myCar 会自动打开。如需无线连接，请先将手机与汽车配对，然后在主页上点按“无线连接”。</string>
+    <string name="help_step_connect_detail">汽车连接后，myCar 会自动打开。第一次用数据线连接时，Android 会询问要打开哪个应用：选择 myCar，然后点按“始终”。如需无线连接，请先将手机与汽车配对，然后在主页上点按“无线连接”。</string>
     <string name="help_step_pair">通过蓝牙配对，用于通话。</string>
     <string name="help_step_pair_detail">手机与汽车配对后，通话会通过汽车播放。首次插上数据线时，myCar 会提议配对。</string>
     <string name="help_step_screening">在响铃前拒接陌生来电。</string>
     <string name="help_step_screening_detail">把 myCar 设为“来电显示和骚扰电话应用”。如果不设置，汽车仍会显示每个来电，你可以在车上接听或拒接。</string>
     <string name="help_set_up">设置</string>
     <string name="help_step_audio_prompt">不再每次行车都询问音频。</string>
-    <string name="help_step_audio_prompt_detail">在手机上开启 USB 调试，连接到电脑，然后运行一次这条命令。如果跳过，每次出发时都要点按“开始”。</string>
+    <string name="help_step_audio_prompt_detail">在手机上开启 USB 调试，连接到电脑，然后运行一次这条命令。如果跳过，每次出发时都要点按一下，接受 Android 的询问。</string>
     <string name="help_step_notifications">让通知内容保持可读。</string>
     <string name="help_step_notifications_detail">共享音频时，Android 会隐藏通知的内容。同时运行这条命令后，myCar 只会在音乐传到车上时解除隐藏。</string>
     <string name="help_tap_to_copy">点按即可复制</string>

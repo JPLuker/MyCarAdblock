@@ -56,8 +56,13 @@ object MyCarPalette {
     val Positive = Color(0xFF32D46B)
     val Negative = Color(0xFFFF4D45)
     val Warning = Color(0xFFFFB020)
+    // Words in green or amber on a light surface, where the two above are too pale to read.
+    val PositiveOnLight = Color(0xFF137A3C)
+    val WarningOnLight = Color(0xFF995800)
     val Indigo = Color(0xFF6C63FF)
     val Graphite = Color(0xFF6B6B72)
+    /** The Jolly key's: a touch of magic, apart from every app's colour in the dock. */
+    val Violet = Color(0xFFA855F7)
 }
 
 /** Corner radii. App icons use [Icon] as a fraction of their side, the rest are fixed. */
@@ -68,6 +73,8 @@ object MyCarRadius {
     val Button = 14.dp
     val Card = 16.dp
     val Sheet = 22.dp
+    /** A panel of a split screen (see Panels.kt): rounder than a card, as it's much bigger. */
+    val Panel = 24.dp
 }
 
 /** The spacing scale. Nothing in the car UI should need a value between these. */
@@ -78,6 +85,21 @@ object MyCarSpace {
     val L = 16.dp
     val XL = 24.dp
     val XXL = 32.dp
+    /** Between the panels of a split screen and round them: small, as an 800x480 screen has little room. */
+    val Panel = S
+}
+
+/** How the panels of a split screen stand off the wallpaper (see Panels.kt). */
+object MyCarLift {
+    /** How far a panel's shadow reaches round it: no further than the gap, so it never falls on the next one. */
+    val ShadowSpread = MyCarSpace.Panel
+    /** How much lower than the panel its shadow is: light from above. */
+    val ShadowDrop = 2.dp
+    /** How dark the shadow is against the panel: deeper on a dark screen, where it's harder to see. */
+    const val SHADOW_DARK = 0.5f
+    const val SHADOW_LIGHT = 0.2f
+    /** The rim of light along a panel's edge. */
+    val Rim = 1.dp
 }
 
 /** Fixed sizes: touch targets, the dock, app icons. */

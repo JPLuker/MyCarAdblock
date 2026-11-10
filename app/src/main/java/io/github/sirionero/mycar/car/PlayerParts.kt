@@ -144,11 +144,12 @@ internal fun PlayModeRow(
     val icon = size * 0.52f
     Row(modifier, horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
         // An app's own like, shuffle or repeat button shows whether it's on only through its icon,
-        // so that icon is drawn, as Android Auto does, and lit when its name says it's on.
+        // so that icon is drawn, as Android Auto does, and lit when it says it's on (the like also
+        // when its name says which way it goes next: NowPlaying.liked).
         // myCar's own stand in for apps that report a heart rating or shuffle and repeat modes.
         val likeAction = now.likeAction
         if (likeAction != null) {
-            CustomActionButton(likeAction, media, size, toggle = true)
+            CustomActionButton(likeAction, media, size, on = liked == true)
         } else {
             PlainButton(media::toggleLike, stringResource(if (liked == true) R.string.car_player_unlike else R.string.car_player_like), size, enabled = liked != null) {
                 Icon(
@@ -161,7 +162,7 @@ internal fun PlayModeRow(
         }
         val shuffleAction = now.shuffleAction
         if (shuffleAction != null) {
-            CustomActionButton(shuffleAction, media, size, toggle = true)
+            CustomActionButton(shuffleAction, media, size, on = shuffleAction.on)
         } else {
             PlainButton(
                 media::toggleShuffle, stringResource(if (shuffleOn) R.string.car_player_shuffle_off else R.string.car_player_shuffle_on), size,
@@ -172,7 +173,7 @@ internal fun PlayModeRow(
         }
         val repeatAction = now.repeatAction
         if (repeatAction != null) {
-            CustomActionButton(repeatAction, media, size, toggle = true)
+            CustomActionButton(repeatAction, media, size, on = repeatAction.on)
         } else {
             PlainButton(media::cycleRepeat, stringResource(R.string.car_player_repeat), size, enabled = repeatKnown, lit = repeatOn) {
                 Icon(
@@ -192,9 +193,9 @@ internal fun PlayModeRow(
  * not myCar's, so it's loaded from there. Its name stands in if the icon won't load.
  */
 @Composable
-private fun CustomActionButton(action: CustomAction, media: CarMedia, size: Dp, toggle: Boolean = false) {
+private fun CustomActionButton(action: CustomAction, media: CarMedia, size: Dp, on: Boolean = false) {
     val icon = rememberActionIcon(action)
-    PlainButton({ media.custom(action) }, action.name, size, lit = toggle && action.on) {
+    PlainButton({ media.custom(action) }, action.name, size, lit = on) {
         if (icon != null) {
             Icon(icon, null, Modifier.size(size * 0.52f))
         } else {

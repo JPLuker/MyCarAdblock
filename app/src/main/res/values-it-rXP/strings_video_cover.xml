@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">Issa la copertina video</string>
+    <string name="car_player_video_cover_off">Ammaina la copertina video</string>
+    <string name="car_player_video_cover_now_on">Copertina video issata, per le ballate che ce l\'hanno</string>
+    <string name="car_player_video_cover_now_off">Copertina ferma all\'àncora</string>
+    <string name="car_settings_cover">Copertina nell\'organetto</string>
+    <string name="car_settings_cover_note">Alcune ballate hanno un breve video in loop, come i Canvas di Spotify. Con Video l\'organetto accanto alla mappa lo mostra al posto della copertina. Lo cambia anche il tasto sulla copertina.</string>
+    <string name="music_video_cover">Copertina video a bordo</string>
+    <string name="music_video_cover_detail">Nell\'organetto della nave accanto alla mappa, il breve video in loop che hanno alcune ballate (i Canvas di Spotify), al posto della copertina. Lo cambia anche il tasto sulla copertina a bordo. Ogni video consuma qualche megabyte di dati.</string>
+</resources>

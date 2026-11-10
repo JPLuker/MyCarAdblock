@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">Le téléphone charge, mais le navire ne répond pas à l’appel</string>
+    <string name="home_no_car_check">S’il est amarré au navire, vérifiez :</string>
+    <string name="home_no_car_always">Quand Android demande quelle app ouvrir, choisissez myCar et appuyez sur Toujours : myCar prend la barre.</string>
+
+    <string name="setup_audio_auto_effect">À chaque traversée, myCar choisit l’une des deux options ci-dessous : le Bluetooth si votre navire reçoit ainsi les chants du téléphone, sinon via myCar.</string>
+    <string name="setup_audio_bluetooth_effect">Aucune demande d’Android à chaque traversée, et la radio de bord reste allumée. Les chants du téléphone n’arrivent à bord que si le navire les reçoit par le Bluetooth : certains navires n’acceptent que les appels par ce biais.</string>
+    <string name="setup_audio_mycar_effect">Le navire diffuse le son du téléphone, par le câble ou le Wi-Fi. À chaque traversée, Android demande de partager l’écran : un appui suffit pour accepter. C’est cette autorisation qui permet à myCar de transmettre le son de vos autres apps.</string>
+</resources>

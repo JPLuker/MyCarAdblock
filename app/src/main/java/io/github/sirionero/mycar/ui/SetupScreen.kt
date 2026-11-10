@@ -353,6 +353,11 @@ fun SetupScreen(entry: SetupEntry, onDone: () -> Unit, onRequestCallScreening: (
                     else -> Button(onClick = ::allowDrive) { Text(stringResource(R.string.common_allow)) }
                 }
             }
+            // With the drive, not folded away in More: it decides Android's question at each drive and
+            // whether the car's radio stays. A choice is always made (Automatic), so it never holds up Done.
+            StepCard(stringResource(R.string.setup_audio_title), Status.DONE, body = stringResource(R.string.setup_audio_body)) {
+                SetupAudioChoice()
+            }
 
             MoreSection(
                 steps = steps,
@@ -489,9 +494,6 @@ private fun MoreSection(
         if (status(Id.SCREENING) != Status.DONE) Button(onClick = onScreening) { Text(stringResource(R.string.setup_screening_button)) }
     }
     VoiceStep()
-    StepCard(stringResource(R.string.setup_audio_title), Status.DONE, body = stringResource(R.string.setup_audio_body)) {
-        AudioChoice()
-    }
     if (UsageStats.sends) {
         StepCard(stringResource(R.string.setup_usage_title), if (UsageStats.asked(context)) Status.DONE else Status.TODO, body = USAGE_STATS_INTRO.text) {
             UsageStatsChoices()

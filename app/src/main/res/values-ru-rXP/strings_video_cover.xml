@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="car_player_video_cover_on">Поднять видеообложку</string>
+    <string name="car_player_video_cover_off">Спустить видеообложку</string>
+    <string name="car_player_video_cover_now_on">Видеообложка поднята — для песен, у которых она есть</string>
+    <string name="car_player_video_cover_now_off">Обложка стоит на якоре</string>
+    <string name="car_settings_cover">Обложка в шарманке</string>
+    <string name="car_settings_cover_note">У некоторых песен есть короткое зацикленное видео, как Canvas в Spotify. С вариантом «Видео» шарманка рядом с картой показывает его вместо обложки. Кнопка на обложке тоже это переключает.</string>
+    <string name="music_video_cover">Видеообложка на борту</string>
+    <string name="music_video_cover_detail">В шарманке корабля рядом с картой — короткое зацикленное видео, которое есть у некоторых песен (Canvas в Spotify), вместо обложки. Кнопка на обложке на борту тоже это переключает. Каждое видео — несколько мегабайт трафика.</string>
+</resources>

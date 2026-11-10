@@ -32,6 +32,18 @@ object CarAudio {
         fun start()
         fun stop()
         fun write(pcm: ByteArray, size: Int)
+
+        /** Streaming: the car plays what the phone sends. */
+        val streaming: Boolean get() = false
+
+        /** The car's speakers are the sink's, asked for, or held by the car for a moment (a call, its own voice). */
+        val speakersAsked: Boolean get() = streaming
+
+        /**
+         * The capture is on: the speakers asked for now ([start]), unless the car keeps its own
+         * source until a player plays (see AudioLink.captureOn).
+         */
+        fun captureOn(radioFirst: Boolean) = start()
     }
 
     enum class Capture { OFF, ASKING, ON, DENIED }
@@ -92,11 +104,31 @@ object CarAudio {
     val sampleRate get() = link?.sampleRate ?: 48_000
     val channels get() = link?.channels ?: 2
 
+    /**
+     * The car plays myCar's media stream now: its speakers are myCar's, and what the phone plays is
+     * heard there. Not after the driver picked the car's radio, nor before the first song while the
+     * radio stays until the phone plays ([io.github.sirionero.mycar.car.CarSettings.radioFirst]).
+     */
+    val speakersOurs: Boolean get() = link?.streaming == true
+
+    /** The media sink has the car's speakers, has asked for them, or the car holds them for a moment. */
+    val speakersAsked: Boolean get() = link?.speakersAsked == true
+
+    /**
+     * Whether a player is really playing on the phone - not a map's voice, a web page or the
+     * assistant: only its sound takes the car's speakers from the radio (see AudioLink). Set by the
+     * car session; any sound counts until then, as it always did.
+     */
+    @Volatile var playerPlaying: () -> Boolean = { true }
+
+    /** The driver keeps the car's radio until the phone plays (see AudioLink.captureOn). */
+    private fun radioFirst() = io.github.sirionero.mycar.car.CarSettings.radioFirst.value
+
     fun attach(link: Link) {
         this.link = link
         MyCarLog.i("audio: the car offered a sink at ${link.sampleRate}Hz x${link.channels}")
         when {
-            _capture.value == Capture.ON -> link.start()
+            _capture.value == Capture.ON -> link.captureOn(radioFirst())
             wanted && consentWaits() -> MyCarLog.i("audio: the car's music is myCar's own - Android isn't asked for now")
             // Not again while the question is up, nor after a "no" this drive.
             wanted && _capture.value == Capture.OFF -> ask()
@@ -156,6 +188,9 @@ object CarAudio {
     private fun updateDirect() {
         _direct.value = wanted && link != null
     }
+
+    /** myCar's own music reaching the car now, or a moment ago (see DirectFeed.feeding): the capture hears none of it. */
+    internal val ownMusicFeeding: Boolean get() = feed?.feeding == true
 
     private fun ask() {
         _capture.value = Capture.ASKING
@@ -253,7 +288,7 @@ object CarAudio {
 
     internal fun captureStarted() {
         _capture.value = Capture.ON
-        link?.start()
+        link?.captureOn(radioFirst())
     }
 
     internal fun captureStopped() {

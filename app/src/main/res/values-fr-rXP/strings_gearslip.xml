@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Changes ported from Gearslip 0.3.32-0.3.40 -->
+<resources>
+    <!-- In the car, a button of AntennaPod in the full-screen player (media/CarMedia.kt,
+         withNextChapter): goes to the podcast episode's next chapter. Short: it is also
+         the button's description, and its text when AntennaPod's icon can't be shown -->
+    <string name="car_player_next_chapter">Cap sur le chapitre suivant</string>
+    <!-- Phone, Settings > Connection (ui/PhoneAddressRow.kt): the phone's own Bluetooth address,
+         written by hand (Android hides it from apps), sent to a car already paired with the phone.
+         The row's title, the line under it when none is written, the line under the field in its
+         dialog (where Android shows it: use the names Android gives these pages in your language),
+         and the error when what's written isn't an address -->
+    <string name="settings_phone_bt_address">Adresse Bluetooth de votre téléphone</string>
+    <string name="settings_phone_bt_address_off">Non définie. Seulement pour un navire qui coupe le Bluetooth du téléphone, ou largue les amarres, quand myCar l\'aborde.</string>
+    <string name="settings_phone_bt_address_hint">Dans les Paramètres d\'Android &gt; À propos du téléphone (sur certains téléphones, sous État) : Adresse Bluetooth. myCar la donne à un navire déjà associé au téléphone, pour qu\'il sache que c\'est le même vieux téléphone.</string>
+</resources>

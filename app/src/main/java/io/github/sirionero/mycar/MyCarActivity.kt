@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
+import android.os.SystemClock
 import android.provider.Settings
 import android.view.MotionEvent
 import android.view.Surface
@@ -82,12 +83,17 @@ class MyCarActivity : ComponentActivity(), Projection {
         if (result.resultCode == RESULT_OK && data != null) {
             // Answered once the car had gone: there's no screen to share with.
             if (surface != null) {
-                // Android keeps one projection: sharing the screen ends the one that sends the
-                // phone's sound to the car, which unmutes the phone. The music pauses first, rather
-                // than carrying on out of the phone's speaker for the whole sharing.
+                // Android keeps one projection: the sharing's takes the place of the one that sends the
+                // phone's sound to the car. The capture moves onto the sharing's, and the music carries
+                // on in the car. Where it can't, the music pauses first, rather than carrying on out of
+                // the phone's speaker, unmuted, for the whole sharing.
                 if (CarAudio.capture.value == CarAudio.Capture.ON) {
-                    io.github.sirionero.mycar.car.CarServices.pausePhoneMedia("screen sharing", keep = packageName)
-                    io.github.sirionero.mycar.car.CarToasts.show(this, Words.get(R.string.activity_toast_music_pauses_sharing), androidx.car.app.CarToast.LENGTH_LONG)
+                    val follows = AudioCaptureService.followSharing()
+                    if (!follows) io.github.sirionero.mycar.car.CarServices.pausePhoneMedia("screen sharing", keep = packageName)
+                    // The car says so when its music stops all the same: a web player's page goes with the car's screen.
+                    if (!follows || webMusicPlaying()) {
+                        io.github.sirionero.mycar.car.CarToasts.show(this, Words.get(R.string.activity_toast_music_pauses_sharing), androidx.car.app.CarToast.LENGTH_LONG)
+                    }
                 }
                 MirrorService.start(this, result.resultCode, data)
             } else {
@@ -97,6 +103,10 @@ class MyCarActivity : ComponentActivity(), Projection {
             MyCarLog.w("screen capture consent declined")
         }
     }
+
+    /** A music service's web player plays, on the car's screen, which a screen sharing takes down. */
+    private fun webMusicPlaying(): Boolean =
+        io.github.sirionero.mycar.webmusic.WebMusic.on.value.any { io.github.sirionero.mycar.webmusic.WebMusicPlayer.state(it).value.playing }
 
     /** Media audio needs the microphone permission (a platform rule for playback capture) first. */
     private val audioPermission = registerForActivityResult(
@@ -122,14 +132,19 @@ class MyCarActivity : ComponentActivity(), Projection {
 
     private val audioConsent = registerForActivityResult(StartActivityForResult()) { result ->
         questionUp = false
+        // How long the answer took: within a few hundred ms no window showed (Android allowed it for
+        // good, with the adb command in the help); seconds, the driver tapped Start.
+        val waited = audioAskedAt.takeIf { it > 0L }?.let { "${SystemClock.elapsedRealtime() - it} ms" } ?: "an unknown time"
+        audioAskedAt = 0L
         val data = result.data
         if (result.resultCode == RESULT_OK && data != null) {
+            MyCarLog.i("audio: Android said yes after $waited")
             // Answered after the car went away, or after the sound moved to Bluetooth: starting now
             // would mute the phone and send its music nowhere.
             if (CarAudio.stillWanted) AudioCaptureService.start(this, result.resultCode, data)
             else MyCarLog.i("audio: capture allowed, but the car no longer wants it")
         } else {
-            MyCarLog.w("audio: capture consent declined")
+            MyCarLog.w("audio: Android said no after $waited - capture consent declined")
             CarAudio.denied()
             // Only when the driver picked "through myCar" by hand. Automatic chose it because the car
             // takes no music over Bluetooth: offering Bluetooth would leave every drive silent.
@@ -495,9 +510,12 @@ class MyCarActivity : ComponentActivity(), Projection {
             manager.createScreenCaptureIntent()
         }
         questionUp = true
+        audioAskedAt = SystemClock.elapsedRealtime()
+        MyCarLog.i("audio: Android's question asked")
         runCatching { audioConsent.launch(intent) }
             .onFailure {
                 questionUp = false
+                audioAskedAt = 0L
                 MyCarLog.e("could not ask for audio capture", it)
                 CarAudio.denied()
             }
@@ -551,11 +569,17 @@ class MyCarActivity : ComponentActivity(), Projection {
         }
         screenProjector?.stop()
         screenProjector = null
-        // Sharing the phone's screen stops the web music, as it stops the sound's capture: not again
-        // when the car's screen comes back.
+        // Sharing the phone's screen stops the web music, whose pages go with the car's screen, and the
+        // sound's capture ends with the sharing: not again when the car's screen comes back.
         WebMusicPlayer.resumeAfterRebuild = emptyList()
         PhoneMirror.begin(token, target, frameWidth, frameHeight, frameDensity)
-        if (PhoneMirror.active.value) PhoneMirror.launchPending(this) else showCarUi()
+        if (PhoneMirror.active.value) {
+            // The capture of the phone's sound, if it waits for this projection, carries on on it.
+            AudioCaptureService.follow(token)
+            PhoneMirror.launchPending(this)
+        } else {
+            showCarUi()
+        }
     }
 
     private fun showCarUi() {
@@ -725,6 +749,7 @@ class MyCarActivity : ComponentActivity(), Projection {
             vehicleProfileFor = { info -> VehicleProfiles.find(VehicleProfiles.load(this), info) },
             onCertVerdict = { identity, verdict -> CertRotation.report(applicationContext, identity, verdict) },
             certAcceptedBefore = { CertRotation.acceptedBefore(applicationContext, it) },
+            phoneIcons = { PhoneIcons.pngs(applicationContext) },
         )
         this.runner = runner
         worker = runSession(runner)
@@ -792,6 +817,7 @@ class MyCarActivity : ComponentActivity(), Projection {
             onCertVerdict = { identity, verdict -> CertRotation.report(applicationContext, identity, verdict) },
             certAcceptedBefore = { CertRotation.acceptedBefore(applicationContext, it) },
             closeTransport = { socket.close() },
+            phoneIcons = { PhoneIcons.pngs(applicationContext) },
         )
         this.runner = runner
         worker = runSession(runner)
@@ -900,7 +926,9 @@ class MyCarActivity : ComponentActivity(), Projection {
         // car showed: a start-up that ended before the picture - the car's Android Auto not ready
         // yet, a certificate turned down, and each start-over after them - paused the phone's
         // music, often playing on the car's Bluetooth.
-        if (surface != null) io.github.sirionero.mycar.car.CarServices.pausePhoneMedia()
+        // Looked at again 2 s later, unless a new drive is under way by then: an app can start again
+        // by itself, out of the phone's speaker.
+        if (surface != null) io.github.sirionero.mycar.car.CarServices.pausePhoneMedia(again = io.github.sirionero.mycar.car.CarServices::noDriveUnderWay)
         runOnUiThread {
             PhoneMirror.requestStop()
             io.github.sirionero.mycar.car.CarKeys.focusSink = null
@@ -918,6 +946,9 @@ class MyCarActivity : ComponentActivity(), Projection {
 
 /** The myCar screen that holds the drive and myCar's hooks: a second one hands it its intent and goes. */
 private var current: java.lang.ref.WeakReference<MyCarActivity>? = null
+
+/** When Android's audio question went up (elapsed clock), for the line with its answer; 0 with none up. */
+private var audioAskedAt = 0L
 
 /**
  * The car came up over Bluetooth (WirelessAuto): straight to the myCar screen already open, in front

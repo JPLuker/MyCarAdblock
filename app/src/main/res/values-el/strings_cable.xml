@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_no_car_title">Το τηλέφωνο φορτίζει, αλλά το αυτοκίνητο δεν απαντά</string>
+    <string name="home_no_car_check">Αν είναι συνδεδεμένο στο αυτοκίνητο, ελέγξτε:</string>
+    <string name="home_no_car_cable">Χρησιμοποιήστε καλώδιο που μεταφέρει δεδομένα: μερικά μόνο φορτίζουν.</string>
+    <string name="home_no_car_always">Όταν το Android ρωτήσει ποια εφαρμογή να ανοίξει, επιλέξτε το myCar και πατήστε «Πάντα».</string>
+    <string name="usb_c_graphene">Το GrapheneOS μπορεί να απενεργοποιήσει τα δεδομένα στη θύρα USB-C, και τότε το αυτοκίνητο βλέπει μόνο ένα τηλέφωνο για φόρτιση. Στις Ρυθμίσεις &gt; Ασφάλεια και απόρρητο &gt; Exploit protection &gt; USB-C port, το Charging-only αφήνει το αυτοκίνητο απέξω· με το Charging-only when locked, την προεπιλογή, ξεκλειδώστε το τηλέφωνο όταν το συνδέετε.</string>
+
+    <string name="help_step_usb_c">Στο GrapheneOS, αφήστε τα δεδομένα να περνούν από τη θύρα USB-C.</string>
+
+    <string name="setup_audio_auto_effect">Σε κάθε διαδρομή το myCar διαλέγει έναν από τους δύο τρόπους παρακάτω: Bluetooth όταν το αυτοκίνητό σας παίρνει έτσι τη μουσική του τηλεφώνου, αλλιώς μέσω του myCar.</string>
+    <string name="setup_audio_bluetooth_effect">Καμία ερώτηση από το Android σε κάθε διαδρομή, και το ραδιόφωνο του αυτοκινήτου συνεχίζει να παίζει. Η μουσική του τηλεφώνου φτάνει στο αυτοκίνητο μόνο αν το αυτοκίνητο την παίρνει από το Bluetooth: μερικά αυτοκίνητα δέχονται από εκεί μόνο κλήσεις.</string>
+    <string name="setup_audio_mycar_effect">Το αυτοκίνητο αναπαράγει τον ήχο του τηλεφώνου, με το καλώδιο ή το Wi-Fi. Σε κάθε διαδρομή το Android ζητά κοινή χρήση της οθόνης: αρκεί ένα πάτημα για αποδοχή. Αυτή η άδεια επιτρέπει στο myCar να μεταφέρει τον ήχο των άλλων εφαρμογών σας.</string>
+</resources>

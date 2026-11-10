@@ -33,7 +33,7 @@
     <string name="car_settings_web_page_note">La mostra l\'app Browser dalla prossima volta che si apre, e un browser nelle tue pagine dalla prossima traversata.</string>
     <string name="car_settings_screen_fit">Assetto dello schermo</string>
     <string name="car_settings_save_for_vehicle">Salva per questa nave</string>
-    <string name="car_settings_no_vehicle_profile">Nessun profilo per questa nave</string>
+    <string name="car_settings_no_vehicle_profile">Nessun profilo in stiva: usa le misure della nave</string>
 
     <string name="car_whatsnew_title">Bottino della %1$s</string>
     <string name="car_whatsnew_show_after_updates">Svela dopo gli aggiornamenti</string>

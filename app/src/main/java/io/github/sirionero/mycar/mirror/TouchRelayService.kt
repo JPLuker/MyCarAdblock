@@ -44,53 +44,57 @@ class TouchRelayService : AccessibilityService() {
         // Bound by Android with BIND_ALLOW_BACKGROUND_ACTIVITY_STARTS: the car map's location service may start now.
         io.github.sirionero.mycar.host.LocationKeepAlive.retry(this, "the accessibility service is on")
         // Switched on while the phone was already showing in the car.
-        if (PhoneMirror.active.value) holdLandscape(true)
+        if (PhoneMirror.active.value) holdTurned(PhoneMirror.upright)
     }
 
     override fun onDestroy() {
-        holdLandscape(false)
+        letTurn()
         super.onDestroy()
         instance = null
         reset()
     }
 
-    /** One transparent pixel that asks Android to keep the phone on its side: see [holdLandscape]. */
-    private var sideways: View? = null
+    /** One transparent pixel that asks Android to hold the phone turned one way: see [holdTurned]. */
+    private var holder: View? = null
 
     /**
-     * Turns the phone landscape while [PhoneMirror] shows it in the car, whose screen is wide, so
-     * apps fill it instead of standing upright between two bars. It's a one-pixel window of
-     * nothing that asks for landscape, which Android puts ahead of the app on screen; removing
-     * it lets the phone turn back. Fixed landscape, not the sensor's: turning the phone in its
-     * holder mustn't flip the car's picture. Apps that only work upright stay upright, boxed in
-     * the middle as before.
+     * Turns the phone to the shape of the car's picture while [PhoneMirror] shows it there, so apps
+     * fill it instead of standing small between two bars: on its side for a wide picture, as most
+     * cars' are, [upright] for a tall one. It's a one-pixel window of nothing that asks for that
+     * orientation, which Android puts ahead of the app on screen; removing it ([letTurn]) lets the
+     * phone turn back. Fixed, not the sensor's: turning the phone in its holder mustn't flip the
+     * car's picture. Apps that only work the other way stay that way, boxed in the middle as
+     * before. The same window keeps the phone's screen on while the car shows it.
      */
-    fun holdLandscape(on: Boolean) {
+    fun holdTurned(upright: Boolean) {
         val windows = getSystemService(WindowManager::class.java) ?: return
-        if (!on) {
-            val view = sideways ?: return
-            sideways = null
-            runCatching { windows.removeView(view) }
-            MyCarLog.i("mirror: phone free to turn again")
-            return
-        }
-        if (sideways != null) return
+        if (holder != null) return
         val view = View(this)
         val params = WindowManager.LayoutParams(
             1, 1,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
             PixelFormat.TRANSPARENT,
         ).apply {
             gravity = Gravity.TOP or Gravity.START
-            screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            screenOrientation = if (upright) ActivityInfo.SCREEN_ORIENTATION_PORTRAIT else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         }
+        val way = if (upright) "upright" else "landscape"
         runCatching { windows.addView(view, params) }
             .onSuccess {
-                sideways = view
-                MyCarLog.i("mirror: phone held landscape")
+                holder = view
+                MyCarLog.i("mirror: phone held $way")
             }
-            .onFailure { MyCarLog.w("mirror: couldn't turn the phone landscape: ${it.message}") }
+            .onFailure { MyCarLog.w("mirror: couldn't hold the phone $way: ${it.message}") }
+    }
+
+    /** Takes the window of [holdTurned] away: the phone turns as it likes again. */
+    fun letTurn() {
+        val view = holder ?: return
+        holder = null
+        runCatching { getSystemService(WindowManager::class.java)?.removeView(view) }
+        MyCarLog.i("mirror: phone free to turn again")
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit

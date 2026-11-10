@@ -28,7 +28,8 @@ data class Caller(val number: String, val name: String?) {
 sealed interface CallUiState {
     data object None : CallUiState
     data class Ringing(val caller: Caller, val canDecline: Boolean) : CallUiState
-    data class Active(val caller: Caller?) : CallUiState
+    /** [since]: when it got under way, on [android.os.SystemClock.elapsedRealtime]'s clock (0: not known), for the time its pill shows. */
+    data class Active(val caller: Caller?, val since: Long = 0L) : CallUiState
 }
 
 /**
@@ -68,6 +69,16 @@ object CarCalls {
     /** The ringing call was answered from the car. */
     private var answeredHere = false
 
+    /** When the call under way started, on the elapsedRealtime clock; 0 with none, or not known. */
+    private var activeSince = 0L
+
+    /** The phone's first word once watched: a call under way then started before myCar watched, at a time it can't know. */
+    private var firstReport = false
+
+    /** A call placed from the car (its Phone, the assistant): who it's to, as the phone's state never says. */
+    private var dialed: Caller? = null
+    private var dialedAt = 0L
+
     /** When the phone last went idle, to tell a late number broadcast from a new call's. */
     private var idleAt = 0L
     /** The application context, kept while call state is being watched. */
@@ -82,6 +93,7 @@ object CarCalls {
         val callback = object : TelephonyCallback(), TelephonyCallback.CallStateListener {
             override fun onCallStateChanged(state: Int) = onPhoneState(state)
         }
+        firstReport = true
         runCatching { manager.registerTelephonyCallback(context.mainExecutor, callback) }
             .onSuccess {
                 telephony = manager
@@ -136,6 +148,8 @@ object CarCalls {
         activeCaller = null
         answeredHere = false
         ringingDuringCall = false
+        activeSince = 0L
+        dialed = null
         phoneState = TelephonyManager.CALL_STATE_IDLE
         _state.value = CallUiState.None
     }
@@ -143,6 +157,8 @@ object CarCalls {
     private fun onPhoneState(state: Int) {
         val previous = phoneState
         phoneState = state
+        val first = firstReport
+        firstReport = false
         when (state) {
             TelephonyManager.CALL_STATE_IDLE -> {
                 pendingRespond = null
@@ -150,6 +166,7 @@ object CarCalls {
                 answerWhenRinging = false
                 answeredHere = false
                 activeCaller = null
+                activeSince = 0L
                 idleAt = android.os.SystemClock.elapsedRealtime()
                 _state.value = CallUiState.None
             }
@@ -160,8 +177,16 @@ object CarCalls {
                 // the same. Only an answer from the car says it's the new caller; otherwise no name,
                 // rather than the one turned away while the first call goes on.
                 val waited = previous == TelephonyManager.CALL_STATE_RINGING && ringingDuringCall
-                activeCaller = if (waited && !answeredHere) null else ringingCaller
-                _state.value = CallUiState.Active(activeCaller)
+                // Off the hook from idle, right after the car placed a call: that one, to whom it placed it.
+                val now = android.os.SystemClock.elapsedRealtime()
+                val placed = dialed?.takeIf { previous == TelephonyManager.CALL_STATE_IDLE && now - dialedAt < DIALED_MS }
+                dialed = null
+                activeCaller = placed ?: (if (waited && !answeredHere) null else ringingCaller)
+                // Its time starts now: a call placed or picked up, or the one that waited, answered from the
+                // car. One turned away (or answered on the phone: it reads the same) leaves the first call's;
+                // one already under way as the car came has none (its pill shows no time, rather than a wrong one).
+                if (!first && previous != TelephonyManager.CALL_STATE_OFFHOOK && !(waited && !answeredHere)) activeSince = now
+                _state.value = CallUiState.Active(activeCaller, activeSince)
                 answeredHere = false
                 // Taken: a call waiting later starts from no name, not this caller's, until its
                 // own number comes.
@@ -244,7 +269,7 @@ object CarCalls {
      * is (a second call waiting on it) - not nothing, which also took the car's hang-up away.
      */
     private fun afterScreened(): CallUiState =
-        if (phoneState == TelephonyManager.CALL_STATE_OFFHOOK) CallUiState.Active(activeCaller) else CallUiState.None
+        if (phoneState == TelephonyManager.CALL_STATE_OFFHOOK) CallUiState.Active(activeCaller, activeSince) else CallUiState.None
 
     fun answer(context: Context) {
         // Still being screened, the call hasn't rung yet and there is nothing to pick up: let it
@@ -269,6 +294,16 @@ object CarCalls {
         runCatching { telecom.acceptRingingCall() }
             .onSuccess { answeredHere = true }
             .onFailure { MyCarLog.w("calls: answer failed: ${it.message}") }
+    }
+
+    /**
+     * A call the car is placing (its Phone, or "call" to the assistant): who it's to, for the call's pill once
+     * the phone goes off the hook - its state says nothing of an outgoing call's number. Forgotten after
+     * [DIALED_MS], should the call never get under way.
+     */
+    fun dialing(context: Context, number: String) {
+        dialed = Caller(number, lookUpName(context, number))
+        dialedAt = android.os.SystemClock.elapsedRealtime()
     }
 
     /** Ends the call under way, as the phone's own red button would. */
@@ -302,6 +337,8 @@ object CarCalls {
     }
 
     private const val RING_GRACE_MS = 3_000L
+    /** How long a call placed from the car may take to get under way: the phone may first ask which SIM. */
+    private const val DIALED_MS = 30_000L
     /** A number broadcast this soon after the phone went idle belongs to the call just over. */
     private const val LATE_NUMBER_MS = 2_000L
 }

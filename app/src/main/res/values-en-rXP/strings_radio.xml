@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The car's own radio kept until the phone plays (CarSettings.radioFirst), with the sound through myCar.
+-->
+<resources>
+    <!-- Title of the setting: a choice on the car's Settings screen, a switch on the phone (Settings > Connection > Car audio). -->
+    <string name="car_settings_radio_first">Keep the ship\'s radio till the phone strikes up</string>
+    <!-- On the car's Settings screen, under that choice. -->
+    <string name="car_settings_radio_first_note">With the sound through myCar, the ship\'s radio, or whatever it was playing, sails on until something plays on the phone. Off, the ship hands its speakers to myCar, and falls quiet, as soon as it\'s boarded.</string>
+    <!-- On the phone, under the switch in Settings > Connection > Car audio. -->
+    <string name="settings_radio_first_detail">With the sound through myCar, the ship\'s radio sails on until you strike up a shanty on the phone, instead of falling quiet as soon as the ship\'s boarded</string>
+</resources>

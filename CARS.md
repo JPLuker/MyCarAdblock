@@ -2,7 +2,7 @@
 
 This list comes from Gearslip, the project myCar is based on: its drivers' usage notes and its
 own testing. myCar talks to cars with the same code, so the same cars should work. A car shows
-up here once Gearslip has reached its screen at least once.
+up here once Gearslip, or a myCar driver, has reached its screen at least once.
 
 The year is the one the car reports. Some cars report the year of the head unit instead,
 and some don't say.
@@ -11,6 +11,7 @@ and some don't say.
 
 | Car | Year | Head unit |
 |---|---|---|
+| Aftermarket, any car | | Pioneer SPH-DA77DAB (wireless, reported by a myCar driver) |
 | Audi | | MIB2+ (Alpine) |
 | Audi | | Harman |
 | Chevrolet, with myChevrolet | 2019, 2020, 2021 | myChevrolet |
@@ -23,6 +24,7 @@ and some don't say.
 | Jeep Cherokee | 2019 | Uconnect 8.4 (Delphi) |
 | MG | 2019 | Desay SV |
 | Ram 1500 | 2018 | Uconnect 8.4 (Panasonic) |
+| Renault Clio V | 2019-2024 | Easy Link |
 | Škoda | 2018 | MIB Standard2 (TechniSat) |
 | Subaru Outback | 2020 | Denso |
 | Toyota RAV4 | 2020 | Pioneer T1 |

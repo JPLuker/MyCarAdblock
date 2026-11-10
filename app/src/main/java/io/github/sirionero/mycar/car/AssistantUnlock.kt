@@ -33,6 +33,10 @@ internal object AssistantUnlock {
     /** When [AssistantUnlockActivity] last had the phone opened, for the start it then asks for. */
     @Volatile private var openedAt = 0L
 
+    /** What starts once the phone is open: the microphone's assistant, or the Jolly key's ([forJolly]). */
+    @Volatile private var next: (() -> Unit)? = null
+    @Volatile private var forJolly = false
+
     /** The phone is locked or asleep: the assistant would start where nobody can talk to it. */
     fun needed(context: Context): Boolean {
         // Just opened for this very touch: the lock may take a moment longer to say it's gone.
@@ -45,8 +49,13 @@ internal object AssistantUnlock {
         return locked || asleep
     }
 
-    /** Opens the phone, then starts the chosen assistant through [CarAssistant] once more. */
-    fun start(context: Context, name: String) {
+    /**
+     * Opens the phone, then starts the chosen assistant through [CarAssistant] once more - or, for the
+     * Jolly key's, [then], with [retry] what the car says when Android won't light the phone.
+     */
+    fun start(context: Context, name: String, then: (() -> Unit)? = null, retry: String? = null) {
+        next = then ?: { CarAssistant.start() }
+        forJolly = then != null
         // Whether opening takes the driver's face, finger or PIN, rather than nothing.
         if (context.getSystemService(KeyguardManager::class.java)?.isDeviceLocked == true) {
             CarToasts.show(this, Words.get(R.string.assistant_unlock_to_start, name), CarToast.LENGTH_LONG)
@@ -61,17 +70,31 @@ internal object AssistantUnlock {
         // Android refuses a screen from the background without a word: if none came, say so.
         main.postDelayed({
             MyCarLog.w("assistant: Android didn't let myCar light the phone - is myCar on under Accessibility?")
-            CarToasts.show(this, Words.get(R.string.assistant_unlock_then_touch), CarToast.LENGTH_LONG)
+            CarToasts.show(this, retry ?: Words.get(R.string.assistant_unlock_then_touch), CarToast.LENGTH_LONG)
         }, watching, SHOWN_WITHIN_MS)
     }
 
     internal fun shown() = main.removeCallbacksAndMessages(watching)
 
-    /** The phone is open: the assistant starts once the lock screen has finished going. */
+    /**
+     * The microphone pressed: a Jolly key's assistant still waiting for the phone to open is let go, so
+     * the phone opened later doesn't start it over what the microphone started meanwhile.
+     */
+    fun dropJolly() {
+        if (!forJolly) return
+        forJolly = false
+        next = null
+        MyCarLog.i("assistant: the Jolly key's assistant no longer waits for the unlock - the microphone came first")
+    }
+
+    /** The phone is open: the assistant starts once the lock screen has finished going (once). */
     internal fun opened() {
         main.postDelayed({
             openedAt = SystemClock.uptimeMillis()
-            CarAssistant.start()
+            val then = next
+            next = null
+            forJolly = false
+            then?.invoke()
         }, LOCK_GONE_MS)
     }
 

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Jolly key (car/Jolly.kt, car/JollyScreen.kt, ui/JollySettings.kt): a key in the car's dock, above
+  the microphone, that does one thing the driver picked with a single tap - a call, an assistant on the
+  phone, something in Home Assistant, a place, a command for myCar's assistant, an app. Held, it opens
+  its chooser on the car; on the phone it's in Settings > Car screen.
+-->
+<resources>
+    <!-- The key's name, in the dock's description, the car's settings and the phone's: the wildcard card that
+         can be anything. The same word in every language (in pirate speak "Jolly Roger"); the other texts take
+         it as a placeholder, so a new name is one line per language. -->
+    <string name="jolly_name">Jolly</string>
+    <!-- What the key does: its description in the dock, and the car's word after a choice. %1$s: jolly_name,
+         %2$s: what it does (one of the jolly_title_* below) -->
+    <string name="jolly_does">%1$s: %2$s</string>
+
+    <!-- Car, the chooser (the key held, or tapped with nothing chosen): under the tiles of the kinds. %1$s: jolly_name -->
+    <string name="jolly_choose_intro">Un toque en el botón hace lo que elijas aquí; mantenlo pulsado para volver. También en el teléfono: Ajustes > Pantalla del coche > %1$s.</string>
+    <!-- Car, the chooser and the car's Settings: what the key does now. %1$s: one of the jolly_title_* below -->
+    <string name="jolly_now">Ahora: %1$s</string>
+
+    <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->
+    <string name="jolly_kind_call">Llamar a alguien</string>
+    <string name="jolly_kind_ai">Hablar con una IA</string>
+    <string name="jolly_kind_home">Home Assistant</string>
+    <string name="jolly_kind_navigate">Ir a un lugar</string>
+    <!-- A phrase myCar's assistant understands, run as if it had been said -->
+    <string name="jolly_kind_say">Orden al asistente</string>
+    <string name="jolly_kind_app">Abrir una app</string>
+
+    <!-- What the key does, in the chooser, the settings and the toasts. %1$s: the contact's name -->
+    <string name="jolly_title_call">Llamar a %1$s</string>
+    <!-- %1$s: an assistant app's name (Gemini, Claude…) -->
+    <string name="jolly_title_ai">Hablar con %1$s</string>
+    <!-- The phone's own assistant, whichever it is -->
+    <string name="jolly_title_ai_phone">Hablar con el asistente del teléfono</string>
+    <!-- Home Assistant: %1$s is the thing's name there. A script or a scene -->
+    <string name="jolly_title_run">Iniciar %1$s</string>
+    <!-- A button -->
+    <string name="jolly_title_press">Pulsar %1$s</string>
+    <!-- A switch, a light -->
+    <string name="jolly_title_toggle">Encender o apagar %1$s</string>
+    <!-- A gate, a garage door, a blind -->
+    <string name="jolly_title_open_close">Abrir o cerrar %1$s</string>
+    <string name="jolly_title_lock">Bloquear %1$s</string>
+    <string name="jolly_title_unlock">Desbloquear %1$s</string>
+    <!-- %1$s: the place's name ("Home"), or the place as written -->
+    <string name="jolly_title_navigate">Ir a %1$s</string>
+    <!-- A command for myCar's assistant, in the language's quotes. %1$s: the command as written -->
+    <string name="jolly_title_say">«%1$s»</string>
+    <!-- %1$s: the app's name -->
+    <string name="jolly_title_app">Abrir %1$s</string>
+
+    <!-- Car, the key's assistant with the phone locked, when Android doesn't let myCar light the phone
+         (myCar off under Accessibility): as the microphone's "Unlock the phone, then touch the microphone
+         again". %1$s: jolly_name -->
+    <string name="jolly_unlock_then_touch">Desbloquea el teléfono y vuelve a tocar el botón %1$s</string>
+    <!-- Car and phone, a contact with several numbers, under the name. %1$d: how many -->
+    <plurals name="jolly_numbers">
+        <item quantity="one">%1$d número</item>
+        <item quantity="other">%1$d números</item>
+    </plurals>
+    <!-- Car and phone, under the list of assistants -->
+    <string name="jolly_ai_note">Escucha y responde en el teléfono, y su voz llega al coche solo por Bluetooth. Con el teléfono bloqueado empieza cuando lo desbloqueas, o, con Home Assistant configurado en myCar, escucha myCar y responde Home Assistant.</string>
+    <!-- Car (also as a toast when the key is tapped) and phone: Home Assistant isn't set up in myCar -->
+    <string name="jolly_home_not_set">Primero configura Plancia en el teléfono: Ajustes > Plancia.</string>
+    <!-- Car: Home Assistant can't be reached now (also as a toast when the key is tapped) -->
+    <string name="jolly_home_offline">Home Assistant no está conectado ahora mismo.</string>
+    <!-- Car and phone, while the list comes -->
+    <string name="jolly_home_loading">Preguntando a Home Assistant…</string>
+    <string name="jolly_home_none">Home Assistant no tiene nada que el botón pueda hacer: ni scripts, ni escenas, ni botones, ni interruptores, ni luces, ni portones, ni cerraduras.</string>
+    <!-- Car and phone, under a list with locks in it -->
+    <string name="jolly_home_unlock_note">Para desbloquear, el botón espera un segundo toque en menos de 3 segundos.</string>
+    <!-- Car, the chooser: a place is written on the phone. %1$s: jolly_name -->
+    <string name="jolly_navigate_on_phone">Los lugares se escriben en el teléfono: Ajustes > Pantalla del coche > %1$s.</string>
+    <!-- Car, the chooser, under the ready-made commands. %1$s: jolly_name -->
+    <string name="jolly_say_on_phone">Cualquier otra orden: escríbela en el teléfono, en Ajustes > Pantalla del coche > %1$s.</string>
+
+    <!-- Ready-made commands, offered in the car and on the phone. Each is said to myCar's assistant as it's
+         written here, so in every language it must be a phrase the assistant understands (see the help of
+         car/AssistantXxx.kt; JollyActionTest checks them). No pirate versions: the assistant wouldn't follow. -->
+    <string name="jolly_say_messages">Lee mis mensajes</string>
+    <string name="jolly_say_arrival">¿Cuándo llego?</string>
+    <string name="jolly_say_call_back">Devuelve la llamada</string>
+    <string name="jolly_say_weather">¿Qué tiempo hace?</string>
+
+    <!-- Car, toasts when the key is tapped. %1$s: the thing's name in Home Assistant -->
+    <string name="jolly_home_done">%1$s: hecho</string>
+    <!-- %1$s: the thing's name in Home Assistant, %2$s: why, in Home Assistant's own words -->
+    <string name="jolly_home_failed">%1$s no ha funcionado: %2$s</string>
+    <!-- Home Assistant doesn't have the thing (any more): nothing was sent. %1$s: its name there -->
+    <string name="jolly_home_missing">%1$s no está en Home Assistant. Mantén pulsado el botón para elegir otra cosa.</string>
+    <!-- Home Assistant can't reach the thing now (its state is "unavailable"): nothing was sent -->
+    <string name="jolly_home_unavailable">%1$s no está disponible en Home Assistant ahora mismo.</string>
+    <!-- A lock, after the key's command: it says it's stuck -->
+    <string name="jolly_lock_jammed">%1$s: la cerradura está atascada.</string>
+    <!-- A lock still as it was 10 seconds after being told to open, or to close -->
+    <string name="jolly_lock_still_locked">%1$s: la cerradura sigue cerrada.</string>
+    <string name="jolly_lock_still_unlocked">%1$s: la cerradura sigue abierta.</string>
+    <!-- A lock still on its way, or silent, 10 seconds after the command -->
+    <string name="jolly_lock_no_news">%1$s aún no ha dicho si ha funcionado.</string>
+    <!-- A lock, at the first tap. %1$s: its name in Home Assistant -->
+    <string name="jolly_confirm_unlock">¿Desbloquear %1$s? Toca otra vez el botón en menos de 3 segundos.</string>
+    <!-- %1$s: the place's name or the place, %2$s: the map app -->
+    <string name="jolly_navigating">Rumbo a %1$s con %2$s</string>
+    <string name="jolly_no_map">No hay ninguna app de mapas en el teléfono.</string>
+    <!-- %1$s: the app's name -->
+    <string name="jolly_app_gone">%1$s ya no está en el teléfono. Mantén pulsado el botón para elegir otra cosa.</string>
+    <!-- The contact's number chosen for the key isn't theirs in the contacts any more: the chooser opens.
+         %1$s: the contact's name -->
+    <string name="jolly_call_gone">%1$s ya no tiene ese número en los contactos: vuelve a elegir.</string>
+    <!-- A tap on the key in the car's preview in the phone's settings, with no drive: what it would do there,
+         rather than doing it. %1$s: one of the jolly_title_* above -->
+    <string name="jolly_preview_only">En el coche, este botón hace: %1$s</string>
+    <!-- A call, an assistant or a command while on a call -->
+    <string name="jolly_after_call">Eso tendrá que esperar a que acabe la llamada.</string>
+
+    <!-- The car's Settings and the phone's (Settings > Car screen): the On/Off choice, a switch on the phone. %1$s: jolly_name -->
+    <string name="car_settings_jolly_key">Botón %1$s</string>
+    <!-- Car's Settings: the button that opens the chooser -->
+    <string name="car_settings_jolly_choose">Elegir qué hace</string>
+    <string name="car_settings_jolly_none">Nada elegido todavía: un toque en el botón te lo pregunta.</string>
+
+    <!-- Phone, Settings > Car screen, the key's section: under the switch -->
+    <string name="settings_jolly_key_detail">En el dock, encima del micrófono: un toque hace lo que elijas aquí</string>
+    <!-- The row that opens the kinds; under it, what the key does -->
+    <string name="settings_jolly_action">Qué hace</string>
+    <string name="settings_jolly_none">Nada todavía: en el coche, un toque en el botón te lo pregunta</string>
+    <!-- Title of the list of kinds -->
+    <string name="settings_jolly_kind">¿Qué debe hacer el botón?</string>
+    <string name="settings_jolly_footer">Una llamada, un asistente, algo de Home Assistant, un lugar, una orden o una app, a un toque. En el coche, mantén pulsado el botón para cambiarlo allí también.</string>
+    <!-- In the list of contacts, without the permission, over an Allow button (which asks for both) -->
+    <string name="settings_jolly_contacts_permission">Para mostrar tus contactos y llamarlos desde el coche, myCar necesita leer tus contactos y hacer llamadas.</string>
+    <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
+    <string name="settings_jolly_place">Dirección o lugar</string>
+    <string name="settings_jolly_place_name">Nombre en el coche (opcional)</string>
+    <string name="settings_jolly_place_note">Llega a la app de mapas del coche tal como lo escribes, como cuando le dices al asistente de myCar adónde ir.</string>
+    <!-- A command: the field, and a note under the ready-made ones -->
+    <string name="settings_jolly_phrase">Orden</string>
+    <string name="settings_jolly_phrase_note">Escríbela como se la dirías al asistente de myCar, en el idioma de myCar: «pon Radio Deejay en Spotify», «abre el portón». En el coche el botón la muestra y el asistente responde.</string>
+    <!-- Home Assistant didn't give its list. %1$s: why, in its own words -->
+    <string name="settings_jolly_home_failed">Home Assistant no ha respondido: %1$s</string>
+</resources>

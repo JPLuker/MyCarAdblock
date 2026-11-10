@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Jolly key (car/Jolly.kt, car/JollyScreen.kt, ui/JollySettings.kt): a key in the car's dock, above
+  the microphone, that does one thing the driver picked with a single tap - a call, an assistant on the
+  phone, something in Home Assistant, a place, a command for myCar's assistant, an app. Held, it opens
+  its chooser on the car; on the phone it's in Settings > Car screen.
+-->
+<resources>
+    <!-- The key's name, in the dock's description, the car's settings and the phone's: the wildcard card that
+         can be anything. The same word in every language (in pirate speak "Jolly Roger"); the other texts take
+         it as a placeholder, so a new name is one line per language. -->
+    <string name="jolly_name">Jolly</string>
+    <!-- What the key does: its description in the dock, and the car's word after a choice. %1$s: jolly_name,
+         %2$s: what it does (one of the jolly_title_* below) -->
+    <string name="jolly_does">%1$s：%2$s</string>
+
+    <!-- Car, the chooser (the key held, or tapped with nothing chosen): under the tiles of the kinds. %1$s: jolly_name -->
+    <string name="jolly_choose_intro">点一下按钮，就会执行你在这里选的操作；长按按钮可回到这里。也可以在手机上选择：设置 > 车机屏幕 > %1$s。</string>
+    <!-- Car, the chooser and the car's Settings: what the key does now. %1$s: one of the jolly_title_* below -->
+    <string name="jolly_now">当前：%1$s</string>
+
+    <!-- The kinds of command: tiles in the car (about 150 dp wide: keep them short) and choices on the phone. -->
+    <string name="jolly_kind_call">呼叫联系人</string>
+    <string name="jolly_kind_ai">与AI对话</string>
+    <string name="jolly_kind_home">Home Assistant</string>
+    <string name="jolly_kind_navigate">去一个地方</string>
+    <!-- A phrase myCar's assistant understands, run as if it had been said -->
+    <string name="jolly_kind_say">助手指令</string>
+    <string name="jolly_kind_app">打开应用</string>
+
+    <!-- What the key does, in the chooser, the settings and the toasts. %1$s: the contact's name -->
+    <string name="jolly_title_call">呼叫%1$s</string>
+    <!-- %1$s: an assistant app's name (Gemini, Claude…) -->
+    <string name="jolly_title_ai">和%1$s对话</string>
+    <!-- The phone's own assistant, whichever it is -->
+    <string name="jolly_title_ai_phone">和手机助手对话</string>
+    <!-- Home Assistant: %1$s is the thing's name there. A script or a scene -->
+    <string name="jolly_title_run">运行%1$s</string>
+    <!-- A button -->
+    <string name="jolly_title_press">按下%1$s</string>
+    <!-- A switch, a light -->
+    <string name="jolly_title_toggle">开关%1$s</string>
+    <!-- A gate, a garage door, a blind -->
+    <string name="jolly_title_open_close">打开或关闭%1$s</string>
+    <string name="jolly_title_lock">锁上%1$s</string>
+    <string name="jolly_title_unlock">解锁%1$s</string>
+    <!-- %1$s: the place's name ("Home"), or the place as written -->
+    <string name="jolly_title_navigate">导航到%1$s</string>
+    <!-- A command for myCar's assistant, in the language's quotes. %1$s: the command as written -->
+    <string name="jolly_title_say">“%1$s”</string>
+    <!-- %1$s: the app's name -->
+    <string name="jolly_title_app">打开%1$s</string>
+
+    <!-- Car, the key's assistant with the phone locked, when Android doesn't let myCar light the phone
+         (myCar off under Accessibility): as the microphone's "Unlock the phone, then touch the microphone
+         again". %1$s: jolly_name -->
+    <string name="jolly_unlock_then_touch">请解锁手机，然后再次触摸%1$s按钮</string>
+    <!-- Car and phone, a contact with several numbers, under the name. %1$d: how many -->
+    <plurals name="jolly_numbers">
+        <item quantity="other">%1$d 个号码</item>
+    </plurals>
+    <!-- Car and phone, under the list of assistants -->
+    <string name="jolly_ai_note">它在手机上聆听和回答，声音只能通过蓝牙传到车上。手机锁屏时，它会在你解锁后启动；如果在 myCar 中设置了 Home Assistant，则由 myCar 聆听、Home Assistant 回答。</string>
+    <!-- Car (also as a toast when the key is tapped) and phone: Home Assistant isn't set up in myCar -->
+    <string name="jolly_home_not_set">请先在手机上设置 Plancia：设置 > Plancia。</string>
+    <!-- Car: Home Assistant can't be reached now (also as a toast when the key is tapped) -->
+    <string name="jolly_home_offline">Home Assistant 暂时未连接。</string>
+    <!-- Car and phone, while the list comes -->
+    <string name="jolly_home_loading">正在询问 Home Assistant…</string>
+    <string name="jolly_home_none">Home Assistant 中没有这个按钮能执行的项目：没有脚本、场景、按钮、开关、灯、大门或门锁。</string>
+    <!-- Car and phone, under a list with locks in it -->
+    <string name="jolly_home_unlock_note">解锁时，按钮会等你在 3 秒内再点一次。</string>
+    <!-- Car, the chooser: a place is written on the phone. %1$s: jolly_name -->
+    <string name="jolly_navigate_on_phone">地点要在手机上填写：设置 > 车机屏幕 > %1$s。</string>
+    <!-- Car, the chooser, under the ready-made commands. %1$s: jolly_name -->
+    <string name="jolly_say_on_phone">其他指令：请在手机上填写，位置是设置 > 车机屏幕 > %1$s。</string>
+
+    <!-- Ready-made commands, offered in the car and on the phone. Each is said to myCar's assistant as it's
+         written here, so in every language it must be a phrase the assistant understands (see the help of
+         car/AssistantXxx.kt; JollyActionTest checks them). No pirate versions: the assistant wouldn't follow. -->
+    <string name="jolly_say_messages">读消息</string>
+    <string name="jolly_say_arrival">什么时候到？</string>
+    <string name="jolly_say_call_back">回拨</string>
+    <string name="jolly_say_weather">天气怎么样？</string>
+
+    <!-- Car, toasts when the key is tapped. %1$s: the thing's name in Home Assistant -->
+    <string name="jolly_home_done">%1$s：已完成</string>
+    <!-- %1$s: the thing's name in Home Assistant, %2$s: why, in Home Assistant's own words -->
+    <string name="jolly_home_failed">%1$s 没有成功：%2$s</string>
+    <!-- Home Assistant doesn't have the thing (any more): nothing was sent. %1$s: its name there -->
+    <string name="jolly_home_missing">Home Assistant 里没有%1$s。长按按钮可以另选一个。</string>
+    <!-- Home Assistant can't reach the thing now (its state is "unavailable"): nothing was sent -->
+    <string name="jolly_home_unavailable">%1$s 目前在 Home Assistant 中不可用。</string>
+    <!-- A lock, after the key's command: it says it's stuck -->
+    <string name="jolly_lock_jammed">%1$s：锁卡住了。</string>
+    <!-- A lock still as it was 10 seconds after being told to open, or to close -->
+    <string name="jolly_lock_still_locked">%1$s：锁仍然锁着。</string>
+    <string name="jolly_lock_still_unlocked">%1$s：锁仍然开着。</string>
+    <!-- A lock still on its way, or silent, 10 seconds after the command -->
+    <string name="jolly_lock_no_news">%1$s 还没有说是否成功。</string>
+    <!-- A lock, at the first tap. %1$s: its name in Home Assistant -->
+    <string name="jolly_confirm_unlock">解锁%1$s？请在 3 秒内再点一次按钮。</string>
+    <!-- %1$s: the place's name or the place, %2$s: the map app -->
+    <string name="jolly_navigating">正在用%2$s前往%1$s</string>
+    <string name="jolly_no_map">手机上没有地图应用。</string>
+    <!-- %1$s: the app's name -->
+    <string name="jolly_app_gone">手机上已经没有%1$s了。长按按钮可以另选一个。</string>
+    <!-- The contact's number chosen for the key isn't theirs in the contacts any more: the chooser opens.
+         %1$s: the contact's name -->
+    <string name="jolly_call_gone">通讯录里%1$s已经没有这个号码了，请重新选择。</string>
+    <!-- A tap on the key in the car's preview in the phone's settings, with no drive: what it would do there,
+         rather than doing it. %1$s: one of the jolly_title_* above -->
+    <string name="jolly_preview_only">在车上，这个按钮会：%1$s</string>
+    <!-- A call, an assistant or a command while on a call -->
+    <string name="jolly_after_call">要等通话结束后才能进行。</string>
+
+    <!-- The car's Settings and the phone's (Settings > Car screen): the On/Off choice, a switch on the phone. %1$s: jolly_name -->
+    <string name="car_settings_jolly_key">%1$s 按钮</string>
+    <!-- Car's Settings: the button that opens the chooser -->
+    <string name="car_settings_jolly_choose">选择它的功能</string>
+    <string name="car_settings_jolly_none">尚未选择：点一下按钮就会询问。</string>
+
+    <!-- Phone, Settings > Car screen, the key's section: under the switch -->
+    <string name="settings_jolly_key_detail">位于停靠栏的麦克风上方：点一下即执行你在这里选的操作</string>
+    <!-- The row that opens the kinds; under it, what the key does -->
+    <string name="settings_jolly_action">功能</string>
+    <string name="settings_jolly_none">尚未选择：在车上点一下按钮就会询问</string>
+    <!-- Title of the list of kinds -->
+    <string name="settings_jolly_kind">这个按钮要做什么？</string>
+    <string name="settings_jolly_footer">打电话、唤起助手、Home Assistant 里的操作、前往某地、一条指令或一个应用，一点即达。在车上长按按钮也能更改。</string>
+    <!-- In the list of contacts, without the permission, over an Allow button (which asks for both) -->
+    <string name="settings_jolly_contacts_permission">要列出你的联系人并在车上给他们打电话，myCar 需要读取联系人和拨打电话的权限。</string>
+    <!-- A place: the field for it, the field for the name the car shows, and a note under them -->
+    <string name="settings_jolly_place">地址或地点</string>
+    <string name="settings_jolly_place_name">车上显示的名称（可选）</string>
+    <string name="settings_jolly_place_note">会按你填写的内容发给车上的地图应用，就像你告诉 myCar 助手要去哪里一样。</string>
+    <!-- A command: the field, and a note under the ready-made ones -->
+    <string name="settings_jolly_phrase">指令</string>
+    <string name="settings_jolly_phrase_note">按你对 myCar 助手说话的方式来写，用 myCar 的语言：“用Spotify播放Radio Deejay”、“打开大门”。在车上，按钮会显示这条指令，并由助手回答。</string>
+    <!-- Home Assistant didn't give its list. %1$s: why, in its own words -->
+    <string name="settings_jolly_home_failed">Home Assistant 没有回应：%1$s</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Waze modified with Morphe that turns myCar down (host/CarAppConnection.kt, host/PatchRefusals.kt) -->
+<resources>
+    <!-- In the car, on the map, under "%1$s would not start.": a modified copy of an app that refuses
+         myCar on its own (Waze re-signed by Morphe) that refuses it too. %1$s: the app's name, as Waze;
+         %2$s: the entry to add, as e477a479…cccc31,io.github.sirionero.mycar. "Allow Gearslip" and
+         "Accepted hosts" are the names Morphe shows, in English: keep them as they are -->
+    <string name="car_host_modified_refused">This copy of %1$s is modified, but it doesn\'t accept myCar. In Morphe, patch \"Allow Gearslip\", option \"Accepted hosts\": add a \";\" and %2$s at the end, then patch %1$s again.</string>
+</resources>
