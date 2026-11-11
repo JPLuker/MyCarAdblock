@@ -126,6 +126,8 @@
     <string name="settings_xonos_test_ok">Music Assistant %1$s, проигрыватель «%2$s»</string>
 
     <string name="settings_cinema_footer">Видеосайты в виде плиток в автомобиле, каждый открывается в браузере, созданном для видео. Защищённое видео (Netflix, DAZN, Prime Video, Disney+ и подобные), скорее всего, останется в автомобиле чёрным: Android скрывает его от экрана, превращённого в видеопоток, — а экран автомобиля именно такой.</string>
+    <string name="settings_cinema_ad_block">Блокировать рекламу и трекеры</string>
+    <string name="settings_cinema_ad_block_detail">Блокирует известные рекламные и отслеживающие серверы на сайтах Cinema. Некоторые видеорекламы всё ещё могут показываться.</string>
     <string name="settings_cinema_parked_only">Видео только на стоянке</string>
     <string name="settings_cinema_parked_only_on">Пока автомобиль едет, изображение закрыто, а звук продолжается</string>
     <string name="settings_cinema_parked_only_off">Выкл.: видео показывается и во время движения</string>
