@@ -80,7 +80,7 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
                 if (result.activeMedia === mediaSession) result.activeMedia = null
             }
         }
-        session.textInput.delegate = object : GeckoSession.TextInputDelegate {
+        session.textInput.setDelegate(object : GeckoSession.TextInputDelegate {
             override fun showSoftInput(session: GeckoSession) {
                 onKeyboard(result.readInput())
             }
@@ -92,7 +92,7 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
                     onKeyboard(result.readInput())
                 }
             }
-        }
+        })
         session.open(runtime)
         view.setSession(session)
 
