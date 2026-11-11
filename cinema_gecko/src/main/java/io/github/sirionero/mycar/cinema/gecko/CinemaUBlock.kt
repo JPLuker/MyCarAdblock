@@ -40,7 +40,9 @@ internal object CinemaUBlock {
         })
         controller.list().accept({ extensions ->
             val existing = extensions.firstOrNull { it.id == EXTENSION_ID }
-            if (existing != null) {
+            if (existing != null && existing.metaData.enabled == enabled) {
+                onReady()
+            } else if (existing != null) {
                 val action = if (enabled) {
                     controller.enable(existing, WebExtensionController.EnableSource.USER)
                 } else {
