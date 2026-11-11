@@ -169,7 +169,17 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:label="${appLabel}"
         android:supportsRtl="true"
-        android:theme="@style/Theme.myCar">
+        android:theme="@style/Theme.myCar"
+        tools:remove="android:zygotePreloadName">
+
+        <!-- GeckoView's library manifest is merged into the base APK by AGP even though the
+             GeckoView classes are in the optional feature split. A content provider is created
+             before Application.onCreate; without this removal the base-only APK crashes on
+             launch with ClassNotFoundException for GeckoClipboardContentProvider.
+             The optional feature retains its own manifest when installed. -->
+        <provider
+            android:name="org.mozilla.gecko.GeckoClipboardContentProvider"
+            tools:node="remove" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
