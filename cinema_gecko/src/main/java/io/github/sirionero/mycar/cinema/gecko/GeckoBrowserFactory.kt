@@ -11,6 +11,7 @@ import org.mozilla.geckoview.GeckoRuntime
 import org.mozilla.geckoview.GeckoSession
 import org.mozilla.geckoview.GeckoSessionSettings
 import org.mozilla.geckoview.GeckoView
+import org.mozilla.geckoview.MediaSession
 
 /**
  * A browser implementation compiled only into :cinema_gecko, instantiated reflectively by
@@ -55,6 +56,14 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
                 onFailure("Firefox's page process stopped. Switch to Android WebView or try reopening this site.")
             }
         }
+        session.mediaSessionDelegate = object : MediaSession.Delegate {
+            override fun onActivated(session: GeckoSession, mediaSession: MediaSession) {
+                result.activeMedia = mediaSession
+            }
+            override fun onDeactivated(session: GeckoSession, mediaSession: MediaSession) {
+                if (result.activeMedia === mediaSession) result.activeMedia = null
+            }
+        }
         session.textInput.delegate = object : GeckoSession.TextInputDelegate {
             override fun showSoftInput(session: GeckoSession) {
                 onKeyboard(result.readInput())
@@ -89,6 +98,7 @@ private class RunningSession(
     private val onKeyboard: (String?) -> Unit,
 ) : CinemaBrowserSession {
     var hasBack = false
+    var activeMedia: MediaSession? = null
     override val canGoBack: Boolean get() = hasBack
 
     private fun connection() = session.textInput.onCreateInputConnection(EditorInfo())
@@ -121,10 +131,12 @@ private class RunningSession(
 
     override fun goBack() { if (hasBack) session.goBack() }
     override fun reload() = session.reload()
-    override fun pause() { session.setActive(false) }
+    // Inactive GeckoSession is a render-visibility hint, not an HTML video pause.
+    override fun pause() { activeMedia?.pause() }
     override fun exitFullScreen() { session.exitFullScreen() }
     override fun close() {
         onKeyboard(null)
+        activeMedia = null
         view.releaseSession()
         session.close()
     }
