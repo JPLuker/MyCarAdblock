@@ -127,6 +127,14 @@
     <string name="settings_cinema_engine_webview">Android WebView</string>
     <string name="settings_cinema_engine_webview_detail">内置，无需额外下载</string>
     <string name="settings_cinema_engine_gecko">Firefox GeckoView + uBlock Origin</string>
+    <string name="settings_cinema_engine_gecko_ready">已安装并就绪（首次打开时将安装 uBlock Origin）</string>
+    <string name="settings_cinema_engine_downloading">正在下载 Firefox 引擎：%1$d%%</string>
+    <string name="settings_cinema_engine_checking">正在检查匹配版本…</string>
+    <string name="settings_cinema_engine_install">安装 Firefox 引擎</string>
+    <string name="settings_cinema_engine_allow_install">允许 myCar 安装应用</string>
+    <string name="settings_cinema_engine_installing">正在安装 Firefox 引擎…</string>
+    <string name="settings_cinema_engine_retry">重试下载</string>
+    <string name="settings_cinema_engine_download">下载 Firefox 引擎</string>
     <string name="settings_cinema_engine_gecko_pending">此版本暂不支持下载可选浏览器</string>
     <string name="settings_cinema_ad_block">拦截广告和追踪器</string>
     <string name="settings_cinema_ad_block_detail">在 Cinema 网站中拦截已知的广告和追踪服务器。部分视频广告仍可能出现。</string>
