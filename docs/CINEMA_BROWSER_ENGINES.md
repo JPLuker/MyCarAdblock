@@ -1,4 +1,45 @@
-# Cinema browser engines: lightweight core and optional uBlock Origin
+# Cinema dual-browser delivery goals
+
+**Fork lineage (verified from GitHub):**
+[JPLuker/MyCarAdblock](https://github.com/JPLuker/MyCarAdblock) →
+[SirioNero/MyCar](https://github.com/SirioNero/MyCar) →
+[twinksoftware/Gearslip](https://github.com/twinksoftware/Gearslip).
+An upstream contribution from this fork should go to **SirioNero/MyCar first**.
+The F-Droid packaging/signing caveat should be documented for its maintainer;
+it must not prevent testing or delivering the GitHub-release implementation.
+
+## Agreed feature goals
+
+1. Keep the **base GitHub APK small and fully working offline** using Android WebView.
+2. Offer **two selectable Cinema browser engines**: Android WebView (default) and
+   Firefox GeckoView (download only when chosen). Preserve the existing sites and car UI.
+3. Use the **real, Mozilla-signed uBlock Origin** extension for GeckoView; never call
+   a domain-only fallback 'uBlock Origin'.
+4. Make installation explicitly opted-in, show progress, allow cancellation/retry,
+   verify version, ABI, checksum and signing, then activate only after successful install.
+5. Always leave a **working WebView fallback** and retain selected sites. Explain that
+   WebView and GeckoView logins/cookies may be separate.
+6. Ship base and optional split in the **same signed release**, not an unverified
+   downloadable code archive. Keep GeckoView code/native libraries out of base.
+7. Preserve fullscreen video, back, car keyboard, paused-while-driving safety,
+   desktop layouts, Continue, local Jellyfin and native phone/IPTV video behavior.
+8. Test install, rollback and upgrades across Android versions and record known
+   incompatibilities; upstream F-Droid handling is a follow-on discussion.
+
+## Implementation milestones
+
+- [x] Document product goals and accurate fork/upstream lineage.
+- [ ] **M1:** Persist browser choice and show both choices/availability in Cinema settings.
+- [ ] **M2:** Establish the optional GeckoView dynamic-feature packaging with base-only APK
+      and matching split output, verifying actual artifact sizes and installability.
+- [ ] **M3:** Implement authenticated, cancelable matching split download/install and
+      honest install status / recovery UI.
+- [ ] **M4:** Implement optional GeckoView sessions and full Cinema controls; integrate
+      official uBlock Origin with signed add-on verification and updates.
+- [ ] **M5:** Validate WebView/Gecko parity, APK upgrades, crashes, video playback, and
+      car hardware; submit upstream PR and note F-Droid signing limitation.
+
+---
 
 **Status:** Architecture decision; GeckoView module and installer are NOT implemented yet.
 **Scope:** Cinema websites only. Preserve myCar's existing WebViews (music, dashboard, etc.)
