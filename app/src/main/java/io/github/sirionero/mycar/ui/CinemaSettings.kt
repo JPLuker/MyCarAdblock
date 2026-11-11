@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +26,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +35,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
@@ -41,6 +44,8 @@ import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.cinema.Cinema
 import io.github.sirionero.mycar.cinema.CinemaSite
 import io.github.sirionero.mycar.cinema.CinemaBrowserEngine
+import io.github.sirionero.mycar.cinema.CinemaGeckoBridge
+import io.github.sirionero.mycar.cinema.CinemaGeckoInstaller
 
 /**
  * Cinema, set up here on the phone: the video sites that show as tiles in the car, each one as on
@@ -50,6 +55,10 @@ import io.github.sirionero.mycar.cinema.CinemaBrowserEngine
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun CinemaSection() {
+    val context = LocalContext.current
+    val geckoStatus by CinemaGeckoInstaller.status.collectAsState()
+    LaunchedEffect(Unit) { CinemaGeckoInstaller.refresh(context) }
+    val geckoInstalled = geckoStatus is CinemaGeckoInstaller.Status.Installed || CinemaGeckoBridge.installed(context)
     val sites by Cinema.sites.collectAsState()
     val parkedOnly by Cinema.parkedOnly.collectAsState()
     val adBlockEnabled by Cinema.adBlockEnabled.collectAsState()
@@ -112,23 +121,68 @@ internal fun CinemaSection() {
         SettingsDivider()
         SettingsRow(
             stringResource(R.string.settings_cinema_engine_gecko),
-            // Not selectable before a tested optional module and its browser UI are installed.
-            // The next milestone will replace this with download/install/status handling.
             Modifier.selectable(
                 selected = browserEngine == CinemaBrowserEngine.FIREFOX_GECKOVIEW,
-                enabled = false,
+                enabled = geckoInstalled,
                 role = Role.RadioButton,
-                onClick = {},
+                onClick = { Cinema.setBrowserEngine(CinemaBrowserEngine.FIREFOX_GECKOVIEW) },
             ),
-            subtitle = stringResource(R.string.settings_cinema_engine_gecko_pending),
+            subtitle = stringResource(
+                if (geckoInstalled) R.string.settings_cinema_engine_gecko_ready
+                else R.string.settings_cinema_engine_gecko_pending,
+            ),
             trailing = {
                 RadioButton(
                     selected = browserEngine == CinemaBrowserEngine.FIREFOX_GECKOVIEW,
                     onClick = null,
-                    enabled = false,
+                    enabled = geckoInstalled,
                 )
             },
         )
+        if (!geckoInstalled) {
+            Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                when (val status = geckoStatus) {
+                    is CinemaGeckoInstaller.Status.Downloading -> {
+                        Text(stringResource(R.string.settings_cinema_engine_downloading, (status.fraction * 100).toInt()))
+                        LinearProgressIndicator(progress = { status.fraction }, modifier = Modifier.fillMaxWidth())
+                        TextButton(onClick = { CinemaGeckoInstaller.cancel(context) }) {
+                            Text(stringResource(R.string.common_cancel))
+                        }
+                    }
+                    CinemaGeckoInstaller.Status.Checking -> {
+                        Text(stringResource(R.string.settings_cinema_engine_checking))
+                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                        TextButton(onClick = { CinemaGeckoInstaller.cancel(context) }) {
+                            Text(stringResource(R.string.common_cancel))
+                        }
+                    }
+                    is CinemaGeckoInstaller.Status.Downloaded -> {
+                        Button(onClick = {
+                            if (context.packageManager.canRequestPackageInstalls()) {
+                                CinemaGeckoInstaller.install(context)
+                            } else {
+                                CinemaGeckoInstaller.askInstallPermission(context)
+                            }
+                        }) {
+                            Text(stringResource(
+                                if (context.packageManager.canRequestPackageInstalls()) R.string.settings_cinema_engine_install
+                                else R.string.settings_cinema_engine_allow_install,
+                            ))
+                        }
+                    }
+                    CinemaGeckoInstaller.Status.Installing -> Text(stringResource(R.string.settings_cinema_engine_installing))
+                    is CinemaGeckoInstaller.Status.Failed -> {
+                        Text(status.reason, color = MaterialTheme.colorScheme.error)
+                        Button(onClick = { CinemaGeckoInstaller.download(context) }) {
+                            Text(stringResource(R.string.settings_cinema_engine_retry))
+                        }
+                    }
+                    else -> Button(onClick = { CinemaGeckoInstaller.download(context) }) {
+                        Text(stringResource(R.string.settings_cinema_engine_download))
+                    }
+                }
+            }
+        }
         SettingsDivider()
         PhoneVideosRow()
         sites.forEach { site ->
