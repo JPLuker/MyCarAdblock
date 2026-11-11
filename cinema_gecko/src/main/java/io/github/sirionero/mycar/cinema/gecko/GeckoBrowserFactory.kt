@@ -7,6 +7,8 @@ import android.view.inputmethod.ExtractedTextRequest
 import android.view.KeyEvent
 import io.github.sirionero.mycar.cinema.CinemaBrowserFactory
 import io.github.sirionero.mycar.cinema.CinemaBrowserSession
+import org.mozilla.geckoview.AllowOrDeny
+import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoRuntime
 import org.mozilla.geckoview.GeckoSession
 import org.mozilla.geckoview.GeckoSessionSettings
@@ -37,6 +39,20 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         val view = GeckoView(context)
         val result = RunningSession(runtime, session, view, onKeyboard)
         session.navigationDelegate = object : GeckoSession.NavigationDelegate {
+            // Cinema has one visible browser surface. Links that request a separate tab
+            // (including some login links) should not open an invisible Gecko session.
+            override fun onLoadRequest(
+                session: GeckoSession,
+                request: GeckoSession.NavigationDelegate.LoadRequest,
+            ): GeckoResult<AllowOrDeny>? {
+                if (request.target == GeckoSession.NavigationDelegate.TARGET_WINDOW_NEW &&
+                    (request.uri.startsWith("https://") || request.uri.startsWith("http://"))) {
+                    session.loadUri(request.uri)
+                    return GeckoResult.fromValue(AllowOrDeny.DENY)
+                }
+                return null
+            }
+
             override fun onLocationChange(
                 session: GeckoSession,
                 url: String?,
