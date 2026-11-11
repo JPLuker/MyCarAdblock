@@ -56,6 +56,22 @@ jobs:
           fi
           echo "No GeckoView native engine found in the base APK"
 
+      # The GeckoView AAR contributes a clipboard ContentProvider and a zygote preload
+      # entry to the merged base manifest, although their classes are in a separate split.
+      # Android instantiates content providers before Application.onCreate: this caused
+      # an immediate startup crash in the first passing debug APK.
+      - name: Verify base APK can start without GeckoView
+        run: |
+          set -euo pipefail
+          aapt=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          test -x "$aapt"
+          "$aapt" dump xmltree build/myCar-debug.apk AndroidManifest.xml > build/base-manifest.txt
+          if grep -E 'org[.]mozilla[.]gecko[.]GeckoClipboardContentProvider|zygotePreloadName' build/base-manifest.txt; then
+            echo "GeckoView startup components incorrectly merged into the base APK"
+            exit 1
+          fi
+          echo "Base APK has no Gecko clipboard provider or zygote preload declaration"
+
       # Every language has every text, with the same placeholders (tools/check_strings.py). After
       # the build, so a missing translation doesn't hide a build error.
       - name: Translations
