@@ -4,7 +4,7 @@
  * a separate milestone and must be tested before exposing downloads to users.
  */
 plugins {
-    alias(libs.plugins.android.dynamic.feature)
+    id("com.android.dynamic-feature")
 }
 
 android {
