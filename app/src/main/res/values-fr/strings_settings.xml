@@ -124,6 +124,11 @@
     <string name="settings_xonos_test_ok">Music Assistant %1$s, lecteur « %2$s »</string>
 
     <string name="settings_cinema_footer">Des sites vidéo en tuiles dans la voiture, chacun ouvert dans un navigateur fait pour la vidéo. Les vidéos protégées (Netflix, DAZN, Prime Video, Disney+ et autres) restent très probablement noires en voiture : Android les cache à un écran transformé en flux vidéo, comme celui de la voiture.</string>
+    <string name="settings_cinema_browser_engine">Moteur du navigateur</string>
+    <string name="settings_cinema_engine_webview">Android WebView</string>
+    <string name="settings_cinema_engine_webview_detail">Intégré, aucun téléchargement supplémentaire</string>
+    <string name="settings_cinema_engine_gecko">Firefox GeckoView + uBlock Origin</string>
+    <string name="settings_cinema_engine_gecko_pending">Le téléchargement facultatif du navigateur est indisponible dans cette version</string>
     <string name="settings_cinema_ad_block">Bloquer les publicités et les traqueurs</string>
     <string name="settings_cinema_ad_block_detail">Bloque les serveurs publicitaires et de suivi connus sur les sites de Cinema. Certaines publicités vidéo peuvent encore apparaître.</string>
     <string name="settings_cinema_parked_only">Vidéo uniquement à l’arrêt</string>
