@@ -29,23 +29,29 @@ it must not prevent testing or delivering the GitHub-release implementation.
 ## Implementation milestones
 
 - [x] Document product goals and accurate fork/upstream lineage.
-- [x] **M1 groundwork:** Persist the preference, test safe fallback, and display both browser options in all nine Cinema-settings languages. GeckoView is intentionally disabled until its install/routing pipeline is ready.
-- [ ] **M2 (scaffold committed):** Dynamic-feature module `:cinema_gecko` contains the pinned
-      Mozilla GeckoView dependency and first runtime/session prototype, with no base-app
-      GeckoView imports. Still need working Android Gradle build, independent base/split
-      artifact verification, matching signatures and installation proof.
-- [ ] **M3:** Implement authenticated, cancelable matching split download/install and
-      honest install status / recovery UI.
-- [ ] **M4:** Implement optional GeckoView sessions and full Cinema controls; integrate
-      official uBlock Origin with signed add-on verification and updates.
+- [x] **M1:** Save engine choice, display both options in all nine supported languages,
+      select installed engine only, and keep WebView fallback if the split is absent.
+- [ ] **M2 (implementation committed; unverified):** Optional arm64 `:cinema_gecko` dynamic
+      feature, pinned GeckoView dependency, base title resource, R8 factory keep rule,
+      release workflow bundletool signing and packaging, independent split-archive tests.
+      **Cannot mark complete without actual APK/bundle build and signature/size audit.**
+- [ ] **M3 (implementation committed; unverified):** Exact-version release lookup, SHA-256
+      integrity verification, on-demand download progress/cancel, PackageInstaller split session,
+      private install callback, install/permission/error UI. **Needs real on-device install test.**
+- [ ] **M4 (implementation committed; unverified):** Optional GeckoView session, Cinema view
+      selection, navigation, single-surface new links, fullscreen, input connection for car keyboard,
+      car audio pause, official Mozilla-signed uBlock Origin XPI installation and daily update
+      checks. **Needs API compile and real video/site tests.**
 - [ ] **M5:** Validate WebView/Gecko parity, APK upgrades, crashes, video playback, and
       car hardware; submit upstream PR and note F-Droid signing limitation.
 
 ---
 
-**Status:** Architecture + early implementation. Browser preference UI and GeckoView feature-module
-scaffold exist on the draft branch. The signed split installer, working GeckoView routing,
-actual uBlock Origin install and full Android build verification are NOT complete.
+**Status:** The implementation is pushed on the draft branch, but no Android build,
+signed APK set or installed uBlock Origin instance has been verified. Tests for the
+split-archive packager and browser fallback are committed, not confirmed passing in Android CI.
+DO NOT MERGE OR RELEASE UNTIL M2–M5 ARE VALIDATED. GitHub Actions has returned no workflow
+runs for this branch, and this environment has no Android SDK for a local Gradle build.
 **Scope:** Cinema websites only. Preserve myCar's existing WebViews (music, dashboard, etc.)
 and the native media/IPTV player.
 
