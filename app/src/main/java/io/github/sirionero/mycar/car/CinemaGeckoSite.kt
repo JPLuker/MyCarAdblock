@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.weight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -21,7 +20,6 @@ import io.github.sirionero.mycar.audio.CarAudio
 import io.github.sirionero.mycar.cinema.Cinema
 import io.github.sirionero.mycar.cinema.CinemaBrowserEngine
 import io.github.sirionero.mycar.cinema.CinemaBrowserSession
-import io.github.sirionero.mycar.cinema.CinemaContinue
 import io.github.sirionero.mycar.cinema.CinemaGeckoBridge
 import io.github.sirionero.mycar.cinema.CinemaSite
 
