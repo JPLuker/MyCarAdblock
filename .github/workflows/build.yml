@@ -2,6 +2,7 @@ name: Build
 
 # Compiles the debug app and runs the unit tests on every push, so a change that doesn't build
 # shows up at once. The APK is kept as an artifact, to install on the phone and try in the car.
+# This workflow is also manually runnable from Actions > Build > Run workflow.
 on:
   push:
   pull_request:
