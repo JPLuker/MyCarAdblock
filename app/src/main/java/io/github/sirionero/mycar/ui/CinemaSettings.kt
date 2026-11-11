@@ -49,6 +49,7 @@ import io.github.sirionero.mycar.cinema.CinemaSite
 internal fun CinemaSection() {
     val sites by Cinema.sites.collectAsState()
     val parkedOnly by Cinema.parkedOnly.collectAsState()
+    val adBlockEnabled by Cinema.adBlockEnabled.collectAsState()
     var warning by remember { mutableStateOf(false) }
     var resetAsk by remember { mutableStateOf(false) }
     var name by rememberSaveable { mutableStateOf("") }
@@ -77,6 +78,13 @@ internal fun CinemaSection() {
             icon = if (parkedOnly) Icons.Filled.PlayArrow else Icons.Filled.Warning,
             tint = if (parkedOnly) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
             trailing = { Switch(checked = parkedOnly, onCheckedChange = null) },
+        )
+        SettingsDivider()
+        SettingsRow(
+            stringResource(R.string.settings_cinema_ad_block),
+            Modifier.toggleable(adBlockEnabled, role = Role.Switch) { Cinema.setAdBlockEnabled(it) },
+            subtitle = stringResource(R.string.settings_cinema_ad_block_detail),
+            trailing = { Switch(checked = adBlockEnabled, onCheckedChange = null) },
         )
         SettingsDivider()
         PhoneVideosRow()
