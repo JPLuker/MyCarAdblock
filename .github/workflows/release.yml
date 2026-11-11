@@ -31,7 +31,9 @@ jobs:
           EOF
 
       - name: Build release APK and optional GeckoView bundle
-        run: ./gradlew :app:assembleRelease :app:bundleRelease
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          ./gradlew :app:assembleRelease :app:bundleRelease "-PmyCarVersionName=$version"
 
       # Use the same signing key for the base and the on-demand Android split APKs.
       # A mismatched key or version is refused by Android PackageInstaller.
