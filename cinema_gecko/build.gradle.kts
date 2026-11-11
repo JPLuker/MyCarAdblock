@@ -10,7 +10,10 @@ plugins {
 android {
     namespace = "io.github.sirionero.mycar.cinema.gecko"
     compileSdk = 37
-    defaultConfig { minSdk = 31 }
+    defaultConfig {
+        minSdk = 31
+        ndk { abiFilters += "arm64-v8a" }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -20,5 +23,5 @@ android {
 dependencies {
     implementation(project(":app"))
     // Pinned GeckoView stable from Mozilla. Keep synchronized with the matching signed split.
-    implementation("org.mozilla.geckoview:geckoview:159.0.20261102144711")
+    implementation("org.mozilla.geckoview:geckoview-arm64-v8a:159.0.20261102144711")
 }
