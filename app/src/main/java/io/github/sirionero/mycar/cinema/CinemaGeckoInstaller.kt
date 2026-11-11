@@ -57,13 +57,27 @@ object CinemaGeckoInstaller {
     fun refresh(context: Context) {
         if (CinemaGeckoBridge.installed(context)) {
             flow.value = Status.Installed
-        } else if (flow.value is Status.Installed) {
-            flow.value = Status.Idle
+            return
+        }
+        if (flow.value is Status.Installed) flow.value = Status.Idle
+        // Android may have stopped myCar while it opened the package-install permission page.
+        // The verified download is in app-private cache, so a return can offer Install again.
+        if (flow.value is Status.Idle && !BuildConfig.DEBUG) {
+            val file = archive(context)
+            if (file.isFile && runCatching { validateSplitArchive(file) }.isSuccess) {
+                flow.value = Status.Downloaded(file.length())
+            }
         }
     }
 
     /** Explicitly started from Settings on the phone, never automatically on first launch. */
     fun download(context: Context) {
+        if (BuildConfig.DEBUG) {
+            flow.value = Status.Failed(
+                "The Firefox engine needs a matching signed release build; debug APKs use a different package ID.",
+            )
+            return
+        }
         if (flow.value is Status.Checking || flow.value is Status.Downloading || flow.value is Status.Installing) return
         val app = context.applicationContext
         if (CinemaGeckoBridge.installed(app)) { flow.value = Status.Installed; return }
