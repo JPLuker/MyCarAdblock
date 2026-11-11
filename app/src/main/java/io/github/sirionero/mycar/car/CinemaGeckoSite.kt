@@ -45,7 +45,7 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, onClose: ()
         navigator.backInterceptor = {
             val current = browser
             when {
-                fullScreen -> { fullScreen = false; true }
+                fullScreen -> { browser?.exitFullScreen(); fullScreen = false; true }
                 current != null && current.canGoBack -> { current.goBack(); true }
                 else -> { onClose(); true }
             }
