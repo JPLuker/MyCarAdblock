@@ -1,5 +1,7 @@
 package io.github.sirionero.mycar.cinema.gecko
 
+import android.content.Context
+import io.github.sirionero.mycar.MyCarLog
 import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoRuntime
 import org.mozilla.geckoview.WebExtension
@@ -12,8 +14,11 @@ import org.mozilla.geckoview.WebExtensionController
 internal object CinemaUBlock {
     private const val EXTENSION_ID = "uBlock0@raymondhill.net"
     private const val OFFICIAL_XPI = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi"
+    private const val UPDATE_INTERVAL_MS = 24L * 60 * 60 * 1000
+    private const val KEY_LAST_UPDATE = "ubo_update_checked"
 
     fun ensure(
+        context: Context,
         runtime: GeckoRuntime,
         enabled: Boolean,
         onReady: () -> Unit,
@@ -41,6 +46,7 @@ internal object CinemaUBlock {
         controller.list().accept({ extensions ->
             val existing = extensions.firstOrNull { it.id == EXTENSION_ID }
             if (existing != null && existing.metaData.enabled == enabled) {
+                if (enabled) checkForUpdate(context, controller, existing)
                 onReady()
             } else if (existing != null) {
                 val action = if (enabled) {
@@ -48,7 +54,10 @@ internal object CinemaUBlock {
                 } else {
                     controller.disable(existing, WebExtensionController.EnableSource.USER)
                 }
-                action.accept({ onReady() }, { onError("uBlock Origin could not be toggled: ${it.message}") })
+                action.accept({
+                    if (enabled) checkForUpdate(context, controller, it)
+                    onReady()
+                }, { onError("uBlock Origin could not be toggled: ${it.message}") })
             } else if (!enabled) {
                 onReady()
             } else {
@@ -67,5 +76,21 @@ internal object CinemaUBlock {
         }, {
             onError("Firefox add-ons could not be checked: ${it.message}")
         })
+    }
+    /** GeckoView does not automatically keep external extensions current. Check at most daily. */
+    private fun checkForUpdate(
+        context: Context,
+        controller: WebExtensionController,
+        extension: WebExtension,
+    ) {
+        val prefs = context.applicationContext.getSharedPreferences("cinema_firefox", Context.MODE_PRIVATE)
+        val now = System.currentTimeMillis()
+        val previous = prefs.getLong(KEY_LAST_UPDATE, 0)
+        if (now - previous in 0 until UPDATE_INTERVAL_MS) return
+        prefs.edit().putLong(KEY_LAST_UPDATE, now).apply()
+        controller.update(extension).accept(
+            { /* GeckoView preserves extension settings across updates. */ },
+            { MyCarLog.w("cinema: uBlock update check failed (" + it.javaClass.simpleName + ")") },
+        )
     }
 }
