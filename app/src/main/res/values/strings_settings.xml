@@ -166,6 +166,8 @@
 
     <!-- Settings > Cinema: video sites in the car (ui/CinemaSettings.kt, ui/CinemaSources.kt) -->
     <string name="settings_cinema_footer">Video sites as tiles in the car, each opened in a browser made for video. Protected video (Netflix, DAZN, Prime Video, Disney+ and the like) most likely stays black in the car: Android hides it from a screen made into a video stream, as the car\'s is.</string>
+    <string name="settings_cinema_ad_block">Block ads and trackers</string>
+    <string name="settings_cinema_ad_block_detail">Blocks known ad and tracking hosts on Cinema websites. Some video ads may still appear.</string>
     <string name="settings_cinema_parked_only">Video only when parked</string>
     <string name="settings_cinema_parked_only_on">While the car moves the picture is covered, and the sound carries on</string>
     <string name="settings_cinema_parked_only_off">Off: video shows while the car moves too</string>
