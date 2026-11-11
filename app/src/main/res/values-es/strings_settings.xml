@@ -128,6 +128,14 @@
     <string name="settings_cinema_engine_webview">Android WebView</string>
     <string name="settings_cinema_engine_webview_detail">Integrado, sin descargas adicionales</string>
     <string name="settings_cinema_engine_gecko">Firefox GeckoView + uBlock Origin</string>
+    <string name="settings_cinema_engine_gecko_ready">Instalado y listo (uBlock Origin se instalará al abrir por primera vez)</string>
+    <string name="settings_cinema_engine_downloading">Descargando el motor Firefox: %1$d%%</string>
+    <string name="settings_cinema_engine_checking">Comprobando la versión compatible…</string>
+    <string name="settings_cinema_engine_install">Instalar motor Firefox</string>
+    <string name="settings_cinema_engine_allow_install">Permitir instalaciones desde myCar</string>
+    <string name="settings_cinema_engine_installing">Instalando motor Firefox…</string>
+    <string name="settings_cinema_engine_retry">Reintentar descarga</string>
+    <string name="settings_cinema_engine_download">Descargar motor Firefox</string>
     <string name="settings_cinema_engine_gecko_pending">La descarga opcional del navegador todavía no está disponible en esta versión</string>
     <string name="settings_cinema_ad_block">Bloquear anuncios y rastreadores</string>
     <string name="settings_cinema_ad_block_detail">Bloquea los servidores conocidos de anuncios y seguimiento en los sitios de Cinema. Algunos anuncios en vídeo pueden seguir apareciendo.</string>
