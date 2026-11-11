@@ -124,6 +124,8 @@
     <string name="settings_xonos_test_ok">Music Assistant %1$s, αναπαραγωγή ως %2$s</string>
 
     <string name="settings_cinema_footer">Ιστότοποι βίντεο ως πλακίδια στο αυτοκίνητο, ο καθένας σε ένα πρόγραμμα περιήγησης φτιαγμένο για βίντεο. Το προστατευμένο βίντεο (Netflix, DAZN, Prime Video, Disney+ και παρόμοια) πιθανότατα μένει μαύρο στο αυτοκίνητο: το Android το κρύβει από μια οθόνη που γίνεται ροή βίντεο, όπως αυτή του αυτοκινήτου.</string>
+    <string name="settings_cinema_ad_block">Αποκλεισμός διαφημίσεων και ιχνηλατών</string>
+    <string name="settings_cinema_ad_block_detail">Αποκλείει γνωστούς διαφημιστικούς διακομιστές και ιχνηλάτες στους ιστότοπους Cinema. Ορισμένες διαφημίσεις βίντεο ίσως εξακολουθούν να εμφανίζονται.</string>
     <string name="settings_cinema_parked_only">Βίντεο μόνο σε στάθμευση</string>
     <string name="settings_cinema_parked_only_on">Όσο το αυτοκίνητο κινείται, η εικόνα καλύπτεται και ο ήχος συνεχίζει</string>
     <string name="settings_cinema_parked_only_off">Ανενεργό: το βίντεο φαίνεται και όσο το αυτοκίνητο κινείται</string>
