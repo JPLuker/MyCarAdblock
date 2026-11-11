@@ -44,7 +44,7 @@ internal object CinemaUBlock {
             }
         })
         controller.list().accept({ extensions ->
-            val existing = extensions.firstOrNull { it.id == EXTENSION_ID }
+            val existing = extensions?.firstOrNull { it.id == EXTENSION_ID }
             if (existing != null && existing.metaData.enabled == enabled) {
                 if (enabled) checkForUpdate(context, controller, existing)
                 onReady()
@@ -54,27 +54,31 @@ internal object CinemaUBlock {
                 } else {
                     controller.disable(existing, WebExtensionController.EnableSource.USER)
                 }
-                action.accept({
-                    if (enabled) checkForUpdate(context, controller, it)
-                    onReady()
-                }, { onError("uBlock Origin could not be toggled: ${it.message}") })
+                action.accept({ toggled ->
+                    if (toggled == null) {
+                        onError("uBlock Origin did not return an updated extension.")
+                    } else {
+                        if (enabled) checkForUpdate(context, controller, toggled)
+                        onReady()
+                    }
+                }, { failure -> onError("uBlock Origin could not be toggled: ${failure?.message ?: "unknown error"}") })
             } else if (!enabled) {
                 onReady()
             } else {
                 controller.install(OFFICIAL_XPI, WebExtensionController.INSTALLATION_METHOD_MANAGER)
                     .accept({ extension ->
-                        if (extension.id == EXTENSION_ID) {
+                        if (extension?.id == EXTENSION_ID) {
                             onReady()
                         } else {
-                            controller.uninstall(extension)
+                            if (extension != null) controller.uninstall(extension)
                             onError("The downloaded add-on was not uBlock Origin.")
                         }
-                    }, {
-                        onError("Official uBlock Origin could not be installed: ${it.message}")
+                    }, { failure ->
+                        onError("Official uBlock Origin could not be installed: ${failure?.message ?: "unknown error"}")
                     })
             }
-        }, {
-            onError("Firefox add-ons could not be checked: ${it.message}")
+        }, { failure ->
+            onError("Firefox add-ons could not be checked: ${failure?.message ?: "unknown error"}")
         })
     }
     /** GeckoView does not automatically keep external extensions current. Check at most daily. */
@@ -90,7 +94,7 @@ internal object CinemaUBlock {
         prefs.edit().putLong(KEY_LAST_UPDATE, now).apply()
         controller.update(extension).accept(
             { /* GeckoView preserves extension settings across updates. */ },
-            { MyCarLog.w("cinema: uBlock update check failed (" + it.javaClass.simpleName + ")") },
+            { MyCarLog.w("cinema: uBlock update check failed (" + (it?.javaClass?.simpleName ?: "unknown error") + ")") },
         )
     }
 }
