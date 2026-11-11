@@ -82,7 +82,7 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
 
         // Do not load the page without blocking when the driver selected uBO. A signed add-on
         // installation may be necessary on the first launch, and is asynchronous.
-        CinemaUBlock.ensure(runtime, adBlock, onReady = {
+        CinemaUBlock.ensure(context, runtime, adBlock, onReady = {
             session.loadUri(url)
         }, onError = {
             onFailure(it)
