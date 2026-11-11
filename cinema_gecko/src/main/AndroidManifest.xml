@@ -4,7 +4,7 @@
 
     <!-- This split is never fused into the installer. GitHub release and PackageInstaller
          delivery still require implementation and independent verification. -->
-    <dist:module dist:instant="false" dist:title="@string/cinema_gecko_module_title">
+    <dist:module dist:instant="false" dist:title="@string/settings_cinema_engine_gecko">
         <dist:delivery>
             <dist:on-demand/>
         </dist:delivery>
