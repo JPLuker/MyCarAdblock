@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:dist="http://schemas.android.com/apk/distribution">
+    xmlns:dist="http://schemas.android.com/apk/distribution"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- This split is never fused into the installer. GitHub release and PackageInstaller
          delivery still require implementation and independent verification. -->
@@ -11,5 +12,12 @@
         <dist:fusing dist:include="false"/>
     </dist:module>
 
-    <application android:hasCode="true" />
+    <application android:hasCode="true">
+        <!-- Only the base app needs Google Play Services metadata. Copying its merged
+             manifest entry into this dynamic feature references a resource that is not
+             present in the feature's resource table, causing AAPT2 to fail linking. -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            tools:node="remove" />
+    </application>
 </manifest>
