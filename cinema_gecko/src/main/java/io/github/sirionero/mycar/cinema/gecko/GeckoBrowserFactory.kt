@@ -122,6 +122,7 @@ private class RunningSession(
     override fun goBack() { if (hasBack) session.goBack() }
     override fun reload() = session.reload()
     override fun pause() { session.setActive(false) }
+    override fun exitFullScreen() { session.exitFullScreen() }
     override fun close() {
         onKeyboard(null)
         view.releaseSession()
