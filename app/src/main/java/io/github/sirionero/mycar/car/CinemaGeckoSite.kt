@@ -42,6 +42,8 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, onClose: ()
     LaunchedEffect(Unit) { CarAudio.askAgainOnce(); CarAudio.captureNow() }
 
     DisposableEffect(browser) {
+        val pause = browser?.let { active -> { active.pause() } }
+        if (pause != null) CinemaNow.pause = pause
         navigator.backInterceptor = {
             val current = browser
             when {
@@ -50,7 +52,10 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, onClose: ()
                 else -> { onClose(); true }
             }
         }
-        onDispose { navigator.backInterceptor = null }
+        onDispose {
+            navigator.backInterceptor = null
+            if (pause != null && CinemaNow.pause === pause) CinemaNow.pause = null
+        }
     }
 
     Column(Modifier.fillMaxSize()) {
