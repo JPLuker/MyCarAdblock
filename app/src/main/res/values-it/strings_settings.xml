@@ -124,6 +124,11 @@
     <string name="settings_xonos_test_ok">Music Assistant %1$s, come lettore %2$s</string>
 
     <string name="settings_cinema_footer">I siti di video come riquadri in auto, ognuno aperto in un browser fatto per il video. Il video protetto (Netflix, DAZN, Prime Video, Disney+ e simili) molto probabilmente resta nero in auto: Android lo nasconde a uno schermo trasformato in un flusso video, come quello dell\'auto.</string>
+    <string name="settings_cinema_browser_engine">Motore del browser</string>
+    <string name="settings_cinema_engine_webview">Android WebView</string>
+    <string name="settings_cinema_engine_webview_detail">Integrato, nessun download aggiuntivo</string>
+    <string name="settings_cinema_engine_gecko">Firefox GeckoView + uBlock Origin</string>
+    <string name="settings_cinema_engine_gecko_pending">Il download opzionale del browser non è ancora disponibile in questa versione</string>
     <string name="settings_cinema_ad_block">Blocca annunci e tracker</string>
     <string name="settings_cinema_ad_block_detail">Blocca i server pubblicitari e di tracciamento noti nei siti di Cinema. Alcuni annunci video potrebbero comunque apparire.</string>
     <string name="settings_cinema_parked_only">Video solo ad auto ferma</string>
