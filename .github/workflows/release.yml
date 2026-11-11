@@ -30,8 +30,52 @@ jobs:
           keyPassword=${{ secrets.KEYSTORE_KEY_PASSWORD }}
           EOF
 
-      - name: Build release APK
-        run: ./gradlew :app:assembleRelease
+      - name: Build release APK and optional GeckoView bundle
+        run: ./gradlew :app:assembleRelease :app:bundleRelease
+
+      # Use the same signing key for the base and the on-demand Android split APKs.
+      # A mismatched key or version is refused by Android PackageInstaller.
+      - name: Package optional signed GeckoView splits
+        env:
+          KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 \
+            https://github.com/google/bundletool/releases/download/1.18.2/bundletool-all-1.18.2.jar \
+            --output bundletool.jar
+          bundle=$(find build/app/outputs/bundle/release -name '*.aab' -print -quit)
+          test -n "$bundle"
+          umask 077
+          printf '%s' "$KEYSTORE_STORE_PASSWORD" > store.pass
+          printf '%s' "$KEYSTORE_KEY_PASSWORD" > key.pass
+          trap 'rm -f store.pass key.pass' EXIT
+          java -jar bundletool.jar build-apks \
+            --bundle="$bundle" \
+            --output=build/cinema-signed.apks \
+            --mode=default \
+            --ks=mycar-release.jks \
+            --ks-pass=file:store.pass \
+            --ks-key-alias="$KEYSTORE_KEY_ALIAS" \
+            --key-pass=file:key.pass
+          python3 tools/package_gecko_split.py \
+            build/cinema-signed.apks build/myCar-gecko-arm64-v8a.zip
+          mkdir -p build/gecko-verify
+          unzip -q build/myCar-gecko-arm64-v8a.zip -d build/gecko-verify
+          signer=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          test -n "$signer"
+          "$signer" verify build/myCar-release.apk
+          for split in build/gecko-verify/*.apk; do
+            "$signer" verify "$split"
+          done
+          base_sha=$("$signer" verify --print-certs build/myCar-release.apk | awk '/Signer #1 certificate SHA-256 digest:/ {print $NF}')
+          test -n "$base_sha"
+          for split in build/gecko-verify/*.apk; do
+            sha=$("$signer" verify --print-certs "$split" | awk '/Signer #1 certificate SHA-256 digest:/ {print $NF}')
+            test "$sha" = "$base_sha" || { echo "Feature signing mismatch: $split"; exit 1; }
+          done
+          echo "Optional GeckoView splits match the base signing certificate."
 
       - name: Locate APK
         id: apk
@@ -53,6 +97,7 @@ jobs:
           files: |
             ${{ steps.apk.outputs.path }}
             ${{ steps.apk.outputs.mapping }}
+            build/myCar-gecko-arm64-v8a.zip
           # The hand-written notes go first; GitHub adds the full changelog link under them.
           body_path: .github/release-notes.md
           generate_release_notes: true
