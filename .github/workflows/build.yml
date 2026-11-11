@@ -39,8 +39,21 @@ jobs:
           printf 'storeFile=mycar-release.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
             "$KEYSTORE_STORE_PASSWORD" "$KEYSTORE_KEY_ALIAS" "$KEYSTORE_KEY_PASSWORD" > keystore.properties
 
-      - name: Build and test
-        run: ./gradlew :app:assembleDebug :app:testDebugUnitTest --no-daemon --stacktrace
+      - name: Optional split archive tests
+        run: python3 -m unittest tools/test_package_gecko_split.py
+
+      - name: Build, split bundle and test
+        run: ./gradlew :app:assembleDebug :app:bundleDebug :app:testDebugUnitTest --no-daemon --stacktrace
+
+      # A dynamic feature is useful only if the standard installer does not contain GeckoView.
+      - name: Confirm base APK stays lightweight
+        run: |
+          test -f build/myCar-debug.apk
+          if unzip -Z1 build/myCar-debug.apk | grep -Eq '(^|/)(libxul[.]so|omni[.]ja)$'; then
+            echo "GeckoView native engine leaked into the base APK"
+            exit 1
+          fi
+          echo "No GeckoView native engine found in the base APK"
 
       # Every language has every text, with the same placeholders (tools/check_strings.py). After
       # the build, so a missing translation doesn't hide a build error.

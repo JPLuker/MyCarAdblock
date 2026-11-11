@@ -173,7 +173,10 @@ behind it all — still or moving.
 - **Cinema.** Your video sites as tiles, each with the icon it gives itself: YouTube, RaiPlay
   and Twitch to start with, and any you add on the phone, your own Jellyfin included. Each opens
   in a browser made for video: full screen when the player asks for it, the car's keyboard for
-  searching, a site's computer layout when you prefer it. Next to the sites, the videos on your
+  searching, a site's computer layout when you prefer it. The Cinema browser blocks known ad
+  and tracking hosts by default; Settings > Cinema can turn this off if a site has trouble.
+  The [StevenBlack hosts list](https://github.com/StevenBlack/hosts) refreshes weekly and is
+  cached on the phone. YouTube and Twitch video ads may still appear. Next to the sites, the videos on your
   phone (they start again where you left them) and TV: add an IPTV list (M3U) from your provider, a
   public list or a TV server at home, and its channels show with their logos and groups. Both play
   on Android's own player, with nothing extra to install. Video shows only when the car is parked:
@@ -358,14 +361,18 @@ myCar gets the new one before the old one runs out. You can also pick one in Set
 import a file of your own. Certificates stay on your phone. myCar never uploads, backs up, or
 logs them.
 
-## Based on Gearslip
+## Fork lineage and Gearslip credit
 
-myCar is a modified version of [Gearslip](https://github.com/twinksoftware/gearslip),
-Copyright (C) 2026 Twink Software LLC and contributors, released under the GNU Affero
-General Public License v3.0. myCar does not take updates from Gearslip and is not
-affiliated with, endorsed by, or sponsored by Twink Software LLC.
+**MyCarAdblock** is a fork of [SirioNero/MyCar](https://github.com/SirioNero/MyCar),
+which is itself a fork of [twinksoftware/Gearslip](https://github.com/twinksoftware/Gearslip).
+Contributions originating in this fork should be proposed to MyCar upstream first.
 
-Changes since October 26, 2026, when myCar forked Gearslip 0.3.01-alpha:
+The upstream myCar project is derived from Gearslip, Copyright (C) 2026 Twink Software
+LLC and contributors, under the GNU Affero General Public License v3.0. Neither this fork
+nor upstream myCar is affiliated with, endorsed by, or sponsored by Twink Software LLC.
+
+The following is the upstream myCar change history since it forked Gearslip 0.3.01-alpha
+on October 26, 2026:
 
 **Identity**
 - New name, icon, package name (`io.github.sirionero.mycar`), signing key, and source repository.

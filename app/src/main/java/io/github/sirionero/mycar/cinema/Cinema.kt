@@ -29,6 +29,8 @@ object Cinema {
 
     private const val KEY_SITES = "cinema_sites"
     private const val KEY_PARKED_ONLY = "cinema_parked_only"
+    private const val KEY_AD_BLOCK = "cinema_ad_block"
+    private const val KEY_BROWSER_ENGINE = "cinema_browser_engine"
 
     /** To start with, until the driver changes the list: sites whose video shows in the car. */
     val SUGGESTED = listOf(
@@ -63,17 +65,29 @@ object Cinema {
     private var app: Context? = null
     private val sitesFlow = MutableStateFlow(SUGGESTED)
     private val parkedOnlyFlow = MutableStateFlow(true)
+    private val adBlockFlow = MutableStateFlow(true)
+    private val browserEngineFlow = MutableStateFlow(CinemaBrowserEngine.ANDROID_WEBVIEW)
 
     val sites: StateFlow<List<CinemaSite>> = sitesFlow.asStateFlow()
 
     /** Video only with the car parked: on unless the owner turned it off on the phone. */
     val parkedOnly: StateFlow<Boolean> = parkedOnlyFlow.asStateFlow()
 
+    /** Blocking applies to Cinema websites only, and is enabled unless turned off. */
+    val adBlockEnabled: StateFlow<Boolean> = adBlockFlow.asStateFlow()
+
+    /** Preferred website engine; the UI falls back to WebView if the optional split is absent. */
+    val browserEngine: StateFlow<CinemaBrowserEngine> = browserEngineFlow.asStateFlow()
+
     fun init(context: Context) {
         val app = context.applicationContext.also { this.app = it }
         val saved = AppSettings.getString(app, KEY_SITES, "")
         sitesFlow.value = if (saved.isEmpty()) SUGGESTED else read(saved)
         parkedOnlyFlow.value = AppSettings.getString(app, KEY_PARKED_ONLY, "true") == "true"
+        adBlockFlow.value = AppSettings.getString(app, KEY_AD_BLOCK, "true") == "true"
+        browserEngineFlow.value = CinemaBrowserEngine.fromStored(
+            AppSettings.getString(app, KEY_BROWSER_ENGINE, CinemaBrowserEngine.ANDROID_WEBVIEW.storageValue),
+        )
         TvLists.init(app)
     }
 
@@ -89,6 +103,16 @@ object Cinema {
     fun setParkedOnly(on: Boolean) {
         parkedOnlyFlow.value = on
         app?.let { AppSettings.putString(it, KEY_PARKED_ONLY, on.toString()) }
+    }
+
+    fun setAdBlockEnabled(on: Boolean) {
+        adBlockFlow.value = on
+        app?.let { AppSettings.putString(it, KEY_AD_BLOCK, on.toString()) }
+    }
+
+    fun setBrowserEngine(engine: CinemaBrowserEngine) {
+        browserEngineFlow.value = engine
+        app?.let { AppSettings.putString(it, KEY_BROWSER_ENGINE, engine.storageValue) }
     }
 
     /** Whether [site]'s video is protected, and so most likely black in the car. */

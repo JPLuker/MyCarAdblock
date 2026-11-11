@@ -31,6 +31,8 @@ val keystoreProperties = Properties().apply {
 layout.buildDirectory.set(rootProject.layout.buildDirectory.dir("app"))
 
 android {
+    // GeckoView is delivered as a separate on-demand split, never bundled in the base APK.
+    dynamicFeatures += setOf(":cinema_gecko")
     namespace = "io.github.sirionero.mycar"
     compileSdk = 37
 

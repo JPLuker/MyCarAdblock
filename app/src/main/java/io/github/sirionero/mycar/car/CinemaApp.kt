@@ -12,6 +12,7 @@ import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
@@ -79,7 +80,11 @@ import io.github.sirionero.mycar.car.design.MyCarRadius
 import io.github.sirionero.mycar.car.design.MyCarSpace
 import io.github.sirionero.mycar.car.design.glassFinish
 import io.github.sirionero.mycar.cinema.Cinema
+import io.github.sirionero.mycar.cinema.CinemaAdBlock
 import io.github.sirionero.mycar.cinema.CinemaSite
+import io.github.sirionero.mycar.cinema.CinemaBrowserEngine
+import io.github.sirionero.mycar.cinema.CinemaBrowserPolicy
+import io.github.sirionero.mycar.cinema.CinemaGeckoBridge
 import io.github.sirionero.mycar.cinema.SiteIcons
 import io.github.sirionero.mycar.cinema.TvList
 import io.github.sirionero.mycar.cinema.TvLists
@@ -104,6 +109,9 @@ internal fun CinemaScreen() {
         onDispose { CinemaMusic.closed(music) }
     }
     val sites by Cinema.sites.collectAsState()
+    val preferredEngine by Cinema.browserEngine.collectAsState()
+    val adBlockEnabled by Cinema.adBlockEnabled.collectAsState()
+    LaunchedEffect(adBlockEnabled) { if (adBlockEnabled) CinemaAdBlock.warmUp(context) }
     val tvLists by TvLists.lists.collectAsState()
     LaunchedEffect(Unit) { CinemaContinue.load(context) }
     val last by CinemaContinue.last.collectAsState()
@@ -151,7 +159,14 @@ internal fun CinemaScreen() {
             },
             onShelf = { shelf = it },
         )
-        else -> key(open.url) { CinemaSiteView(open, startAt = startPage, onClose = { openUrl = null }) }
+        else -> key(open.url, preferredEngine) {
+            val engine = CinemaBrowserPolicy.active(preferredEngine, CinemaGeckoBridge.installed(context))
+            if (engine == CinemaBrowserEngine.FIREFOX_GECKOVIEW) {
+                CinemaGeckoSiteView(open, startAt = startPage, onClose = { openUrl = null })
+            } else {
+                CinemaSiteView(open, startAt = startPage, onClose = { openUrl = null })
+            }
+        }
     }
 }
 
@@ -541,6 +556,9 @@ private class CinemaClient(
 
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean =
         view?.handledAppLink(request) == true
+
+    override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? =
+        CinemaAdBlock.intercept(request)
 
     // The web engine's page process is one for the whole app: when it dies (video sites weigh on
     // it most), every web view on it must say it handled that, or Android ends myCar - and the

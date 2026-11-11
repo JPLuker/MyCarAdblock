@@ -124,6 +124,21 @@
     <string name="settings_xonos_test_ok">Music Assistant %1$s, αναπαραγωγή ως %2$s</string>
 
     <string name="settings_cinema_footer">Ιστότοποι βίντεο ως πλακίδια στο αυτοκίνητο, ο καθένας σε ένα πρόγραμμα περιήγησης φτιαγμένο για βίντεο. Το προστατευμένο βίντεο (Netflix, DAZN, Prime Video, Disney+ και παρόμοια) πιθανότατα μένει μαύρο στο αυτοκίνητο: το Android το κρύβει από μια οθόνη που γίνεται ροή βίντεο, όπως αυτή του αυτοκινήτου.</string>
+    <string name="settings_cinema_browser_engine">Μηχανή περιήγησης</string>
+    <string name="settings_cinema_engine_webview">Android WebView</string>
+    <string name="settings_cinema_engine_webview_detail">Ενσωματωμένο, χωρίς επιπλέον λήψη</string>
+    <string name="settings_cinema_engine_gecko">Firefox GeckoView + uBlock Origin</string>
+    <string name="settings_cinema_engine_gecko_ready">Εγκαταστάθηκε (το uBlock Origin θα εγκατασταθεί στο πρώτο άνοιγμα)</string>
+    <string name="settings_cinema_engine_downloading">Λήψη μηχανής Firefox: %1$d%%</string>
+    <string name="settings_cinema_engine_checking">Έλεγχος συμβατής έκδοσης…</string>
+    <string name="settings_cinema_engine_install">Εγκατάσταση μηχανής Firefox</string>
+    <string name="settings_cinema_engine_allow_install">Να επιτρέπονται εγκαταστάσεις από το myCar</string>
+    <string name="settings_cinema_engine_installing">Εγκατάσταση μηχανής Firefox…</string>
+    <string name="settings_cinema_engine_retry">Επανάληψη λήψης</string>
+    <string name="settings_cinema_engine_download">Λήψη μηχανής Firefox</string>
+    <string name="settings_cinema_engine_gecko_pending">Η προαιρετική λήψη του προγράμματος περιήγησης δεν είναι ακόμη διαθέσιμη σε αυτήν την έκδοση</string>
+    <string name="settings_cinema_ad_block">Αποκλεισμός διαφημίσεων και ιχνηλατών</string>
+    <string name="settings_cinema_ad_block_detail">Αποκλείει γνωστούς διαφημιστικούς διακομιστές και ιχνηλάτες στους ιστότοπους Cinema. Ορισμένες διαφημίσεις βίντεο ίσως εξακολουθούν να εμφανίζονται.</string>
     <string name="settings_cinema_parked_only">Βίντεο μόνο σε στάθμευση</string>
     <string name="settings_cinema_parked_only_on">Όσο το αυτοκίνητο κινείται, η εικόνα καλύπτεται και ο ήχος συνεχίζει</string>
     <string name="settings_cinema_parked_only_off">Ανενεργό: το βίντεο φαίνεται και όσο το αυτοκίνητο κινείται</string>

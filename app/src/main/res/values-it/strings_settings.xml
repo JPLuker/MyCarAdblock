@@ -124,6 +124,21 @@
     <string name="settings_xonos_test_ok">Music Assistant %1$s, come lettore %2$s</string>
 
     <string name="settings_cinema_footer">I siti di video come riquadri in auto, ognuno aperto in un browser fatto per il video. Il video protetto (Netflix, DAZN, Prime Video, Disney+ e simili) molto probabilmente resta nero in auto: Android lo nasconde a uno schermo trasformato in un flusso video, come quello dell\'auto.</string>
+    <string name="settings_cinema_browser_engine">Motore del browser</string>
+    <string name="settings_cinema_engine_webview">Android WebView</string>
+    <string name="settings_cinema_engine_webview_detail">Integrato, nessun download aggiuntivo</string>
+    <string name="settings_cinema_engine_gecko">Firefox GeckoView + uBlock Origin</string>
+    <string name="settings_cinema_engine_gecko_ready">Installato e pronto (uBlock Origin si installa al primo avvio)</string>
+    <string name="settings_cinema_engine_downloading">Download motore Firefox: %1$d%%</string>
+    <string name="settings_cinema_engine_checking">Controllo versione compatibile…</string>
+    <string name="settings_cinema_engine_install">Installa motore Firefox</string>
+    <string name="settings_cinema_engine_allow_install">Consenti installazioni da myCar</string>
+    <string name="settings_cinema_engine_installing">Installazione motore Firefox…</string>
+    <string name="settings_cinema_engine_retry">Riprova download</string>
+    <string name="settings_cinema_engine_download">Scarica motore Firefox</string>
+    <string name="settings_cinema_engine_gecko_pending">Il download opzionale del browser non è ancora disponibile in questa versione</string>
+    <string name="settings_cinema_ad_block">Blocca annunci e tracker</string>
+    <string name="settings_cinema_ad_block_detail">Blocca i server pubblicitari e di tracciamento noti nei siti di Cinema. Alcuni annunci video potrebbero comunque apparire.</string>
     <string name="settings_cinema_parked_only">Video solo ad auto ferma</string>
     <string name="settings_cinema_parked_only_on">Mentre l\'auto si muove l\'immagine è coperta, e l\'audio continua</string>
     <string name="settings_cinema_parked_only_off">Spento: il video si vede anche mentre l\'auto si muove</string>

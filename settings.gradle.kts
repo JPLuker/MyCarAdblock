@@ -19,11 +19,13 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://maven.mozilla.org/maven2/")
         maven("https://jitpack.io")
     }
 }
 
 rootProject.name = "myCar"
 include(":app")
+include(":cinema_gecko")
 // include(":ksdump")
  
