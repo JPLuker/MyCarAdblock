@@ -20,6 +20,7 @@ interface CinemaBrowserSession {
     fun setText(text: String)
     fun submitText()
     fun pause()
+    fun exitFullScreen()
     fun close()
 }
 
