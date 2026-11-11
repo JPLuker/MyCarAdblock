@@ -14,11 +14,12 @@ import org.mozilla.geckoview.GeckoView
  */
 class GeckoPrototype(private val context: Context) {
 
-    private val runtime: GeckoRuntime =
-        GeckoRuntime.getDefault(context.applicationContext)
+    // GeckoRuntime may only be created once per process; a new Cinema tab gets its own session.
+    private val runtime: GeckoRuntime = RuntimeHolder.get(context)
 
     fun open(url: String): GeckoView {
         val session = GeckoSession()
+        session.setContentDelegate(object : GeckoSession.ContentDelegate {})
         session.open(runtime)
         return GeckoView(context).apply {
             setSession(session)
@@ -29,4 +30,13 @@ class GeckoPrototype(private val context: Context) {
     fun close(view: GeckoView) {
         view.releaseSession()?.close()
     }
+}
+
+/** Process-wide runtime, initialized only on the UI thread when Gecko is requested. */
+private object RuntimeHolder {
+    private var runtime: GeckoRuntime? = null
+
+    @Synchronized
+    fun get(context: Context): GeckoRuntime =
+        runtime ?: GeckoRuntime.create(context.applicationContext).also { runtime = it }
 }
