@@ -29,9 +29,11 @@ it must not prevent testing or delivering the GitHub-release implementation.
 ## Implementation milestones
 
 - [x] Document product goals and accurate fork/upstream lineage.
-- [ ] **M1:** Persist browser choice and show both choices/availability in Cinema settings.
-- [ ] **M2:** Establish the optional GeckoView dynamic-feature packaging with base-only APK
-      and matching split output, verifying actual artifact sizes and installability.
+- [x] **M1 groundwork:** Persist the preference, test safe fallback, and display both browser options in all nine Cinema-settings languages. GeckoView is intentionally disabled until its install/routing pipeline is ready.
+- [ ] **M2 (scaffold committed):** Dynamic-feature module `:cinema_gecko` contains the pinned
+      Mozilla GeckoView dependency and first runtime/session prototype, with no base-app
+      GeckoView imports. Still need working Android Gradle build, independent base/split
+      artifact verification, matching signatures and installation proof.
 - [ ] **M3:** Implement authenticated, cancelable matching split download/install and
       honest install status / recovery UI.
 - [ ] **M4:** Implement optional GeckoView sessions and full Cinema controls; integrate
@@ -41,7 +43,9 @@ it must not prevent testing or delivering the GitHub-release implementation.
 
 ---
 
-**Status:** Architecture decision; GeckoView module and installer are NOT implemented yet.
+**Status:** Architecture + early implementation. Browser preference UI and GeckoView feature-module
+scaffold exist on the draft branch. The signed split installer, working GeckoView routing,
+actual uBlock Origin install and full Android build verification are NOT complete.
 **Scope:** Cinema websites only. Preserve myCar's existing WebViews (music, dashboard, etc.)
 and the native media/IPTV player.
 
