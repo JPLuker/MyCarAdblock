@@ -361,14 +361,18 @@ myCar gets the new one before the old one runs out. You can also pick one in Set
 import a file of your own. Certificates stay on your phone. myCar never uploads, backs up, or
 logs them.
 
-## Based on Gearslip
+## Fork lineage and Gearslip credit
 
-myCar is a modified version of [Gearslip](https://github.com/twinksoftware/gearslip),
-Copyright (C) 2026 Twink Software LLC and contributors, released under the GNU Affero
-General Public License v3.0. myCar does not take updates from Gearslip and is not
-affiliated with, endorsed by, or sponsored by Twink Software LLC.
+**MyCarAdblock** is a fork of [SirioNero/MyCar](https://github.com/SirioNero/MyCar),
+which is itself a fork of [twinksoftware/Gearslip](https://github.com/twinksoftware/Gearslip).
+Contributions originating in this fork should be proposed to MyCar upstream first.
 
-Changes since October 26, 2026, when myCar forked Gearslip 0.3.01-alpha:
+The upstream myCar project is derived from Gearslip, Copyright (C) 2026 Twink Software
+LLC and contributors, under the GNU Affero General Public License v3.0. Neither this fork
+nor upstream myCar is affiliated with, endorsed by, or sponsored by Twink Software LLC.
+
+The following is the upstream myCar change history since it forked Gearslip 0.3.01-alpha
+on October 26, 2026:
 
 **Identity**
 - New name, icon, package name (`io.github.sirionero.mycar`), signing key, and source repository.
