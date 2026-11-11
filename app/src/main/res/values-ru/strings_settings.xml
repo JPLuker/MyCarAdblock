@@ -130,6 +130,14 @@
     <string name="settings_cinema_engine_webview">Android WebView</string>
     <string name="settings_cinema_engine_webview_detail">Встроен, дополнительная загрузка не нужна</string>
     <string name="settings_cinema_engine_gecko">Firefox GeckoView + uBlock Origin</string>
+    <string name="settings_cinema_engine_gecko_ready">Установлен и готов (uBlock Origin будет установлен при первом открытии)</string>
+    <string name="settings_cinema_engine_downloading">Загрузка движка Firefox: %1$d%%</string>
+    <string name="settings_cinema_engine_checking">Проверка совместимой версии…</string>
+    <string name="settings_cinema_engine_install">Установить движок Firefox</string>
+    <string name="settings_cinema_engine_allow_install">Разрешить установку из myCar</string>
+    <string name="settings_cinema_engine_installing">Установка движка Firefox…</string>
+    <string name="settings_cinema_engine_retry">Повторить загрузку</string>
+    <string name="settings_cinema_engine_download">Скачать движок Firefox</string>
     <string name="settings_cinema_engine_gecko_pending">Загрузка дополнительного браузера пока недоступна в этой сборке</string>
     <string name="settings_cinema_ad_block">Блокировать рекламу и трекеры</string>
     <string name="settings_cinema_ad_block_detail">Блокирует известные рекламные и отслеживающие серверы на сайтах Cinema. Некоторые видеорекламы всё ещё могут показываться.</string>
