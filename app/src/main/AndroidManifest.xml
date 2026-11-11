@@ -182,6 +182,12 @@
         </provider>
 
 
+        <!-- Android PackageInstaller returns progress/consent for the optional Cinema split
+             only to this explicit, private receiver. -->
+        <receiver
+            android:name=".cinema.CinemaGeckoInstallReceiver"
+            android:exported="false" />
+
         <!--
           singleTop: the head unit can re-attach while we are already foregrounded, which
           arrives via onNewIntent rather than a fresh instance.
