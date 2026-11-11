@@ -26,5 +26,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "myCar"
 include(":app")
+include(":cinema_gecko")
 // include(":ksdump")
  
