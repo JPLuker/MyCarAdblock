@@ -124,6 +124,8 @@
     <string name="settings_xonos_test_ok">Music Assistant %1$s, come lettore %2$s</string>
 
     <string name="settings_cinema_footer">I siti di video come riquadri in auto, ognuno aperto in un browser fatto per il video. Il video protetto (Netflix, DAZN, Prime Video, Disney+ e simili) molto probabilmente resta nero in auto: Android lo nasconde a uno schermo trasformato in un flusso video, come quello dell\'auto.</string>
+    <string name="settings_cinema_ad_block">Blocca annunci e tracker</string>
+    <string name="settings_cinema_ad_block_detail">Blocca i server pubblicitari e di tracciamento noti nei siti di Cinema. Alcuni annunci video potrebbero comunque apparire.</string>
     <string name="settings_cinema_parked_only">Video solo ad auto ferma</string>
     <string name="settings_cinema_parked_only_on">Mentre l\'auto si muove l\'immagine è coperta, e l\'audio continua</string>
     <string name="settings_cinema_parked_only_off">Spento: il video si vede anche mentre l\'auto si muove</string>
