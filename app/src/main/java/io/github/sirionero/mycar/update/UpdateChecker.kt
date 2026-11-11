@@ -81,7 +81,7 @@ object UpdateChecker {
     private const val DAY_MS = 24 * 60 * 60 * 1000L
     private const val LATEST = "https://api.github.com/repos/JPLuker/MyCarAdblock/releases/latest"
     /** Newest first, pre-releases included. Ten covers any run of betas between two releases. */
-    private const val ALL = "https://api.github.com/repos/sirionero/mycar/releases?per_page=10"
+    private const val ALL = "https://api.github.com/repos/JPLuker/MyCarAdblock/releases?per_page=10"
 
     /** Set when the driver tapped Install but first had to allow installs from myCar. */
     @Volatile private var installWhenAllowed = false
