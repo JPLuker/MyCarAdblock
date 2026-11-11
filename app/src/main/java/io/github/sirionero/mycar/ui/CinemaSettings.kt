@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -19,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.cinema.Cinema
 import io.github.sirionero.mycar.cinema.CinemaSite
+import io.github.sirionero.mycar.cinema.CinemaBrowserEngine
 
 /**
  * Cinema, set up here on the phone: the video sites that show as tiles in the car, each one as on
@@ -50,6 +53,7 @@ internal fun CinemaSection() {
     val sites by Cinema.sites.collectAsState()
     val parkedOnly by Cinema.parkedOnly.collectAsState()
     val adBlockEnabled by Cinema.adBlockEnabled.collectAsState()
+    val browserEngine by Cinema.browserEngine.collectAsState()
     var warning by remember { mutableStateOf(false) }
     var resetAsk by remember { mutableStateOf(false) }
     var name by rememberSaveable { mutableStateOf("") }
@@ -85,6 +89,45 @@ internal fun CinemaSection() {
             Modifier.toggleable(adBlockEnabled, role = Role.Switch) { Cinema.setAdBlockEnabled(it) },
             subtitle = stringResource(R.string.settings_cinema_ad_block_detail),
             trailing = { Switch(checked = adBlockEnabled, onCheckedChange = null) },
+        )
+        SettingsDivider()
+        Text(
+            stringResource(R.string.settings_cinema_browser_engine),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
+        )
+        SettingsRow(
+            stringResource(R.string.settings_cinema_engine_webview),
+            Modifier.selectable(
+                selected = browserEngine == CinemaBrowserEngine.ANDROID_WEBVIEW,
+                role = Role.RadioButton,
+                onClick = { Cinema.setBrowserEngine(CinemaBrowserEngine.ANDROID_WEBVIEW) },
+            ),
+            subtitle = stringResource(R.string.settings_cinema_engine_webview_detail),
+            trailing = {
+                RadioButton(selected = browserEngine == CinemaBrowserEngine.ANDROID_WEBVIEW, onClick = null)
+            },
+        )
+        SettingsDivider()
+        SettingsRow(
+            stringResource(R.string.settings_cinema_engine_gecko),
+            // Not selectable before a tested optional module and its browser UI are installed.
+            // The next milestone will replace this with download/install/status handling.
+            Modifier.selectable(
+                selected = browserEngine == CinemaBrowserEngine.FIREFOX_GECKOVIEW,
+                enabled = false,
+                role = Role.RadioButton,
+                onClick = {},
+            ),
+            subtitle = stringResource(R.string.settings_cinema_engine_gecko_pending),
+            trailing = {
+                RadioButton(
+                    selected = browserEngine == CinemaBrowserEngine.FIREFOX_GECKOVIEW,
+                    onClick = null,
+                    enabled = false,
+                )
+            },
         )
         SettingsDivider()
         PhoneVideosRow()
