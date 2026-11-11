@@ -39,6 +39,7 @@ internal object CinemaAdBlock {
     )
     private val updateLock = Mutex()
     private var cacheLoaded = false
+    private var cacheUsable = false
 
     /** Published as a whole, never modified in place while WebView's IO threads read it. */
     @Volatile private var blockedDomains: Set<String> = bundled
@@ -54,11 +55,12 @@ internal object CinemaAdBlock {
                     cache.openRead().bufferedReader(Charsets.UTF_8).use { AdBlockRules.parseHosts(it.readText()) }
                 }.getOrNull()?.takeIf { it.size >= MIN_RULES }?.let {
                     blockedDomains = bundled + it
+                    cacheUsable = true
                 }
             }
             if (!Cinema.adBlockEnabled.value) return@withLock
             val age = System.currentTimeMillis() - cache.baseFile.lastModified()
-            if (cache.baseFile.exists() && age in 0 until UPDATE_INTERVAL_MS) return@withLock
+            if (cacheUsable && cache.baseFile.exists() && age in 0 until UPDATE_INTERVAL_MS) return@withLock
 
             val text = runCatching { downloadHosts() }.getOrElse {
                 MyCarLog.w("cinema: ad-block rules refresh unavailable (" + it.javaClass.simpleName + ")")
@@ -77,6 +79,7 @@ internal object CinemaAdBlock {
                 try {
                     out.write(text.toByteArray(Charsets.UTF_8))
                     cache.finishWrite(out)
+                    cacheUsable = true
                 } catch (error: Exception) {
                     cache.failWrite(out)
                     throw error
