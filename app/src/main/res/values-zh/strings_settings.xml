@@ -123,6 +123,11 @@
     <string name="settings_xonos_test_ok">Music Assistant %1$s，播放器为 %2$s</string>
 
     <string name="settings_cinema_footer">视频网站会以图块的形式出现在车上，每个网站都在专为视频打造的浏览器中打开。受保护的视频（Netflix、DAZN、Prime Video、Disney+ 等）在车上很可能是黑屏：Android 会对被转成视频流的屏幕隐藏这些内容，而车机屏幕正是这样。</string>
+    <string name="settings_cinema_browser_engine">浏览器引擎</string>
+    <string name="settings_cinema_engine_webview">Android WebView</string>
+    <string name="settings_cinema_engine_webview_detail">内置，无需额外下载</string>
+    <string name="settings_cinema_engine_gecko">Firefox GeckoView + uBlock Origin</string>
+    <string name="settings_cinema_engine_gecko_pending">此版本暂不支持下载可选浏览器</string>
     <string name="settings_cinema_ad_block">拦截广告和追踪器</string>
     <string name="settings_cinema_ad_block_detail">在 Cinema 网站中拦截已知的广告和追踪服务器。部分视频广告仍可能出现。</string>
     <string name="settings_cinema_parked_only">仅停车时显示视频</string>
