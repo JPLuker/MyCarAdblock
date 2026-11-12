@@ -107,15 +107,19 @@ object Cinema {
 
     fun setAdBlockEnabled(on: Boolean) {
         adBlockFlow.value = on
-        app?.let {
-            AppSettings.putString(it, KEY_AD_BLOCK, on.toString())
-            // Turning blocking off is the explicit, safe recovery path after an
-            // interrupted Firefox add-on startup. Do not clear this on app launch.
-            if (!on) CinemaGeckoAttemptGuard.finish(it)
-        }
+        app?.let { AppSettings.putString(it, KEY_AD_BLOCK, on.toString()) }
+        // Never reset Gecko's native crash checkpoint merely by disabling uBlock:
+        // three real-device SIGSEGVs showed identical crashes with blocking ON and OFF.
     }
 
     fun setBrowserEngine(engine: CinemaBrowserEngine) {
+        // Deliberately switching *from WebView to Firefox* is the explicit retry action.
+        // Auto-restoring the stored Gecko preference at app startup must NOT clear this.
+        val previous = browserEngineFlow.value
+        if (engine == CinemaBrowserEngine.FIREFOX_GECKOVIEW &&
+            previous != CinemaBrowserEngine.FIREFOX_GECKOVIEW) {
+            app?.let(CinemaGeckoAttemptGuard::finish)
+        }
         browserEngineFlow.value = engine
         app?.let { AppSettings.putString(it, KEY_BROWSER_ENGINE, engine.storageValue) }
     }
