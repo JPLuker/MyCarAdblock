@@ -212,6 +212,9 @@ private class RunningSession(
     private var sponsorFailureFor: Boolean? = null
     private var applyingBlocking = false
     private var navigationStarted = false
+    private var fullscreenAlignmentRequested = false
+    private var fullscreenAlignmentReady = false
+    private var fullscreenAlignmentTimeout: Runnable? = null
     private var pendingTimeout: Runnable? = null
 
     override fun setAdBlockEnabled(enabled: Boolean) {
@@ -385,11 +388,44 @@ private class RunningSession(
 
     private fun startNavigationOnce() {
         if (isClosed || navigationStarted) return
-        // No navigation is allowed before the selected extension state has been verified.
+        // No navigation is allowed before the selected ad-block state has been verified.
         if (desiredBlocking == null || appliedBlocking != desiredBlocking) return
         if (!CinemaSponsorTransitionPolicy.allowsNavigation(
                 desiredSponsor, appliedSponsor, sponsorFailureFor,
             )) return
+
+        // A tiny first-party content script aligns YouTube's VIDEO and CAPTIONS
+        // without resizing Gecko's Android surface. Install it before loading the
+        // first webpage so its content script catches the fullscreen transition.
+        // A missing/unsupported asset must never keep Firefox from navigating.
+        if (!fullscreenAlignmentReady) {
+            if (!fullscreenAlignmentRequested) {
+                fullscreenAlignmentRequested = true
+                val settled = AtomicBoolean(false)
+                val timeout = Runnable {
+                    if (settled.compareAndSet(false, true)) {
+                        fullscreenAlignmentTimeout = null
+                        MyCarLog.w(
+                            "gecko: fullscreen alignment script timed out; browsing without it",
+                            "CINEMA",
+                        )
+                        fullscreenAlignmentReady = true
+                        startNavigationOnce()
+                    }
+                }
+                fullscreenAlignmentTimeout = timeout
+                handler.postDelayed(timeout, 8_000L)
+                CinemaFullscreenAlignment.ensure(runtime) {
+                    if (settled.compareAndSet(false, true)) {
+                        handler.removeCallbacks(timeout)
+                        fullscreenAlignmentTimeout = null
+                        fullscreenAlignmentReady = true
+                        if (!isClosed) startNavigationOnce()
+                    }
+                }
+            }
+            return
+        }
         navigationStarted = true
         MyCarLog.i("gecko: extension state confirmed; navigating without a session reload", "CINEMA")
         runCatching { session.loadUri(initialUrl) }
@@ -452,6 +488,8 @@ private class RunningSession(
         isClosed = true
         pendingTimeout?.let(handler::removeCallbacks)
         pendingTimeout = null
+        fullscreenAlignmentTimeout?.let(handler::removeCallbacks)
+        fullscreenAlignmentTimeout = null
         activeMedia = null
         onKeyboard(null)
         runCatching { view.releaseSession() }
