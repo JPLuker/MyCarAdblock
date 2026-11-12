@@ -135,6 +135,9 @@
     <string name="settings_cinema_engine_allow_install">Permitir instalações do myCar</string>
     <string name="settings_cinema_engine_installing">A instalar motor Firefox…</string>
     <string name="settings_cinema_engine_retry">Tentar novamente</string>
+    <string name="settings_cinema_engine_import_zip">Selecionar ZIP de teste</string>
+    <string name="settings_cinema_engine_import_hint">Use o ZIP GeckoView da mesma compilação GitHub Actions deste APK.</string>
+    <string name="settings_cinema_engine_importing">A ler o ZIP de teste…</string>
     <string name="settings_cinema_engine_download">Transferir motor Firefox</string>
     <string name="settings_cinema_engine_gecko_pending">A transferência opcional do navegador ainda não está disponível nesta versão</string>
     <string name="settings_cinema_ad_block">Bloquear anúncios e rastreadores</string>
