@@ -129,6 +129,13 @@ jobs:
             || { echo "GeckoView implementation missing from optional feature master"; exit 1; }
           echo "Signed optional splits match debug app ID, versionCode and signing certificate"
 
+      # Compare the DER certificate encoded into APK Signature Scheme v2/v3, not
+      # formatted apksigner stdout. Earlier text parsing let two different debug
+      # keys pass, causing INSTALL_FAILED_INVALID_APK on the phone and emulator.
+      - name: Verify base and GeckoView signing certificates byte-for-byte
+        run: |
+          python3 tools/check_apk_cert.py build/myCar-debug.apk build/gecko-splits/*.apk
+
       # A dynamic feature is useful only if the standard installer does not contain GeckoView.
       - name: Confirm base APK stays lightweight
         run: |
