@@ -1,9 +1,18 @@
 package io.github.sirionero.mycar.cinema
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CinemaBrowserEngineTest {
+    @Test fun interruptedNativeStartupDoesNotCrashLoop() {
+        assertFalse(CinemaGeckoAttemptPolicy.shouldStart(adBlockEnabled = true, interrupted = true))
+        assertTrue(CinemaGeckoAttemptPolicy.shouldStart(adBlockEnabled = true, interrupted = false))
+        assertTrue(CinemaGeckoAttemptPolicy.shouldStart(adBlockEnabled = false, interrupted = true))
+        assertTrue(CinemaGeckoAttemptPolicy.shouldStart(adBlockEnabled = false, interrupted = false))
+    }
+
     @Test fun absentSettingKeepsLightweightBrowser() {
         assertEquals(CinemaBrowserEngine.ANDROID_WEBVIEW, CinemaBrowserEngine.fromStored(""))
         assertEquals(CinemaBrowserEngine.ANDROID_WEBVIEW, CinemaBrowserEngine.fromStored("other"))
