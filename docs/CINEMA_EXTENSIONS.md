@@ -27,9 +27,12 @@ change no longer keys/destroys the session or forces the YouTube page to reload.
 
 A uBlock failure blocks initial navigation and displays the existing WebView
 recovery error rather than silently navigating unprotected. SponsorBlock is
-optional: a failure is recorded in Settings and the log, but the page can still
-open. If a newly enabled extension needs a fresh content-script injection,
-the current page may require a manual reload.
+optional **when enabling**: if its install fails, Settings/logs show the error
+and the page can still open. **Disabling must succeed:** if Firefox cannot
+disable an already installed SponsorBlock, it pauses media and displays the
+WebView fallback rather than silently continuing to send requests to the
+SponsorBlock service. If a newly enabled extension needs a fresh content-script
+injection, the current page may require a manual reload.
 
 ### User-selected signed XPIs
 
