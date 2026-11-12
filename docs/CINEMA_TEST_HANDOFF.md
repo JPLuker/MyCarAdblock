@@ -5,19 +5,38 @@
 
 ## Current state
 
-The base WebView still has a safe fallback. GeckoView runtime/session/view setup was observed on
-a real ARM64 phone, followed within a second by a **native null-pointer process crash** near
-signed-extension initialization (November 12, 2026). The new November 12 10:44:36 device log from build #145 confirms
-the process reaches `WebExtensionController.list()` (last recorded operation at
-10:44:51.534), then dies at 10:44:52 with `SIGSEGV (SEGV_MAPERR)`. Frames #0–3
-are in Gecko's `libxul.so`, with `libmozglue.so` at frame #4. This is strong
-evidence the problem lies in Gecko's native startup/extension-list path, but it
-does not yet identify the failing native function. The earlier log did not have
-native frames; the updated native-footnote diagnostic now works on the device.
-A further commit adds PC offsets to future reports so the frames can be symbolicated.
+The latest ARM64 device logs capture **three identical native crashes** on
+November 12, 2026, with the same `libxul.so` program offset `0x3f66680`
+and SIGSEGV/SEGV_MAPERR null dereference at `0x8`:
 
-The crash guard and extension timeout have **not** been confirmed as a successful
-fix on a physical device. The native fault remains open.
+| Time | Ad blocking | Last operation | Result |
+|---|---|---|---|
+| 11:06:36 | ON | Extension listing requested | Native crash |
+| 11:07:38 | OFF | Extension manager bypassed; website navigation | Native crash |
+| 11:10:57 | OFF | Extension manager bypassed; website navigation | Native crash |
+
+All three runs constructed GeckoRuntime, GeckoSession and GeckoView before the
+Gecko thread died. **The extension controller and uBlock Origin are not necessary
+triggers.** The root cause is still unknown: it may involve Gecko version 159,
+split APK integration, or another Gecko startup condition. The native crash
+log improvement is confirmed working, including PC addresses and fault type.
+
+Do **not** retest the same build simply to reproduce the crash again.
+
+### Safeguard and controlled comparison
+
+The startup guard now records *every* Gecko startup attempt, including blocking
+OFF. It clears only after Gecko reports the first contentful paint, or when
+the user explicitly selects Android WebView and then Firefox to retry. This
+prevents unintentional crash loops, but it **does not fix the native engine**.
+The revised guard is committed and still requires device validation.
+
+The candidate branch `feature/cinema-adblock` remains on GeckoView
+`159.0.20261102144711`. A separate
+`experiment/gecko-158-startup` branch tests the last GeckoView 158 ARM64
+stable release `158.0.20261021001945`. Its CI build and physical-device
+behavior are not yet verified. If 158 behaves differently, that will
+isolate a version regression versus an integration problem.
 
 ## One-time optional signing setup
 
@@ -39,22 +58,25 @@ not uninstall the separate production myCar app.
 
 ## Minimal parked-device test
 
-1. Open [GitHub Actions > Build](https://github.com/JPLuker/MyCarAdblock/actions/workflows/build.yml),
-   select the newest **successful** run for `feature/cinema-adblock`, then download its
-   `myCar-debug-<commit>` artifact. It must contain both
-   `myCar-debug.apk` and `myCar-gecko-arm64-v8a.zip`. Do not mix runs or versions.
-   If no run is successful, stop here; a source commit alone is not an installable build.
-2. Install that APK on the phone. Go to phone **myCar Debug > Settings > Cinema**,
-   import the matching Gecko ZIP, approve Android installation, and restart the app if
-   requested. Leave WebView selected if the split import/install fails.
-3. While **parked**, select Firefox GeckoView and turn **Cinema ad blocking OFF**.
-   Open a Cinema website and note whether the Gecko page renders without crashing.
-   This diagnostic bypass skips add-on startup; it does **not** prove an already-installed
-   uBO extension has stopped filtering.
-4. Only if the unblocked-startup diagnostic succeeds, turn Cinema ad blocking **ON** and
-   reopen that website. If the app crashes, restart and **do not repeatedly retry** the
-   crashing configuration. On the next attempt the checkpoint should display a recovery
-   message and allow switching to Android WebView.
+1. Do not retest Gecko 159 on the existing build: ON and OFF have already
+   failed identically and repeat crashes interrupt the car host.
+2. For the controlled comparison, open
+   [GitHub Actions > Build](https://github.com/JPLuker/MyCarAdblock/actions/workflows/build.yml)
+   and select a **successful** run from `experiment/gecko-158-startup`.
+   Download both `myCar-debug.apk` and `myCar-gecko-arm64-v8a.zip`
+   from **that same run**. No successful run means no new test APK yet.
+3. Install the APK and import its matching Gecko ZIP in
+   **myCar Debug > Settings > Cinema**, then restart the app if prompted.
+   Do not mix 159 and 158 packages. If Android refuses an update because
+   signing identities differ, uninstall **only myCar Debug** first (this
+   removes its saved debug data; it does not affect production myCar).
+4. While **parked**, choose Firefox, turn Cinema ad blocking OFF and open
+   a site **once**. If it still crashes, the next attempt should display
+   the guarded fallback. Switch to Android WebView instead of repeatedly
+   triggering the crash.
+5. Only if OFF renders correctly, turn ad blocking ON and open once.
+   ON must initialize the signed uBlock extension successfully before
+   navigation; further actual filtering tests remain separate.
 
 ## Report only these observations for this milestone
 
