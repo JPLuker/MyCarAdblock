@@ -328,6 +328,9 @@ private class RunningSession(
     }
 
     private fun failBlocking(reason: String) {
+        // Stop active media before showing the failure overlay. In particular, never
+        // leave video playing invisibly if the user requested uBlock to switch OFF.
+        pause()
         // This is a managed extension error rather than a native crash. Do not leave the
         // native-startup checkpoint set after reporting a recoverable Java/Kotlin failure.
         CinemaGeckoAttemptGuard.finish(context)
