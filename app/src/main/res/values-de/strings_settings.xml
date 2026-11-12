@@ -369,4 +369,13 @@
     <string name="settings_cinema_engine_restart_short">Neustart erforderlich</string>
     <string name="settings_cinema_sponsorblock">SponsorBlock (Firefox)</string>
     <string name="settings_cinema_sponsorblock_detail">Überspringt bekannte Sponsorensegmente in YouTube-Videos. Optional; erfordert Firefox GeckoView.</string>
+    <string name="settings_cinema_extensions_header">Firefox-Erweiterungen</string>
+    <string name="settings_cinema_extension_import_detail">Wähle nur von Mozilla signierte XPI-Dateien vertrauenswürdiger Entwickler. Erweiterungen können Websitedaten lesen und verändern.</string>
+    <string name="settings_cinema_extension_import">Signierte Erweiterung installieren (.xpi)</string>
+    <string name="settings_cinema_extension_reading">Erweiterungsdatei wird gelesen…</string>
+    <string name="settings_cinema_extension_installing">Signierte Erweiterung wird installiert…</string>
+    <string name="settings_cinema_extension_installed">Erweiterung installiert: %1$s</string>
+    <string name="settings_cinema_extension_consent_title">Diese Firefox-Erweiterung zulassen?</string>
+    <string name="settings_cinema_extension_consent_detail">Prüfe Erweiterungs-ID, Berechtigungen und Websitezugriffe vor der Installation.</string>
+    <string name="settings_cinema_extension_consent_accept">Erweiterung installieren</string>
 </resources>
