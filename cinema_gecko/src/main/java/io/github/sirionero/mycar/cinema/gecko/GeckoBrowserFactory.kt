@@ -35,7 +35,7 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         onFullScreen: (Boolean) -> Unit,
         onFailure: (String) -> Unit,
     ): CinemaBrowserSession {
-        MyCarLog.i("gecko: starting optional runtime", "CINEMA")
+        MyCarLog.i("gecko: starting optional runtime; packaged GeckoView=${BuildConfig.GECKOVIEW_VERSION}", "CINEMA")
         val runtime = CinemaGeckoRuntime.get(context.applicationContext)
         MyCarLog.i("gecko: runtime attached; creating browser session", "CINEMA")
         val options = GeckoSessionSettings.Builder()
