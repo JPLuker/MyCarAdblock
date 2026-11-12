@@ -366,4 +366,5 @@
     <string name="cinema_full_width">Schermo intero</string>
     <string name="cinema_exit_fullscreen">Esci da schermo intero</string>
     <string name="settings_cinema_engine_restart_required">Firefox è installato. Forza l\'arresto di myCar Debug nelle impostazioni Android, poi riaprilo prima di selezionare Firefox.</string>
+    <string name="settings_cinema_engine_restart_short">Riavvia per attivare</string>
 </resources>
