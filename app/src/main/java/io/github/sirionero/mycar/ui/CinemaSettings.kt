@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.github.sirionero.mycar.BuildConfig
@@ -135,8 +136,14 @@ internal fun CinemaSection() {
                 onClick = { Cinema.setBrowserEngine(CinemaBrowserEngine.FIREFOX_GECKOVIEW) },
             ),
             subtitle = stringResource(
-                if (geckoInstalled) R.string.settings_cinema_engine_gecko_ready
-                else R.string.settings_cinema_engine_gecko_pending,
+                when {
+                    geckoInstalled -> R.string.settings_cinema_engine_gecko_ready
+                    geckoStatus is CinemaGeckoInstaller.Status.Downloaded ->
+                        R.string.settings_cinema_engine_gecko_downloaded
+                    geckoStatus is CinemaGeckoInstaller.Status.Installing ->
+                        R.string.settings_cinema_engine_installing
+                    else -> R.string.settings_cinema_engine_gecko_pending
+                },
             ),
             trailing = {
                 RadioButton(
@@ -147,7 +154,10 @@ internal fun CinemaSection() {
             },
         )
         if (!geckoInstalled) {
-            Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            Column(
+                Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 when (val status = geckoStatus) {
                     is CinemaGeckoInstaller.Status.Downloading -> {
                         Text(stringResource(R.string.settings_cinema_engine_downloading, (status.fraction * 100).toInt()))
@@ -182,12 +192,32 @@ internal fun CinemaSection() {
                     }
                     CinemaGeckoInstaller.Status.Installing -> Text(stringResource(R.string.settings_cinema_engine_installing))
                     is CinemaGeckoInstaller.Status.Failed -> {
-                        Text(status.reason, color = MaterialTheme.colorScheme.error)
+                        Text(
+                            if (status.signingMismatch) {
+                                stringResource(R.string.settings_cinema_engine_signing_error)
+                            } else {
+                                status.reason
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        if (status.signingMismatch) {
+                            Text(
+                                stringResource(R.string.settings_cinema_engine_signing_help),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                         Button(onClick = {
                             if (BuildConfig.DEBUG) testGeckoPicker.launch(arrayOf("application/zip", "application/octet-stream"))
                             else CinemaGeckoInstaller.download(context)
                         }) {
-                            Text(stringResource(R.string.settings_cinema_engine_retry))
+                            Text(stringResource(
+                                if (BuildConfig.DEBUG) R.string.settings_cinema_engine_choose_matching_zip
+                                else R.string.settings_cinema_engine_retry,
+                            ))
                         }
                     }
                     else -> {
