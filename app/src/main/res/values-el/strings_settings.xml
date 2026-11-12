@@ -135,6 +135,9 @@
     <string name="settings_cinema_engine_allow_install">Να επιτρέπονται εγκαταστάσεις από το myCar</string>
     <string name="settings_cinema_engine_installing">Εγκατάσταση μηχανής Firefox…</string>
     <string name="settings_cinema_engine_retry">Επανάληψη λήψης</string>
+    <string name="settings_cinema_engine_import_zip">Επιλογή δοκιμαστικού ZIP</string>
+    <string name="settings_cinema_engine_import_hint">Χρησιμοποιήστε το GeckoView ZIP από την ίδια έκδοση GitHub Actions με αυτό το APK.</string>
+    <string name="settings_cinema_engine_importing">Ανάγνωση δοκιμαστικού ZIP…</string>
     <string name="settings_cinema_engine_download">Λήψη μηχανής Firefox</string>
     <string name="settings_cinema_engine_gecko_pending">Η προαιρετική λήψη του προγράμματος περιήγησης δεν είναι ακόμη διαθέσιμη σε αυτήν την έκδοση</string>
     <string name="settings_cinema_ad_block">Αποκλεισμός διαφημίσεων και ιχνηλατών</string>
