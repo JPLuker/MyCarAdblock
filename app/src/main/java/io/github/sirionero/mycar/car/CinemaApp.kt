@@ -174,9 +174,9 @@ internal fun CinemaScreen(active: Boolean = true) {
         else -> key(
             open.url,
             preferredEngine,
-            // Gecko's extension state is chosen at session creation. A deliberate setting
-            // change must rebuild only Firefox; ordinary WebView stays on the same page.
-            if (preferredEngine == CinemaBrowserEngine.FIREFOX_GECKOVIEW) adBlockEnabled else null,
+            // Never use adBlockEnabled as an identity key: replacing GeckoView here
+            // reloads YouTube and discards its playback position during a toggle.
+            // The existing Gecko session applies the extension state asynchronously.
         ) {
             val engine = CinemaBrowserPolicy.active(preferredEngine, CinemaGeckoInstaller.ready(context))
             if (engine == CinemaBrowserEngine.FIREFOX_GECKOVIEW) {
