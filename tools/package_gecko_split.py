@@ -7,6 +7,7 @@ libraries in the base APK; refuse missing or surprising optional split layouts.
 """
 import argparse
 import pathlib
+import shutil
 import zipfile
 
 FEATURE = "cinema_gecko"
@@ -30,13 +31,16 @@ def extract(apks, output):
             items[name] = entry
         if set(items) != set(OUTPUTS):
             raise ValueError(f"Unexpected GeckoView splits: {sorted(items)}; expected {OUTPUTS}")
-        with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_STORED) as target:
+        # APKs retain their original byte signatures. The native GeckoView .so is stored
+        # uncompressed inside its signed APK for mmap, so compressing the OUTER ZIP saves
+        # more than 100 MB on the wire without changing either APK's contents/signature.
+        with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as target:
             for name in OUTPUTS:
                 entry = items[name]
                 if entry.file_size < 1 or entry.file_size > MAX_APK:
                     raise ValueError(f"Invalid split size: {name} {entry.file_size}")
-                # The APK itself is already compressed and signed; avoid recompressing it.
-                target.writestr(name, source.read(entry))
+                with source.open(entry) as unsigned_read_only, target.open(name, "w", force_zip64=True) as writer:
+                    shutil.copyfileobj(unsigned_read_only, writer, length=1024 * 1024)
     print(f"Optional feature: {output.stat().st_size:,} bytes")
 
 
