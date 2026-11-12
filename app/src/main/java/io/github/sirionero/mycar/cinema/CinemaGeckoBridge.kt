@@ -60,14 +60,14 @@ object CinemaGeckoBridge {
         onFailure: (String) -> Unit,
     ): CinemaBrowserSession? {
         if (!installed(context)) return null
-        // A native Gecko crash kills the whole Android process, bypassing Kotlin exception
-        // handlers. Do not repeat an interrupted signed-extension startup on the next drive.
-        if (!CinemaGeckoAttemptPolicy.shouldStart(adBlock, CinemaGeckoAttemptGuard.interrupted(context))) {
-            onFailure("uBlock Origin did not finish starting. Turn off Cinema ad blocking to bypass add-on startup, or use Android WebView.")
+        // A SIGSEGV kills the process even with ad blocking OFF. Guard the *entire* Gecko
+        // startup, not just WebExtensionController. Never retry automatically on next drive.
+        if (!CinemaGeckoAttemptPolicy.shouldStart(CinemaGeckoAttemptGuard.interrupted(context))) {
+            onFailure("Firefox crashed while starting last time. Android WebView still works. To retry Firefox, select Android WebView in phone settings, then select Firefox again.")
             return null
         }
-        if (adBlock && !CinemaGeckoAttemptGuard.begin(context)) {
-            onFailure("Firefox could not save the add-on startup checkpoint. Use Android WebView.")
+        if (!CinemaGeckoAttemptGuard.begin(context)) {
+            onFailure("Firefox could not save its startup checkpoint. Use Android WebView.")
             return null
         }
         return runCatching {
@@ -77,7 +77,7 @@ object CinemaGeckoBridge {
         }.onFailure {
             // A normal Java/Kotlin failure did not kill the process; clear the checkpoint.
             // Only interrupted native/process exits must keep it for crash-loop protection.
-            if (adBlock) CinemaGeckoAttemptGuard.finish(context)
+            CinemaGeckoAttemptGuard.finish(context)
             // Never bring down the whole car connection because a split failed to load.
             // Preserve the full Java cause chain in the existing on-device crash log.
             // A class-loader, missing split manifest component or GeckoRuntime startup error
@@ -89,29 +89,31 @@ object CinemaGeckoBridge {
 }
 
 /**
- * A durable checkpoint around *signed-extension startup*, not around page navigation.
- * commit() is intentional: an async preference write might be lost in the native SIGSEGV
- * that prompted this guard. The only stored value is a Boolean, never browsing data.
+ * Persist a checkpoint before GeckoRuntime is created. A native crash on the Gecko thread
+ * cannot be caught by Kotlin and was reproduced with Cinema ad blocking ON and OFF.
+ * Mark startup complete only after Gecko paints content, not when an add-on is ready.
  *
- * Turning off Cinema ad blocking explicitly clears the checkpoint and bypasses add-on
- * startup for diagnosis. An installed extension may remain enabled until actually disabled.
+ * Keep the old key from initial experiments so an interrupted startup before this update
+ * is not silently retried. No browsing data is stored. Synchronous commit is deliberate.
  */
 object CinemaGeckoAttemptGuard {
     private const val PREFS = "cinema_gecko_startup"
-    private const val PENDING = "signed_extension_pending"
+    private const val PENDING = "native_startup_pending"
+    private const val LEGACY_PENDING = "signed_extension_pending"
 
     private fun prefs(context: Context) =
         context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
-    fun interrupted(context: Context): Boolean = prefs(context).getBoolean(PENDING, false)
+    fun interrupted(context: Context): Boolean = prefs(context).run {
+        getBoolean(PENDING, false) || getBoolean(LEGACY_PENDING, false)
+    }
 
     fun begin(context: Context): Boolean {
-        val preferences = prefs(context)
-        if (preferences.getBoolean(PENDING, false)) return false
-        return preferences.edit().putBoolean(PENDING, true).commit()
+        if (interrupted(context)) return false
+        return prefs(context).edit().putBoolean(PENDING, true).commit()
     }
 
     fun finish(context: Context) {
-        prefs(context).edit().remove(PENDING).commit()
+        prefs(context).edit().remove(PENDING).remove(LEGACY_PENDING).commit()
     }
 }
