@@ -15,6 +15,7 @@ import io.github.sirionero.mycar.cinema.CinemaBrowserSession
 import io.github.sirionero.mycar.cinema.CinemaGeckoAttemptGuard
 import io.github.sirionero.mycar.cinema.CinemaAdBlockAction
 import io.github.sirionero.mycar.cinema.CinemaAdBlockTransitionPolicy
+import io.github.sirionero.mycar.cinema.Cinema
 import org.mozilla.geckoview.AllowOrDeny
 import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoRuntime
@@ -33,6 +34,7 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         url: String,
         desktop: Boolean,
         adBlock: Boolean,
+        sponsorBlock: Boolean,
         onVisited: (String) -> Unit,
         onKeyboard: (String?) -> Unit,
         onFullScreen: (Boolean) -> Unit,
@@ -121,6 +123,7 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         // leaves an already-installed uBlock Origin active in the persistent Gecko profile.
         // Navigation waits for the extension to be confirmed enabled or disabled, and later
         // settings changes are applied to the same GeckoSession without a reload.
+        result.setSponsorBlockEnabled(sponsorBlock)
         result.setAdBlockEnabled(adBlock)
         return result
     }
@@ -144,6 +147,9 @@ private class RunningSession(
     private val handler = Handler(Looper.getMainLooper())
     private var desiredBlocking: Boolean? = null
     private var appliedBlocking: Boolean? = null
+    private var desiredSponsor: Boolean? = null
+    private var appliedSponsor: Boolean? = null
+    private var sponsorFailureFor: Boolean? = null
     private var applyingBlocking = false
     private var navigationStarted = false
     private var pendingTimeout: Runnable? = null
@@ -151,6 +157,16 @@ private class RunningSession(
     override fun setAdBlockEnabled(enabled: Boolean) {
         if (isClosed) return
         desiredBlocking = enabled
+        applyBlockingIfNeeded()
+    }
+
+    override fun setSponsorBlockEnabled(enabled: Boolean) {
+        if (isClosed) return
+        if (desiredSponsor != enabled) {
+            desiredSponsor = enabled
+            sponsorFailureFor = null
+            Cinema.reportSponsorBlockError(null)
+        }
         applyBlockingIfNeeded()
     }
 
@@ -164,8 +180,15 @@ private class RunningSession(
         when (CinemaAdBlockTransitionPolicy.next(
             desiredBlocking, appliedBlocking, applyingBlocking, navigationStarted,
         )) {
-            CinemaAdBlockAction.WAIT, CinemaAdBlockAction.IDLE -> return
-            CinemaAdBlockAction.NAVIGATE -> {
+            CinemaAdBlockAction.WAIT -> return
+            CinemaAdBlockAction.IDLE, CinemaAdBlockAction.NAVIGATE -> {
+                // SponsorBlock is optional but its persistent state must also be checked.
+                // Only one Gecko extension operation may run at a time.
+                val sponsor = desiredSponsor
+                if (sponsor != null && appliedSponsor != sponsor && sponsorFailureFor != sponsor) {
+                    applySponsorBlockIfNeeded(sponsor)
+                    return
+                }
                 startNavigationOnce()
                 return
             }
@@ -222,6 +245,63 @@ private class RunningSession(
         }
     }
 
+    /** SponsorBlock failures are visible in Settings, but never prevent YouTube loading. */
+    private fun applySponsorBlockIfNeeded(requested: Boolean) {
+        if (isClosed || applyingBlocking) return
+        applyingBlocking = true
+        val settled = AtomicBoolean(false)
+        val timeout = Runnable {
+            if (settled.compareAndSet(false, true)) {
+                pendingTimeout = null
+                applyingBlocking = false
+                failSponsorBlock(requested, "SponsorBlock initialization timed out.")
+            }
+        }
+        pendingTimeout = timeout
+        if (!handler.postDelayed(timeout, 30_000L)) {
+            pendingTimeout = null
+            applyingBlocking = false
+            failSponsorBlock(requested, "SponsorBlock initialization could not be scheduled.")
+            return
+        }
+        try {
+            CinemaSponsorBlock.ensure(context, runtime, requested, onReady = {
+                if (settled.compareAndSet(false, true)) {
+                    handler.removeCallbacks(timeout)
+                    pendingTimeout = null
+                    applyingBlocking = false
+                    if (!isClosed) {
+                        appliedSponsor = requested
+                        Cinema.reportSponsorBlockError(null)
+                        applyBlockingIfNeeded()
+                    }
+                }
+            }, onError = { message ->
+                if (settled.compareAndSet(false, true)) {
+                    handler.removeCallbacks(timeout)
+                    pendingTimeout = null
+                    applyingBlocking = false
+                    if (!isClosed) failSponsorBlock(requested, message)
+                }
+            })
+        } catch (failure: Exception) {
+            if (settled.compareAndSet(false, true)) {
+                handler.removeCallbacks(timeout)
+                pendingTimeout = null
+                applyingBlocking = false
+                MyCarLog.e("gecko: SponsorBlock synchronization threw", failure, "CINEMA")
+                if (!isClosed) failSponsorBlock(requested, "SponsorBlock could not initialize.")
+            }
+        }
+    }
+
+    private fun failSponsorBlock(requested: Boolean, reason: String) {
+        sponsorFailureFor = requested
+        MyCarLog.w("gecko: SponsorBlock unavailable: $reason", "CINEMA")
+        Cinema.reportSponsorBlockError(reason)
+        applyBlockingIfNeeded()
+    }
+
     private fun failBlocking(reason: String) {
         // This is a managed extension error rather than a native crash. Do not leave the
         // native-startup checkpoint set after reporting a recoverable Java/Kotlin failure.
@@ -234,6 +314,8 @@ private class RunningSession(
         if (isClosed || navigationStarted) return
         // No navigation is allowed before the selected extension state has been verified.
         if (desiredBlocking == null || appliedBlocking != desiredBlocking) return
+        val sponsor = desiredSponsor ?: return
+        if (appliedSponsor != sponsor && sponsorFailureFor != sponsor) return
         navigationStarted = true
         MyCarLog.i("gecko: extension state confirmed; navigating without a session reload", "CINEMA")
         runCatching { session.loadUri(initialUrl) }
