@@ -11,7 +11,7 @@ import zipfile
 
 FEATURE = "cinema_gecko"
 MASTER = FEATURE + "-master.apk"
-ARM64 = FEATURE + "-config.arm64_v8a.apk"
+ARM64 = FEATURE + "-arm64_v8a.apk"
 OUTPUTS = (MASTER, ARM64)
 MAX_APK = 400 * 1024 * 1024
 
