@@ -365,4 +365,5 @@
     <string name="cinema_map_split">Karte + Cinema</string>
     <string name="cinema_full_width">Volle Breite</string>
     <string name="cinema_exit_fullscreen">Vollbild beenden</string>
+    <string name="settings_cinema_engine_restart_required">Firefox ist installiert. Beende myCar Debug in den Android-Einstellungen und öffne es erneut, bevor du Firefox auswählst.</string>
 </resources>
