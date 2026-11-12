@@ -32,12 +32,18 @@ object CinemaExtensionConsent {
         dataCollectionPermissions: Array<String>,
         respond: (Boolean) -> Unit,
     ): Boolean {
-        if (reply != null) return false
+        // Never truncate a requested permission or host origin in the consent UI.
+        // Refuse unusually large/malformed prompts rather than asking a user to
+        // authorize privileges they cannot see in full.
+        if (reply != null || id.isBlank() || id.length > 200 ||
+            permissions.size > 50 || origins.size > 50 || dataCollectionPermissions.size > 50 ||
+            permissions.any { it.length > 200 } || origins.any { it.length > 300 } ||
+            dataCollectionPermissions.any { it.length > 200 }) return false
         pendingFlow.value = Request(
-            id = id.take(200),
-            permissions = permissions.take(50).map { it.take(200) },
-            origins = origins.take(50).map { it.take(300) },
-            dataCollectionPermissions = dataCollectionPermissions.take(50).map { it.take(200) },
+            id = id,
+            permissions = permissions.toList(),
+            origins = origins.toList(),
+            dataCollectionPermissions = dataCollectionPermissions.toList(),
         )
         reply = respond
         return true
