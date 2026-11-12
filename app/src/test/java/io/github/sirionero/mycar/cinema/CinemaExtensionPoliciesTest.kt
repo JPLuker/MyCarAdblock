@@ -33,6 +33,18 @@ class CinemaExtensionPoliciesTest {
         assertTrue(CinemaExtensionManagementPolicy.userManaged("example-addon@example.org"))
     }
 
+    @Test fun oversizedPermissionPromptsAreRejectedInsteadOfTruncated() {
+        CinemaExtensionConsent.decide(false)
+        val excessive = Array(51) { "host-$it" }
+        assertFalse(CinemaExtensionConsent.offer(
+            "example@example.org", emptyArray(), excessive, emptyArray(),
+        ) {})
+        assertFalse(CinemaExtensionConsent.offer(
+            "example@example.org", emptyArray(), arrayOf("x".repeat(301)), emptyArray(),
+        ) {})
+        assertNull(CinemaExtensionConsent.pending.value)
+    }
+
     @Test fun userSelectedXpiPermissionsRequireAnExplicitDecision() {
         CinemaExtensionConsent.decide(false)
         var decision: Boolean? = null
