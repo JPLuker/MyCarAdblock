@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
@@ -52,6 +55,8 @@ import io.github.sirionero.mycar.cinema.CinemaSite
 import io.github.sirionero.mycar.cinema.CinemaBrowserEngine
 import io.github.sirionero.mycar.cinema.CinemaGeckoBridge
 import io.github.sirionero.mycar.cinema.CinemaGeckoInstaller
+import io.github.sirionero.mycar.cinema.CinemaSignedXpi
+import io.github.sirionero.mycar.cinema.CinemaExtensionConsent
 
 /**
  * Cinema, set up here on the phone: the video sites that show as tiles in the car, each one as on
@@ -81,6 +86,11 @@ internal fun CinemaSection() {
         if (uri != null) CinemaGeckoInstaller.importDebugSplit(context, uri)
     }
     val geckoInstalled = CinemaGeckoInstaller.ready(context)
+    val signedXpiStatus by CinemaSignedXpi.status.collectAsState()
+    val extensionPermissionRequest by CinemaExtensionConsent.pending.collectAsState()
+    val xpiPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) CinemaSignedXpi.importDocument(context, uri)
+    }
     val sites by Cinema.sites.collectAsState()
     val parkedOnly by Cinema.parkedOnly.collectAsState()
     val adBlockEnabled by Cinema.adBlockEnabled.collectAsState()
@@ -273,6 +283,41 @@ internal fun CinemaSection() {
                 }
             }
         }
+        if (geckoInstalled) {
+            SettingsDivider()
+            Text(
+                stringResource(R.string.settings_cinema_extensions_header),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
+            )
+            Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    stringResource(R.string.settings_cinema_extension_import_detail),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Button(
+                    enabled = signedXpiStatus !is CinemaSignedXpi.Status.Reading &&
+                        signedXpiStatus !is CinemaSignedXpi.Status.Installing,
+                    onClick = { xpiPicker.launch(arrayOf("application/x-xpinstall", "application/zip", "application/octet-stream")) },
+                ) { Text(stringResource(R.string.settings_cinema_extension_import)) }
+                when (val state = signedXpiStatus) {
+                    CinemaSignedXpi.Status.Reading -> Text(stringResource(R.string.settings_cinema_extension_reading))
+                    CinemaSignedXpi.Status.Installing -> Text(stringResource(R.string.settings_cinema_extension_installing))
+                    is CinemaSignedXpi.Status.Installed -> Text(
+                        stringResource(R.string.settings_cinema_extension_installed, state.id),
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    is CinemaSignedXpi.Status.Failed -> Text(
+                        state.reason,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                    else -> Unit
+                }
+            }
+        }
         SettingsDivider()
         PhoneVideosRow()
         sites.forEach { site ->
@@ -319,6 +364,41 @@ internal fun CinemaSection() {
             }
         }
         MoreSitesRow()
+    }
+
+    val pendingExtension = extensionPermissionRequest
+    if (pendingExtension != null) {
+        AlertDialog(
+            onDismissRequest = { CinemaExtensionConsent.decide(false) },
+            title = { Text(stringResource(R.string.settings_cinema_extension_consent_title)) },
+            text = {
+                Column(
+                    Modifier.heightIn(max = 340.dp).verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(pendingExtension.id, style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.settings_cinema_extension_consent_detail))
+                    val requested = pendingExtension.permissions +
+                        pendingExtension.origins + pendingExtension.dataCollectionPermissions
+                    requested.distinct().forEach { permission -> Text("• $permission") }
+                    Text(
+                        stringResource(R.string.settings_cinema_extension_import_detail),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = { CinemaExtensionConsent.decide(true) }) {
+                    Text(stringResource(R.string.settings_cinema_extension_consent_accept))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { CinemaExtensionConsent.decide(false) }) {
+                    Text(stringResource(R.string.common_cancel))
+                }
+            },
+        )
     }
 
     if (resetAsk) {
