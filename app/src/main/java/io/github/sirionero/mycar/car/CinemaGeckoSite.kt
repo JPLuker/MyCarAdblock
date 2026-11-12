@@ -62,6 +62,7 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
 
     // A hidden GeckoView keeps its open session and playback position; no navigation reload.
     LaunchedEffect(active, browser) {
+        browser?.setVisible(active)
         if (!active) {
             browser?.pause()
             if (fullScreen) {
