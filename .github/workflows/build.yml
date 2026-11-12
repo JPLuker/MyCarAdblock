@@ -125,6 +125,7 @@ jobs:
           set -euo pipefail
           python3 -m json.tool cinema_gecko/src/main/assets/cinema_fullscreen/manifest.json >/dev/null
           node --check cinema_gecko/src/main/assets/cinema_fullscreen/alignment.js
+          node tools/test_cinema_fullscreen_alignment.cjs
 
       - name: Validate signed base and optional feature identity
         run: |
