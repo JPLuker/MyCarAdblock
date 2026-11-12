@@ -365,4 +365,5 @@
     <string name="cinema_map_split">Mapa + Cinema</string>
     <string name="cinema_full_width">Largura total</string>
     <string name="cinema_exit_fullscreen">Sair do ecrã inteiro</string>
+    <string name="settings_cinema_engine_restart_required">Firefox está instalado. Force a paragem do myCar Debug nas definições Android e reabra-o antes de escolher Firefox.</string>
 </resources>
