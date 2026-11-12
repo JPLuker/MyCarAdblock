@@ -57,7 +57,7 @@ jobs:
         run: python3 -m unittest tools/test_package_gecko_split.py
 
       - name: Build, split bundle and test
-        run: ./gradlew :app:assembleDebug :app:bundleDebug :app:testDebugUnitTest --no-daemon --stacktrace
+        run: ./gradlew :app:assembleDebug :app:bundleDebug :app:testDebugUnitTest "-PmyCarCiDebugKeystore=$HOME/.android/debug.keystore" --no-daemon --stacktrace
 
       # AABs alone are not installable. Exercise the exact split ZIP packaging used for
       # releases against the matching debug APK, before the device tests. The debug
