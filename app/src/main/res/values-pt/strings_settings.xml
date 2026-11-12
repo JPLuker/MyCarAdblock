@@ -362,4 +362,6 @@
     <string name="music_needs_amazon">Precisa do Amazon Prime ou do Amazon Music Unlimited.</string>
     <string name="music_needs_tidal">Precisa de uma assinatura do TIDAL.</string>
     <string name="music_needs_qobuz">Precisa de uma assinatura do Qobuz.</string>
+    <string name="cinema_map_split">Mapa + Cinema</string>
+    <string name="cinema_full_width">Largura total</string>
 </resources>
