@@ -6,11 +6,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CinemaBrowserEngineTest {
-    @Test fun interruptedNativeStartupDoesNotCrashLoop() {
-        assertFalse(CinemaGeckoAttemptPolicy.shouldStart(adBlockEnabled = true, interrupted = true))
-        assertTrue(CinemaGeckoAttemptPolicy.shouldStart(adBlockEnabled = true, interrupted = false))
-        assertTrue(CinemaGeckoAttemptPolicy.shouldStart(adBlockEnabled = false, interrupted = true))
-        assertTrue(CinemaGeckoAttemptPolicy.shouldStart(adBlockEnabled = false, interrupted = false))
+    @Test fun interruptedNativeStartupDoesNotCrashLoopEvenWithoutAdBlock() {
+        // The extension toggle is deliberately irrelevant: Gecko itself crashes.
+        assertFalse(CinemaGeckoAttemptPolicy.shouldStart(interrupted = true))
+        assertTrue(CinemaGeckoAttemptPolicy.shouldStart(interrupted = false))
     }
 
     @Test fun absentSettingKeepsLightweightBrowser() {
