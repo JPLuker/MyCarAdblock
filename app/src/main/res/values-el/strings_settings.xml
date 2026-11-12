@@ -362,4 +362,6 @@
     <string name="music_needs_amazon">Απαιτεί Amazon Prime ή Amazon Music Unlimited.</string>
     <string name="music_needs_tidal">Απαιτεί συνδρομή στο TIDAL.</string>
     <string name="music_needs_qobuz">Απαιτεί συνδρομή στο Qobuz.</string>
+    <string name="cinema_map_split">Χάρτης + Cinema</string>
+    <string name="cinema_full_width">Πλήρες πλάτος</string>
 </resources>
