@@ -178,7 +178,7 @@ object CinemaSignedXpi {
                     managementMessageFlow.value = error
                     managing.set(false)
                     managementBusyFlow.value = false
-                    refresh(app)
+                    if (error == null) refresh(app)
                 }
             }
         }
@@ -193,7 +193,7 @@ object CinemaSignedXpi {
                     managementMessageFlow.value = error
                     managing.set(false)
                     managementBusyFlow.value = false
-                    refresh(app)
+                    if (error == null) refresh(app)
                 }
             }
         }
