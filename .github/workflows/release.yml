@@ -26,20 +26,26 @@ jobs:
           KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
           KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
           KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          KEYSTORE_CERT_SHA256: ${{ secrets.KEYSTORE_CERT_SHA256 }}
         run: |
           set -euo pipefail
           if [[ -z "$KEYSTORE_BASE64" || -z "$KEYSTORE_STORE_PASSWORD" ||
-                -z "$KEYSTORE_KEY_ALIAS" || -z "$KEYSTORE_KEY_PASSWORD" ]]; then
-            echo "Release signing is missing. Configure the four KEYSTORE_* GitHub Actions secrets before tagging."
+                -z "$KEYSTORE_KEY_ALIAS" || -z "$KEYSTORE_KEY_PASSWORD" ||
+                -z "$KEYSTORE_CERT_SHA256" ]]; then
+            echo "Release signing is missing or incomplete. Run tools/setup-signing.sh on a trusted machine before tagging."
             exit 1
           fi
           umask 077
           printf '%s' "$KEYSTORE_BASE64" | base64 -d > mycar-release.jks
+          actual=$(keytool -exportcert -rfc -keystore mycar-release.jks \
+              -alias "$KEYSTORE_KEY_ALIAS" -storepass:env KEYSTORE_STORE_PASSWORD 2>/dev/null | \
+              openssl x509 -inform PEM -outform DER | openssl dgst -sha256 -r | awk '{print $1}')
+          if [[ "$actual" != "$KEYSTORE_CERT_SHA256" ]]; then
+            echo "Release signer differs from the pinned certificate. Refusing to publish."
+            exit 1
+          fi
           printf 'storeFile=mycar-release.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
             "$KEYSTORE_STORE_PASSWORD" "$KEYSTORE_KEY_ALIAS" "$KEYSTORE_KEY_PASSWORD" > keystore.properties
-          keytool -list -keystore mycar-release.jks \
-            -storepass:env KEYSTORE_STORE_PASSWORD -alias "$KEYSTORE_KEY_ALIAS" > /dev/null \
-            || { echo "Release keystore cannot be opened with the configured credentials"; exit 1; }
 
       - name: Build release APK and optional GeckoView bundle
         run: |
@@ -92,6 +98,11 @@ jobs:
             test "$sha" = "$base_sha" || { echo "Feature signing mismatch: $split"; exit 1; }
           done
           echo "Optional GeckoView splits match the base signing certificate."
+
+      - name: Verify release base and splits against the pinned certificate
+        env:
+          MYCAR_EXPECT_CERT_SHA256: ${{ secrets.KEYSTORE_CERT_SHA256 }}
+        run: python3 tools/check_apk_cert.py build/myCar-release.apk build/gecko-verify/*.apk
 
       - name: Locate APK
         id: apk
