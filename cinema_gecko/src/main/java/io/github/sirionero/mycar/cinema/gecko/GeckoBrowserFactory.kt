@@ -201,7 +201,8 @@ private class RunningSession(
                 // SponsorBlock is optional but its persistent state must also be checked.
                 // Only one Gecko extension operation may run at a time.
                 val sponsor = desiredSponsor
-                if (CinemaSponsorTransitionPolicy.needsSync(sponsor, appliedSponsor, sponsorFailureFor)) {
+                if (sponsor != null &&
+                    CinemaSponsorTransitionPolicy.needsSync(sponsor, appliedSponsor, sponsorFailureFor)) {
                     applySponsorBlockIfNeeded(sponsor)
                     return
                 }
