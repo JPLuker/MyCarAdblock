@@ -74,6 +74,7 @@ jobs:
           curl --fail --location --retry 3 --max-time 120 \
             https://github.com/google/bundletool/releases/download/1.18.2/bundletool-all-1.18.2.jar \
             --output build/bundletool.jar
+          echo "378b5434cd1378bef6b2bc527b8c7f0ff2584b273830335bce54d6d0813c8584  build/bundletool.jar" | sha256sum --check
           umask 077
           if test -s keystore.properties; then
             store=mycar-release.jks
