@@ -384,4 +384,9 @@
     <string name="settings_cinema_extension_consent_title">Разрешить расширение Firefox?</string>
     <string name="settings_cinema_extension_consent_detail">Проверьте ID расширения, разрешения и доступ к сайтам перед установкой.</string>
     <string name="settings_cinema_extension_consent_accept">Установить расширение</string>
+    <string name="settings_cinema_extension_list_header">Установленные расширения</string>
+    <string name="settings_cinema_extension_list_empty">Дополнительные расширения Firefox не установлены.</string>
+    <string name="settings_cinema_extension_remove">Удалить</string>
+    <string name="settings_cinema_extension_remove_title">Удалить расширение Firefox?</string>
+    <string name="settings_cinema_extension_remove_detail">Удалить %1$s из Firefox?</string>
 </resources>
