@@ -1,10 +1,21 @@
 package io.github.sirionero.mycar.car
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CinemaFullscreenSizingTest {
+    @Test fun splitFullscreenDoesNotResizeNativeGeckoRenderer() {
+        assertFalse(CinemaFullscreenSizing.resizeGeckoSurface(fullscreen = false, split = true))
+        assertFalse(CinemaFullscreenSizing.resizeGeckoSurface(fullscreen = true, split = true))
+    }
+
+    @Test fun workingSinglePaneFullscreenKeepsItsAspectFitPath() {
+        assertFalse(CinemaFullscreenSizing.resizeGeckoSurface(fullscreen = false, split = false))
+        assertTrue(CinemaFullscreenSizing.resizeGeckoSurface(fullscreen = true, split = false))
+    }
+
     @Test fun widescreenVideoFitsAndCentersInsideNarrowMapSplit() {
         val stage = CinemaFullscreenSizing.fit(313f, 384f, 16f / 9f)
         assertEquals(313f, stage.width, 0.05f)
