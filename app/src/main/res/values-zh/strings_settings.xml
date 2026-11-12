@@ -359,4 +359,6 @@
     <string name="music_needs_amazon">需要 Amazon Prime 或 Amazon Music Unlimited。</string>
     <string name="music_needs_tidal">需要订阅 TIDAL。</string>
     <string name="music_needs_qobuz">需要订阅 Qobuz。</string>
+    <string name="cinema_map_split">地图 + Cinema</string>
+    <string name="cinema_full_width">全屏宽度</string>
 </resources>
