@@ -123,3 +123,32 @@ Cinema Settings now refreshes its permission-dependent button state on Activity
 resume. The button should switch from **Allow myCar to install** to **Install**
 without reopening the Cinema settings screen. The initial download refresh remains
 in place. This UI change is committed but not yet verified on device.
+
+
+## November 12, 11:37–11:39 Car Preview logs
+
+Five additional logs were uploaded. Observations:
+- `11:37:51`: process launched; certificate download/TLS self-tests passed;
+  there is no Cinema/Gecko startup in this log.
+- `11:38:25`: Android reports the prior process ended because its package was
+  **updated**, not because it crashed.
+- `11:38:36`: the car preview starts Gecko and calls the extension list, then
+  `SIGSEGV` at 11:38:51. First native PC is **exactly** the previously observed
+  `libxul.so+0x3f66680`; the app restarts at 11:38:53.
+- `11:38:53`: the app restores car preview; `cinema: opening youtube.com`
+  at 11:39:13; the preview's surface is destroyed at 11:39:20.
+  **No new native crash is logged in that session.**
+- `11:39:23`: a new session starts Gecko at 11:39:35 with blocking OFF,
+  bypasses the extension API and requests the page. Its captured log ends
+  immediately afterward, **before success or another crash is established**.
+
+**Do not claim GeckoView 158 passed or failed from these logs.** They do not
+record the installed GeckoView dependency version. The same libxul offset
+suggests the previous native binary could still be present, but it is not
+proof of package identity.
+
+**New diagnostic:** both branch builds now place their single pinned Gecko
+dependency version in the feature's generated BuildConfig and write a
+`gecko: starting optional runtime; packaged GeckoView=...` line before
+initializing the engine. The next phone log can distinguish source 158
+from 159. CI must successfully build this change before the marker is available.
