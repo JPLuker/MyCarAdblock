@@ -130,3 +130,33 @@ jobs:
             build/myCar-debug.apk
             build/myCar-gecko-arm64-v8a.zip
           if-no-files-found: error
+
+  # Compile success does not prove launchability. This separate job installs only the
+  # base debug APK into Android, opens the real activity and checks for startup crashes.
+  # It deliberately does not install the optional GeckoView split.
+  launch-smoke:
+    name: Base APK startup (emulator)
+    needs: build
+    if: github.ref == 'refs/heads/feature/cinema-adblock' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: myCar-debug-${{ github.sha }}
+          path: build
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install and launch the base APK
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          script: bash tools/cinema-smoke.sh
