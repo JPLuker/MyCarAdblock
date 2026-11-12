@@ -178,7 +178,7 @@
     <string name="settings_cinema_engine_installing">Installing Firefox engine…</string>
     <string name="settings_cinema_engine_retry">Retry download</string>
     <string name="settings_cinema_engine_import_zip">Select test engine ZIP</string>
-    <string name="settings_cinema_engine_import_hint">Use the GeckoView ZIP from this APK's GitHub Actions build.</string>
+    <string name="settings_cinema_engine_import_hint">Use the GeckoView ZIP from the same GitHub Actions build as this APK.</string>
     <string name="settings_cinema_engine_importing">Reading test engine ZIP…</string>
     <string name="settings_cinema_engine_download">Download Firefox engine</string>
     <string name="settings_cinema_engine_gecko_pending">Optional browser download is not ready in this build</string>
