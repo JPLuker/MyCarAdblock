@@ -139,7 +139,11 @@
     <string name="settings_cinema_engine_import_hint">GeckoView-ZIP aus demselben GitHub-Actions-Build wie diese APK verwenden.</string>
     <string name="settings_cinema_engine_importing">Test-Engine-ZIP wird eingelesen…</string>
     <string name="settings_cinema_engine_download">Firefox-Engine herunterladen</string>
-    <string name="settings_cinema_engine_gecko_pending">Der optionale Browser-Download ist in diesem Build noch nicht verfügbar</string>
+    <string name="settings_cinema_engine_gecko_downloaded">ZIP bereit zur Installation</string>
+    <string name="settings_cinema_engine_signing_error">Dieses Firefox-ZIP passt nicht zur installierten myCar-Debug-App.</string>
+    <string name="settings_cinema_engine_signing_help">Verwende APK und ZIP aus demselben Actions-Lauf. Alte Debug-Installationen müssen möglicherweise entfernt werden; ihre Einstellungen gehen verloren.</string>
+    <string name="settings_cinema_engine_choose_matching_zip">Passende ZIP wählen</string>
+    <string name="settings_cinema_engine_gecko_pending">Nicht installiert</string>
     <string name="settings_cinema_ad_block">Werbung und Tracker blockieren</string>
     <string name="settings_cinema_ad_block_detail">Blockiert bekannte Werbe- und Tracking-Server auf Cinema-Websites. Manche Videowerbung kann weiterhin erscheinen.</string>
     <string name="settings_cinema_parked_only">Video nur im Stand</string>
