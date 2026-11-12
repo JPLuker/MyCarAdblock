@@ -63,7 +63,7 @@ object CinemaGeckoBridge {
         // A native Gecko crash kills the whole Android process, bypassing Kotlin exception
         // handlers. Do not repeat an interrupted signed-extension startup on the next drive.
         if (!CinemaGeckoAttemptPolicy.shouldStart(adBlock, CinemaGeckoAttemptGuard.interrupted(context))) {
-            onFailure("uBlock Origin did not finish starting last time. Turn off Cinema ad blocking to test Firefox without it, or use Android WebView.")
+            onFailure("uBlock Origin did not finish starting. Turn off Cinema ad blocking to bypass add-on startup, or use Android WebView.")
             return null
         }
         if (adBlock && !CinemaGeckoAttemptGuard.begin(context)) {
@@ -93,8 +93,8 @@ object CinemaGeckoBridge {
  * commit() is intentional: an async preference write might be lost in the native SIGSEGV
  * that prompted this guard. The only stored value is a Boolean, never browsing data.
  *
- * Turning off Cinema ad blocking explicitly clears the checkpoint and allows unblocked
- * Firefox to be tested. Turning it on again is an explicit retry after that choice.
+ * Turning off Cinema ad blocking explicitly clears the checkpoint and bypasses add-on
+ * startup for diagnosis. An installed extension may remain enabled until actually disabled.
  */
 object CinemaGeckoAttemptGuard {
     private const val PREFS = "cinema_gecko_startup"
