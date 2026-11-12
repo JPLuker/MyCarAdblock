@@ -2,9 +2,11 @@ package io.github.sirionero.mycar.car
 
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -14,6 +16,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.background
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import io.github.sirionero.mycar.audio.CarAudio
@@ -39,6 +45,7 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
     var browser by remember { mutableStateOf<CinemaBrowserSession?>(null) }
     var fieldText by remember { mutableStateOf<String?>(null) }
     var fullScreen by remember { mutableStateOf(false) }
+    var fullScreenAspect by remember { mutableStateOf<Float?>(null) }
     var failure by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) { CarAudio.askAgainOnce(); CarAudio.captureNow() }
@@ -99,9 +106,25 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
                 onToggleSplit = navigator::toggleCinemaSplit,
             )
         }
-        Box(Modifier.weight(1f).fillMaxWidth()) {
+        BoxWithConstraints(
+            Modifier.weight(1f).fillMaxWidth()
+                .background(if (fullScreen) Color.Black else Color.Transparent),
+        ) {
+            // Gecko fullscreen is bound to Cinema's pane, not the phone Activity.
+            // In a tall split pane, filling all height yields a top-anchored video and
+            // captions at the bottom of the *pane*, far from the actual picture.
+            // Fit the actual media aspect (or 16:9 while Gecko metadata is pending),
+            // and center the same live surface, never recreating the browser.
+            val ratio = fullScreenAspect ?: (16f / 9f)
+            val fitted = CinemaFullscreenSizing.fit(maxWidth.value, maxHeight.value, ratio)
+            val geckoViewport = if (fullScreen) {
+                Modifier.align(Alignment.Center)
+                    .size(fitted.width.dp, fitted.height.dp)
+            } else {
+                Modifier.fillMaxSize()
+            }
             AndroidView(
-                modifier = Modifier.fillMaxSize(),
+                modifier = geckoViewport,
                 factory = { ctx ->
                     val instance = CinemaGeckoBridge.open(
                         context = ctx,
@@ -113,8 +136,10 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
                         onKeyboard = { fieldText = it },
                         onFullScreen = {
                             fullScreen = it
+                            if (!it) fullScreenAspect = null
                             navigator.cinemaVideoFullscreen = it
                         },
+                        onFullScreenAspect = { fullScreenAspect = it },
                         onFailure = { failure = it },
                     )
                     if (instance == null) {
@@ -136,7 +161,7 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
                 },
             )
             if (fullScreen) {
-                Box(Modifier.align(androidx.compose.ui.Alignment.TopEnd)) {
+                Box(Modifier.align(Alignment.TopEnd)) {
                     CinemaExitFullscreen(
                         split = navigator.cinemaSplit,
                         onToggleSplit = navigator::toggleCinemaSplit,
