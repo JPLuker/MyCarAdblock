@@ -18,3 +18,10 @@
     public <init>();
     public *;
 }
+
+# Signed .xpi import and management live in the on-demand Gecko feature, but are
+# discovered reflectively from the lightweight base app.
+-keep class io.github.sirionero.mycar.cinema.gecko.CinemaSignedXpiInstallerImpl {
+    public <init>();
+    public *;
+}
