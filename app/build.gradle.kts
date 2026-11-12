@@ -17,6 +17,11 @@ plugins {
 // The release signing key, read from an untracked keystore.properties beside this file or at the
 // repository root. Third-party apps allowlist myCar by the SHA-256 of this certificate, so the
 // key must stay the same for the life of the project - and must never be committed.
+// GitHub Actions supplies this explicitly so AGP and bundletool sign from the SAME key.
+// Without a configured repository secret, a fresh test keystore is generated per CI run.
+// A persistent repository secret is required for install-over-install across CI runs.
+val ciDebugKeystore = project.findProperty("myCarCiDebugKeystore")?.toString()
+
 val keystoreProperties = Properties().apply {
     listOf(
         rootProject.file("keystore.properties"),
@@ -60,6 +65,17 @@ android {
     }
 
     signingConfigs {
+        // Never rely on AGP's implicit default debug key when CI produces separately signed
+        // dynamic-feature APKs. Its actual debug store can differ from ~/.android/debug.keystore.
+        // All APKs in one package MUST be signed by the exact same X.509 certificate.
+        if (ciDebugKeystore != null) {
+            create("ciDebug") {
+                storeFile = file(ciDebugKeystore)
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
         // Declared only when the properties file is present, so a clone without the key still
         // builds debug; assembleRelease then falls back to unsigned rather than failing here.
         if (keystoreProperties.getProperty("storeFile") != null) {
@@ -84,7 +100,8 @@ android {
         // permission, and Android refuses a second app declaring it under a different key.
         debug {
             applicationIdSuffix = ".dev"
-            signingConfigs.findByName("release")?.let { signingConfig = it }
+            (signingConfigs.findByName("release") ?: signingConfigs.findByName("ciDebug"))
+                ?.let { signingConfig = it }
             manifestPlaceholders["appLabel"] = "myCar Debug"
             // -Pr8 shrinks a debug build like a release one, to test R8 in the debug install.
             if (project.hasProperty("r8")) {
