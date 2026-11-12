@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="settings_cinema_background_audio">Hintergrundaudio</string>
+    <string name="settings_cinema_background_audio_detail">Firefox-Audio beim Wechsel zu Karten weiter abspielen. Standardmäßig deaktiviert.</string>
     <string name="settings_support_title">myCar unterstützen</string>
     <string name="settings_support_footer">myCar ist kostenlos, ohne Werbung und ohne Tracking. Deine Unterstützung hält es am Laufen.</string>
     <string name="settings_usage_notes_title">Nutzungsberichte</string>
