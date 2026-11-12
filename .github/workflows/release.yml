@@ -60,6 +60,7 @@ jobs:
           curl --fail --location --retry 3 \
             https://github.com/google/bundletool/releases/download/1.18.2/bundletool-all-1.18.2.jar \
             --output bundletool.jar
+          echo "378b5434cd1378bef6b2bc527b8c7f0ff2584b273830335bce54d6d0813c8584  bundletool.jar" | sha256sum --check
           bundle=$(find build/app/outputs/bundle/release -name '*.aab' -print -quit)
           test -n "$bundle"
           umask 077
