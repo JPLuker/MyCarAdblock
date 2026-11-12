@@ -21,6 +21,8 @@ interface CinemaBrowserSession {
     fun submitText()
     fun pause()
     fun setVisible(visible: Boolean)
+    /** Apply the setting to the existing Firefox session without reloading its page. */
+    fun setAdBlockEnabled(enabled: Boolean)
     fun exitFullScreen()
     fun close()
 }
