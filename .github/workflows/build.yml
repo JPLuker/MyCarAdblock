@@ -76,7 +76,16 @@ jobs:
         run: python3 -m unittest discover -s tools -p 'test_*.py'
 
       - name: Build, split bundle and test
-        run: ./gradlew :app:assembleDebug :app:bundleDebug :app:testDebugUnitTest "-PmyCarVersionCode=$((50 + GITHUB_RUN_NUMBER))" "-PmyCarCiDebugKeystore=$HOME/.android/debug.keystore" --no-daemon --stacktrace
+        run: |
+          set -euo pipefail
+          # Maven Central/Google Maven occasionally return transient missing-artifact
+          # responses on fresh runners. Retry once with refreshed metadata rather
+          # than modifying pinned dependency versions or shipping incomplete builds.
+          if ! ./gradlew :app:assembleDebug :app:bundleDebug :app:testDebugUnitTest "-PmyCarVersionCode=$((50 + GITHUB_RUN_NUMBER))" "-PmyCarCiDebugKeystore=$HOME/.android/debug.keystore" --no-daemon --stacktrace; then
+            echo "::warning::First Gradle build failed; retrying once with refreshed dependencies."
+            sleep 15
+            ./gradlew :app:assembleDebug :app:bundleDebug :app:testDebugUnitTest "-PmyCarVersionCode=$((50 + GITHUB_RUN_NUMBER))" "-PmyCarCiDebugKeystore=$HOME/.android/debug.keystore" --no-daemon --refresh-dependencies --stacktrace
+          fi
 
       # AABs alone are not installable. Exercise the exact split ZIP packaging used for
       # releases against the matching debug APK, before the device tests. The debug
