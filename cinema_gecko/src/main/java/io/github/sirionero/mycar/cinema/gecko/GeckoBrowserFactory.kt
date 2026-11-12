@@ -1,6 +1,7 @@
 package io.github.sirionero.mycar.cinema.gecko
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -256,8 +257,48 @@ private object CinemaGeckoRuntime {
     @Synchronized
     fun get(context: Context): GeckoRuntime {
         runtime?.let { return it }
-        val created = GeckoRuntime.create(context.applicationContext)
+        val app = context.applicationContext
+        val split = findGeckoResourceSplit(app)
+        // GeckoThread builds its native -greomni argument from
+        // GeckoAppShell.getApplicationContext().getPackageResourcePath().
+        // The ordinary application context returns BASE.APK, but assets/omni.ja
+        // is delivered in the optional cinema_gecko MASTER split. That leaves
+        // Gecko with a successfully loaded libxul.so and no valid omnijar.
+        // Point only Gecko's resource-path query at the Android-installed,
+        // same-signature split while delegating all other Context operations.
+        val geckoContext = GeckoResourceContext(app, split)
+        MyCarLog.i("gecko: native omnijar source=${split.name}; present in installed feature", "CINEMA")
+        val created = GeckoRuntime.create(geckoContext)
         runtime = created
         return created
     }
+}
+
+/** Mozilla's -greomni path must name the APK *containing* assets/omni.ja. */
+private class GeckoResourceContext(base: Context, private val featureApk: java.io.File) :
+    ContextWrapper(base) {
+    override fun getApplicationContext(): Context = this
+    override fun getPackageResourcePath(): String = featureApk.absolutePath
+}
+
+/** Use only a split path already installed by Android's package manager. */
+private fun findGeckoResourceSplit(context: Context): java.io.File {
+    val info = context.applicationInfo
+    val splits = info.splitSourceDirs.orEmpty()
+    val names = info.splitNames.orEmpty()
+    val apk = splits.indices
+        .asSequence()
+        .filter { names.getOrNull(it) == "cinema_gecko" }
+        .map { java.io.File(splits[it]) }
+        .firstOrNull { candidate ->
+            candidate.isFile && runCatching {
+                java.util.zip.ZipFile(candidate).use { zip ->
+                    zip.getEntry("assets/omni.ja") != null
+                }
+            }.getOrDefault(false)
+        }
+        ?: throw IllegalStateException(
+            "Firefox's installed feature is missing assets/omni.ja. Import the matching Gecko ZIP again.",
+        )
+    return apk
 }
