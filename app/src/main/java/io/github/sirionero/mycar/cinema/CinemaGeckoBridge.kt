@@ -40,6 +40,8 @@ interface CinemaBrowserFactory {
         onVisited: (String) -> Unit,
         onKeyboard: (String?) -> Unit,
         onFullScreen: (Boolean) -> Unit,
+        /** Actual fullscreen media aspect, derived from Gecko's media metadata when known. */
+        onFullScreenAspect: (Float?) -> Unit,
         onFailure: (String) -> Unit,
     ): CinemaBrowserSession
 }
@@ -63,6 +65,8 @@ object CinemaGeckoBridge {
         onVisited: (String) -> Unit,
         onKeyboard: (String?) -> Unit,
         onFullScreen: (Boolean) -> Unit,
+        /** Actual fullscreen media aspect, derived from Gecko's media metadata when known. */
+        onFullScreenAspect: (Float?) -> Unit,
         onFailure: (String) -> Unit,
     ): CinemaBrowserSession? {
         if (!installed(context)) return null
@@ -79,7 +83,10 @@ object CinemaGeckoBridge {
         return runCatching {
             val clazz = Class.forName(FACTORY, true, context.classLoader)
             val factory = clazz.getDeclaredConstructor().newInstance() as CinemaBrowserFactory
-            factory.create(context, url, desktop, adBlock, sponsorBlock, onVisited, onKeyboard, onFullScreen, onFailure)
+            factory.create(
+                context, url, desktop, adBlock, sponsorBlock,
+                onVisited, onKeyboard, onFullScreen, onFullScreenAspect, onFailure,
+            )
         }.onFailure {
             // A normal Java/Kotlin failure did not kill the process; clear the checkpoint.
             // Only interrupted native/process exits must keep it for crash-loop protection.
