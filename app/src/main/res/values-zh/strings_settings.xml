@@ -366,4 +366,13 @@
     <string name="settings_cinema_engine_restart_short">重启后启用</string>
     <string name="settings_cinema_sponsorblock">SponsorBlock（Firefox）</string>
     <string name="settings_cinema_sponsorblock_detail">跳过 YouTube 视频中已标记的赞助片段。可选功能，需要 Firefox GeckoView。</string>
+    <string name="settings_cinema_extensions_header">Firefox 扩展</string>
+    <string name="settings_cinema_extension_import_detail">仅选择来自可信开发者且由 Mozilla 签名的 XPI 文件。扩展可能读取和更改网站数据。</string>
+    <string name="settings_cinema_extension_import">安装已签名扩展（.xpi）</string>
+    <string name="settings_cinema_extension_reading">正在读取扩展文件…</string>
+    <string name="settings_cinema_extension_installing">正在安装已签名扩展…</string>
+    <string name="settings_cinema_extension_installed">已安装扩展：%1$s</string>
+    <string name="settings_cinema_extension_consent_title">允许此 Firefox 扩展？</string>
+    <string name="settings_cinema_extension_consent_detail">安装前请检查扩展 ID、所需权限及网站访问范围。</string>
+    <string name="settings_cinema_extension_consent_accept">安装扩展</string>
 </resources>
