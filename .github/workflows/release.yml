@@ -35,17 +35,17 @@ jobs:
           fi
           umask 077
           printf '%s' "$KEYSTORE_BASE64" | base64 -d > mycar-release.jks
-          printf 'storeFile=mycar-release.jks\\nstorePassword=%s\\nkeyAlias=%s\\nkeyPassword=%s\\n' \\
+          printf 'storeFile=mycar-release.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
             "$KEYSTORE_STORE_PASSWORD" "$KEYSTORE_KEY_ALIAS" "$KEYSTORE_KEY_PASSWORD" > keystore.properties
-          keytool -list -keystore mycar-release.jks \\
-            -storepass:env KEYSTORE_STORE_PASSWORD -alias "$KEYSTORE_KEY_ALIAS" > /dev/null \\
+          keytool -list -keystore mycar-release.jks \
+            -storepass:env KEYSTORE_STORE_PASSWORD -alias "$KEYSTORE_KEY_ALIAS" > /dev/null \
             || { echo "Release keystore cannot be opened with the configured credentials"; exit 1; }
 
       - name: Build release APK and optional GeckoView bundle
         run: |
           version="${GITHUB_REF_NAME#v}"
           version_code=$((50 + GITHUB_RUN_NUMBER))
-          ./gradlew :app:assembleRelease :app:bundleRelease \\
+          ./gradlew :app:assembleRelease :app:bundleRelease \
             "-PmyCarVersionName=$version" "-PmyCarVersionCode=$version_code"
 
       # Use the same signing key for the base and the on-demand Android split APKs.
