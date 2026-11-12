@@ -364,4 +364,6 @@
     <string name="cinema_exit_fullscreen">退出全屏</string>
     <string name="settings_cinema_engine_restart_required">Firefox 已安装。请在 Android 设置中强行停止 myCar Debug，再重新打开后选择 Firefox。</string>
     <string name="settings_cinema_engine_restart_short">重启后启用</string>
+    <string name="settings_cinema_sponsorblock">SponsorBlock（Firefox）</string>
+    <string name="settings_cinema_sponsorblock_detail">跳过 YouTube 视频中已标记的赞助片段。可选功能，需要 Firefox GeckoView。</string>
 </resources>
