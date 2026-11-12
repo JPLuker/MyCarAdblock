@@ -454,7 +454,7 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, active: Boolean, 
                 Box(Modifier.align(Alignment.TopEnd)) {
                     CinemaExitFullscreen {
                         fullScreen?.second?.onCustomViewHidden()
-                    fullScreen = null
+                        fullScreen = null
                         navigator.cinemaVideoFullscreen = false
                     }
                 }
@@ -509,7 +509,7 @@ internal fun CinemaExitFullscreen(onClick: () -> Unit) {
         Surface(
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
             contentColor = MaterialTheme.colorScheme.onSurface,
-            shape = RoundedCornerShape(MyCarRadius.M),
+            shape = RoundedCornerShape(MyCarRadius.Button),
             modifier = Modifier.align(Alignment.TopEnd)
                 .size(CHROME_BAR)
                 .clickable(onClick = onClick),
