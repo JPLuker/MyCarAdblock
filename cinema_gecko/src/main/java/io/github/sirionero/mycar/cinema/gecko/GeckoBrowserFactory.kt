@@ -477,12 +477,38 @@ private class RunningSession(
             .onFailure { MyCarLog.w("gecko: media pause failed (${it.javaClass.simpleName})", "CINEMA") }
     }
 
-    override fun setVisible(visible: Boolean) {
+    private var wasHidden = false
+    private var pausedForMap = false
+
+    override fun setVisible(visible: Boolean, backgroundAudio: Boolean) {
         if (isClosed) return
-        if (!visible) pause()
-        // GeckoSession#setActive is explicitly about rendering visibility, not navigation.
-        // Keeping the GeckoSession and its GeckoView attached preserves the page/seek state.
-        session.setActive(visible)
+        if (!visible) {
+            if (!wasHidden) {
+                wasHidden = true
+                // Only pause a media session that was present when leaving Cinema.
+                // Do not restart a page or recreate the Firefox runtime.
+                pausedForMap = !backgroundAudio && activeMedia != null
+                if (pausedForMap) pause()
+            } else if (backgroundAudio && pausedForMap) {
+                // Preference changed while Maps is visible.
+                pausedForMap = false
+                runCatching { activeMedia?.play() }
+            } else if (!backgroundAudio && !pausedForMap && activeMedia != null) {
+                pausedForMap = true
+                pause()
+            }
+        } else if (wasHidden) {
+            wasHidden = false
+            if (pausedForMap) {
+                pausedForMap = false
+                runCatching { activeMedia?.play() }
+                    .onFailure { MyCarLog.w("gecko: playback resume failed", "CINEMA") }
+            }
+        }
+        // setActive controls Gecko rendering, not the media's transport state.
+        // Keep it active when background audio is requested, while hiding the
+        // Android view so Maps never displays video on top of its own surface.
+        session.setActive(visible || backgroundAudio)
         view.visibility = if (visible) View.VISIBLE else View.INVISIBLE
     }
 
