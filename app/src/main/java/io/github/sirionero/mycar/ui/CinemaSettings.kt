@@ -66,7 +66,7 @@ internal fun CinemaSection() {
         if (uri != null) CinemaGeckoInstaller.importDebugSplit(context, uri)
     }
     LaunchedEffect(Unit) { CinemaGeckoInstaller.refresh(context) }
-    val geckoInstalled = geckoStatus is CinemaGeckoInstaller.Status.Installed || CinemaGeckoBridge.installed(context)
+    val geckoInstalled = CinemaGeckoInstaller.ready(context)
     val sites by Cinema.sites.collectAsState()
     val parkedOnly by Cinema.parkedOnly.collectAsState()
     val adBlockEnabled by Cinema.adBlockEnabled.collectAsState()
