@@ -45,7 +45,7 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
             .build()
         val session = GeckoSession(options)
         val view = GeckoView(context)
-        val result = RunningSession(runtime, session, view, onKeyboard)
+        val result = RunningSession(context.applicationContext, runtime, session, view, url, onKeyboard, onFailure)
         session.navigationDelegate = object : GeckoSession.NavigationDelegate {
             // Cinema has one visible browser surface. Links that request a separate tab
             // (including some login links) should not open an invisible Gecko session.
@@ -114,86 +114,126 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         session.open(runtime)
         MyCarLog.i("gecko: session opened; attaching display", "CINEMA")
         view.setSession(session)
-        MyCarLog.i("gecko: view attached; initializing signed extension", "CINEMA")
-
-        // Diagnostic isolation: when Cinema's ad blocking toggle is OFF, do not touch
-        // WebExtensionController at all. Its initialization is the last logged operation
-        // before the real-device native SIGSEGV on 2026-11-12. A simple controller.list()
-        // still initializes Gecko's extension machinery even with enabled=false.
-        // Never silently bypass uBO while the setting is ON.
-        if (!adBlock) {
-            MyCarLog.i("gecko: extension path bypassed by user setting; loading page directly", "CINEMA")
-            session.loadUri(url)
-            return result
-        }
-
-        // Don't show an indefinitely blank Cinema page if Gecko's extension service stalls.
-        // Leave the durable checkpoint in place on timeout; a blocked native service may still
-        // crash later, and a repeat startup should require an explicit settings change.
-        val completed = AtomicBoolean(false)
-        val handler = Handler(Looper.getMainLooper())
-        val timeout = Runnable {
-            if (completed.compareAndSet(false, true)) {
-                MyCarLog.w("gecko: signed uBlock Origin startup timed out", "CINEMA")
-                if (!result.isClosed) {
-                    onFailure("uBlock Origin took too long to start. Turn off Cinema ad blocking to bypass add-on startup, or use Android WebView.")
-                }
-            }
-        }
-        if (!handler.postDelayed(timeout, 30_000L)) {
-            onFailure("Firefox could not schedule add-on initialization. Use Android WebView.")
-            return result
-        }
-
-        // Blocking ON: do not navigate until the signed extension is initialized. An error
-        // must be shown, rather than silently loading the page without uBlock Origin.
-        MyCarLog.i("gecko: requesting signed uBlock Origin initialization", "CINEMA")
-        try {
-            CinemaUBlock.ensure(context, runtime, adBlock, onReady = {
-                if (completed.compareAndSet(false, true)) {
-                    handler.removeCallbacks(timeout)
-                    if (!result.isClosed) {
-                        MyCarLog.i("gecko: add-on ready; loading website", "CINEMA")
-                        runCatching { session.loadUri(url) }
-                            .onFailure {
-                                MyCarLog.e("gecko: navigation failed", it, "CINEMA")
-                                onFailure("Firefox could not navigate to the website.")
-                            }
-                    }
-                }
-            }, onError = { reason ->
-                if (completed.compareAndSet(false, true)) {
-                    handler.removeCallbacks(timeout)
-                    if (!result.isClosed) {
-                        MyCarLog.w("gecko: add-on initialization failed: $reason", "CINEMA")
-                        onFailure(reason)
-                    }
-                }
-            })
-        } catch (failure: Exception) {
-            if (completed.compareAndSet(false, true)) {
-                handler.removeCallbacks(timeout)
-                MyCarLog.e("gecko: add-on initialization threw", failure, "CINEMA")
-                if (!result.isClosed) {
-                    onFailure("Firefox add-on initialization failed. Open the myCar log for details.")
-                }
-            }
-        }
+        MyCarLog.i("gecko: view attached; synchronizing the selected ad-block setting", "CINEMA")
+        // This must run for BOTH settings. Simply bypassing WebExtensionController when OFF
+        // leaves an already-installed uBlock Origin active in the persistent Gecko profile.
+        // Navigation waits for the extension to be confirmed enabled or disabled, and later
+        // settings changes are applied to the same GeckoSession without a reload.
+        result.setAdBlockEnabled(adBlock)
         return result
     }
 }
 
 private class RunningSession(
+    private val context: Context,
     private val runtime: GeckoRuntime,
     private val session: GeckoSession,
     override val view: GeckoView,
+    private val initialUrl: String,
     private val onKeyboard: (String?) -> Unit,
+    private val onFailure: (String) -> Unit,
 ) : CinemaBrowserSession {
     @Volatile var isClosed: Boolean = false
         private set
     var hasBack = false
     var activeMedia: MediaSession? = null
     override val canGoBack: Boolean get() = hasBack
+
+    private val handler = Handler(Looper.getMainLooper())
+    private var desiredBlocking: Boolean? = null
+    private var appliedBlocking: Boolean? = null
+    private var applyingBlocking = false
+    private var navigationStarted = false
+    private var pendingTimeout: Runnable? = null
+
+    override fun setAdBlockEnabled(enabled: Boolean) {
+        if (isClosed) return
+        desiredBlocking = enabled
+        applyBlockingIfNeeded()
+    }
+
+    /**
+     * Serializes extension changes: the user can flip the switch during an install or
+     * update, but only the latest desired value may authorize initial navigation.
+     * The WebExtensionController is shared by the runtime, so no parallel requests.
+     */
+    private fun applyBlockingIfNeeded() {
+        if (isClosed || applyingBlocking) return
+        val requested = desiredBlocking ?: return
+        if (appliedBlocking == requested) {
+            startNavigationOnce()
+            return
+        }
+        applyingBlocking = true
+        val settled = AtomicBoolean(false)
+        val timeout = Runnable {
+            if (settled.compareAndSet(false, true)) {
+                pendingTimeout = null
+                applyingBlocking = false
+                failBlocking("Firefox could not confirm the ad-block setting. Use Android WebView or retry.")
+            }
+        }
+        pendingTimeout = timeout
+        if (!handler.postDelayed(timeout, 30_000L)) {
+            pendingTimeout = null
+            applyingBlocking = false
+            failBlocking("Firefox could not schedule extension initialization.")
+            return
+        }
+        MyCarLog.i("gecko: synchronizing signed uBlock Origin (enabled=$requested)", "CINEMA")
+        try {
+            CinemaUBlock.ensure(context, runtime, requested, onReady = {
+                if (settled.compareAndSet(false, true)) {
+                    handler.removeCallbacks(timeout)
+                    pendingTimeout = null
+                    applyingBlocking = false
+                    if (!isClosed) {
+                        appliedBlocking = requested
+                        MyCarLog.i("gecko: uBlock Origin state applied (enabled=$requested)", "CINEMA")
+                        // If a later settings change arrived while the operation was running,
+                        // apply the newer state BEFORE navigating to the first page.
+                        applyBlockingIfNeeded()
+                    }
+                }
+            }, onError = { reason ->
+                if (settled.compareAndSet(false, true)) {
+                    handler.removeCallbacks(timeout)
+                    pendingTimeout = null
+                    applyingBlocking = false
+                    if (!isClosed) failBlocking(reason)
+                }
+            })
+        } catch (failure: Exception) {
+            if (settled.compareAndSet(false, true)) {
+                handler.removeCallbacks(timeout)
+                pendingTimeout = null
+                applyingBlocking = false
+                MyCarLog.e("gecko: extension state synchronization threw", failure, "CINEMA")
+                if (!isClosed) failBlocking("Firefox could not apply its ad-block setting.")
+            }
+        }
+    }
+
+    private fun failBlocking(reason: String) {
+        // This is a managed extension error rather than a native crash. Do not leave the
+        // native-startup checkpoint set after reporting a recoverable Java/Kotlin failure.
+        CinemaGeckoAttemptGuard.finish(context)
+        MyCarLog.w("gecko: signed uBlock Origin synchronization failed: $reason", "CINEMA")
+        onFailure(reason)
+    }
+
+    private fun startNavigationOnce() {
+        if (isClosed || navigationStarted) return
+        // No navigation is allowed before the selected extension state has been verified.
+        if (desiredBlocking == null || appliedBlocking != desiredBlocking) return
+        navigationStarted = true
+        MyCarLog.i("gecko: extension state confirmed; navigating without a session reload", "CINEMA")
+        runCatching { session.loadUri(initialUrl) }
+            .onFailure {
+                MyCarLog.e("gecko: navigation failed", it, "CINEMA")
+                onFailure("Firefox could not navigate to this website.")
+            }
+    }
 
     private fun connection() = session.textInput.onCreateInputConnection(EditorInfo())
 
@@ -240,6 +280,8 @@ private class RunningSession(
     override fun close() {
         if (isClosed) return
         isClosed = true
+        pendingTimeout?.let(handler::removeCallbacks)
+        pendingTimeout = null
         onKeyboard(null)
         activeMedia = null
         view.releaseSession()
