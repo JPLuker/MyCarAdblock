@@ -58,33 +58,42 @@ If an older myCar Debug APK was signed with a temporary CI key, it cannot be upg
 uninstall **myCar Debug** once (this erases that debug app's data), then use the new build. Do
 not uninstall the separate production myCar app.
 
-## Minimal phone-only test using Car Preview
+## Next test — corrected main branch (Car Preview, one attempt)
 
-1. You can conduct all Gecko startup and Cinema browser tests in **myCar Debug's
-   in-app Car Preview** on the ARM64 phone. No head-unit connection or drive
-   is required. Do not retest Gecko 159 on the existing build: ON and OFF
-   have already failed identically.
-2. For the controlled comparison, open
-   [GitHub Actions > Build](https://github.com/JPLuker/MyCarAdblock/actions/workflows/build.yml)
-   and select a **successful** run from `experiment/gecko-158-startup`.
-   Download both `myCar-debug.apk` and `myCar-gecko-arm64-v8a.zip`
-   from **that same run**. No successful run means no new test APK yet.
-3. **For a meaningful clean A/B test**, avoid carrying Gecko's previous
-   profile or a persisted uBlock Origin installation into the experiment.
-   The recommended path is to uninstall **only myCar Debug**, then reinstall
-   the experimental APK and matching Gecko ZIP in **Settings > Cinema**.
-   **Uninstalling myCar Debug erases its saved sites, settings and sign-ins.**
-   Back up anything important first. Do **not** uninstall production myCar.
-   If you choose an install-over-install instead, disclose that the old Gecko
-   profile may still be present, so the result will not isolate the native
-   engine as cleanly. Do not mix 159 and 158 base/split versions.
-4. Open **Car Preview in myCar Debug**, choose Cinema, select Firefox in
-   phone Settings and turn Cinema ad blocking OFF. Open a site **once**. If it still crashes, the next attempt should display
-   the guarded fallback. Switch to Android WebView instead of repeatedly
-   triggering the crash.
-5. Only if OFF renders correctly, turn ad blocking ON and open once.
-   ON must initialize the signed uBlock extension successfully before
-   navigation; further actual filtering tests remain separate.
+**Test `feature/cinema-adblock` first.** The independent review found strong
+source-level support for the `-greomni` base-APK versus feature-APK mismatch.
+The direct correction is present on this branch; the 158 version comparison is
+now a **fallback investigation**, not the immediate test.
+
+1. In [GitHub Actions > Build](https://github.com/JPLuker/MyCarAdblock/actions/workflows/build.yml)
+   choose a **successful** run on `feature/cinema-adblock` whose commit includes
+   `df0ab4f` (the corrected context and omnijar lookup). The latest source
+   HEAD at review time was `92c6a3d`. The most recent build result is **not
+   independently verified** by this handoff; source pushes alone are not
+   installable APKs.
+2. Download **both** `myCar-debug.apk` and
+   `myCar-gecko-arm64-v8a.zip` from the **same** run.
+   Never mix APK and optional split versions or signers.
+3. Open myCar Debug on the phone. Import the matching Gecko ZIP in
+   **Settings > Cinema** and restart if prompted. Installing over a
+   previously used Debug app can preserve an old Gecko profile; for a
+   fully clean profile, uninstall **only myCar Debug** first.
+   **Warning: uninstalling erases all its saved Debug data and sign-ins.**
+   Do not uninstall the separate production app.
+4. In myCar's **in-app Car Preview**, select Firefox GeckoView and turn
+   Cinema ad blocking **OFF**. Open a simple website **once**.
+5. Inspect the new myCar log for both
+   `packaged GeckoView=159.0.20261102144711` and
+   `gecko: native omnijar source=split_cinema_gecko.apk`,
+   then look for `first contentful paint` and an actually rendered
+   website. If it still crashes, do **not** retry the same build.
+
+Only if this unblocked page renders should signed uBlock Origin startup
+be tested separately. If the **same** native crash persists after the
+corrected omnijar path is logged, inspect the actual Gecko application
+context, symbolicate the four `libxul.so` program offsets with the
+matching ELF build ID, and examine child-process path propagation.
+Consider the Gecko 158 control branch **only after** this is resolved.
 
 ## Report only these observations for this milestone
 
@@ -232,3 +241,32 @@ another diagnostic or uBlock retry.
 
 If this 159 packaging fix does not work, compare the isolated 158
 experiment and investigate symbolicated Gecko native stack frames.
+
+## Independent root-cause review (November 12)
+
+A second independent source review strengthened the missing-omnijar
+hypothesis and examined Gecko's native ZIP handling. Confirmed from
+upstream Gecko sources (not yet checked against the exact Firefox 159 tag):
+
+- Android's `OMNIJAR_NAME` is `assets/omni.ja`.
+- `GeckoThread.getMainProcessArgs()` supplies `-greomni` using
+  `GeckoAppShell.getApplicationContext().getPackageResourcePath()`.
+- `Omnijar::InitOne()` opens that APK ZIP and tries to unwrap
+  `assets/omni.ja`. On a valid ZIP *without* that entry it may keep
+  the outer ZIP and report success rather than issuing a clear error.
+- `GeckoRuntime.create(context)` calls `attachTo(context)`, which
+  sets `GeckoAppShell`'s application context from
+  `context.getApplicationContext()`. The committed `ContextWrapper`
+  deliberately returns itself from that method so Gecko sees the
+  overridden feature-master APK path.
+
+These facts make the base-versus-feature resource-path mismatch the
+**leading hypothesis**, not a proven resolution. Gecko internal APIs
+may change between versions, and child-process omnijar propagation
+is still unverified. Recheck the exact 159 upstream source and
+native symbols if the corrected version does not render.
+
+Original review references:
+- https://github.com/mozilla-firefox/firefox/blob/main/mobile/android/geckoview/src/main/java/org/mozilla/gecko/GeckoThread.java
+- https://github.com/mozilla-firefox/firefox/blob/main/mobile/android/geckoview/src/main/java/org/mozilla/geckoview/GeckoRuntime.java
+- https://github.com/mozilla-firefox/firefox/blob/main/xpcom/build/Omnijar.cpp
