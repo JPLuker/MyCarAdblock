@@ -140,7 +140,11 @@ internal fun CinemaSection() {
         SettingsRow(
             stringResource(R.string.settings_cinema_ad_block),
             Modifier.toggleable(adBlockEnabled, role = Role.Switch) { Cinema.setAdBlockEnabled(it) },
-            subtitle = stringResource(R.string.settings_cinema_ad_block_detail),
+            subtitle = stringResource(
+                if (browserEngine == CinemaBrowserEngine.FIREFOX_GECKOVIEW)
+                    R.string.settings_cinema_ad_block_detail_gecko
+                else R.string.settings_cinema_ad_block_detail,
+            ),
             trailing = { Switch(checked = adBlockEnabled, onCheckedChange = null) },
         )
         SettingsDivider()
