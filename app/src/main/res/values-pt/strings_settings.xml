@@ -367,4 +367,6 @@
     <string name="cinema_exit_fullscreen">Sair do ecrã inteiro</string>
     <string name="settings_cinema_engine_restart_required">Firefox está instalado. Force a paragem do myCar Debug nas definições Android e reabra-o antes de escolher Firefox.</string>
     <string name="settings_cinema_engine_restart_short">Reiniciar para ativar</string>
+    <string name="settings_cinema_sponsorblock">SponsorBlock (Firefox)</string>
+    <string name="settings_cinema_sponsorblock_detail">Ignora segmentos patrocinados conhecidos em vídeos do YouTube. Opcional; requer Firefox GeckoView.</string>
 </resources>
