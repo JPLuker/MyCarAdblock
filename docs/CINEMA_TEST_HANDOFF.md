@@ -7,9 +7,17 @@
 
 The base WebView still has a safe fallback. GeckoView runtime/session/view setup was observed on
 a real ARM64 phone, followed within a second by a **native null-pointer process crash** near
-signed-extension initialization (November 12, 2026). There is still no native stack proving
-which library/function caused it. The new checkpoint, timeout and previous-log tombstone
-changes have **not** been verified on a device.
+signed-extension initialization (November 12, 2026). The new November 12 10:44:36 device log from build #145 confirms
+the process reaches `WebExtensionController.list()` (last recorded operation at
+10:44:51.534), then dies at 10:44:52 with `SIGSEGV (SEGV_MAPERR)`. Frames #0–3
+are in Gecko's `libxul.so`, with `libmozglue.so` at frame #4. This is strong
+evidence the problem lies in Gecko's native startup/extension-list path, but it
+does not yet identify the failing native function. The earlier log did not have
+native frames; the updated native-footnote diagnostic now works on the device.
+A further commit adds PC offsets to future reports so the frames can be symbolicated.
+
+The crash guard and extension timeout have **not** been confirmed as a successful
+fix on a physical device. The native fault remains open.
 
 ## One-time optional signing setup
 
@@ -69,3 +77,11 @@ on app switching, fullscreen exit, Maps/Cinema side-by-side, parked-only cover, 
 release-signed split installation and upgrades on physical ARM64 hardware.
 
 **None of these physical-device checks is marked passed by this handoff.**
+
+## Install permission button (November 12)
+
+When Android's **Allow from this source** permission is granted outside the app,
+Cinema Settings now refreshes its permission-dependent button state on Activity
+resume. The button should switch from **Allow myCar to install** to **Install**
+without reopening the Cinema settings screen. The initial download refresh remains
+in place. This UI change is committed but not yet verified on device.
