@@ -11,6 +11,7 @@ signing certificate(s), which is what Android's package manager compares.
 Only APK Signature Scheme v2/v3 is supported, as required on our minSdk 31.
 """
 import hashlib
+import os
 import pathlib
 import struct
 import sys
@@ -101,6 +102,14 @@ def check(apks):
         print(f"{path}: cert sha256 {digest}")
     if len({digest for _, digest in pairs}) != 1:
         raise ValueError("Base APK and optional GeckoView splits have DIFFERENT signing certificates")
+    # The shared signer check is necessary but not sufficient: all APKs could have
+    # been signed with the wrong key. Pin the expected trusted certificate in CI.
+    expected = os.environ.get("MYCAR_EXPECT_CERT_SHA256", "").strip().lower()
+    if expected:
+        if len(expected) != 64 or any(c not in "0123456789abcdef" for c in expected):
+            raise ValueError("Configured signing certificate fingerprint is malformed")
+        if pairs[0][1] != expected:
+            raise ValueError("APK signing certificate differs from the configured trusted key")
 
 
 def main():
