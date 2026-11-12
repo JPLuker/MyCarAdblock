@@ -473,3 +473,53 @@ Android's car host, or parked-only masking.
   `gecko: fullscreen video metadata available=true` appears. That tells
   us whether Gecko supplied a real media aspect and whether the native
   surface needs further correction.
+
+
+## November 12, 15:49 — split fullscreen immediately exits
+
+**Latest user-confirmed observation:** On the same 800×480 phone Car Preview,
+YouTube fullscreen works and looks correctly sized with Cinema using the
+whole content width. In **Map + Cinema split** mode, tapping YouTube fullscreen
+causes a brief attempt and immediate return to the normal YouTube watch page.
+The video is not simply letterboxed; the *document fullscreen state is lost*.
+The screenshots do not show an actual runtime crash.
+
+**Source-level candidate cause:** Our immediately preceding aspect-ratio
+workaround changes the **physical GeckoView AndroidView dimensions** during
+`ContentDelegate.onFullScreen(true)`. In a narrow Cinema pane, this shrinks
+the live renderer from the whole pane to a 16:9 element size, firing a viewport
+resize while Firefox/site fullscreen is in progress. Firefox/YouTube may
+respond by exiting fullscreen (this sequence is a hypothesis until logs show
+a Gecko `true → false` callback pair). This is distinct from Gecko's older
+sub-window fullscreen sizing bug.
+
+**Focused source fix committed (needs CI + Car Preview validation):**
+
+- `CinemaFullscreenSizing.resizeGeckoSurface(fullscreen, split)` returns
+  **false in split mode**, regardless of fullscreen state, so the Android
+  GeckoView stays `Modifier.fillMaxSize()` within the Cinema pane across a
+  fullscreen entry or exit. This prevents an *additional host-initiated
+  resize* during the transition.
+- The single-pane fullscreen branch retains its previously verified
+  aspect-fitted renderer. Neither view/session nor the page is recreated.
+- Gecko now logs `gecko: document fullscreen=true/false` for each actual
+  content delegate event; this enables a decisive follow-up without guessing
+  from a screenshot.
+- JVM policy tests verify stable split-mode viewport sizing for both states
+  and preserve the working single-pane path.
+
+**Tradeoff/remaining problem:** Stabilizing Gecko's native fullscreen state
+is **the immediate objective**. The earlier top-anchored picture/distant
+captions issue may return while we keep GeckoView full height in split.
+If fullscreen stays active but the picture is still poorly positioned,
+the next fix must adjust *rendering/content geometry without remeasuring
+the GeckoView during the fullscreen transition*. Do not claim a visual
+fullscreen fix until a new Car Preview screenshot confirms it.
+
+**Next parked-car test:** Start with Map + Cinema *already split*; enter
+YouTube fullscreen once. Did the video remain in native fullscreen? Does the
+existing split/exit overlay remain visible? If it immediately exits again,
+return the new myCar log, specifically the sequence
+`gecko: document fullscreen=true`, `false`, and
+`gecko: fullscreen video metadata available=...`. Then try the
+full-width path once as the control. Never test while driving.
