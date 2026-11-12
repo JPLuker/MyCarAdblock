@@ -126,7 +126,7 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
             if (completed.compareAndSet(false, true)) {
                 MyCarLog.w("gecko: signed uBlock Origin startup timed out", "CINEMA")
                 if (!result.isClosed) {
-                    onFailure("uBlock Origin took too long to start. Turn off Cinema ad blocking to test Firefox, or use Android WebView.")
+                    onFailure("uBlock Origin took too long to start. Turn off Cinema ad blocking to bypass add-on startup, or use Android WebView.")
                 }
             }
         }
