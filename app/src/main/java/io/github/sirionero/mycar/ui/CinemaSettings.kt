@@ -188,7 +188,7 @@ internal fun CinemaSection() {
                     geckoStatus is CinemaGeckoInstaller.Status.Downloaded ->
                         R.string.settings_cinema_engine_gecko_downloaded
                     geckoStatus is CinemaGeckoInstaller.Status.Installing ->
-                        R.string.settings_cinema_engine_installing_short
+                        R.string.settings_cinema_engine_installing
                     geckoStatus is CinemaGeckoInstaller.Status.RestartRequired ->
                         R.string.settings_cinema_engine_restart_short
                     else -> R.string.settings_cinema_engine_gecko_pending
@@ -239,8 +239,9 @@ internal fun CinemaSection() {
                             ))
                         }
                     }
-                    CinemaGeckoInstaller.Status.Installing ->
-                        Text(stringResource(R.string.settings_cinema_engine_installing))
+                    // The Firefox radio row already shows the installation state.
+                    // Do not repeat the same message immediately underneath.
+                    CinemaGeckoInstaller.Status.Installing -> Unit
                     CinemaGeckoInstaller.Status.RestartRequired ->
                         Text(
                             stringResource(R.string.settings_cinema_engine_restart_required),
