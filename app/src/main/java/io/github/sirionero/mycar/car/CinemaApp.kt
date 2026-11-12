@@ -166,7 +166,13 @@ internal fun CinemaScreen(active: Boolean = true) {
             },
             onShelf = { shelf = it },
         )
-        else -> key(open.url, preferredEngine) {
+        else -> key(
+            open.url,
+            preferredEngine,
+            // Gecko's extension state is chosen at session creation. A deliberate setting
+            // change must rebuild only Firefox; ordinary WebView stays on the same page.
+            if (preferredEngine == CinemaBrowserEngine.FIREFOX_GECKOVIEW) adBlockEnabled else null,
+        ) {
             val engine = CinemaBrowserPolicy.active(preferredEngine, CinemaGeckoInstaller.ready(context))
             if (engine == CinemaBrowserEngine.FIREFOX_GECKOVIEW) {
                 CinemaGeckoSiteView(open, startAt = startPage, active = active, onClose = { openUrl = null })
