@@ -102,8 +102,20 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         view.setSession(session)
         MyCarLog.i("gecko: view attached; initializing signed extension", "CINEMA")
 
-        // Do not load the page without blocking when the driver selected uBO. A signed add-on
-        // installation may be necessary on the first launch, and is asynchronous.
+        // Diagnostic isolation: when Cinema's ad blocking toggle is OFF, do not touch
+        // WebExtensionController at all. Its initialization is the last logged operation
+        // before the real-device native SIGSEGV on 2026-11-12. A simple controller.list()
+        // still initializes Gecko's extension machinery even with enabled=false.
+        // Never silently bypass uBO while the setting is ON.
+        if (!adBlock) {
+            MyCarLog.i("gecko: extension path bypassed by user setting; loading page directly", "CINEMA")
+            session.loadUri(url)
+            return result
+        }
+
+        // When ad blocking is ON, wait for the verified signed uBO extension before
+        // navigating to the website. Any failure is surfaced instead of loading unblocked.
+        MyCarLog.i("gecko: requesting signed uBlock Origin initialization", "CINEMA")
         try {
             CinemaUBlock.ensure(context, runtime, adBlock, onReady = {
                 if (!result.isClosed) {
