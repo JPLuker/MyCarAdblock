@@ -12,6 +12,21 @@ class CinemaBrowserEngineTest {
         assertTrue(CinemaGeckoAttemptPolicy.shouldStart(interrupted = false))
     }
 
+    @Test fun crashGuardResetsOnlyForExplicitWebViewToFirefoxChange() {
+        assertTrue(CinemaGeckoAttemptPolicy.shouldResetOnEngineSelection(
+            CinemaBrowserEngine.ANDROID_WEBVIEW, CinemaBrowserEngine.FIREFOX_GECKOVIEW,
+        ))
+        assertFalse(CinemaGeckoAttemptPolicy.shouldResetOnEngineSelection(
+            CinemaBrowserEngine.FIREFOX_GECKOVIEW, CinemaBrowserEngine.FIREFOX_GECKOVIEW,
+        ))
+        assertFalse(CinemaGeckoAttemptPolicy.shouldResetOnEngineSelection(
+            CinemaBrowserEngine.FIREFOX_GECKOVIEW, CinemaBrowserEngine.ANDROID_WEBVIEW,
+        ))
+        assertFalse(CinemaGeckoAttemptPolicy.shouldResetOnEngineSelection(
+            CinemaBrowserEngine.ANDROID_WEBVIEW, CinemaBrowserEngine.ANDROID_WEBVIEW,
+        ))
+    }
+
     @Test fun absentSettingKeepsLightweightBrowser() {
         assertEquals(CinemaBrowserEngine.ANDROID_WEBVIEW, CinemaBrowserEngine.fromStored(""))
         assertEquals(CinemaBrowserEngine.ANDROID_WEBVIEW, CinemaBrowserEngine.fromStored("other"))
