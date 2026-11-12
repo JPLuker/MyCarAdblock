@@ -152,3 +152,30 @@ dependency version in the feature's generated BuildConfig and write a
 `gecko: starting optional runtime; packaged GeckoView=...` line before
 initializing the engine. The next phone log can distinguish source 158
 from 159. CI must successfully build this change before the marker is available.
+
+
+## November 12, 11:58 confirmed GeckoView 159
+
+An additional Car Preview log `mycar-log-20261112-115710.txt` explicitly
+records at 11:58:38.737:
+
+```text
+gecko: starting optional runtime; packaged GeckoView=159.0.20261102144711
+```
+
+The runtime, session and view attach successfully. Ad blocking is ON.
+`WebExtensionController.list()` is requested at 11:58:38.772.
+At 11:58:39 the process again terminates with native
+`SIGSEGV (SEGV_MAPERR)`, first frame `libxul.so+0x3f66680`.
+This **confirms** both the build-version marker works and that the
+installed package on this test remains **GeckoView 159**.
+
+This log is *not* a 158 regression comparison. Do not retest 159 simply
+to reconfirm the same fault. Next useful evidence is a successful 158
+build bearing `packaged GeckoView=158.0.20261021001945`, installed with
+its matching split, ideally against a clean Debug app profile. The
+source artifact version was checked against the Mozilla Maven
+distribution; an installable Actions artifact and successful runtime
+remain unverified.
+
+No successful Firefox page paint is recorded in the latest log.
