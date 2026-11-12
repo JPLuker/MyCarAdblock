@@ -20,7 +20,8 @@ interface CinemaBrowserSession {
     fun setText(text: String)
     fun submitText()
     fun pause()
-    fun setVisible(visible: Boolean)
+    /** Hide or restore the same Firefox session; preserve playback state. */
+    fun setVisible(visible: Boolean, backgroundAudio: Boolean)
     /** Apply the setting to the existing Firefox session without reloading its page. */
     fun setAdBlockEnabled(enabled: Boolean)
     /** Toggle optional SponsorBlock without discarding playback. */
