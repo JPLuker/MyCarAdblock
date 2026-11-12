@@ -106,7 +106,9 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
                         onFailure = { failure = it },
                     )
                     if (instance == null) {
-                        failure = "Optional Firefox engine is not installed or could not start."
+                        // The bridge may already have provided the actionable crash-loop error.
+                        // Do not overwrite it with a generic missing-split message.
+                        if (failure == null) failure = "Optional Firefox engine is not installed or could not start."
                         FrameLayout(ctx)
                     } else {
                         browser = instance
