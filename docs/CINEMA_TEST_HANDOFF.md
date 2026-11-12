@@ -523,3 +523,61 @@ return the new myCar log, specifically the sequence
 `gecko: document fullscreen=true`, `false`, and
 `gecko: fullscreen video metadata available=...`. Then try the
 full-width path once as the control. Never test while driving.
+
+
+## November 12, 16:02 — center video and captions in split fullscreen
+
+**Car Preview screenshot result:** Split-screen Firefox fullscreen now **stays
+active**, after the previous native-surface resize was prohibited. The 56%
+Cinema pane nevertheless shows the YouTube video pinned at its **top**, with
+the caption overlay pinned near its **bottom**. In the same session,
+single-pane fullscreen is correctly centered. This isolates the remaining
+problem to the *site's fullscreen content geometry*, not a lost Gecko
+fullscreen state or a native browser crash.
+
+**New source-level correction (not yet device validated):**
+
+- Keep the **GeckoView Android surface unchanged and full-height in split**.
+  Resizing this surface during `ContentDelegate.onFullScreen(true)` was
+  previously observed to cause Firefox to exit fullscreen immediately.
+- Bundle one tiny first-party, local-only WebExtension in the optional Gecko
+  feature: `cinema_gecko/src/main/assets/cinema_fullscreen/`. Mozilla
+  recommends built-in Gecko extensions for controlled page DOM interaction;
+  there is no supported GeckoView `evaluateJavascript()` equivalent.
+- The script matches only YouTube and youtube-nocookie hosts and runs only
+  if **document fullscreen is active and the viewport is narrow**
+  (width/height under 1.15). It reads the actual video rectangle and the
+  fullscreen stage, then applies the independent CSS `translate` property
+  to move the video down to the stage center and the caption overlay up by
+  the same amount. This leaves page controls at their normal position
+  and avoids changing native view bounds, playback state or video aspect.
+- The script preserves and restores each touched element's original inline
+  `translate` declaration when fullscreen exits, including if the site
+  removes/replaces its video element. It makes no network calls, reads no
+  account or URL data, and does not affect unrelated sites.
+- `CinemaFullscreenAlignment.ensure()` calls Gecko's documented
+  `WebExtensionController.ensureBuiltIn(resource://android/assets/...)`
+  **before the first page navigation**, after curated extension states
+  settle. If the helper can't initialize, a bounded 8-second fallback
+  allows ordinary Firefox navigation and logs the failure; it does not
+  block uBlock, video playback or the built-in WebView fallback.
+- CI now checks the helper's manifest JSON, JavaScript syntax and packaged
+  presence in `cinema_gecko-master.apk`; it also runs a dependency-free
+  JavaScript regression suite for narrow/full-width/restore behavior.
+  A local V8 execution of the same centering script passed those geometry
+  cases, but Gradle/Actions build has **not** been independently verified.
+
+**Next parked-only Car Preview acceptance test:** Start YouTube with Map +
+Cinema already split, enter fullscreen and inspect **whether the video is
+vertically centered and subtitles sit near the picture**, not at the pane's
+bottom. Exit/re-enter fullscreen once and confirm the page isn't reloaded.
+Repeat full-width fullscreen to ensure it remains unchanged. If the image
+is still top-anchored, inspect the successful-session log for
+`gecko: Cinema fullscreen alignment script installed`; a missing/failed
+line points to bundled resource loading, whereas a successful line means
+the site DOM/YouTube player requires a further targeted style correction.
+
+**Known limitations:** The extension does not modify Android WebView,
+non-YouTube sites, or videos that are already correctly centered; and Gecko's
+exact DOM rendering can differ across YouTube versions. This is a candidate
+fix pending screenshot/device confirmation, not a closed release gate.
