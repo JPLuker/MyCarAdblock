@@ -137,7 +137,10 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
             )
             if (fullScreen) {
                 Box(Modifier.align(androidx.compose.ui.Alignment.TopEnd)) {
-                    CinemaExitFullscreen {
+                    CinemaExitFullscreen(
+                        split = navigator.cinemaSplit,
+                        onToggleSplit = navigator::toggleCinemaSplit,
+                    ) {
                         browser?.exitFullScreen()
                         fullScreen = false
                         navigator.cinemaVideoFullscreen = false
