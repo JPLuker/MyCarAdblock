@@ -179,3 +179,56 @@ distribution; an installable Actions artifact and successful runtime
 remain unverified.
 
 No successful Firefox page paint is recorded in the latest log.
+
+
+## November 12, 12:11:49 – confirmed repeat and Gecko resource-path correction
+
+New log `mycar-log-20261112-121138.txt` **explicitly** shows
+`packaged GeckoView=159.0.20261102144711`, ad blocking OFF,
+native `SIGSEGV` at 12:11:49, with the same
+`libxul.so+0x3f66680` first frame. No new Gecko 159 device
+reproduction was needed to diagnose this recurring fault.
+
+### Source-level cause to test (NOT yet confirmed)
+
+Mozilla's `GeckoThread.getMainProcessArgs()` explicitly constructs
+`-greomni <context.getPackageResourcePath()>` (upstream source:
+`mozilla/gecko-dev/mobile/android/geckoview/.../GeckoThread.java`).
+Android's ordinary application context returns the **base APK**
+path. Our `cinema_gecko` dynamic feature packs
+`assets/omni.ja` inside the **optional feature master split**,
+not the base. This means Gecko can load `libxul.so` from
+the arm64 split but be directed to the wrong APK for its startup
+omnijar. That is a concrete source-level mismatch plausibly
+causing the repeatable early native fault.
+
+The candidate branch now passes a narrow application ContextWrapper
+to `GeckoRuntime.create()` that overrides
+`getPackageResourcePath()` to the Android-installed **feature master
+split containing `assets/omni.ja`**; all other methods remain
+delegated. If no matching split with that asset exists, startup fails
+as a normal Java/Kotlin exception and presents the existing WebView
+fallback instead of risking another unqualified native launch.
+The log line `gecko: native omnijar source=...` confirms which
+split the runtime receives.
+
+**This fix is committed, NOT build-verified and NOT device-verified.**
+It is a meaningful new native-startup packaging change, not simply
+another diagnostic or uBlock retry.
+
+### Next useful Car Preview test
+
+1. After a **successful** `feature/cinema-adblock` Actions run,
+   install the base debug APK and Gecko ZIP from **that one run**.
+   Avoid reinstalling the known-crashing previous build.
+2. In Car Preview, enable GeckoView and set blocking OFF; open
+   a simple site once. The new log should show both
+   `packaged GeckoView=159...` and
+   `native omnijar source=split_cinema_gecko.apk`.
+3. Look for `first contentful paint` and actual page rendering.
+   If another native SIGSEGV occurs, stop there and share that log.
+4. Only after a successful unblocked page render, enable blocking
+   and test uBlock startup. Preserve the existing recovery guard.
+
+If this 159 packaging fix does not work, compare the isolated 158
+experiment and investigate symbolicated Gecko native stack frames.
