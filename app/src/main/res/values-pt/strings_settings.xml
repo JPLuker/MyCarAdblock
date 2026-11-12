@@ -364,4 +364,5 @@
     <string name="music_needs_qobuz">Precisa de uma assinatura do Qobuz.</string>
     <string name="cinema_map_split">Mapa + Cinema</string>
     <string name="cinema_full_width">Largura total</string>
+    <string name="cinema_exit_fullscreen">Sair do ecrã inteiro</string>
 </resources>
