@@ -114,6 +114,15 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
                 },
                 onRelease = { browser?.close(); browser = null },
             )
+            if (fullScreen) {
+                Box(Modifier.align(androidx.compose.ui.Alignment.TopEnd)) {
+                    CinemaExitFullscreen {
+                        browser?.exitFullScreen()
+                        fullScreen = false
+                        navigator.cinemaVideoFullscreen = false
+                    }
+                }
+            }
             if (failure != null) {
                 PageCover(
                     "Firefox engine unavailable",
