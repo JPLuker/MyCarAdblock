@@ -60,11 +60,24 @@ object CinemaGeckoBridge {
         onFailure: (String) -> Unit,
     ): CinemaBrowserSession? {
         if (!installed(context)) return null
+        // A native Gecko crash kills the whole Android process, bypassing Kotlin exception
+        // handlers. Do not repeat an interrupted signed-extension startup on the next drive.
+        if (!CinemaGeckoAttemptPolicy.shouldStart(adBlock, CinemaGeckoAttemptGuard.interrupted(context))) {
+            onFailure("uBlock Origin did not finish starting last time. Turn off Cinema ad blocking to test Firefox without it, or use Android WebView.")
+            return null
+        }
+        if (adBlock && !CinemaGeckoAttemptGuard.begin(context)) {
+            onFailure("Firefox could not save the add-on startup checkpoint. Use Android WebView.")
+            return null
+        }
         return runCatching {
             val clazz = Class.forName(FACTORY, true, context.classLoader)
             val factory = clazz.getDeclaredConstructor().newInstance() as CinemaBrowserFactory
             factory.create(context, url, desktop, adBlock, onVisited, onKeyboard, onFullScreen, onFailure)
         }.onFailure {
+            // A normal Java/Kotlin failure did not kill the process; clear the checkpoint.
+            // Only interrupted native/process exits must keep it for crash-loop protection.
+            if (adBlock) CinemaGeckoAttemptGuard.finish(context)
             // Never bring down the whole car connection because a split failed to load.
             // Preserve the full Java cause chain in the existing on-device crash log.
             // A class-loader, missing split manifest component or GeckoRuntime startup error
@@ -72,5 +85,33 @@ object CinemaGeckoBridge {
             MyCarLog.e("cinema: GeckoView initialization failed", it, tag = "CINEMA")
             onFailure("Firefox could not start. Choose Android WebView; see the myCar log for details.")
         }.getOrNull()
+    }
+}
+
+/**
+ * A durable checkpoint around *signed-extension startup*, not around page navigation.
+ * commit() is intentional: an async preference write might be lost in the native SIGSEGV
+ * that prompted this guard. The only stored value is a Boolean, never browsing data.
+ *
+ * Turning off Cinema ad blocking explicitly clears the checkpoint and allows unblocked
+ * Firefox to be tested. Turning it on again is an explicit retry after that choice.
+ */
+object CinemaGeckoAttemptGuard {
+    private const val PREFS = "cinema_gecko_startup"
+    private const val PENDING = "signed_extension_pending"
+
+    private fun prefs(context: Context) =
+        context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
+    fun interrupted(context: Context): Boolean = prefs(context).getBoolean(PENDING, false)
+
+    fun begin(context: Context): Boolean {
+        val preferences = prefs(context)
+        if (preferences.getBoolean(PENDING, false)) return false
+        return preferences.edit().putBoolean(PENDING, true).commit()
+    }
+
+    fun finish(context: Context) {
+        prefs(context).edit().remove(PENDING).commit()
     }
 }
