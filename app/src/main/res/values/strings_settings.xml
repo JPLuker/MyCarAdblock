@@ -480,4 +480,5 @@
     <string name="cinema_full_width">Full width</string>
     <string name="cinema_exit_fullscreen">Exit fullscreen</string>
     <string name="settings_cinema_engine_restart_required">Firefox is installed. Force-stop myCar Debug in Android settings, then reopen it before selecting Firefox.</string>
+    <string name="settings_cinema_engine_restart_short">Restart to enable</string>
 </resources>
