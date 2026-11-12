@@ -73,6 +73,9 @@ internal fun CinemaSection() {
         canInstallPackages = context.packageManager.canRequestPackageInstalls()
         CinemaGeckoInstaller.refresh(context)
     }
+    // Also restore any verified download if this screen is first composed while its
+    // Activity is already resumed and no new ON_RESUME event will be dispatched.
+    LaunchedEffect(Unit) { CinemaGeckoInstaller.refresh(context) }
     // Signed debug APKs need the optional split ZIP from the exact same CI run.
     val testGeckoPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) CinemaGeckoInstaller.importDebugSplit(context, uri)
