@@ -45,11 +45,12 @@ else
 fi
 chmod 600 "$password_file" "$store"
 
+# Hash the DER certificate itself. Do not parse keytool's human-readable fingerprint.
 fingerprint="$(
-    keytool -list -v -keystore "$store" -alias "$alias_name" \
+    keytool -exportcert -rfc -keystore "$store" -alias "$alias_name" \
         -storepass:env MYCAR_SIGNING_PASSWORD 2>/dev/null |
-        sed -n 's/^[[:space:]]*SHA256: //p' | head -1 |
-        tr -d ':[:space:]' | tr '[:upper:]' '[:lower:]'
+        openssl x509 -inform PEM -outform DER |
+        openssl dgst -sha256 -r | awk '{print $1}'
 )"
 if [[ ! "$fingerprint" =~ ^[a-f0-9]{64}$ ]]; then
     echo "Cannot read the signing certificate. No GitHub secrets have been changed." >&2
@@ -60,6 +61,7 @@ base64 < "$store" | tr -d '\r\n' | gh secret set KEYSTORE_BASE64 --repo "$repo"
 printf '%s' "$MYCAR_SIGNING_PASSWORD" | gh secret set KEYSTORE_STORE_PASSWORD --repo "$repo"
 printf '%s' "$MYCAR_SIGNING_PASSWORD" | gh secret set KEYSTORE_KEY_PASSWORD --repo "$repo"
 printf '%s' "$alias_name" | gh secret set KEYSTORE_KEY_ALIAS --repo "$repo"
+printf '%s' "$fingerprint" | gh secret set KEYSTORE_CERT_SHA256 --repo "$repo"
 unset MYCAR_SIGNING_PASSWORD
 
 echo
