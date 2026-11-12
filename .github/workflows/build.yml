@@ -120,6 +120,12 @@ jobs:
             build/cinema-debug.apks build/myCar-gecko-arm64-v8a.zip
           echo "Debug base APK and test-only optional Gecko split are both available"
 
+      - name: Validate bundled Firefox fullscreen script syntax
+        run: |
+          set -euo pipefail
+          python3 -m json.tool cinema_gecko/src/main/assets/cinema_fullscreen/manifest.json >/dev/null
+          node --check cinema_gecko/src/main/assets/cinema_fullscreen/alignment.js
+
       - name: Validate signed base and optional feature identity
         run: |
           set -euo pipefail
@@ -151,6 +157,12 @@ jobs:
           # while classes.dex and libxul.so alone still pass our previous CI check.
           unzip -Z1 build/gecko-splits/cinema_gecko-master.apk | grep -qx 'assets/omni.ja' \
             || { echo "Gecko startup archive omni.ja missing from optional feature master"; exit 1; }
+          # The tiny first-party YouTube CSS helper must travel with the optional
+          # Gecko master APK, not the lightweight base application.
+          unzip -Z1 build/gecko-splits/cinema_gecko-master.apk | grep -qx 'assets/cinema_fullscreen/manifest.json' \
+            || { echo "Cinema fullscreen extension manifest missing from Gecko feature"; exit 1; }
+          unzip -Z1 build/gecko-splits/cinema_gecko-master.apk | grep -qx 'assets/cinema_fullscreen/alignment.js' \
+            || { echo "Cinema fullscreen alignment content script missing from Gecko feature"; exit 1; }
           unzip -Z1 build/gecko-splits/cinema_gecko-arm64_v8a.apk | grep -qx 'lib/arm64-v8a/libmozglue.so' \
             || { echo "Gecko native loader missing from optional ARM64 split"; exit 1; }
           echo "Signed Gecko splits have classes.dex, omni.ja, libxul.so and libmozglue.so"
