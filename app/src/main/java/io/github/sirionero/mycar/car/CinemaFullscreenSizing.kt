@@ -12,6 +12,15 @@ package io.github.sirionero.mycar.car
  * inferred from the phone's display or the car's physical resolution.
  */
 internal object CinemaFullscreenSizing {
+    /**
+     * Firefox can immediately abandon document fullscreen when its Android rendering
+     * surface is remeasured during the fullscreen transition. In a map split, preserve
+     * the same full-height GeckoView bounds across entry and exit. Only the already
+     * proven single-pane fullscreen path uses aspect-fitted AndroidView bounds.
+     */
+    fun resizeGeckoSurface(fullscreen: Boolean, split: Boolean): Boolean =
+        fullscreen && !split
+
     data class Size(val width: Float, val height: Float)
 
     fun fit(paneWidth: Float, paneHeight: Float, videoAspectRatio: Float): Size {
