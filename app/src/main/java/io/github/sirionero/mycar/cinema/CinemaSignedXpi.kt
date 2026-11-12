@@ -56,11 +56,12 @@ object CinemaSignedXpi {
             try {
                 val folder = File(app.cacheDir, "cinema-signed-xpi")
                 check(folder.isDirectory || folder.mkdirs()) { "Cannot create a private extension cache." }
-                xpi = File(folder, "${UUID.randomUUID()}.xpi")
+                val temporary = File(folder, "${UUID.randomUUID()}.xpi")
+                xpi = temporary
                 val input = app.contentResolver.openInputStream(uri)
                     ?: throw IllegalArgumentException("Cannot open the selected document.")
                 input.use { source ->
-                    xpi.outputStream().use { out ->
+                    temporary.outputStream().use { out ->
                         val buffer = ByteArray(64 * 1024)
                         var total = 0L
                         while (true) {
@@ -72,15 +73,15 @@ object CinemaSignedXpi {
                         }
                     }
                 }
-                require(xpi.length() > 0L) { "The selected file is empty." }
-                ZipFile(xpi).use { zip ->
+                require(temporary.length() > 0L) { "The selected file is empty." }
+                ZipFile(temporary).use { zip ->
                     val manifest = zip.getEntry("manifest.json")
                     require(manifest != null && !manifest.isDirectory &&
-                            manifest.size in 1..(1024 * 1024)) {
+                            manifest.size in 1L..(1024L * 1024L)) {
                         "The selected file is not a valid Firefox XPI (manifest.json missing)."
                     }
                 }
-                val selectedFile = xpi
+                val selectedFile = temporary
                 main.post {
                     state.value = Status.Installing
                     var finished = false
