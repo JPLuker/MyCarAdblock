@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="settings_cinema_background_audio">Фоновое аудио</string>
+    <string name="settings_cinema_background_audio_detail">Продолжать воспроизведение звука Firefox при переходе к картам. По умолчанию выключено.</string>
     <string name="settings_support_title">Поддержать myCar</string>
     <string name="settings_support_footer">myCar бесплатный, без рекламы и слежки. Ваша поддержка помогает проекту жить.</string>
     <string name="settings_usage_notes_title">Отчёты об использовании</string>
