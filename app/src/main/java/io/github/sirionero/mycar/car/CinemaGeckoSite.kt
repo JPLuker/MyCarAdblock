@@ -110,16 +110,20 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
             Modifier.weight(1f).fillMaxWidth()
                 .background(if (fullScreen) Color.Black else Color.Transparent),
         ) {
-            // Gecko fullscreen is bound to Cinema's pane, not the phone Activity.
-            // In a tall split pane, filling all height yields a top-anchored video and
-            // captions at the bottom of the *pane*, far from the actual picture.
-            // Fit the actual media aspect (or 16:9 while Gecko metadata is pending),
-            // and center the same live surface, never recreating the browser.
-            val ratio = fullScreenAspect ?: (16f / 9f)
-            val fitted = CinemaFullscreenSizing.fit(maxWidth.value, maxHeight.value, ratio)
-            val geckoViewport = if (fullScreen) {
-                Modifier.align(Alignment.Center)
-                    .size(fitted.width.dp, fitted.height.dp)
+            // Do not resize the Android GeckoView as Firefox enters fullscreen in
+            // Maps + Cinema. The resize itself can trigger a browser fullscreen-exit
+            // event, producing the observed brief fullscreen flash followed by the
+            // normal YouTube player. Keep the renderer full-height and stable in
+            // split mode; full-width fullscreen keeps its confirmed aspect-fit path.
+            // This never creates a second GeckoView or reloads the media session.
+            val geckoViewport = if (CinemaFullscreenSizing.resizeGeckoSurface(
+                    fullscreen = fullScreen,
+                    split = navigator.cinemaSplit,
+                )
+            ) {
+                val ratio = fullScreenAspect ?: (16f / 9f)
+                val fitted = CinemaFullscreenSizing.fit(maxWidth.value, maxHeight.value, ratio)
+                Modifier.align(Alignment.Center).size(fitted.width.dp, fitted.height.dp)
             } else {
                 Modifier.fillMaxSize()
             }
