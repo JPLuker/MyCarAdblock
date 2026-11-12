@@ -42,7 +42,7 @@ def field(data, index):
 
 def signing_blocks(apk):
     data = pathlib.Path(apk).read_bytes()
-    end_record = data.rfind(b"PK\\x05\\x06")
+    end_record = data.rfind(b"PK\x05\x06")
     if end_record < 0 or end_record + 22 > len(data):
         raise ValueError("APK ZIP directory missing")
     central_directory = u32(data, end_record + 16)
