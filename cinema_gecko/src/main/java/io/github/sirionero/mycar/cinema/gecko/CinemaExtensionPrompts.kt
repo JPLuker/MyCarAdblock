@@ -17,6 +17,8 @@ internal object CinemaExtensionPrompts {
     private val trustedPending = mutableSetOf<String>()
     private var userXpiPending = false
 
+    fun ensureAttached(runtime: GeckoRuntime) = attach(runtime)
+
     fun allowOfficial(runtime: GeckoRuntime, id: String, enable: Boolean) {
         attach(runtime)
         if (enable) trustedPending.add(id) else trustedPending.remove(id)
