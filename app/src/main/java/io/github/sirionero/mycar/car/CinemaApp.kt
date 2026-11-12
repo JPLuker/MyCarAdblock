@@ -167,7 +167,7 @@ internal fun CinemaScreen(active: Boolean = true) {
             onShelf = { shelf = it },
         )
         else -> key(open.url, preferredEngine) {
-            val engine = CinemaBrowserPolicy.active(preferredEngine, CinemaGeckoBridge.installed(context))
+            val engine = CinemaBrowserPolicy.active(preferredEngine, CinemaGeckoInstaller.ready(context))
             if (engine == CinemaBrowserEngine.FIREFOX_GECKOVIEW) {
                 CinemaGeckoSiteView(open, startAt = startPage, active = active, onClose = { openUrl = null })
             } else {
