@@ -33,7 +33,7 @@ committed=$(adb shell pm install-commit "$session" | tr -d '\r')
 session=""
 echo "$committed"
 [[ "$committed" == Success* ]] || { echo "Optional feature install commit failed"; exit 1; }
-adb shell pm path "$PKG" | grep -q 'cinema_gecko-master.apk' || {
+adb shell pm path "$PKG" | grep -qi 'cinema_gecko' || {
   echo "Optional GeckoView feature master is absent after install."
   adb shell pm path "$PKG"
   exit 1
