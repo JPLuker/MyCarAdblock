@@ -375,4 +375,13 @@
     <string name="settings_cinema_engine_restart_short">Перезапуск для включения</string>
     <string name="settings_cinema_sponsorblock">SponsorBlock (Firefox)</string>
     <string name="settings_cinema_sponsorblock_detail">Пропускает известные спонсорские вставки в видео YouTube. Необязательно; требуется Firefox GeckoView.</string>
+    <string name="settings_cinema_extensions_header">Расширения Firefox</string>
+    <string name="settings_cinema_extension_import_detail">Выбирайте подписанные Mozilla XPI только от доверенных разработчиков. Расширения могут читать и изменять данные сайтов.</string>
+    <string name="settings_cinema_extension_import">Установить подписанное расширение (.xpi)</string>
+    <string name="settings_cinema_extension_reading">Чтение файла расширения…</string>
+    <string name="settings_cinema_extension_installing">Установка подписанного расширения…</string>
+    <string name="settings_cinema_extension_installed">Расширение установлено: %1$s</string>
+    <string name="settings_cinema_extension_consent_title">Разрешить расширение Firefox?</string>
+    <string name="settings_cinema_extension_consent_detail">Проверьте ID расширения, разрешения и доступ к сайтам перед установкой.</string>
+    <string name="settings_cinema_extension_consent_accept">Установить расширение</string>
 </resources>
