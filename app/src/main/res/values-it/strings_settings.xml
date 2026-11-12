@@ -128,7 +128,7 @@
     <string name="settings_cinema_engine_webview">Android WebView</string>
     <string name="settings_cinema_engine_webview_detail">Integrato, nessun download aggiuntivo</string>
     <string name="settings_cinema_engine_gecko">Firefox GeckoView + uBlock Origin</string>
-    <string name="settings_cinema_engine_gecko_ready">Installato e pronto (uBlock Origin si installa al primo avvio)</string>
+    <string name="settings_cinema_engine_gecko_ready">Installato e pronto (uBlock Origin si installa quando il blocco annunci è attivo)</string>
     <string name="settings_cinema_engine_downloading">Download motore Firefox: %1$d%%</string>
     <string name="settings_cinema_engine_checking">Controllo versione compatibile…</string>
     <string name="settings_cinema_engine_install">Installa motore Firefox</string>
@@ -384,4 +384,5 @@
     <string name="settings_cinema_extension_remove_title">Rimuovere estensione Firefox?</string>
     <string name="settings_cinema_extension_remove_detail">Disinstallare %1$s da Firefox?</string>
     <string name="settings_cinema_extension_refresh">Aggiorna</string>
+    <string name="settings_cinema_ad_block_detail_gecko">Firefox usa uBlock Origin firmato da Mozilla per annunci e tracker. SponsorBlock ha un controllo separato.</string>
 </resources>
