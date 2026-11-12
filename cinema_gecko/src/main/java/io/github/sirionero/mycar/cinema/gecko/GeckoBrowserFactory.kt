@@ -15,6 +15,7 @@ import io.github.sirionero.mycar.cinema.CinemaBrowserSession
 import io.github.sirionero.mycar.cinema.CinemaGeckoAttemptGuard
 import io.github.sirionero.mycar.cinema.CinemaAdBlockAction
 import io.github.sirionero.mycar.cinema.CinemaAdBlockTransitionPolicy
+import io.github.sirionero.mycar.cinema.CinemaSponsorTransitionPolicy
 import io.github.sirionero.mycar.cinema.Cinema
 import org.mozilla.geckoview.AllowOrDeny
 import org.mozilla.geckoview.GeckoResult
@@ -185,7 +186,7 @@ private class RunningSession(
                 // SponsorBlock is optional but its persistent state must also be checked.
                 // Only one Gecko extension operation may run at a time.
                 val sponsor = desiredSponsor
-                if (sponsor != null && appliedSponsor != sponsor && sponsorFailureFor != sponsor) {
+                if (CinemaSponsorTransitionPolicy.needsSync(sponsor, appliedSponsor, sponsorFailureFor)) {
                     applySponsorBlockIfNeeded(sponsor)
                     return
                 }
@@ -314,8 +315,9 @@ private class RunningSession(
         if (isClosed || navigationStarted) return
         // No navigation is allowed before the selected extension state has been verified.
         if (desiredBlocking == null || appliedBlocking != desiredBlocking) return
-        val sponsor = desiredSponsor ?: return
-        if (appliedSponsor != sponsor && sponsorFailureFor != sponsor) return
+        if (!CinemaSponsorTransitionPolicy.allowsNavigation(
+                desiredSponsor, appliedSponsor, sponsorFailureFor,
+            )) return
         navigationStarted = true
         MyCarLog.i("gecko: extension state confirmed; navigating without a session reload", "CINEMA")
         runCatching { session.loadUri(initialUrl) }
