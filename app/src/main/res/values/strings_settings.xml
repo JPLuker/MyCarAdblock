@@ -165,73 +165,73 @@
     <string name="settings_xonos_test_ok">Music Assistant %1$s, playing as %2$s</string>
 
     <!-- Settings > Cinema: video sites in the car (ui/CinemaSettings.kt, ui/CinemaSources.kt) -->
-    <string name="settings_cinema_footer">Video sites as tiles in the car, each opened in a browser made for video. Protected video (Netflix, DAZN, Prime Video, Disney+ and the like) most likely stays black in the car: Android hides it from a screen made into a video stream, as the car\'s is.</string>
+    <string name="settings_cinema_footer">Add websites to Cinema for playback on the car display. Some streaming services use protected video that may appear black.</string>
     <string name="settings_cinema_browser_engine">Browser engine</string>
     <string name="settings_cinema_engine_webview">Android WebView</string>
     <string name="settings_cinema_engine_webview_detail">Built in; no download needed</string>
     <string name="settings_cinema_engine_gecko">Firefox (GeckoView)</string>
     <string name="settings_cinema_engine_gecko_ready">Ready to use</string>
     <string name="settings_cinema_engine_downloading">Downloading Firefox engine: %1$d%%</string>
-    <string name="settings_cinema_engine_checking">Checking matching release…</string>
+    <string name="settings_cinema_engine_checking">Checking for a compatible download…</string>
     <string name="settings_cinema_engine_install">Install Firefox engine</string>
     <string name="settings_cinema_engine_allow_install">Allow installations from myCar</string>
     <string name="settings_cinema_engine_installing">Installing Firefox engine…</string>
     <string name="settings_cinema_engine_retry">Retry download</string>
-    <string name="settings_cinema_engine_import_zip">Select test engine ZIP</string>
+    <string name="settings_cinema_engine_import_zip">Choose Firefox ZIP</string>
     <string name="settings_cinema_engine_import_hint">Select the Firefox ZIP from the same build as this app.</string>
-    <string name="settings_cinema_engine_importing">Reading test engine ZIP…</string>
+    <string name="settings_cinema_engine_importing">Checking Firefox ZIP…</string>
     <string name="settings_cinema_engine_download">Download Firefox engine</string>
     <string name="settings_cinema_engine_gecko_downloaded">Ready to install</string>
-    <string name="settings_cinema_engine_signing_error">This Firefox ZIP does not match the installed myCar Debug app.</string>
-    <string name="settings_cinema_engine_signing_help">Use the APK and ZIP from the same Actions run. Older debug installations may need removal (erases debug settings).</string>
+    <string name="settings_cinema_engine_signing_error">This Firefox ZIP does not match the installed debug app.</string>
+    <string name="settings_cinema_engine_signing_help">Install the app and Firefox ZIP from the same build. Replacing an older debug installation may require uninstalling it, which deletes its settings.</string>
     <string name="settings_cinema_engine_choose_matching_zip">Choose matching ZIP</string>
-    <string name="settings_cinema_engine_gecko_pending">Optional download required</string>
+    <string name="settings_cinema_engine_gecko_pending">Not installed</string>
     <string name="settings_cinema_ad_block">Block ads and trackers</string>
-    <string name="settings_cinema_ad_block_detail">Blocks known ad and tracking hosts on Cinema websites. Some video ads may still appear.</string>
+    <string name="settings_cinema_ad_block_detail">Blocks known advertising and tracking domains. Some video ads may still appear.</string>
     <string name="settings_cinema_parked_only">Video only when parked</string>
-    <string name="settings_cinema_parked_only_on">While the car moves the picture is covered, and the sound carries on</string>
-    <string name="settings_cinema_parked_only_off">Off: video shows while the car moves too</string>
+    <string name="settings_cinema_parked_only_on">Video is hidden while moving; audio continues.</string>
+    <string name="settings_cinema_parked_only_off">Video remains visible while moving.</string>
     <!-- A field's label: a site's or a TV list's name -->
     <string name="settings_cinema_name">Name</string>
     <!-- A field's label: a site's address -->
     <string name="settings_cinema_address">Address</string>
-    <string name="settings_cinema_add_site">Add the site</string>
-    <string name="settings_cinema_reset">Reset the list</string>
-    <string name="settings_cinema_reset_title">Back to the suggested sites?</string>
+    <string name="settings_cinema_add_site">Add site</string>
+    <string name="settings_cinema_reset">Reset sites</string>
+    <string name="settings_cinema_reset_title">Restore suggested sites?</string>
     <!-- %1$s: the suggested sites' names, like "YouTube, RaiPlay, Twitch" -->
-    <string name="settings_cinema_reset_text">Cinema goes back to %1$s.</string>
+    <string name="settings_cinema_reset_text">Restore the suggested sites: %1$s.</string>
     <!-- %1$s: the suggested sites' names, %2$s: the names of the driver's own sites -->
-    <string name="settings_cinema_reset_text_own">Cinema goes back to %1$s. Your own sites leave it: %2$s.</string>
+    <string name="settings_cinema_reset_text_own">Restore the suggested sites (%1$s) and remove your custom sites (%2$s)?</string>
     <!-- Button: puts the suggested sites back -->
     <string name="settings_cinema_reset_confirm">Reset</string>
     <string name="settings_cinema_warning_title">Video while driving?</string>
-    <string name="settings_cinema_warning_text">myCar strongly advises against it. Watching video while driving is dangerous for you and for others on the road, and in many countries it\'s against the law.\n\nWith the protection off, video shows on the car\'s screen while the car moves too, and the responsibility is the driver\'s alone.</string>
-    <string name="settings_cinema_warning_off">Turn it off</string>
-    <string name="settings_cinema_warning_keep">Keep it on</string>
+    <string name="settings_cinema_warning_text">Watching video while driving is dangerous and may be illegal. Turning off this protection allows video on the car display while the vehicle is moving. Keep your attention on the road.</string>
+    <string name="settings_cinema_warning_off">Disable protection</string>
+    <string name="settings_cinema_warning_keep">Keep protection</string>
     <!-- %1$s: a site's or a TV list's name -->
     <string name="settings_cinema_remove_title">Remove %1$s?</string>
-    <string name="settings_cinema_remove_site_text">It leaves Cinema. To have it back, its address is typed in again.</string>
+    <string name="settings_cinema_remove_site_text">This site will be removed from Cinema. You can add it again later.</string>
     <!-- Accessibility label of a bin button. %1$s: a site's or a TV list's name -->
     <string name="settings_cinema_remove">Remove %1$s</string>
     <!-- After a site's address: how the site is shown in the car -->
-    <string name="settings_cinema_layout_computer">computer layout</string>
-    <string name="settings_cinema_layout_phone">phone layout</string>
-    <string name="settings_cinema_protected">protected video, likely black in the car</string>
+    <string name="settings_cinema_layout_computer">desktop layout</string>
+    <string name="settings_cinema_layout_phone">mobile layout</string>
+    <string name="settings_cinema_protected">protected video may not play</string>
     <string name="settings_cinema_videos">Videos on this phone</string>
     <!-- "On this phone": the tile's name in Cinema in the car -->
-    <string name="settings_cinema_videos_ask">Allow myCar to show them in the car, under \"On this phone\"</string>
-    <string name="settings_cinema_videos_limited">Only the videos picked for myCar show in the car</string>
+    <string name="settings_cinema_videos_ask">Allow videos from this phone to appear in Cinema.</string>
+    <string name="settings_cinema_videos_limited">Only selected videos are available in Cinema.</string>
     <!-- "On this phone": the tile's name in Cinema in the car -->
-    <string name="settings_cinema_videos_allowed">They show in the car, under \"On this phone\"</string>
+    <string name="settings_cinema_videos_allowed">Videos from this phone are available in Cinema.</string>
     <!-- Button: choose which videos myCar may show -->
     <string name="settings_cinema_videos_pick">Pick</string>
     <string name="settings_cinema_more_sites">More sites</string>
     <!-- Settings > Cinema: TV, the IPTV lists -->
     <string name="settings_cinema_tv_title">Cinema: TV</string>
-    <string name="settings_cinema_tv_footer">IPTV lists in the M3U format, from your provider, a public list or a TV server at home: each one is a tile in Cinema with its channels. They play on the phone\'s own player; protected channels (DRM) and multicast ones are left out.</string>
-    <string name="settings_cinema_tv_remove_text">Its address and its channels leave myCar. To have it back, the address is typed in again.</string>
+    <string name="settings_cinema_tv_footer">Add an M3U playlist from a provider or your own server to browse its channels in Cinema. DRM-protected and multicast streams are not supported.</string>
+    <string name="settings_cinema_tv_remove_text">Remove this playlist and its channels from Cinema? You can add it again later.</string>
     <!-- After a list's address, while its channels load -->
-    <string name="settings_cinema_tv_loading">loading…</string>
+    <string name="settings_cinema_tv_loading">Loading…</string>
     <!-- After a list's address -->
     <plurals name="settings_cinema_tv_channels">
         <item quantity="one">%1$d channel</item>
@@ -240,7 +240,7 @@
     <!-- A TV list's name when none is typed, and the name field's example: the tile's name in the car -->
     <string name="settings_cinema_tv_default_name">TV</string>
     <string name="settings_cinema_tv_address">List address (M3U)</string>
-    <string name="settings_cinema_tv_add">Add the list</string>
+    <string name="settings_cinema_tv_add">Add playlist</string>
 
     <!-- The bar on the phone for typing into the car screen's keyboard (ui/PhoneTypingBar.kt) -->
     <string name="settings_phone_typing_close">Close the car keyboard</string>
@@ -479,24 +479,24 @@
     <string name="cinema_map_split">Map + Cinema</string>
     <string name="cinema_full_width">Full width</string>
     <string name="cinema_exit_fullscreen">Exit fullscreen</string>
-    <string name="settings_cinema_engine_restart_required">Firefox is installed. Force-stop myCar Debug in Android settings, then reopen it before selecting Firefox.</string>
+    <string name="settings_cinema_engine_restart_required">Firefox is installed. Force-stop the debug app in Android Settings, then reopen it to enable Firefox.</string>
     <string name="settings_cinema_engine_restart_short">Restart to enable</string>
-    <string name="settings_cinema_sponsorblock">SponsorBlock (Firefox)</string>
+    <string name="settings_cinema_sponsorblock">SponsorBlock</string>
     <string name="settings_cinema_sponsorblock_detail">Skips known sponsored segments in YouTube videos. Requires Firefox.</string>
     <string name="settings_cinema_extensions_header">Firefox extensions</string>
-    <string name="settings_cinema_extension_import_detail">Select a Mozilla-signed XPI only from a developer you trust. Extensions can read and change website data.</string>
+    <string name="settings_cinema_extension_import_detail">Only install Mozilla-signed extensions from sources you trust. Extensions may access or change website data.</string>
     <string name="settings_cinema_extension_import">Install extension (.xpi)</string>
     <string name="settings_cinema_extension_reading">Reading extension file…</string>
-    <string name="settings_cinema_extension_installing">Installing signed extension…</string>
-    <string name="settings_cinema_extension_installed">Installed extension: %1$s</string>
+    <string name="settings_cinema_extension_installing">Installing extension…</string>
+    <string name="settings_cinema_extension_installed">Extension installed: %1$s</string>
     <string name="settings_cinema_extension_consent_title">Allow this Firefox extension?</string>
-    <string name="settings_cinema_extension_consent_detail">Review the extension ID and requested permissions or website access before installing.</string>
+    <string name="settings_cinema_extension_consent_detail">Review the extension ID and the permissions or website access it requests.</string>
     <string name="settings_cinema_extension_consent_accept">Install extension</string>
     <string name="settings_cinema_extension_list_header">Installed extensions</string>
-    <string name="settings_cinema_extension_list_empty">No additional Firefox extensions installed.</string>
+    <string name="settings_cinema_extension_list_empty">No additional extensions installed.</string>
     <string name="settings_cinema_extension_remove">Remove</string>
-    <string name="settings_cinema_extension_remove_title">Remove Firefox extension?</string>
-    <string name="settings_cinema_extension_remove_detail">Uninstall %1$s from Firefox?</string>
+    <string name="settings_cinema_extension_remove_title">Remove extension?</string>
+    <string name="settings_cinema_extension_remove_detail">Remove %1$s from Firefox?</string>
     <string name="settings_cinema_extension_refresh">Refresh</string>
     <string name="settings_cinema_ad_block_detail_gecko">Uses uBlock Origin to block ads and trackers in Firefox.</string>
 </resources>
