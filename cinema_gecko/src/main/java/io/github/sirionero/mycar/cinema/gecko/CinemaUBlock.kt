@@ -27,24 +27,7 @@ internal object CinemaUBlock {
         MyCarLog.i("gecko: entering uBO initialization (enabled=$enabled)", "CINEMA")
         val controller = runtime.webExtensionController
         MyCarLog.i("gecko: web extension controller obtained", "CINEMA")
-        controller.setPromptDelegate(object : WebExtensionController.PromptDelegate {
-            override fun onInstallPromptRequest(
-                extension: WebExtension,
-                permissions: Array<String>,
-                origins: Array<String>,
-                dataCollectionPermissions: Array<String>,
-            ): GeckoResult<WebExtension.PermissionPromptResponse> {
-                // A user explicitly selected GeckoView/uBO. Only accept the well-known official
-                // add-on ID; Gecko itself verifies its Mozilla signature and package manifest.
-                return GeckoResult.fromValue(
-                    WebExtension.PermissionPromptResponse(
-                        enabled && extension.id == EXTENSION_ID,
-                        false,
-                        false,
-                    ),
-                )
-            }
-        })
+        CinemaExtensionPrompts.allowOfficial(runtime, EXTENSION_ID, enabled)
         MyCarLog.i("gecko: extension prompt delegate installed; listing extensions", "CINEMA")
         controller.list().accept({ extensions ->
             MyCarLog.i("gecko: extension list returned", "CINEMA")
