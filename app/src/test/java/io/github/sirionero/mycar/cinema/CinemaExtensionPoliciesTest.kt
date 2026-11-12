@@ -23,6 +23,7 @@ class CinemaExtensionPoliciesTest {
         assertFalse(CinemaSponsorTransitionPolicy.needsSync(true, false, true))
         assertTrue(CinemaSponsorTransitionPolicy.allowsNavigation(true, false, true))
         assertTrue(CinemaSponsorTransitionPolicy.needsSync(false, true, null))
+        assertFalse(CinemaSponsorTransitionPolicy.allowsNavigation(false, true, false))
         assertFalse(CinemaSponsorTransitionPolicy.allowsNavigation(null, null, null))
     }
 
