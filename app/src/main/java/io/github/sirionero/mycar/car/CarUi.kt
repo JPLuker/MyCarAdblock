@@ -60,6 +60,7 @@ import android.media.session.PlaybackState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -330,6 +331,10 @@ fun CarUi() {
                     )
                 }
                 val screen = navigator.current
+                val cinemaVisible = screen == CarScreen.App("cinema")
+                var cinemaEverOpened by remember { mutableStateOf(false) }
+                LaunchedEffect(cinemaVisible) { if (cinemaVisible) cinemaEverOpened = true }
+                val cinemaSplit = navigator.cinemaSplit && !navigator.cinemaVideoFullscreen
                 // A page's dropdown belongs to the screen it was opened on.
                 LaunchedEffect(screen) { WebSelect.cancel() }
                 val safetyWarningSeen by CarSettings.hasSeenSafetyWarning.collectAsState()
@@ -348,8 +353,31 @@ fun CarUi() {
                         // Home never leaves the composition; other screens cover it. Dropping it
                         // would tear down the map's surface, and coming back would then show black
                         // while the nav app redrew on a new one.
-                        CarHome()
-                        if (screen != CarScreen.Home) {
+                        // Keep Cinema *in the composition* after first opening it. Merely switching
+                        // the car screen must not dispose its WebView/GeckoSession and reload a video.
+                        // Home's existing map and its one attached navigation surface also stay alive.
+                        // Negative zIndex puts these behind all calls, toasts and overlay controls.
+                        Box(
+                            Modifier.fillMaxHeight()
+                                .fillMaxWidth(if (cinemaVisible && cinemaSplit) 0.44f else 1f)
+                                .align(Alignment.CenterStart)
+                                .zIndex(if (cinemaVisible) -2f else -1f)
+                                .background(MaterialTheme.colorScheme.background),
+                        ) {
+                            CarHome(forceMapOnly = cinemaVisible && cinemaSplit)
+                        }
+                        if (cinemaEverOpened || cinemaVisible) {
+                            Box(
+                                Modifier.fillMaxHeight()
+                                    .fillMaxWidth(if (cinemaSplit) 0.56f else 1f)
+                                    .align(Alignment.CenterEnd)
+                                    .zIndex(if (cinemaVisible) -1f else -2f)
+                                    .background(MaterialTheme.colorScheme.background),
+                            ) {
+                                CinemaScreen(active = cinemaVisible)
+                            }
+                        }
+                        if (screen != CarScreen.Home && !cinemaVisible) {
                             // Each new screen settles in: a short fade and a slight grow, over an
                             // opaque background that's there at once, so the map never flashes
                             // through between two screens.
@@ -393,7 +421,7 @@ fun CarUi() {
                                     CarScreen.Jolly -> JollyScreen()
                                     is CarScreen.Notifications -> NotificationsScreen(screen.replyTo)
                                     is CarScreen.Messages -> MessagesScreen(screen.packageName)
-                                    is CarScreen.App -> CarApps.find(screen.id)?.content?.invoke()
+                                    is CarScreen.App -> if (screen.id != "cinema") CarApps.find(screen.id)?.content?.invoke()
                                 }
                             }
                         }
