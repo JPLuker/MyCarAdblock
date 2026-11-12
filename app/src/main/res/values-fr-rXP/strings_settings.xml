@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="settings_cinema_background_audio">Audio en arrière-plan</string>
+    <string name="settings_cinema_background_audio_detail">Continuer l\'audio de Firefox lors du passage à Cartes. Désactivé par défaut.</string>
     <string name="settings_support_title">Ravitailler myCar</string>
     <string name="settings_support_footer">myCar est gratuit, sans publicité ni pistage, libre comme la mer. Votre soutien le garde à flot.</string>
     <string name="settings_usage_notes_title">Notes de traversée</string>
