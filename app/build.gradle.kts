@@ -33,6 +33,14 @@ layout.buildDirectory.set(rootProject.layout.buildDirectory.dir("app"))
 android {
     // GeckoView is delivered as a separate on-demand split, never bundled in the base APK.
     dynamicFeatures += setOf(":cinema_gecko")
+    // GitHub releases install the feature directly via PackageInstaller, not Play's
+    // device-config selector. Keep language/density resources with the feature master
+    // so its ZIP needs only the master and ARM64 native split (not 90 config APKs).
+    // This changes only generated .aab split outputs, not the standalone base APK.
+    bundle {
+        language { enableSplit = false }
+        density { enableSplit = false }
+    }
     namespace = "io.github.sirionero.mycar"
     compileSdk = 37
 
