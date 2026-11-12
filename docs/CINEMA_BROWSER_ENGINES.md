@@ -44,7 +44,7 @@ it must not prevent testing or delivering the GitHub-release implementation.
 - [ ] **M4 (implementation committed; unverified):** Optional GeckoView session, Cinema view
       selection, navigation, single-surface new links, fullscreen, input connection for car keyboard,
       car audio pause, official Mozilla-signed uBlock Origin XPI installation and daily update
-      checks. **Needs API compile and real video/site tests.**
+      checks. **Debug compilation confirmed November 11; real video/site tests pending.**
 - [ ] **M5:** Base-only launch/onboarding and Android emulator startup are checked.
       Still validate WebView/Gecko parity, signed feature installation, APK upgrades,
       crashes, video playback and car hardware; submit to SirioNero/MyCar with
@@ -213,20 +213,31 @@ attempts the bridge refuses the risky initialization before loading the optional
 class, preserving the car app and the built-in WebView fallback. An ordinary
 handled startup failure clears the checkpoint.
 
-To recover or test **Firefox without uBlock Origin**, turn off the existing Cinema
-ad-blocking setting on the phone; this explicitly clears the interrupted checkpoint,
-without deleting sites or cookies. The next launch bypasses the extension controller.
-Turning it on again is an explicit reattempt. Neither path silently advertises
-disabled blocking as uBlock Origin.
+To test whether Firefox renders **without initializing the uBlock Origin manager**,
+turn off Cinema ad blocking on the phone. This explicitly clears the interrupted
+checkpoint without deleting sites or cookies, and bypasses add-on manager startup.
+Turning blocking back on is an explicit reattempt.
+
+**Important limitation:** GeckoView persists installed extensions between runtime
+restarts. Bypassing the controller does **not** establish that a previously installed
+and enabled uBlock Origin add-on has stopped filtering. The OFF path is currently
+diagnostic isolation, **not a verified production off switch**. The release must use
+a verified extension-disable operation or another demonstrated mechanism before
+advertising OFF as unblocked. Mozilla documents signed add-on installation,
+listing and enable/disable through the WebExtensionController API.
 
 **Next device evidence needed:** install the newest base APK and exact-matching
 Gecko ZIP from one Actions artifact, turn Cinema ad blocking **off**, and open a
 Cinema page. If it works, turn blocking **on** and repeat once; capture the new log.
 If the native crash returns, the following launch should show a recoverable
-Firefox error instead of crashing again. Keep the PR in draft until the native
+Firefox error instead of crashing again. A 30-second watchdog also reports extension
+initialization stalls, but leaves the interrupted checkpoint pending. Native signal
+and up to ten library/symbol frames are now appended to the crashed run's log when
+Android supplies a readable tombstone. Keep the PR in draft until the native
 root cause, video playback, projection and split upgrades are verified.
 
-**CI limitation:** the JVM tests cover all four policy combinations
+**CI limitation:** the source includes JVM tests for all four policy combinations
 (blocking on/off × interrupted yes/no); they cannot reproduce an ARM64
-GeckoView native crash. The x86_64 emulator tests package installation of the
-architecture-independent split master, not native Firefox playback.
+GeckoView native crash. Existing x86_64 emulator tests package installation of the
+architecture-independent split master, not native Firefox playback. **The new commits
+in this session have not yet been independently verified by CI or installed on a device.**
