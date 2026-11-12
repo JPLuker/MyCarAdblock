@@ -101,6 +101,34 @@ jobs:
             build/cinema-debug.apks build/myCar-gecko-arm64-v8a.zip
           echo "Debug base APK and test-only optional Gecko split are both available"
 
+      - name: Validate signed base and optional feature identity
+        run: |
+          set -euo pipefail
+          mkdir -p build/gecko-splits
+          unzip -q build/myCar-gecko-arm64-v8a.zip -d build/gecko-splits
+          signer=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          aapt=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          test -x "$signer" && test -x "$aapt"
+          signature() {
+            "$signer" verify "$1" >/dev/null
+            "$signer" verify --print-certs "$1" | awk '/Signer #1 certificate SHA-256 digest:/ {print $NF}'
+          }
+          identity() {
+            "$aapt" dump badging "$1" | grep '^package:' | head -n1 | sed -E "s/.*name='([^']+)'.*versionCode='([^']+)'.*/\\1:\\2/"
+          }
+          base_signer=$(signature build/myCar-debug.apk)
+          base_identity=$(identity build/myCar-debug.apk)
+          test -n "$base_signer" && test -n "$base_identity"
+          for split in build/gecko-splits/*.apk; do
+            test "$(signature "$split")" = "$base_signer" || { echo "Split signer mismatch: $split"; exit 1; }
+            test "$(identity "$split")" = "$base_identity" || { echo "Split app ID/version mismatch: $split"; exit 1; }
+          done
+          unzip -Z1 build/gecko-splits/cinema_gecko-arm64_v8a.apk | grep -qx 'lib/arm64-v8a/libxul.so' \\
+            || { echo "GeckoView native engine missing from optional split"; exit 1; }
+          unzip -Z1 build/gecko-splits/cinema_gecko-master.apk | grep -qx 'classes.dex' \\
+            || { echo "GeckoView implementation missing from optional feature master"; exit 1; }
+          echo "Signed optional splits match debug app ID, versionCode and signing certificate"
+
       # A dynamic feature is useful only if the standard installer does not contain GeckoView.
       - name: Confirm base APK stays lightweight
         run: |
