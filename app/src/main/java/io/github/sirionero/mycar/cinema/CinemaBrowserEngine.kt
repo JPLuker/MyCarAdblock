@@ -21,8 +21,7 @@ internal object CinemaBrowserPolicy {
         }
 }
 
-/** Only an explicit choice to disable blocking may bypass an interrupted uBO attempt. */
+/** Gecko native startup can crash even when extensions are bypassed. */
 internal object CinemaGeckoAttemptPolicy {
-    fun shouldStart(adBlockEnabled: Boolean, interrupted: Boolean): Boolean =
-        !adBlockEnabled || !interrupted
+    fun shouldStart(interrupted: Boolean): Boolean = !interrupted
 }
