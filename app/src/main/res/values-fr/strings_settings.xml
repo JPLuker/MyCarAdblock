@@ -383,4 +383,5 @@
     <string name="settings_cinema_extension_remove">Supprimer</string>
     <string name="settings_cinema_extension_remove_title">Supprimer cette extension Firefox ?</string>
     <string name="settings_cinema_extension_remove_detail">Désinstaller %1$s de Firefox ?</string>
+    <string name="settings_cinema_extension_refresh">Actualiser</string>
 </resources>
