@@ -373,4 +373,6 @@
     <string name="cinema_exit_fullscreen">Выйти из полноэкранного режима</string>
     <string name="settings_cinema_engine_restart_required">Firefox установлен. Принудительно остановите myCar Debug в настройках Android и откройте снова перед выбором Firefox.</string>
     <string name="settings_cinema_engine_restart_short">Перезапуск для включения</string>
+    <string name="settings_cinema_sponsorblock">SponsorBlock (Firefox)</string>
+    <string name="settings_cinema_sponsorblock_detail">Пропускает известные спонсорские вставки в видео YouTube. Необязательно; требуется Firefox GeckoView.</string>
 </resources>
