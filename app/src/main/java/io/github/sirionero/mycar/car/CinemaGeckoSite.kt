@@ -34,6 +34,7 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
     val navigator = LocalCarNavigator.current
     val parkedOnly by Cinema.parkedOnly.collectAsState()
     val adBlockEnabled by Cinema.adBlockEnabled.collectAsState()
+    val sponsorBlockEnabled by Cinema.sponsorBlockEnabled.collectAsState()
     val allowed = !parkedOnly || rememberVideoAllowed()
     var browser by remember { mutableStateOf<CinemaBrowserSession?>(null) }
     var fieldText by remember { mutableStateOf<String?>(null) }
@@ -46,6 +47,9 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
     // Changing this setting while a video is playing must not navigate to YouTube anew.
     LaunchedEffect(browser, adBlockEnabled) {
         browser?.setAdBlockEnabled(adBlockEnabled)
+    }
+    LaunchedEffect(browser, sponsorBlockEnabled) {
+        browser?.setSponsorBlockEnabled(sponsorBlockEnabled)
     }
 
     DisposableEffect(browser, active) {
@@ -104,6 +108,7 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
                         url = startAt ?: site.url,
                         desktop = site.desktop,
                         adBlock = Cinema.adBlockEnabled.value,
+                        sponsorBlock = Cinema.sponsorBlockEnabled.value,
                         onVisited = { url -> CinemaContinue.site(context, site, url) },
                         onKeyboard = { fieldText = it },
                         onFullScreen = {
