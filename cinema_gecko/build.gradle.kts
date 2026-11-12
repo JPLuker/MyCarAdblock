@@ -16,7 +16,7 @@ android {
     defaultConfig {
         minSdk = 31
         ndk { abiFilters += "arm64-v8a" }
-        buildConfigField("String", "GECKOVIEW_VERSION", "\\"$geckoVersion\\"")
+        buildConfigField("String", "GECKOVIEW_VERSION", "\"$geckoVersion\"")
     }
     buildFeatures {
         buildConfig = true
