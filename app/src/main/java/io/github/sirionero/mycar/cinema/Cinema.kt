@@ -116,8 +116,7 @@ object Cinema {
         // Deliberately switching *from WebView to Firefox* is the explicit retry action.
         // Auto-restoring the stored Gecko preference at app startup must NOT clear this.
         val previous = browserEngineFlow.value
-        if (engine == CinemaBrowserEngine.FIREFOX_GECKOVIEW &&
-            previous != CinemaBrowserEngine.FIREFOX_GECKOVIEW) {
+        if (CinemaGeckoAttemptPolicy.shouldResetOnEngineSelection(previous, engine)) {
             app?.let(CinemaGeckoAttemptGuard::finish)
         }
         browserEngineFlow.value = engine
