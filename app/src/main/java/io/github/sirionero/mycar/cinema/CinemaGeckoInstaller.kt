@@ -8,6 +8,7 @@ import android.net.Uri
 import android.app.PendingIntent
 import android.os.Build
 import android.provider.Settings
+import android.util.AtomicFile
 import io.github.sirionero.mycar.BuildConfig
 import io.github.sirionero.mycar.MyCarLog
 import java.io.File
@@ -53,6 +54,7 @@ object CinemaGeckoInstaller {
 
     private fun directory(context: Context): File = File(context.cacheDir, "optional-gecko")
     private fun archive(context: Context): File = File(directory(context), ASSET)
+    private fun receipt(context: Context): File = File(directory(context), "verified.json")
 
     fun refresh(context: Context) {
         if (CinemaGeckoBridge.installed(context)) {
@@ -64,7 +66,7 @@ object CinemaGeckoInstaller {
         // The verified download is in app-private cache, so a return can offer Install again.
         if (flow.value is Status.Idle && !BuildConfig.DEBUG) {
             val file = archive(context)
-            if (file.isFile && runCatching { validateSplitArchive(file) }.isSuccess) {
+            if (file.isFile && runCatching { readReceipt(context, file) }.isSuccess) {
                 flow.value = Status.Downloaded(file.length())
             }
         }
@@ -91,12 +93,16 @@ object CinemaGeckoInstaller {
                 directory(app).apply { mkdirs() }
                 downloadVerified(asset, file)
                 validateSplitArchive(file)
+                if (cancelled.get()) throw InterruptedException()
+                saveReceipt(app, asset)
                 flow.value = Status.Downloaded(file.length())
             } catch (_: InterruptedException) {
                 archive(app).delete()
+                receipt(app).delete()
                 flow.value = Status.Idle
             } catch (error: Exception) {
                 archive(app).delete()
+                receipt(app).delete()
                 MyCarLog.w("cinema: optional Gecko download failed (" + error.javaClass.simpleName + ")")
                 flow.value = Status.Failed(error.message ?: "Optional browser download failed")
             }
@@ -108,6 +114,7 @@ object CinemaGeckoInstaller {
         // Network request is bounded by timeouts. Its thread removes the partial file.
         if (flow.value is Status.Downloaded) {
             archive(context).delete()
+            receipt(context).delete()
             flow.value = Status.Idle
         }
     }
@@ -134,6 +141,9 @@ object CinemaGeckoInstaller {
         Thread({
             var sessionId = -1
             try {
+                // Re-hash immediately before use. A cached ZIP's existence/shape alone
+                // cannot authorize installing code after an interrupted download or restart.
+                verifyReceipt(app, zip)
                 validateSplitArchive(zip)
                 val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_INHERIT_EXISTING).apply {
                     setAppPackageName(app.packageName)
@@ -197,6 +207,7 @@ object CinemaGeckoInstaller {
             }
             PackageInstaller.STATUS_SUCCESS -> {
                 archive(context).delete()
+                receipt(context).delete()
                 flow.value = if (CinemaGeckoBridge.installed(context)) Status.Installed
                     else Status.Failed("Android installed the engine. Restart myCar to finish enabling it.")
             }
@@ -208,6 +219,58 @@ object CinemaGeckoInstaller {
     }
 
     private data class Asset(val url: String, val size: Long, val sha256: String)
+
+    /** A download receipt is only a hint for the UI; installation always re-hashes the ZIP. */
+    private fun saveReceipt(context: Context, asset: Asset) {
+        val file = AtomicFile(receipt(context))
+        val bytes = JSONObject()
+            .put("version", BuildConfig.VERSION_NAME)
+            .put("size", asset.size)
+            .put("sha256", asset.sha256.lowercase())
+            .toString().toByteArray(Charsets.UTF_8)
+        val output = file.startWrite()
+        try {
+            output.write(bytes)
+            file.finishWrite(output)
+        } catch (error: Exception) {
+            file.failWrite(output)
+            throw error
+        }
+    }
+
+    private fun readReceipt(context: Context, zip: File): Pair<Long, String> {
+        if (!zip.isFile || zip.length() !in 1..ZIP_MAX_BYTES) {
+            throw IOException("Optional browser package is missing")
+        }
+        val payload = JSONObject(AtomicFile(receipt(context)).openRead().bufferedReader().use { it.readText() })
+        val length = payload.optLong("size")
+        val digest = payload.optString("sha256")
+        if (payload.optString("version") != BuildConfig.VERSION_NAME ||
+            length != zip.length() || !digest.matches(Regex("[a-f0-9]{64}"))) {
+            throw IOException("Cached optional browser does not match this app release")
+        }
+        return length to digest
+    }
+
+    private fun verifyReceipt(context: Context, zip: File) {
+        val (expectedLength, expectedDigest) = readReceipt(context, zip)
+        val md = MessageDigest.getInstance("SHA-256")
+        var read = 0L
+        zip.inputStream().use { input ->
+            val buffer = ByteArray(64 * 1024)
+            while (true) {
+                val count = input.read(buffer)
+                if (count < 0) break
+                read += count
+                if (read > ZIP_MAX_BYTES) throw IOException("Oversized optional engine")
+                md.update(buffer, 0, count)
+            }
+        }
+        val actual = md.digest().joinToString("") { "%02x".format(it) }
+        if (read != expectedLength || actual != expectedDigest) {
+            throw IOException("Cached optional engine failed SHA-256 verification. Download it again.")
+        }
+    }
 
     /** Only the release for this app's exact version; no unpinned latest/nightly packages. */
     private fun getReleaseAsset(): Asset {
@@ -245,6 +308,10 @@ object CinemaGeckoInstaller {
     }
 
     private fun downloadVerified(asset: Asset, into: File) {
+        // Write to a temporary file first. A failed/cancelled download must never appear
+        // to be a complete package in the next launch.
+        val partial = File(into.parentFile, into.name + ".part")
+        partial.delete()
         val connection = URL(asset.url).openConnection() as HttpURLConnection
         connection.connectTimeout = 10_000
         connection.readTimeout = 20_000
@@ -254,7 +321,7 @@ object CinemaGeckoInstaller {
             val digest = MessageDigest.getInstance("SHA-256")
             var written = 0L
             connection.inputStream.use { source ->
-                into.outputStream().use { output ->
+                partial.outputStream().use { output ->
                     val buffer = ByteArray(64 * 1024)
                     while (true) {
                         if (cancelled.get()) throw InterruptedException()
@@ -272,8 +339,12 @@ object CinemaGeckoInstaller {
             if (written != asset.size || !actual.equals(asset.sha256, ignoreCase = true)) {
                 throw IOException("Optional engine failed integrity verification")
             }
+            if (cancelled.get()) throw InterruptedException()
+            if (into.exists() && !into.delete()) throw IOException("Cannot replace cached engine")
+            if (!partial.renameTo(into)) throw IOException("Cannot finalize optional engine")
         } finally {
             connection.disconnect()
+            partial.delete()
         }
     }
 
