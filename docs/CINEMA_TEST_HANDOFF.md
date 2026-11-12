@@ -67,11 +67,15 @@ not uninstall the separate production myCar app.
    and select a **successful** run from `experiment/gecko-158-startup`.
    Download both `myCar-debug.apk` and `myCar-gecko-arm64-v8a.zip`
    from **that same run**. No successful run means no new test APK yet.
-3. Install the APK and import its matching Gecko ZIP in
-   **myCar Debug > Settings > Cinema**, then restart the app if prompted.
-   Do not mix 159 and 158 packages. If Android refuses an update because
-   signing identities differ, uninstall **only myCar Debug** first (this
-   removes its saved debug data; it does not affect production myCar).
+3. **For a meaningful clean A/B test**, avoid carrying Gecko's previous
+   profile or a persisted uBlock Origin installation into the experiment.
+   The recommended path is to uninstall **only myCar Debug**, then reinstall
+   the experimental APK and matching Gecko ZIP in **Settings > Cinema**.
+   **Uninstalling myCar Debug erases its saved sites, settings and sign-ins.**
+   Back up anything important first. Do **not** uninstall production myCar.
+   If you choose an install-over-install instead, disclose that the old Gecko
+   profile may still be present, so the result will not isolate the native
+   engine as cleanly. Do not mix 159 and 158 base/split versions.
 4. While **parked**, choose Firefox, turn Cinema ad blocking OFF and open
    a site **once**. If it still crashes, the next attempt should display
    the guarded fallback. Switch to Android WebView instead of repeatedly
