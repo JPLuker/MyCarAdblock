@@ -333,8 +333,16 @@ fun CarUi() {
                 val screen = navigator.current
                 val cinemaVisible = screen == CarScreen.App("cinema")
                 var cinemaEverOpened by remember { mutableStateOf(false) }
-                LaunchedEffect(cinemaVisible) { if (cinemaVisible) cinemaEverOpened = true }
-                val cinemaSplit = navigator.cinemaSplit && !navigator.cinemaVideoFullscreen
+                LaunchedEffect(cinemaVisible) {
+                    if (cinemaVisible) {
+                        cinemaEverOpened = true
+                        navigator.markCinemaOpened()
+                    }
+                }
+                // Video fullscreen is scoped to the Cinema pane. If the user chose
+                // Map + Cinema, keep the 44/56 split even when the site enters fullscreen.
+                // The parked-only cover remains inside CinemaScreen in either layout.
+                val cinemaSplit = navigator.cinemaSplit
                 // A page's dropdown belongs to the screen it was opened on.
                 LaunchedEffect(screen) { WebSelect.cancel() }
                 val safetyWarningSeen by CarSettings.hasSeenSafetyWarning.collectAsState()
