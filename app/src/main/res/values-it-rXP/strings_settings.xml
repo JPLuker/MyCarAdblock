@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="settings_cinema_background_audio">Audio in background</string>
+    <string name="settings_cinema_background_audio_detail">Continua a riprodurre l\'audio di Firefox quando passi a Mappe. Disattivato per impostazione predefinita.</string>
     <string name="settings_support_title">Sostieni la traversata</string>
     <string name="settings_support_footer">myCar è gratuita, senza pubblicità e senza tracciamento. Il tuo sostegno le gonfia le vele.</string>
     <string name="settings_usage_notes_title">Note di bordo</string>
