@@ -364,4 +364,5 @@
     <string name="music_needs_qobuz">Nécessite un abonnement Qobuz.</string>
     <string name="cinema_map_split">Carte + Cinema</string>
     <string name="cinema_full_width">Pleine largeur</string>
+    <string name="cinema_exit_fullscreen">Quitter le plein écran</string>
 </resources>
