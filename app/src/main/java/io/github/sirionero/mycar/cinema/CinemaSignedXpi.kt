@@ -14,9 +14,25 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /** Optional feature implementation, loaded only after Android confirms the Gecko split. */
+data class CinemaInstalledExtension(
+    val id: String,
+    val name: String,
+    val version: String,
+    val enabled: Boolean,
+)
+
+/** Built-in curated add-ons have dedicated settings; their state is not managed here. */
+object CinemaExtensionManagementPolicy {
+    private val curatedIds = setOf("uBlock0@raymondhill.net", "sponsorBlocker@ajay.app")
+    fun userManaged(id: String): Boolean = id.isNotBlank() && id !in curatedIds
+}
+
 interface CinemaSignedXpiInstaller {
     fun install(context: Context, xpiFile: File, finished: (id: String?, error: String?) -> Unit)
     fun cancel()
+    fun list(context: Context, finished: (List<CinemaInstalledExtension>?, String?) -> Unit)
+    fun setEnabled(context: Context, id: String, enabled: Boolean, finished: (String?) -> Unit)
+    fun uninstall(context: Context, id: String, finished: (String?) -> Unit)
 }
 
 /**
@@ -40,6 +56,11 @@ object CinemaSignedXpi {
 
     private val state = MutableStateFlow<Status>(Status.Idle)
     val status: StateFlow<Status> = state.asStateFlow()
+
+    private val installedFlow = MutableStateFlow<List<CinemaInstalledExtension>>(emptyList())
+    val installed: StateFlow<List<CinemaInstalledExtension>> = installedFlow.asStateFlow()
+    private val managementMessageFlow = MutableStateFlow<String?>(null)
+    val managementMessage: StateFlow<String?> = managementMessageFlow.asStateFlow()
     private val inProgress = AtomicBoolean(false)
     private val main = Handler(Looper.getMainLooper())
 
@@ -128,6 +149,62 @@ object CinemaSignedXpi {
         }, "CinemaSignedXpiImport").start()
     }
 
+    /** Refreshes user-installed extensions without conflating them with our curated toggles. */
+    fun refresh(context: Context) {
+        if (!CinemaGeckoBridge.installed(context)) return
+        runInstaller(context) { installer, app ->
+            installer.list(app) { extensions, error ->
+                main.post {
+                    if (error != null) managementMessageFlow.value = error
+                    else {
+                        installedFlow.value = extensions.orEmpty()
+                            .filter { CinemaExtensionManagementPolicy.userManaged(it.id) }
+                        managementMessageFlow.value = null
+                    }
+                }
+            }
+        }
+    }
+
+    fun setEnabled(context: Context, id: String, enabled: Boolean) {
+        if (!CinemaExtensionManagementPolicy.userManaged(id)) return
+        runInstaller(context) { installer, app ->
+            installer.setEnabled(app, id, enabled) { error ->
+                main.post {
+                    managementMessageFlow.value = error
+                    refresh(app)
+                }
+            }
+        }
+    }
+
+    fun uninstall(context: Context, id: String) {
+        if (!CinemaExtensionManagementPolicy.userManaged(id)) return
+        runInstaller(context) { installer, app ->
+            installer.uninstall(app, id) { error ->
+                main.post {
+                    managementMessageFlow.value = error
+                    refresh(app)
+                }
+            }
+        }
+    }
+
+    private fun runInstaller(
+        context: Context,
+        action: (CinemaSignedXpiInstaller, Context) -> Unit,
+    ) {
+        val app = context.applicationContext
+        try {
+            val cls = Class.forName(FACTORY, true, app.classLoader)
+            val installer = cls.getDeclaredConstructor().newInstance() as CinemaSignedXpiInstaller
+            action(installer, app)
+        } catch (failure: Exception) {
+            MyCarLog.e("cinema: extension management could not start", failure, tag = "CINEMA")
+            managementMessageFlow.value = "Firefox extension management is unavailable."
+        }
+    }
+
     private fun complete(file: File?, id: String?, error: String?) {
         file?.delete()
         state.value = if (error == null && !id.isNullOrBlank()) {
@@ -136,5 +213,10 @@ object CinemaSignedXpi {
             Status.Failed(error ?: "Firefox did not confirm extension installation.")
         }
         inProgress.set(false)
+        if (error == null && !id.isNullOrBlank()) {
+            // Refresh from the Gecko profile rather than trusting the just-imported filename.
+            // Signed XPI files are cached only until Gecko confirms installation.
+            // Caller supplies no context here; Settings refreshes when it resumes.
+        }
     }
 }
