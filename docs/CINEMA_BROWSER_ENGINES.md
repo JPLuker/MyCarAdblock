@@ -195,3 +195,38 @@ remains a device-test blocker for PR merge.
   https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/WebExtensionController.html
 - Official uBlock Origin Android add-on:
   https://addons.mozilla.org/en-US/android/addon/ublock-origin/
+
+## Native Gecko add-on startup fault and recovery (November 12, 2026)
+
+The phone's `mycar-log-20261112-091000.txt` records the optional GeckoRuntime,
+session and view being attached at 09:10:13.881–09:10:13.915, followed by the
+"initializing signed extension" log. The process then ended in a native null-pointer
+dereference at 09:10:14. This is a timing correlation, **not** proof that uBlock Origin
+or `WebExtensionController` caused the crash. The diagnostic commits after that log
+also emit more precise stage markers, but have not yet been exercised on-device.
+
+A Kotlin `catch` block cannot recover from a native process SIGSEGV. The base
+bridge now writes a durable Boolean checkpoint immediately before attempting a
+Gecko session with ad blocking enabled. Its completion callback clears that value;
+an abrupt process death leaves the value in app-private preferences. On subsequent
+attempts the bridge refuses the risky initialization before loading the optional
+class, preserving the car app and the built-in WebView fallback. An ordinary
+handled startup failure clears the checkpoint.
+
+To recover or test **Firefox without uBlock Origin**, turn off the existing Cinema
+ad-blocking setting on the phone; this explicitly clears the interrupted checkpoint,
+without deleting sites or cookies. The next launch bypasses the extension controller.
+Turning it on again is an explicit reattempt. Neither path silently advertises
+disabled blocking as uBlock Origin.
+
+**Next device evidence needed:** install the newest base APK and exact-matching
+Gecko ZIP from one Actions artifact, turn Cinema ad blocking **off**, and open a
+Cinema page. If it works, turn blocking **on** and repeat once; capture the new log.
+If the native crash returns, the following launch should show a recoverable
+Firefox error instead of crashing again. Keep the PR in draft until the native
+root cause, video playback, projection and split upgrades are verified.
+
+**CI limitation:** the JVM tests cover all four policy combinations
+(blocking on/off × interrupted yes/no); they cannot reproduce an ARM64
+GeckoView native crash. The x86_64 emulator tests package installation of the
+architecture-independent split master, not native Firefox playback.
