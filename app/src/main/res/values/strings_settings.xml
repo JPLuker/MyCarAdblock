@@ -492,4 +492,9 @@
     <string name="settings_cinema_extension_consent_title">Allow this Firefox extension?</string>
     <string name="settings_cinema_extension_consent_detail">Review the extension ID and requested permissions or website access before installing.</string>
     <string name="settings_cinema_extension_consent_accept">Install extension</string>
+    <string name="settings_cinema_extension_list_header">Installed extensions</string>
+    <string name="settings_cinema_extension_list_empty">No additional Firefox extensions installed.</string>
+    <string name="settings_cinema_extension_remove">Remove</string>
+    <string name="settings_cinema_extension_remove_title">Remove Firefox extension?</string>
+    <string name="settings_cinema_extension_remove_detail">Uninstall %1$s from Firefox?</string>
 </resources>
