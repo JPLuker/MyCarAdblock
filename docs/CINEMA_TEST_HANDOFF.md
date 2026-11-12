@@ -16,8 +16,10 @@ and SIGSEGV/SEGV_MAPERR null dereference at `0x8`:
 | 11:10:57 | OFF | Extension manager bypassed; website navigation | Native crash |
 
 All three runs constructed GeckoRuntime, GeckoSession and GeckoView before the
-Gecko thread died. **The extension controller and uBlock Origin are not necessary
-triggers.** The root cause is still unknown: it may involve Gecko version 159,
+Gecko thread died. **The explicit extension-controller call is not required
+to trigger the crash.** A previously installed uBlock Origin extension can
+still load automatically when Gecko starts, so the add-on itself is not fully
+excluded. The root cause is unknown: it may involve Gecko version 159,
 split APK integration, or another Gecko startup condition. The native crash
 log improvement is confirmed working, including PC addresses and fault type.
 
