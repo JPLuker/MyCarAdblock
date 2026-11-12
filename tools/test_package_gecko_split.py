@@ -29,14 +29,14 @@ class PackageGeckoSplitTest(unittest.TestCase):
         self.make_source({
             "splits/base-master.apk": b"base",
             "splits/cinema_gecko-master.apk": b"master",
-            "splits/cinema_gecko-config.arm64_v8a.apk": b"native",
+            "splits/cinema_gecko-arm64_v8a.apk": b"native",
             "toc.pb": b"bundletool",
         })
         package.extract(self.source, self.result)
         with zipfile.ZipFile(self.result) as ready:
             self.assertEqual(
                 ready.namelist(),
-                ["cinema_gecko-master.apk", "cinema_gecko-config.arm64_v8a.apk"],
+                ["cinema_gecko-master.apk", "cinema_gecko-arm64_v8a.apk"],
             )
             self.assertEqual(ready.read("cinema_gecko-master.apk"), b"master")
 
@@ -48,7 +48,7 @@ class PackageGeckoSplitTest(unittest.TestCase):
     def test_unexpected_feature_splits_are_rejected(self):
         self.make_source({
             "splits/cinema_gecko-master.apk": b"master",
-            "splits/cinema_gecko-config.arm64_v8a.apk": b"native",
+            "splits/cinema_gecko-arm64_v8a.apk": b"native",
             "splits/cinema_gecko-config.x86_64.apk": b"other",
         })
         with self.assertRaises(ValueError):
@@ -57,7 +57,7 @@ class PackageGeckoSplitTest(unittest.TestCase):
     def test_duplicate_feature_split_is_rejected(self):
         self.make_source({
             "splits/cinema_gecko-master.apk": b"master",
-            "splits/cinema_gecko-config.arm64_v8a.apk": b"native",
+            "splits/cinema_gecko-arm64_v8a.apk": b"native",
             "splits/another/cinema_gecko-master.apk": b"duplicate",
         })
         with self.assertRaises(ValueError):
