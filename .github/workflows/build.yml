@@ -8,6 +8,11 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Frequent feature-branch commits should not spend minutes compiling stale revisions.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
