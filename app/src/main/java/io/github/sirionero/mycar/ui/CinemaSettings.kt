@@ -84,6 +84,8 @@ internal fun CinemaSection() {
     val sites by Cinema.sites.collectAsState()
     val parkedOnly by Cinema.parkedOnly.collectAsState()
     val adBlockEnabled by Cinema.adBlockEnabled.collectAsState()
+    val sponsorBlockEnabled by Cinema.sponsorBlockEnabled.collectAsState()
+    val sponsorBlockError by Cinema.sponsorBlockError.collectAsState()
     val browserEngine by Cinema.browserEngine.collectAsState()
     var warning by remember { mutableStateOf(false) }
     var resetAsk by remember { mutableStateOf(false) }
@@ -120,6 +122,13 @@ internal fun CinemaSection() {
             Modifier.toggleable(adBlockEnabled, role = Role.Switch) { Cinema.setAdBlockEnabled(it) },
             subtitle = stringResource(R.string.settings_cinema_ad_block_detail),
             trailing = { Switch(checked = adBlockEnabled, onCheckedChange = null) },
+        )
+        SettingsDivider()
+        SettingsRow(
+            stringResource(R.string.settings_cinema_sponsorblock),
+            Modifier.toggleable(sponsorBlockEnabled, role = Role.Switch) { Cinema.setSponsorBlockEnabled(it) },
+            subtitle = sponsorBlockError ?: stringResource(R.string.settings_cinema_sponsorblock_detail),
+            trailing = { Switch(checked = sponsorBlockEnabled, onCheckedChange = null) },
         )
         SettingsDivider()
         Text(
