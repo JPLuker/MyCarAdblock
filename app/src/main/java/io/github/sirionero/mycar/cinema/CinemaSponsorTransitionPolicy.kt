@@ -6,5 +6,5 @@ object CinemaSponsorTransitionPolicy {
         desired != null && desired != applied && desired != failedFor
 
     fun allowsNavigation(desired: Boolean?, applied: Boolean?, failedFor: Boolean?): Boolean =
-        desired != null && (desired == applied || desired == failedFor)
+        desired != null && (desired == applied || (desired && desired == failedFor))
 }
