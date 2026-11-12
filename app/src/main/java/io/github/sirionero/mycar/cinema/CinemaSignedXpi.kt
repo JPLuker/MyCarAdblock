@@ -9,6 +9,7 @@ import java.io.File
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipFile
+import org.json.JSONObject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -81,6 +82,11 @@ object CinemaSignedXpi {
             try {
                 val folder = File(app.cacheDir, "cinema-signed-xpi")
                 check(folder.isDirectory || folder.mkdirs()) { "Cannot create a private extension cache." }
+                // Delete abandoned imports from earlier killed processes, never user files.
+                folder.listFiles()?.filter {
+                    it.isFile && it.name.endsWith(".xpi") &&
+                        System.currentTimeMillis() - it.lastModified() > 24L * 60L * 60L * 1000L
+                }?.forEach { it.delete() }
                 val temporary = File(folder, "${UUID.randomUUID()}.xpi")
                 xpi = temporary
                 val input = app.contentResolver.openInputStream(uri)
@@ -104,6 +110,16 @@ object CinemaSignedXpi {
                     require(manifest != null && !manifest.isDirectory &&
                             manifest.size in 1L..(1024L * 1024L)) {
                         "The selected file is not a valid Firefox XPI (manifest.json missing)."
+                    }
+                    // Imported packages cannot silently replace the two official add-ons
+                    // controlled by Cinema's dedicated settings.
+                    val manifestJson = zip.getInputStream(manifest).bufferedReader().use { it.readText() }
+                    val root = JSONObject(manifestJson)
+                    val gecko = root.optJSONObject("browser_specific_settings")?.optJSONObject("gecko")
+                        ?: root.optJSONObject("applications")?.optJSONObject("gecko")
+                    val statedId = gecko?.optString("id").orEmpty()
+                    require(statedId.isBlank() || CinemaExtensionManagementPolicy.userManaged(statedId)) {
+                        "Use Cinema settings to manage uBlock Origin and SponsorBlock."
                     }
                 }
                 val selectedFile = temporary
