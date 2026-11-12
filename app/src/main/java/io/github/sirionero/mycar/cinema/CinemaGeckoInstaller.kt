@@ -38,7 +38,7 @@ object CinemaGeckoInstaller {
         data class Downloaded(val bytes: Long) : Status
         data object Installing : Status
         data object Installed : Status
-        data class Failed(val reason: String) : Status
+        data class Failed(val reason: String, val signingMismatch: Boolean = false) : Status
     }
 
     private const val RELEASES = "https://api.github.com/repos/JPLuker/MyCarAdblock/releases/tags/v"
@@ -272,7 +272,24 @@ object CinemaGeckoInstaller {
             }
             else -> {
                 val message = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE).orEmpty()
-                flow.value = Status.Failed("Android refused the optional browser: $message")
+                val status = intent.getIntExtra(
+                    PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE,
+                )
+                // Installer errors are diagnostic detail, not suitable for a prominent UI row.
+                // Signatures can be inconsistent when the debug APK on the phone came from
+                // a different GitHub Actions run than its feature ZIP. The archives are
+                // checked for matching signatures in CI; the installed package is separate.
+                MyCarLog.w("cinema: optional install rejected (status=$status): $message")
+                val signatureMismatch = message.contains("signature", ignoreCase = true) ||
+                    message.contains("certificate", ignoreCase = true)
+                flow.value = if (signatureMismatch) {
+                    Status.Failed(
+                        "Firefox ZIP does not match this installed myCar Debug app.",
+                        signingMismatch = true,
+                    )
+                } else {
+                    Status.Failed("Firefox engine installation failed. Choose the matching ZIP and retry.")
+                }
             }
         }
     }
