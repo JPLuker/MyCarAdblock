@@ -378,4 +378,9 @@
     <string name="settings_cinema_extension_consent_title">Να επιτραπεί αυτή η επέκταση Firefox;</string>
     <string name="settings_cinema_extension_consent_detail">Ελέγξτε το αναγνωριστικό και τα δικαιώματα πριν από την εγκατάσταση.</string>
     <string name="settings_cinema_extension_consent_accept">Εγκατάσταση επέκτασης</string>
+    <string name="settings_cinema_extension_list_header">Εγκατεστημένες επεκτάσεις</string>
+    <string name="settings_cinema_extension_list_empty">Δεν υπάρχουν άλλες εγκατεστημένες επεκτάσεις Firefox.</string>
+    <string name="settings_cinema_extension_remove">Κατάργηση</string>
+    <string name="settings_cinema_extension_remove_title">Κατάργηση επέκτασης Firefox;</string>
+    <string name="settings_cinema_extension_remove_detail">Απεγκατάσταση του %1$s από το Firefox;</string>
 </resources>
