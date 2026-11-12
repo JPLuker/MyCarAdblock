@@ -129,6 +129,42 @@ support, validate a compatible same-signer split distribution or evaluate a sepa
 companion APK with an IPC bridge. The companion route also needs a demonstrated embedded
 surface/input mechanism, so do not present it as equivalent without a prototype.
 
+## November 12: Cinema session retention, split map and Gecko crash investigation
+
+**Reported on Android:** The ARM64 GeckoView optional feature installed, but opening the
+browser crashed or exited to Android recents (a blank white page appeared in the preview).
+This **has not been proven fixed**; a past-session phone log or Android crash buffer is
+needed to distinguish a Gecko native startup fault, missing split resource, browser
+embedding/surface issue, or uBlock Origin callback. The source now logs Gecko runtime
+startup stages and the full synchronous failure chain, reuses a process-lifetime GeckoRuntime,
+and ignores extension callbacks after a browser session closes. A newly installed split
+is withheld from the selector until the app process has been restarted. Browser startup
+remains a device-test blocker for PR merge.
+
+**New user-requested behavior:**
+- [x] **Keep Cinema alive while changing car screens.** Preserve the same Android WebView
+      or GeckoSession rather than disposing/recreating on Home, map, or Apps; pause
+      media on hide and resume rendering when visible. YouTube's existing seek position
+      should survive these transitions within the same car UI process. Explicitly closing
+      the website, disconnecting and destroying the car UI, Android killing the process,
+      and changes requiring site reload are outside this guarantee.
+- [x] **Map + Cinema** toggle from the site header. Show the current interactive navigation
+      map in the left ~44% and Cinema in the right ~56%; switch back to full width in-place
+      without navigating or creating a fresh browser. Keep only the existing single map
+      surface/connection, not a second independent map instance. Existing parked-only cover
+      continues to apply to the video area.
+- [x] **Fullscreen behavior:** YouTube/fullscreen video temporarily expands the Cinema
+      pane to full available width while leaving the car's navigation dock independent.
+      Explicit 'Exit fullscreen' control is visible; the prior split choice is restored on exit.
+- [ ] **Still unverified on hardware:** Gecko startup, browser persistence under actual
+      car projection, map tapping/route controls in split mode, fullscreen video overlay,
+      media pause/resume and seek preservation on YouTube, especially with Firefox.
+- [ ] **Test plan:** open a YouTube video, seek into it, switch to Map and Apps repeatedly,
+      return without reload and check playback is still at the same timestamp. Switch
+      Map + Cinema on/off while the map runs. Enter/exit YouTube fullscreen and inspect the
+      navigation dock. With parked-only enabled, ensure video imagery is obscured when
+      movement is detected, including split mode. Repeat on Firefox only after it launches.
+
 ## Acceptance criteria
 
 - [ ] A fresh installation's base APK contains **no GeckoView classes or native engine**.
