@@ -362,4 +362,6 @@
     <string name="music_needs_amazon">Braucht Amazon Prime oder Amazon Music Unlimited.</string>
     <string name="music_needs_tidal">Braucht ein TIDAL-Abo.</string>
     <string name="music_needs_qobuz">Braucht ein Qobuz-Abo.</string>
+    <string name="cinema_map_split">Karte + Cinema</string>
+    <string name="cinema_full_width">Volle Breite</string>
 </resources>
