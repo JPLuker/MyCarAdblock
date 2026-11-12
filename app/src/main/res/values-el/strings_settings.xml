@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="settings_cinema_background_audio">Ήχος στο παρασκήνιο</string>
+    <string name="settings_cinema_background_audio_detail">Συνέχιση του ήχου Firefox κατά τη μετάβαση στους Χάρτες. Απενεργοποιημένο από προεπιλογή.</string>
     <string name="settings_support_title">Στηρίξτε το myCar</string>
     <string name="settings_support_footer">Το myCar είναι δωρεάν, χωρίς διαφημίσεις και χωρίς παρακολούθηση. Η στήριξή σας το κρατά ζωντανό.</string>
     <string name="settings_usage_notes_title">Σημειώσεις χρήσης</string>
