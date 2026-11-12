@@ -252,8 +252,10 @@ controller itself caused the process crash. Three real ARM64 device logs:
 - 11:10:57: blocking OFF, controller entirely bypassed, same SIGSEGV.
 
 All fault at `libxul.so+0x3f66680` with `SEGV_MAPERR` at address
-`0x8`. The Gecko native thread fails during startup independent of the
-application's extension call. Exact Mozilla symbol/function and root cause
+`0x8`. The Gecko native thread fails during startup even when the
+application bypasses the extension-controller call. A previously installed
+extension could still start automatically; the native root cause and exact
+Mozilla function
 remain unknown. Do **not** ask for repeat tests of this same 159 build.
 
 The crash checkpoint therefore now guards **all Gecko startup attempts**, ON
