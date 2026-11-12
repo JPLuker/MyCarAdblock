@@ -270,3 +270,49 @@ Original review references:
 - https://github.com/mozilla-firefox/firefox/blob/main/mobile/android/geckoview/src/main/java/org/mozilla/gecko/GeckoThread.java
 - https://github.com/mozilla-firefox/firefox/blob/main/mobile/android/geckoview/src/main/java/org/mozilla/geckoview/GeckoRuntime.java
 - https://github.com/mozilla-firefox/firefox/blob/main/xpcom/build/Omnijar.cpp
+
+
+## First Firefox render and split-button UI (November 12)
+
+**Observed in the user's Car Preview screenshot at approximately 12:57 PM:**
+YouTube's home/search/navigation UI is visibly rendered inside Cinema. The user
+explicitly confirmed that **Firefox GeckoView**, not Android WebView, was
+selected. This is our first confirmed successful *visual* page render with
+Firefox after the optional-feature `omni.ja` resource-path correction.
+It is strong evidence for the corrected resource-path hypothesis, but the
+success-session log containing `native omnijar source=` and
+`first contentful paint` has not yet been supplied.
+
+**Important testing distinction:** A subsequent phone Settings screenshot
+shows **Block ads and trackers ON** and **Firefox GeckoView selected**.
+It does not prove that the toggle was ON during the earlier successful
+page render, nor does it prove that the signed uBlock Origin extension
+installed, activated, or actually filtered a request.
+
+**New UI change:** commit `0bf8bf4` replaces the long
+`Map + Cinema` / `Full width` text in the Cinema title bar with a
+compact two-panel vector icon. It is interactive and uses the existing
+translated labels for accessibility, highlights the active split state,
+and is shared by both WebView and GeckoView. The UI commit needs CI
+verification and a visual test.
+
+**Next efficient device-test sequence (in Car Preview):**
+1. On a newly successful build, confirm the two-panel icon toggles
+   Maps/Cinema split view on and off; confirm it remains touch-friendly.
+2. With Firefox selected, play one YouTube video and confirm picture
+   and sound. Test entering/leaving video fullscreen.
+3. While a video is paused or playing, switch to Maps or another screen
+   and return. Check for page refresh, playback reset or timestamp loss.
+4. Check the log for `packaged GeckoView=159...`,
+   `native omnijar source=...`, `first contentful paint`, and
+   `gecko: add-on ready` or extension-install failures.
+5. Verify actual uBlock Origin installation and filtering **separately**;
+   the Settings toggle alone is insufficient evidence.
+6. Continue with real-head-unit and release-signing tests only after
+   preview behavior is stable.
+
+**Note on the most recently supplied log**
+(`mycar-log-20261112-125544.txt`): the 12:55 file contains startup,
+certificate/TLS self-tests and weather data only. It ends at
+12:56:00, with no `CINEMA`, `gecko:`, or playback events. It cannot
+corroborate or refute the later YouTube screenshot.
