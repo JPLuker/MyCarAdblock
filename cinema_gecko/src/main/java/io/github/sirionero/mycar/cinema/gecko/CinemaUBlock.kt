@@ -24,7 +24,9 @@ internal object CinemaUBlock {
         onReady: () -> Unit,
         onError: (String) -> Unit,
     ) {
+        MyCarLog.i("gecko: entering uBO initialization (enabled=$enabled)", "CINEMA")
         val controller = runtime.webExtensionController
+        MyCarLog.i("gecko: web extension controller obtained", "CINEMA")
         controller.setPromptDelegate(object : WebExtensionController.PromptDelegate {
             override fun onInstallPromptRequest(
                 extension: WebExtension,
@@ -43,7 +45,9 @@ internal object CinemaUBlock {
                 )
             }
         })
+        MyCarLog.i("gecko: extension prompt delegate installed; listing extensions", "CINEMA")
         controller.list().accept({ extensions ->
+            MyCarLog.i("gecko: extension list returned", "CINEMA")
             val existing = extensions?.firstOrNull { it.id == EXTENSION_ID }
             if (existing != null && existing.metaData.enabled == enabled) {
                 if (enabled) checkForUpdate(context, controller, existing)
@@ -65,6 +69,7 @@ internal object CinemaUBlock {
             } else if (!enabled) {
                 onReady()
             } else {
+                MyCarLog.i("gecko: requesting Mozilla-signed uBO XPI", "CINEMA")
                 controller.install(OFFICIAL_XPI, WebExtensionController.INSTALLATION_METHOD_MANAGER)
                     .accept({ extension ->
                         if (extension?.id == EXTENSION_ID) {
