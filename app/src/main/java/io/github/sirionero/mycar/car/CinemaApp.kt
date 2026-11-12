@@ -86,6 +86,7 @@ import io.github.sirionero.mycar.cinema.CinemaSite
 import io.github.sirionero.mycar.cinema.CinemaBrowserEngine
 import io.github.sirionero.mycar.cinema.CinemaBrowserPolicy
 import io.github.sirionero.mycar.cinema.CinemaGeckoBridge
+import io.github.sirionero.mycar.cinema.CinemaGeckoInstaller
 import io.github.sirionero.mycar.cinema.SiteIcons
 import io.github.sirionero.mycar.cinema.TvList
 import io.github.sirionero.mycar.cinema.TvLists
