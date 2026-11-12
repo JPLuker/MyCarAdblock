@@ -7,12 +7,19 @@ plugins {
     id("com.android.dynamic-feature")
 }
 
+// Single pinned coordinate for both Gradle resolution and the runtime diagnostic log.
+val geckoVersion = "159.0.20261102144711"
+
 android {
     namespace = "io.github.sirionero.mycar.cinema.gecko"
     compileSdk = 37
     defaultConfig {
         minSdk = 31
         ndk { abiFilters += "arm64-v8a" }
+        buildConfigField("String", "GECKOVIEW_VERSION", "\\"$geckoVersion\\"")
+    }
+    buildFeatures {
+        buildConfig = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -23,5 +30,5 @@ android {
 dependencies {
     implementation(project(":app"))
     // Pinned GeckoView stable from Mozilla. Keep synchronized with the matching signed split.
-    implementation("org.mozilla.geckoview:geckoview-arm64-v8a:159.0.20261102144711")
+    implementation("org.mozilla.geckoview:geckoview-arm64-v8a:$geckoVersion")
 }
