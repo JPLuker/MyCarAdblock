@@ -13,6 +13,8 @@ import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.cinema.CinemaBrowserFactory
 import io.github.sirionero.mycar.cinema.CinemaBrowserSession
 import io.github.sirionero.mycar.cinema.CinemaGeckoAttemptGuard
+import io.github.sirionero.mycar.cinema.CinemaAdBlockAction
+import io.github.sirionero.mycar.cinema.CinemaAdBlockTransitionPolicy
 import org.mozilla.geckoview.AllowOrDeny
 import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoRuntime
@@ -158,12 +160,18 @@ private class RunningSession(
      * The WebExtensionController is shared by the runtime, so no parallel requests.
      */
     private fun applyBlockingIfNeeded() {
-        if (isClosed || applyingBlocking) return
-        val requested = desiredBlocking ?: return
-        if (appliedBlocking == requested) {
-            startNavigationOnce()
-            return
+        if (isClosed) return
+        when (CinemaAdBlockTransitionPolicy.next(
+            desiredBlocking, appliedBlocking, applyingBlocking, navigationStarted,
+        )) {
+            CinemaAdBlockAction.WAIT, CinemaAdBlockAction.IDLE -> return
+            CinemaAdBlockAction.NAVIGATE -> {
+                startNavigationOnce()
+                return
+            }
+            CinemaAdBlockAction.SYNCHRONIZE -> Unit
         }
+        val requested = desiredBlocking ?: return
         applyingBlocking = true
         val settled = AtomicBoolean(false)
         val timeout = Runnable {
