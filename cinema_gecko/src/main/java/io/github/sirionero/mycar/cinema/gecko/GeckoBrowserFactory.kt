@@ -1,7 +1,10 @@
 package io.github.sirionero.mycar.cinema.gecko
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.view.View
+import java.util.concurrent.atomic.AtomicBoolean
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.ExtractedTextRequest
 import android.view.KeyEvent
@@ -114,33 +117,61 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
             return result
         }
 
-        // When ad blocking is ON, wait for the verified signed uBO extension before
-        // navigating to the website. Any failure is surfaced instead of loading unblocked.
+        // Don't show an indefinitely blank Cinema page if Gecko's extension service stalls.
+        // Leave the durable checkpoint in place on timeout; a blocked native service may still
+        // crash later, and a repeat startup should require an explicit settings change.
+        val completed = AtomicBoolean(false)
+        val handler = Handler(Looper.getMainLooper())
+        val timeout = Runnable {
+            if (completed.compareAndSet(false, true)) {
+                MyCarLog.w("gecko: signed uBlock Origin startup timed out", "CINEMA")
+                if (!result.isClosed) {
+                    onFailure("uBlock Origin took too long to start. Turn off Cinema ad blocking to test Firefox, or use Android WebView.")
+                }
+            }
+        }
+        if (!handler.postDelayed(timeout, 30_000L)) {
+            CinemaGeckoAttemptGuard.finish(context)
+            onFailure("Firefox could not schedule add-on initialization. Use Android WebView.")
+            return result
+        }
+
+        // Blocking ON: do not navigate until the signed extension is initialized. An error
+        // must be shown, rather than silently loading the page without uBlock Origin.
         MyCarLog.i("gecko: requesting signed uBlock Origin initialization", "CINEMA")
         try {
             CinemaUBlock.ensure(context, runtime, adBlock, onReady = {
-                // The add-on either initialized successfully or returned a handled error.
-                // A native process exit before either callback leaves the durable checkpoint.
-                CinemaGeckoAttemptGuard.finish(context)
-                if (!result.isClosed) {
-                    MyCarLog.i("gecko: add-on ready; loading website", "CINEMA")
-                    runCatching { session.loadUri(url) }
-                        .onFailure {
-                            MyCarLog.e("gecko: navigation failed", it, "CINEMA")
-                            onFailure("Firefox could not navigate to the website.")
-                        }
+                if (completed.compareAndSet(false, true)) {
+                    handler.removeCallbacks(timeout)
+                    CinemaGeckoAttemptGuard.finish(context)
+                    if (!result.isClosed) {
+                        MyCarLog.i("gecko: add-on ready; loading website", "CINEMA")
+                        runCatching { session.loadUri(url) }
+                            .onFailure {
+                                MyCarLog.e("gecko: navigation failed", it, "CINEMA")
+                                onFailure("Firefox could not navigate to the website.")
+                            }
+                    }
                 }
-            }, onError = {
-                CinemaGeckoAttemptGuard.finish(context)
-                if (!result.isClosed) {
-                    MyCarLog.w("gecko: add-on initialization failed: $it", "CINEMA")
-                    onFailure(it)
+            }, onError = { reason ->
+                if (completed.compareAndSet(false, true)) {
+                    handler.removeCallbacks(timeout)
+                    CinemaGeckoAttemptGuard.finish(context)
+                    if (!result.isClosed) {
+                        MyCarLog.w("gecko: add-on initialization failed: $reason", "CINEMA")
+                        onFailure(reason)
+                    }
                 }
             })
         } catch (failure: Exception) {
-            CinemaGeckoAttemptGuard.finish(context)
-            MyCarLog.e("gecko: add-on initialization threw", failure, "CINEMA")
-            onFailure("Firefox add-on initialization failed. Open the myCar log for details.")
+            if (completed.compareAndSet(false, true)) {
+                handler.removeCallbacks(timeout)
+                CinemaGeckoAttemptGuard.finish(context)
+                MyCarLog.e("gecko: add-on initialization threw", failure, "CINEMA")
+                if (!result.isClosed) {
+                    onFailure("Firefox add-on initialization failed. Open the myCar log for details.")
+                }
+            }
         }
         return result
     }
