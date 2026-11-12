@@ -188,6 +188,8 @@
     <string name="settings_cinema_engine_gecko_pending">Not installed</string>
     <string name="settings_cinema_ad_block">Block ads and trackers</string>
     <string name="settings_cinema_ad_block_detail">Blocks known advertising and tracking domains. Some video ads may still appear.</string>
+    <string name="settings_cinema_background_audio">Background audio</string>
+    <string name="settings_cinema_background_audio_detail">Keep Firefox audio playing when you switch to Maps. Off by default.</string>
     <string name="settings_cinema_parked_only">Video only when parked</string>
     <string name="settings_cinema_parked_only_on">Video is hidden while moving; audio continues.</string>
     <string name="settings_cinema_parked_only_off">Video remains visible while moving.</string>
