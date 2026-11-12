@@ -134,6 +134,9 @@
     <string name="settings_cinema_engine_allow_install">允许 myCar 安装应用</string>
     <string name="settings_cinema_engine_installing">正在安装 Firefox 引擎…</string>
     <string name="settings_cinema_engine_retry">重试下载</string>
+    <string name="settings_cinema_engine_import_zip">选择测试引擎 ZIP</string>
+    <string name="settings_cinema_engine_import_hint">使用与此 APK 同一次 GitHub Actions 构建生成的 GeckoView ZIP。</string>
+    <string name="settings_cinema_engine_importing">正在读取测试引擎 ZIP…</string>
     <string name="settings_cinema_engine_download">下载 Firefox 引擎</string>
     <string name="settings_cinema_engine_gecko_pending">此版本暂不支持下载可选浏览器</string>
     <string name="settings_cinema_ad_block">拦截广告和追踪器</string>
