@@ -5,6 +5,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.ExtractedTextRequest
 import android.view.KeyEvent
+import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.cinema.CinemaBrowserFactory
 import io.github.sirionero.mycar.cinema.CinemaBrowserSession
 import org.mozilla.geckoview.AllowOrDeny
