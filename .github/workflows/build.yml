@@ -155,6 +155,26 @@ jobs:
             || { echo "Gecko native loader missing from optional ARM64 split"; exit 1; }
           echo "Signed Gecko splits have classes.dex, omni.ja, libxul.so and libmozglue.so"
 
+      # Capture the ELF build ID needed by Mozilla symbols to map native PC
+      # offsets in on-device SIGSEGV traces to exact functions. Keep the large
+      # extracted library out of uploaded artifacts; only publish small metadata.
+      - name: Record Gecko ARM64 native build identity
+        run: |
+          set -euo pipefail
+          unzip -p build/gecko-splits/cinema_gecko-arm64_v8a.apk \
+            lib/arm64-v8a/libxul.so > build/gecko-debug-libxul.so
+          test -s build/gecko-debug-libxul.so
+          build_id=$(readelf -n build/gecko-debug-libxul.so | sed -n 's/.*Build ID: //p' | head -n1)
+          test -n "$build_id" || { echo "Missing Gecko native ELF build ID"; exit 1; }
+          {
+            echo "Git commit: $GITHUB_SHA"
+            echo "ARM64 libxul.so ELF build ID: $build_id"
+            echo "ARM64 libxul.so SHA256: $(sha256sum build/gecko-debug-libxul.so | awk '{print $1}')"
+            echo "Reproduction PCs (Gecko 159, Nov 12): 0x3f66680 0x40d9730 0x42ff96c 0x3f5d8cc"
+            echo "A different GeckoView version has different PC locations."
+          } > build/gecko-native-build-id.txt
+          rm -f build/gecko-debug-libxul.so
+
       # Compare the DER certificate encoded into APK Signature Scheme v2/v3, not
       # formatted apksigner stdout. Earlier text parsing let two different debug
       # keys pass, causing INSTALL_FAILED_INVALID_APK on the phone and emulator.
@@ -201,6 +221,7 @@ jobs:
           path: |
             build/myCar-debug.apk
             build/myCar-gecko-arm64-v8a.zip
+            build/gecko-native-build-id.txt
           if-no-files-found: error
 
   # Compile success does not prove launchability. This separate job installs only the
