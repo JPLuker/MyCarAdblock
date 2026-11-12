@@ -23,5 +23,8 @@ android {
 dependencies {
     implementation(project(":app"))
     // Pinned GeckoView stable from Mozilla. Keep synchronized with the matching signed split.
-    implementation("org.mozilla.geckoview:geckoview-arm64-v8a:159.0.20261102144711")
+    // A/B diagnostic branch: the ARM64 device reproduces an identical native libxul.so
+    // SIGSEGV on 159 even when uBlock/extension startup is bypassed. Keep the
+    // production candidate on 159 while testing the previous stable Gecko engine.
+    implementation("org.mozilla.geckoview:geckoview-arm64-v8a:158.0.20261021001945")
 }
