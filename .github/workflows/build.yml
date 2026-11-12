@@ -38,7 +38,15 @@ jobs:
           KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
         run: |
           if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "No signing key in the secrets: the debug key signs this build."
+            echo "No repository signing key; prepare the standard Android debug key for this CI run."
+            mkdir -p "$HOME/.android"
+            if [ ! -f "$HOME/.android/debug.keystore" ]; then
+              keytool -genkeypair -noprompt \
+                -keystore "$HOME/.android/debug.keystore" \
+                -storepass android -keypass android \
+                -alias androiddebugkey -keyalg RSA -keysize 2048 \
+                -validity 10000 -dname "CN=Android Debug,O=Android,C=US" > /dev/null
+            fi
             exit 0
           fi
           echo "$KEYSTORE_BASE64" | base64 -d > mycar-release.jks
