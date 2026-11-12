@@ -465,7 +465,10 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, active: Boolean, 
             }
             if (fullScreen != null) {
                 Box(Modifier.align(Alignment.TopEnd)) {
-                    CinemaExitFullscreen {
+                    CinemaExitFullscreen(
+                        split = navigator.cinemaSplit,
+                        onToggleSplit = navigator::toggleCinemaSplit,
+                    ) {
                         fullScreen?.second?.onCustomViewHidden()
                         fullScreen = null
                         navigator.cinemaVideoFullscreen = false
@@ -514,18 +517,43 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, active: Boolean, 
 /** A local escape control when a website hides its own UI in fullscreen.
  * Unlike letting a web video take Android's entire window, the car's dock remains usable. */
 @Composable
-internal fun CinemaExitFullscreen(onClick: () -> Unit) {
-    Box(
+internal fun CinemaExitFullscreen(
+    split: Boolean = false,
+    onToggleSplit: (() -> Unit)? = null,
+    onClick: () -> Unit,
+) {
+    // Fullscreen belongs to the Cinema pane, so the user can keep Maps alongside
+    // the video. Both actions stay reachable even when YouTube hides its page toolbar.
+    Row(
         modifier = Modifier.padding(MyCarSpace.S),
-        contentAlignment = Alignment.CenterEnd,
+        horizontalArrangement = Arrangement.spacedBy(MyCarSpace.S),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
+        if (onToggleSplit != null) {
+            val label = stringResource(
+                if (split) R.string.cinema_full_width else R.string.cinema_map_split,
+            )
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = if (split) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurface,
+                shape = RoundedCornerShape(MyCarRadius.Button),
+                modifier = Modifier.size(CHROME_BAR).clickable(onClick = onToggleSplit),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        painter = painterResource(R.drawable.sym_split_view),
+                        contentDescription = label,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+            }
+        }
         Surface(
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
             contentColor = MaterialTheme.colorScheme.onSurface,
             shape = RoundedCornerShape(MyCarRadius.Button),
-            modifier = Modifier.align(Alignment.TopEnd)
-                .size(CHROME_BAR)
-                .clickable(onClick = onClick),
+            modifier = Modifier.size(CHROME_BAR).clickable(onClick = onClick),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
