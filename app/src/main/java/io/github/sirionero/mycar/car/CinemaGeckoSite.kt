@@ -44,6 +44,9 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
     val allowed = !parkedOnly || rememberVideoAllowed()
     var browser by remember { mutableStateOf<CinemaBrowserSession?>(null) }
     var fieldText by remember { mutableStateOf<String?>(null) }
+    // Gecko may send delayed restartInput snapshots while the car keyboard is typing.
+    // Never let an older browser snapshot replace newer locally entered characters.
+    var keyboardEdited by remember { mutableStateOf(false) }
     var fullScreen by remember { mutableStateOf(false) }
     var fullScreenAspect by remember { mutableStateOf<Float?>(null) }
     var failure by remember { mutableStateOf<String?>(null) }
@@ -89,6 +92,7 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
                 fullScreen = false
             }
             fieldText = null
+            keyboardEdited = false
             navigator.cinemaVideoFullscreen = false
         }
     }
@@ -137,7 +141,14 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
                         adBlock = Cinema.adBlockEnabled.value,
                         sponsorBlock = Cinema.sponsorBlockEnabled.value,
                         onVisited = { url -> CinemaContinue.site(context, site, url) },
-                        onKeyboard = { fieldText = it },
+                        onKeyboard = { snapshot ->
+                            if (snapshot == null) {
+                                fieldText = null
+                                keyboardEdited = false
+                            } else if (!keyboardEdited || fieldText == null) {
+                                fieldText = snapshot
+                            }
+                        },
                         onFullScreen = {
                             fullScreen = it
                             if (!it) fullScreenAspect = null
@@ -193,10 +204,11 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
                 text = text,
                 onTextChange = { updated ->
                     fieldText = updated
+                    keyboardEdited = true
                     browser?.setText(updated)
                 },
-                onSubmit = { browser?.submitText() },
-                onDismiss = { fieldText = null },
+                onSubmit = { browser?.submitText(); keyboardEdited = false },
+                onDismiss = { fieldText = null; keyboardEdited = false },
                 clipboard = true,
             )
         }
