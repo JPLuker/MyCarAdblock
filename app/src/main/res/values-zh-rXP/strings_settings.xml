@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="settings_cinema_background_audio">后台音频</string>
+    <string name="settings_cinema_background_audio_detail">切换到地图时继续播放 Firefox 音频。默认关闭。</string>
     <string name="settings_support_title">支持这趟航行</string>
     <string name="settings_support_footer">myCar 免费，没有广告，也不跟踪你。你的支持能让这艘船继续乘风破浪。</string>
     <string name="settings_usage_notes_title">航行报告</string>
