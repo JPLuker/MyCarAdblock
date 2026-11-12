@@ -30,6 +30,7 @@ object Cinema {
     private const val KEY_SITES = "cinema_sites"
     private const val KEY_PARKED_ONLY = "cinema_parked_only"
     private const val KEY_AD_BLOCK = "cinema_ad_block"
+    private const val KEY_SPONSOR_BLOCK = "cinema_sponsor_block"
     private const val KEY_BROWSER_ENGINE = "cinema_browser_engine"
 
     /** To start with, until the driver changes the list: sites whose video shows in the car. */
@@ -66,6 +67,8 @@ object Cinema {
     private val sitesFlow = MutableStateFlow(SUGGESTED)
     private val parkedOnlyFlow = MutableStateFlow(true)
     private val adBlockFlow = MutableStateFlow(true)
+    private val sponsorBlockFlow = MutableStateFlow(false)
+    private val sponsorBlockErrorFlow = MutableStateFlow<String?>(null)
     private val browserEngineFlow = MutableStateFlow(CinemaBrowserEngine.ANDROID_WEBVIEW)
 
     val sites: StateFlow<List<CinemaSite>> = sitesFlow.asStateFlow()
@@ -76,6 +79,12 @@ object Cinema {
     /** Blocking applies to Cinema websites only, and is enabled unless turned off. */
     val adBlockEnabled: StateFlow<Boolean> = adBlockFlow.asStateFlow()
 
+    /** Optional official SponsorBlock extension for Firefox only, default OFF. */
+    val sponsorBlockEnabled: StateFlow<Boolean> = sponsorBlockFlow.asStateFlow()
+
+    /** A real extension error, not a fake success indicator in Settings. */
+    val sponsorBlockError: StateFlow<String?> = sponsorBlockErrorFlow.asStateFlow()
+
     /** Preferred website engine; the UI falls back to WebView if the optional split is absent. */
     val browserEngine: StateFlow<CinemaBrowserEngine> = browserEngineFlow.asStateFlow()
 
@@ -85,6 +94,8 @@ object Cinema {
         sitesFlow.value = if (saved.isEmpty()) SUGGESTED else read(saved)
         parkedOnlyFlow.value = AppSettings.getString(app, KEY_PARKED_ONLY, "true") == "true"
         adBlockFlow.value = AppSettings.getString(app, KEY_AD_BLOCK, "true") == "true"
+        sponsorBlockFlow.value = AppSettings.getString(app, KEY_SPONSOR_BLOCK, "false") == "true"
+        sponsorBlockErrorFlow.value = null
         browserEngineFlow.value = CinemaBrowserEngine.fromStored(
             AppSettings.getString(app, KEY_BROWSER_ENGINE, CinemaBrowserEngine.ANDROID_WEBVIEW.storageValue),
         )
@@ -110,6 +121,16 @@ object Cinema {
         app?.let { AppSettings.putString(it, KEY_AD_BLOCK, on.toString()) }
         // Never reset Gecko's native crash checkpoint merely by disabling uBlock:
         // three real-device SIGSEGVs showed identical crashes with blocking ON and OFF.
+    }
+
+    fun setSponsorBlockEnabled(on: Boolean) {
+        sponsorBlockFlow.value = on
+        sponsorBlockErrorFlow.value = null
+        app?.let { AppSettings.putString(it, KEY_SPONSOR_BLOCK, on.toString()) }
+    }
+
+    fun reportSponsorBlockError(reason: String?) {
+        sponsorBlockErrorFlow.value = reason
     }
 
     fun setBrowserEngine(engine: CinemaBrowserEngine) {
