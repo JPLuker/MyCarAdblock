@@ -369,4 +369,13 @@
     <string name="settings_cinema_engine_restart_short">Redémarrer pour activer</string>
     <string name="settings_cinema_sponsorblock">SponsorBlock (Firefox)</string>
     <string name="settings_cinema_sponsorblock_detail">Ignore les segments sponsorisés connus dans les vidéos YouTube. Facultatif ; nécessite Firefox GeckoView.</string>
+    <string name="settings_cinema_extensions_header">Extensions Firefox</string>
+    <string name="settings_cinema_extension_import_detail">Choisissez uniquement un XPI signé par Mozilla provenant de développeurs fiables. Les extensions peuvent lire et modifier les données des sites.</string>
+    <string name="settings_cinema_extension_import">Installer une extension signée (.xpi)</string>
+    <string name="settings_cinema_extension_reading">Lecture du fichier…</string>
+    <string name="settings_cinema_extension_installing">Installation de l\'extension signée…</string>
+    <string name="settings_cinema_extension_installed">Extension installée : %1$s</string>
+    <string name="settings_cinema_extension_consent_title">Autoriser cette extension Firefox ?</string>
+    <string name="settings_cinema_extension_consent_detail">Vérifiez son identifiant et les autorisations ou accès demandés.</string>
+    <string name="settings_cinema_extension_consent_accept">Installer extension</string>
 </resources>
