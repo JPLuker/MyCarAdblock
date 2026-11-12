@@ -365,4 +365,5 @@
     <string name="cinema_map_split">Χάρτης + Cinema</string>
     <string name="cinema_full_width">Πλήρες πλάτος</string>
     <string name="cinema_exit_fullscreen">Έξοδος από πλήρη οθόνη</string>
+    <string name="settings_cinema_engine_restart_required">Το Firefox εγκαταστάθηκε. Κάντε αναγκαστική διακοπή του myCar Debug από τις ρυθμίσεις Android και ανοίξτε το ξανά.</string>
 </resources>
