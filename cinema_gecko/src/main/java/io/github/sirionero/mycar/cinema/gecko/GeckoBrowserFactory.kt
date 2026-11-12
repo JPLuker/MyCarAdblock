@@ -383,7 +383,7 @@ private class RunningSession(
  * Exactly one GeckoRuntime per car-app process. Mozilla specifies a process-lifetime runtime for
  * apps that own sessions; re-creating it whenever Cinema opens can fail or tear down pages.
  */
-private object CinemaGeckoRuntime {
+internal object CinemaGeckoRuntime {
     private var runtime: GeckoRuntime? = null
 
     @Synchronized
