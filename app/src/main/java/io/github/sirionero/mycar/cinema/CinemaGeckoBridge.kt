@@ -65,8 +65,11 @@ object CinemaGeckoBridge {
             factory.create(context, url, desktop, adBlock, onVisited, onKeyboard, onFullScreen, onFailure)
         }.onFailure {
             // Never bring down the whole car connection because a split failed to load.
-            MyCarLog.w("cinema: optional browser unavailable: " + it.javaClass.simpleName)
-            onFailure("Firefox browser could not start. Use Android WebView instead.")
+            // Preserve the full Java cause chain in the existing on-device crash log.
+            // A class-loader, missing split manifest component or GeckoRuntime startup error
+            // cannot be diagnosed from the exception's short type name alone.
+            MyCarLog.e("cinema: GeckoView initialization failed", it, tag = "CINEMA")
+            onFailure("Firefox could not start. Choose Android WebView; see the myCar log for details.")
         }.getOrNull()
     }
 }
