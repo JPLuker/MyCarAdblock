@@ -31,7 +31,9 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         onFullScreen: (Boolean) -> Unit,
         onFailure: (String) -> Unit,
     ): CinemaBrowserSession {
-        val runtime = GeckoRuntime.getDefault(context.applicationContext)
+        MyCarLog.i("gecko: starting optional runtime", "CINEMA")
+        val runtime = CinemaGeckoRuntime.get(context.applicationContext)
+        MyCarLog.i("gecko: runtime attached; creating browser session", "CINEMA")
         val options = GeckoSessionSettings.Builder()
             .userAgentMode(if (desktop) GeckoSessionSettings.USER_AGENT_MODE_DESKTOP else GeckoSessionSettings.USER_AGENT_MODE_MOBILE)
             .viewportMode(if (desktop) GeckoSessionSettings.VIEWPORT_MODE_DESKTOP else GeckoSessionSettings.VIEWPORT_MODE_MOBILE)
@@ -70,6 +72,7 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         session.contentDelegate = object : GeckoSession.ContentDelegate {
             override fun onFullScreen(session: GeckoSession, fullScreen: Boolean) = onFullScreen(fullScreen)
             override fun onCrash(session: GeckoSession) {
+                MyCarLog.w("gecko: content process crashed; Java host is still running", "CINEMA")
                 onFailure("Firefox's page process stopped. Switch to Android WebView or try reopening this site.")
             }
         }
@@ -95,15 +98,24 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
             }
         })
         session.open(runtime)
+        MyCarLog.i("gecko: session opened; attaching display", "CINEMA")
         view.setSession(session)
+        MyCarLog.i("gecko: view attached; initializing signed extension", "CINEMA")
 
         // Do not load the page without blocking when the driver selected uBO. A signed add-on
         // installation may be necessary on the first launch, and is asynchronous.
-        CinemaUBlock.ensure(context, runtime, adBlock, onReady = {
-            session.loadUri(url)
-        }, onError = {
-            onFailure(it)
-        })
+        try {
+            CinemaUBlock.ensure(context, runtime, adBlock, onReady = {
+                MyCarLog.i("gecko: add-on ready; loading website", "CINEMA")
+                session.loadUri(url)
+            }, onError = {
+                MyCarLog.w("gecko: add-on initialization failed: $it", "CINEMA")
+                onFailure(it)
+            })
+        } catch (failure: Exception) {
+            MyCarLog.e("gecko: add-on initialization threw", failure, "CINEMA")
+            onFailure("Firefox add-on initialization failed. Open the myCar log for details.")
+        }
         return result
     }
 }
@@ -150,11 +162,36 @@ private class RunningSession(
     override fun reload() = session.reload()
     // Inactive GeckoSession is a render-visibility hint, not an HTML video pause.
     override fun pause() { activeMedia?.pause() }
+
+    override fun setVisible(visible: Boolean) {
+        if (!visible) pause()
+        // GeckoSession#setActive is explicitly about rendering visibility, not navigation.
+        // Keeping the GeckoSession and its GeckoView attached preserves the page/seek state.
+        session.setActive(visible)
+        view.visibility = if (visible) View.VISIBLE else View.INVISIBLE
+    }
+
     override fun exitFullScreen() { session.exitFullScreen() }
     override fun close() {
         onKeyboard(null)
         activeMedia = null
         view.releaseSession()
         session.close()
+    }
+}
+
+/**
+ * Exactly one GeckoRuntime per car-app process. Mozilla specifies a process-lifetime runtime for
+ * apps that own sessions; re-creating it whenever Cinema opens can fail or tear down pages.
+ */
+private object CinemaGeckoRuntime {
+    private var runtime: GeckoRuntime? = null
+
+    @Synchronized
+    fun get(context: Context): GeckoRuntime {
+        runtime?.let { return it }
+        val created = GeckoRuntime.create(context.applicationContext)
+        runtime = created
+        return created
     }
 }
