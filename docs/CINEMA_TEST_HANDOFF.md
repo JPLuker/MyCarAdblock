@@ -410,3 +410,66 @@ two specific remaining defects:
 **Not yet established:** actual head-unit behavior, uninterrupted
 audio, exact player seek position after navigation, extension effects,
 and latest CI results. PR stays draft pending confirmation.
+
+
+## November 12, 15:35 — fullscreen aspect regression and GeckoView workaround
+
+**User screenshots (Car Preview 800x480):**
+- Maps + Cinema with Firefox fullscreen leaves the actual image stuck near the
+  top of the narrow Cinema pane, while captions are far below in black space.
+  Both media and captions continue playing and the fullscreen escape/split
+  controls are visible.
+- Maps alone can be restored, indicating the earlier return-to-Maps behavior is
+  functional; no successful seek-retention assertion was made here.
+- Firefox fullscreen in the entire content area can show excess black space.
+  Some black space is intrinsic to the video content; do not interpret every
+  letterbox pixel as a layout bug.
+
+**Upstream evidence:** Mozilla Bug 1750416
+https://bugzilla.mozilla.org/show_bug.cgi?id=1750416 is currently NEW/open.
+It documents wrong fullscreen video sizing whenever a GeckoView is smaller
+than the host Android window. A reporter's workaround uses
+`MediaSession.Delegate.onFullscreen(session, mediaSession, enabled, meta)`,
+reads `meta.width`/`meta.height`, and resizes the rendering surface to
+match the video aspect. GeckoView's `ContentDelegate.onFullScreen()` is
+documented as ordinarily expecting an Activity-wide fullscreen window,
+which this car-virtual-display app cannot use without disrupting the phone
+and map dock.
+
+**Implemented on `feature/cinema-adblock`, device and CI unverified:**
+
+1. The optional Gecko feature forwards Gecko's
+   `MediaSession.ElementMetadata` video aspect to the base car UI through
+   an extended `CinemaBrowserFactory` callback, with a 16:9 fallback while
+   metadata is pending. It never forwards the media source URL.
+2. `CinemaFullscreenSizing.fit()` fits that aspect ratio to Cinema's actual
+   available pane size in Compose dp, without cropping or stretching;
+   the existing `AndroidView` hosting Firefox is centered in a black stage
+   and remeasured, not recreated. For split mode that is the 56% Cinema pane;
+   for single-pane mode it uses the entire available content area.
+3. GeckoView now explicitly uses MATCH_PARENT layout params instead of
+   relying on its default Android View layout behavior.
+4. The fullscreen exit and split-view overlay remains anchored to the
+   Cinema pane, outside the aspect-fitted video surface.
+5. Pure JVM tests verify fitting landscape 16:9, vertical portrait, ultrawide
+   and invalid metadata sizes; the tests have been committed but not run.
+
+**Important:** This is a candidate workaround based on matching upstream
+geometry symptoms, **not yet proven to fix the phone's Gecko 159 rendering**.
+It does not change video decoding, GeckoView's site fullscreen protocol,
+Android's car host, or parked-only masking.
+
+**Focused parked-only follow-up after a passing build:**
+- Open a YouTube video in single-pane Firefox and tap fullscreen; confirm
+  its picture is centered and subtitles remain adjacent to the picture.
+- Enable Maps + Cinema while still fullscreen; confirm the same video
+  continues playing, remains centered inside the Cinema pane, with Maps
+  unchanged on the left. Toggle split back without a new page load.
+- Test a portrait video and non-YouTube site if practical, and confirm
+  black bars are symmetrical rather than top-heavy.
+- Exit fullscreen and return to Maps / Cinema via the dock; check for
+  player time reset. Confirm audio and parked-only masking.
+- If still badly cropped, collect one post-fix log and note whether
+  `gecko: fullscreen video metadata available=true` appears. That tells
+  us whether Gecko supplied a real media aspect and whether the native
+  surface needs further correction.
