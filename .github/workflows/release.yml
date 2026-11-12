@@ -20,20 +20,33 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Write signing key and properties
+      - name: Verify and write signing credentials
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > mycar-release.jks
-          cat > keystore.properties <<EOF
-          storeFile=mycar-release.jks
-          storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}
-          keyAlias=${{ secrets.KEYSTORE_KEY_ALIAS }}
-          keyPassword=${{ secrets.KEYSTORE_KEY_PASSWORD }}
-          EOF
+          set -euo pipefail
+          if [[ -z "$KEYSTORE_BASE64" || -z "$KEYSTORE_STORE_PASSWORD" ||
+                -z "$KEYSTORE_KEY_ALIAS" || -z "$KEYSTORE_KEY_PASSWORD" ]]; then
+            echo "Release signing is missing. Configure the four KEYSTORE_* GitHub Actions secrets before tagging."
+            exit 1
+          fi
+          umask 077
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > mycar-release.jks
+          printf 'storeFile=mycar-release.jks\\nstorePassword=%s\\nkeyAlias=%s\\nkeyPassword=%s\\n' \\
+            "$KEYSTORE_STORE_PASSWORD" "$KEYSTORE_KEY_ALIAS" "$KEYSTORE_KEY_PASSWORD" > keystore.properties
+          keytool -list -keystore mycar-release.jks \\
+            -storepass:env KEYSTORE_STORE_PASSWORD -alias "$KEYSTORE_KEY_ALIAS" > /dev/null \\
+            || { echo "Release keystore cannot be opened with the configured credentials"; exit 1; }
 
       - name: Build release APK and optional GeckoView bundle
         run: |
           version="${GITHUB_REF_NAME#v}"
-          ./gradlew :app:assembleRelease :app:bundleRelease "-PmyCarVersionName=$version"
+          version_code=$((50 + GITHUB_RUN_NUMBER))
+          ./gradlew :app:assembleRelease :app:bundleRelease \\
+            "-PmyCarVersionName=$version" "-PmyCarVersionCode=$version_code"
 
       # Use the same signing key for the base and the on-demand Android split APKs.
       # A mismatched key or version is refused by Android PackageInstaller.
