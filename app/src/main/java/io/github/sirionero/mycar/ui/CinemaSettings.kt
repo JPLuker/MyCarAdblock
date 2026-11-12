@@ -92,7 +92,8 @@ internal fun CinemaSection() {
     val extensionManagementBusy by CinemaSignedXpi.managementBusy.collectAsState()
     val extensionPermissionRequest by CinemaExtensionConsent.pending.collectAsState()
     var removeExtensionAsk by remember { mutableStateOf<io.github.sirionero.mycar.cinema.CinemaInstalledExtension?>(null) }
-    LaunchedEffect(geckoInstalled) { if (geckoInstalled) CinemaSignedXpi.refresh(context) }
+    // Do not initialize native Gecko merely because the phone Settings page is open.
+    // The user can explicitly refresh the add-on list or complete an XPI import.
     LaunchedEffect(signedXpiStatus) {
         if (geckoInstalled && signedXpiStatus is CinemaSignedXpi.Status.Installed)
             CinemaSignedXpi.refresh(context)
@@ -332,10 +333,18 @@ internal fun CinemaSection() {
                         color = MaterialTheme.colorScheme.error,
                     )
                 }
-                Text(
-                    stringResource(R.string.settings_cinema_extension_list_header),
-                    style = MaterialTheme.typography.titleSmall,
-                )
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.settings_cinema_extension_list_header),
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(
+                        onClick = { CinemaSignedXpi.refresh(context) },
+                        enabled = !extensionManagementBusy &&
+                            signedXpiStatus !is CinemaSignedXpi.Status.Installing,
+                    ) { Text(stringResource(R.string.settings_cinema_extension_refresh)) }
+                }
                 if (userExtensions.isEmpty()) {
                     Text(
                         stringResource(R.string.settings_cinema_extension_list_empty),
