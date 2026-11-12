@@ -346,7 +346,8 @@ internal fun CinemaSection() {
                     TextButton(
                         onClick = { CinemaSignedXpi.refresh(context) },
                         enabled = !extensionManagementBusy &&
-                            signedXpiStatus !is CinemaSignedXpi.Status.Installing,
+                            signedXpiStatus !is CinemaSignedXpi.Status.Installing &&
+                            signedXpiStatus !is CinemaSignedXpi.Status.Reading,
                     ) { Text(stringResource(R.string.settings_cinema_extension_refresh)) }
                 }
                 if (userExtensions.isEmpty()) {
@@ -375,12 +376,14 @@ internal fun CinemaSection() {
                         Switch(
                             checked = extension.enabled,
                             enabled = !extensionManagementBusy &&
-                                signedXpiStatus !is CinemaSignedXpi.Status.Installing,
+                                signedXpiStatus !is CinemaSignedXpi.Status.Installing &&
+                                signedXpiStatus !is CinemaSignedXpi.Status.Reading,
                             onCheckedChange = { CinemaSignedXpi.setEnabled(context, extension.id, it) },
                         )
                         IconButton(
                             enabled = !extensionManagementBusy &&
-                                signedXpiStatus !is CinemaSignedXpi.Status.Installing,
+                                signedXpiStatus !is CinemaSignedXpi.Status.Installing &&
+                                signedXpiStatus !is CinemaSignedXpi.Status.Reading,
                             onClick = { removeExtensionAsk = extension },
                         ) {
                             Icon(
