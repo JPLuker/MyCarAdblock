@@ -20,3 +20,9 @@ internal object CinemaBrowserPolicy {
             CinemaBrowserEngine.ANDROID_WEBVIEW
         }
 }
+
+/** Only an explicit choice to disable blocking may bypass an interrupted uBO attempt. */
+internal object CinemaGeckoAttemptPolicy {
+    fun shouldStart(adBlockEnabled: Boolean, interrupted: Boolean): Boolean =
+        !adBlockEnabled || !interrupted
+}
