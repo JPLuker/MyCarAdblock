@@ -146,8 +146,16 @@ internal fun CarDock(navigator: CarNavigator, modifier: Modifier = Modifier) {
         Spacer(Modifier.height(MyCarSpace.S))
         BoxWithConstraints(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
             val slots = buildList {
+                // An off-screen route instruction remains the highest-priority dock slot.
                 turn?.let { t -> add(DockSlot("turn") { DockTurn(t) { navigator.home() } }) }
                 add(DockSlot("map") { DockMap(navigator, entries, running) })
+                // Cinema is a built-in screen, not an external RunningSlot. After switching
+                // to Maps its icon used to vanish altogether, leaving no direct return.
+                // Put it ahead of media/pinned apps: on an 800x480 map view the two
+                // available middle slots are enough for Map and return-to-Cinema.
+                if (navigator.cinemaOpened && navigator.current != CarScreen.App("cinema")) {
+                    add(DockSlot("cinema_resume") { DockCinema(navigator) })
+                }
                 if (mediaShown) add(DockSlot("media") { DockNowPlaying(navigator) })
                 (pinned + open).forEach { entry ->
                     entry.componentId?.let { id -> add(DockSlot(id) { DockApp(entry, running, navigator, frame) }) }
@@ -344,6 +352,27 @@ private fun DockMap(navigator: CarNavigator, entries: List<Entry>, running: Map<
         } else {
             GlassTile(MyCarPalette.Accent, R.drawable.sym_navigation, MyCarSize.DockIcon, glyphSize = DockGlyph)
         }
+    }
+}
+
+/**
+ * A persistent return-to-Cinema shortcut once Cinema has been opened in this connection.
+ * Going to Maps must not strand a retained GeckoView/WebView session with no dock button.
+ */
+@Composable
+private fun DockCinema(navigator: CarNavigator) {
+    DockItem(
+        selected = navigator.current == CarScreen.App("cinema"),
+        onClick = { navigator.open("cinema") },
+        description = "Cinema",
+        running = true,
+    ) {
+        GlassTile(
+            MyCarPalette.Warning,
+            R.drawable.sym_movie,
+            MyCarSize.DockIcon,
+            glyphSize = DockGlyph,
+        )
     }
 }
 
