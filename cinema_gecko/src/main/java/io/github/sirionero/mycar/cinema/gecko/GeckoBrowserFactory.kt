@@ -315,6 +315,15 @@ private class RunningSession(
         sponsorFailureFor = requested
         MyCarLog.w("gecko: SponsorBlock unavailable: $reason", "CINEMA")
         Cinema.reportSponsorBlockError(reason)
+        if (!requested) {
+            // A failed opt-out is not optional: SponsorBlock may still be running
+            // against YouTube. Never claim it was disabled or continue browsing.
+            pause()
+            CinemaGeckoAttemptGuard.finish(context)
+            onFailure("Firefox could not disable SponsorBlock. Use Android WebView or retry after restarting Firefox.")
+            return
+        }
+        // Failed opt-in is harmless to the existing page, so preserve browser access.
         applyBlockingIfNeeded()
     }
 
