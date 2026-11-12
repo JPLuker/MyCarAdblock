@@ -345,6 +345,7 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, active: Boolean, 
             // INVISIBLE keeps the original WebView attached and its DOM/seek position alive,
             // without drawing stale video above Home or other projected car screens.
             view.visibility = View.INVISIBLE
+            view.clearFocus()
             fieldText = null
             fullScreen?.second?.onCustomViewHidden()
             fullScreen = null
