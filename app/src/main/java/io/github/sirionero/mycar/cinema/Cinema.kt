@@ -32,6 +32,7 @@ object Cinema {
     private const val KEY_AD_BLOCK = "cinema_ad_block"
     private const val KEY_SPONSOR_BLOCK = "cinema_sponsor_block"
     private const val KEY_BROWSER_ENGINE = "cinema_browser_engine"
+    private const val KEY_BACKGROUND_AUDIO = "cinema_background_audio"
 
     /** To start with, until the driver changes the list: sites whose video shows in the car. */
     val SUGGESTED = listOf(
@@ -70,6 +71,7 @@ object Cinema {
     private val sponsorBlockFlow = MutableStateFlow(false)
     private val sponsorBlockErrorFlow = MutableStateFlow<String?>(null)
     private val browserEngineFlow = MutableStateFlow(CinemaBrowserEngine.ANDROID_WEBVIEW)
+    private val backgroundAudioFlow = MutableStateFlow(false)
 
     val sites: StateFlow<List<CinemaSite>> = sitesFlow.asStateFlow()
 
@@ -88,6 +90,9 @@ object Cinema {
     /** Preferred website engine; the UI falls back to WebView if the optional split is absent. */
     val browserEngine: StateFlow<CinemaBrowserEngine> = browserEngineFlow.asStateFlow()
 
+    /** Keep Firefox audio playing while Maps is foreground; default OFF. */
+    val backgroundAudio: StateFlow<Boolean> = backgroundAudioFlow.asStateFlow()
+
     fun init(context: Context) {
         val app = context.applicationContext.also { this.app = it }
         val saved = AppSettings.getString(app, KEY_SITES, "")
@@ -95,6 +100,7 @@ object Cinema {
         parkedOnlyFlow.value = AppSettings.getString(app, KEY_PARKED_ONLY, "true") == "true"
         adBlockFlow.value = AppSettings.getString(app, KEY_AD_BLOCK, "true") == "true"
         sponsorBlockFlow.value = AppSettings.getString(app, KEY_SPONSOR_BLOCK, "false") == "true"
+        backgroundAudioFlow.value = AppSettings.getString(app, KEY_BACKGROUND_AUDIO, "false") == "true"
         sponsorBlockErrorFlow.value = null
         browserEngineFlow.value = CinemaBrowserEngine.fromStored(
             AppSettings.getString(app, KEY_BROWSER_ENGINE, CinemaBrowserEngine.ANDROID_WEBVIEW.storageValue),
@@ -131,6 +137,11 @@ object Cinema {
 
     fun reportSponsorBlockError(reason: String?) {
         sponsorBlockErrorFlow.value = reason
+    }
+
+    fun setBackgroundAudio(on: Boolean) {
+        backgroundAudioFlow.value = on
+        app?.let { AppSettings.putString(it, KEY_BACKGROUND_AUDIO, on.toString()) }
     }
 
     fun setBrowserEngine(engine: CinemaBrowserEngine) {
