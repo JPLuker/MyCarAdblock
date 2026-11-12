@@ -64,6 +64,11 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -563,11 +568,30 @@ internal fun CinemaBar(
                 modifier = Modifier.weight(1f),
             )
             if (onToggleSplit != null) {
-                TextButton(onClick = onToggleSplit) {
-                    Text(
-                        stringResource(if (split) R.string.cinema_full_width else R.string.cinema_map_split),
-                        style = MaterialTheme.typography.labelSmall,
-                        maxLines = 1,
+                // The car bar has very little horizontal space. Use a two-pane symbol instead
+                // of "Map + Cinema" / "Full width", with the full action label retained
+                // for accessibility. The active split is highlighted like other controls.
+                val splitAction = stringResource(
+                    if (split) R.string.cinema_full_width else R.string.cinema_map_split,
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(CHROME_BAR + MyCarSpace.S)
+                        .clickable(onClick = onToggleSplit)
+                        .semantics {
+                            role = Role.Button
+                            contentDescription = splitAction
+                            selected = split
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.sym_split_view),
+                        contentDescription = null,
+                        modifier = Modifier.size(22.dp),
+                        tint = if (split) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
