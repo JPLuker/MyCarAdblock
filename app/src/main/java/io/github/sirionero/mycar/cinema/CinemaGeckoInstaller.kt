@@ -109,6 +109,65 @@ object CinemaGeckoInstaller {
         }, "mycar-gecko-download").start()
     }
 
+    /**
+     * Debug APKs cannot install the official release split (different application ID and key).
+     * For device verification, import the matching ZIP from the very same Actions build.
+     * This is deliberately absent from release APKs and never enables code from raw archives:
+     * Android's PackageInstaller still checks the package, version and signing certificate.
+     */
+    fun importDebugSplit(context: Context, source: Uri) {
+        if (!BuildConfig.DEBUG) return
+        if (flow.value is Status.Checking || flow.value is Status.Downloading ||
+            flow.value is Status.Installing) return
+        val app = context.applicationContext
+        cancelled.set(false)
+        flow.value = Status.Checking
+        Thread({
+            val partial = File(directory(app), "$ASSET.part")
+            try {
+                directory(app).mkdirs()
+                receipt(app).delete()
+                archive(app).delete()
+                partial.delete()
+                val digest = MessageDigest.getInstance("SHA-256")
+                var bytes = 0L
+                val input = app.contentResolver.openInputStream(source)
+                    ?: throw IOException("Cannot open the selected feature ZIP")
+                input.use { sourceStream ->
+                    partial.outputStream().use { output ->
+                        val buffer = ByteArray(64 * 1024)
+                        while (true) {
+                            if (cancelled.get()) throw InterruptedException()
+                            val count = sourceStream.read(buffer)
+                            if (count < 0) break
+                            bytes += count
+                            if (bytes > ZIP_MAX_BYTES) throw IOException("Oversized feature ZIP")
+                            digest.update(buffer, 0, count)
+                            output.write(buffer, 0, count)
+                        }
+                    }
+                }
+                if (cancelled.get()) throw InterruptedException()
+                val zip = archive(app)
+                if (!partial.renameTo(zip)) throw IOException("Could not finalize imported ZIP")
+                validateSplitArchive(zip)
+                val hash = digest.digest().joinToString("") { "%02x".format(it) }
+                saveReceipt(app, Asset("", bytes, hash))
+                flow.value = Status.Downloaded(bytes)
+            } catch (_: InterruptedException) {
+                archive(app).delete()
+                receipt(app).delete()
+                flow.value = Status.Idle
+            } catch (error: Exception) {
+                archive(app).delete()
+                receipt(app).delete()
+                flow.value = Status.Failed(error.message ?: "Could not import the test engine")
+            } finally {
+                partial.delete()
+            }
+        }, "mycar-gecko-debug-import").start()
+    }
+
     fun cancel(context: Context) {
         cancelled.set(true)
         // Network request is bounded by timeouts. Its thread removes the partial file.
