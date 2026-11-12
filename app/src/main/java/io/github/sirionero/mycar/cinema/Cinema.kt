@@ -107,7 +107,12 @@ object Cinema {
 
     fun setAdBlockEnabled(on: Boolean) {
         adBlockFlow.value = on
-        app?.let { AppSettings.putString(it, KEY_AD_BLOCK, on.toString()) }
+        app?.let {
+            AppSettings.putString(it, KEY_AD_BLOCK, on.toString())
+            // Turning blocking off is the explicit, safe recovery path after an
+            // interrupted Firefox add-on startup. Do not clear this on app launch.
+            if (!on) CinemaGeckoAttemptGuard.finish(it)
+        }
     }
 
     fun setBrowserEngine(engine: CinemaBrowserEngine) {
