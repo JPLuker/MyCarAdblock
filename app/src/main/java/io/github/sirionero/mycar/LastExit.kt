@@ -72,7 +72,9 @@ internal object LastExit {
         val stamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date(exit.timestamp))
         MyCarLog.endPastRun(
             exit.pid, exit.timestamp,
-            "${MyCarLog.ENDED} ${reasonName(exit.reason)} at $stamp" + exit.description?.let { ": $it" }.orEmpty(),
+            "${MyCarLog.ENDED} ${reasonName(exit.reason)} at $stamp" +
+                exit.description?.let { ": $it" }.orEmpty() +
+                if (exit.reason == ApplicationExitInfo.REASON_CRASH_NATIVE) nativeFootnote(exit) else "",
         )
     }
 
@@ -93,6 +95,47 @@ internal object LastExit {
             ApplicationExitInfo.REASON_ANR -> exit.traceInputStream?.use { anr(it.bufferedReader().readLines()) }
         }
     }
+
+
+    /**
+     * The log file from the crashed drive is usually the one the driver shares. Android only
+     * supplies its native tombstone after the next launch, so append a bounded signal and
+     * stack excerpt to that *earlier* log as well. No website URLs, memory maps, token data,
+     * or arbitrary logcat content is copied from the tombstone.
+     */
+    private fun nativeFootnote(exit: ApplicationExitInfo): String = runCatching {
+        val bytes = exit.traceInputStream?.use { input ->
+            val limited = input.readNBytes(4 * 1024 * 1024 + 1)
+            if (limited.size > 4 * 1024 * 1024) return@runCatching "\\n--- Native tombstone too large to include"
+            limited
+        } ?: return@runCatching ""
+        val top = Proto.fields(bytes)
+        val crashedThread = top.varint(6)
+        val thread = top.all(16).map { Proto.fields(it) }
+            .firstOrNull { it.varint(1) == crashedThread }?.message(2)
+        buildString {
+            top.message(10)?.let { signal ->
+                append("\\n--- Native signal: ")
+                append(signal.string(2).take(48))
+                append(" (")
+                append(signal.string(4).take(64))
+                append(")")
+            }
+            thread?.all(4)?.take(10)?.forEachIndexed { index, raw ->
+                val frame = Proto.fields(raw)
+                val library = frame.string(6).substringAfterLast('/').take(96)
+                val function = frame.string(4).take(120)
+                append("\\n--- Native frame #")
+                append(index)
+                append(": ")
+                append(library)
+                if (function.isNotBlank()) {
+                    append(" ")
+                    append(function)
+                }
+            }
+        }
+    }.getOrDefault("")
 
     private fun reasonName(reason: Int): String = when (reason) {
         ApplicationExitInfo.REASON_EXIT_SELF -> "exited by itself"
