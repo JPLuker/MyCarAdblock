@@ -106,11 +106,19 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         // installation may be necessary on the first launch, and is asynchronous.
         try {
             CinemaUBlock.ensure(context, runtime, adBlock, onReady = {
-                MyCarLog.i("gecko: add-on ready; loading website", "CINEMA")
-                session.loadUri(url)
+                if (!result.isClosed) {
+                    MyCarLog.i("gecko: add-on ready; loading website", "CINEMA")
+                    runCatching { session.loadUri(url) }
+                        .onFailure {
+                            MyCarLog.e("gecko: navigation failed", it, "CINEMA")
+                            onFailure("Firefox could not navigate to the website.")
+                        }
+                }
             }, onError = {
-                MyCarLog.w("gecko: add-on initialization failed: $it", "CINEMA")
-                onFailure(it)
+                if (!result.isClosed) {
+                    MyCarLog.w("gecko: add-on initialization failed: $it", "CINEMA")
+                    onFailure(it)
+                }
             })
         } catch (failure: Exception) {
             MyCarLog.e("gecko: add-on initialization threw", failure, "CINEMA")
@@ -126,6 +134,8 @@ private class RunningSession(
     override val view: GeckoView,
     private val onKeyboard: (String?) -> Unit,
 ) : CinemaBrowserSession {
+    @Volatile var isClosed: Boolean = false
+        private set
     var hasBack = false
     var activeMedia: MediaSession? = null
     override val canGoBack: Boolean get() = hasBack
@@ -173,6 +183,8 @@ private class RunningSession(
 
     override fun exitFullScreen() { session.exitFullScreen() }
     override fun close() {
+        if (isClosed) return
+        isClosed = true
         onKeyboard(null)
         activeMedia = null
         view.releaseSession()
