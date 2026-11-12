@@ -483,4 +483,13 @@
     <string name="settings_cinema_engine_restart_short">Restart to enable</string>
     <string name="settings_cinema_sponsorblock">SponsorBlock (Firefox)</string>
     <string name="settings_cinema_sponsorblock_detail">Skips known sponsored segments within YouTube videos. Optional; requires Firefox GeckoView.</string>
+    <string name="settings_cinema_extensions_header">Firefox extensions</string>
+    <string name="settings_cinema_extension_import_detail">Select a Mozilla-signed XPI only from a developer you trust. Extensions can read and change website data.</string>
+    <string name="settings_cinema_extension_import">Install signed extension (.xpi)</string>
+    <string name="settings_cinema_extension_reading">Reading extension file…</string>
+    <string name="settings_cinema_extension_installing">Installing signed extension…</string>
+    <string name="settings_cinema_extension_installed">Installed extension: %1$s</string>
+    <string name="settings_cinema_extension_consent_title">Allow this Firefox extension?</string>
+    <string name="settings_cinema_extension_consent_detail">Review the extension ID and requested permissions or website access before installing.</string>
+    <string name="settings_cinema_extension_consent_accept">Install extension</string>
 </resources>
