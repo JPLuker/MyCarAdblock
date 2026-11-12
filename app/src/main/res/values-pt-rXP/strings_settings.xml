@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="settings_cinema_background_audio">Áudio em segundo plano</string>
+    <string name="settings_cinema_background_audio_detail">Manter o áudio do Firefox ao mudar para Mapas. Desativado por padrão.</string>
     <string name="settings_support_title">Apoie a travessia</string>
     <string name="settings_support_footer">O myCar é livre como o mar: gratuito, sem anúncios e sem rastreamento. Seu apoio mantém as velas no alto.</string>
     <string name="settings_usage_notes_title">Notas de bordo</string>
