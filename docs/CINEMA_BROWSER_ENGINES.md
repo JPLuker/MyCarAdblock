@@ -31,27 +31,37 @@ it must not prevent testing or delivering the GitHub-release implementation.
 - [x] Document product goals and accurate fork/upstream lineage.
 - [x] **M1:** Save engine choice, display both options in all nine supported languages,
       select installed engine only, and keep WebView fallback if the split is absent.
-- [ ] **M2 (implementation committed; unverified):** Optional arm64 `:cinema_gecko` dynamic
-      feature, pinned GeckoView dependency, base title resource, R8 factory keep rule,
-      release workflow bundletool signing and packaging, independent split-archive tests.
-      **Cannot mark complete without actual APK/bundle build and signature/size audit.**
-- [ ] **M3 (implementation committed; unverified):** Exact-version release lookup, SHA-256
-      integrity verification, on-demand download progress/cancel, PackageInstaller split session,
-      private install callback, install/permission/error UI. **Needs real on-device install test.**
+- [ ] **M2 (debug packaging proven, release still pending):** Optional arm64 `:cinema_gecko`
+      feature with real GeckoView, bundletool-signed master/ABI APKs and the original base APK,
+      CI native-library exclusion and compiled-manifest startup checks. The signed
+      **debug** split ZIP has been produced by CI; signed **release** delivery, update
+      compatibility and on-device split installation still require verification.
+- [ ] **M3 (source and debug import committed; phone verification pending):**
+      Exact-version release lookup, streamed/atomic SHA-256-checked download, re-hash before
+      install, optional file import on debug builds, PackageInstaller split session,
+      private callback, permission consent and error/retry UI. Test by choosing the matching
+      feature ZIP from the same debug build in Settings > Cinema and installing it on Android.
 - [ ] **M4 (implementation committed; unverified):** Optional GeckoView session, Cinema view
       selection, navigation, single-surface new links, fullscreen, input connection for car keyboard,
       car audio pause, official Mozilla-signed uBlock Origin XPI installation and daily update
       checks. **Needs API compile and real video/site tests.**
-- [ ] **M5:** Validate WebView/Gecko parity, APK upgrades, crashes, video playback, and
-      car hardware; submit upstream PR and note F-Droid signing limitation.
+- [ ] **M5:** Base-only launch/onboarding and Android emulator startup are checked.
+      Still validate WebView/Gecko parity, signed feature installation, APK upgrades,
+      crashes, video playback and car hardware; submit to SirioNero/MyCar with
+      the F-Droid signing caveat.
 
 ---
 
-**Status:** The implementation is pushed on the draft branch, but no Android build,
-signed APK set or installed uBlock Origin instance has been verified. Tests for the
-split-archive packager and browser fallback are committed, not confirmed passing in Android CI.
-DO NOT MERGE OR RELEASE UNTIL M2–M5 ARE VALIDATED. GitHub Actions has returned no workflow
-runs for this branch, and this environment has no Android SDK for a local Gradle build.
+**Status (November 11, 2026):** The **base-only debug APK launches and completes
+onboarding on a real phone**, confirmed by Joseph after the manifest crash fix. An Android
+34 emulator smoke test also installed, launched and reopened that base APK successfully.
+The next test branch has compiled a matching **debug-only signed GeckoView feature ZIP**
+containing the master module and ARM64 engine, and the outer ZIP is now compressed to
+avoid more than 100 MB of unnecessary download bytes. Debug-only Settings can import
+the ZIP from the *same Actions build as the debug APK*. This test installation has
+NOT yet been performed on a real device; full Firefox session/uBlock Origin behavior,
+screen projection, release-signed downloads, and upgrade/rollback behavior remain unverified.
+DO NOT MERGE OR RELEASE until those tests pass.
 **Scope:** Cinema websites only. Preserve myCar's existing WebViews (music, dashboard, etc.)
 and the native media/IPTV player.
 
