@@ -336,10 +336,14 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, active: Boolean, 
     LaunchedEffect(active, web) {
         val view = web ?: return@LaunchedEffect
         if (active) {
+            view.visibility = View.VISIBLE
             view.onResume()
         } else {
             CinemaNow.pausePage(view).invoke()
             view.onPause()
+            // INVISIBLE keeps the original WebView attached and its DOM/seek position alive,
+            // without drawing stale video above Home or other projected car screens.
+            view.visibility = View.INVISIBLE
             fieldText = null
             fullScreen?.second?.onCustomViewHidden()
             fullScreen = null
