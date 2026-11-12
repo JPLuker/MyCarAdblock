@@ -349,3 +349,64 @@ Do not interpret the earlier successful Firefox screenshot as proof that
 this subsequent add-on batch builds, that SponsorBlock skips segments,
 that a user-signed XPI imports, or that uBlock's OFF state is correct.
 All of those are **pending**.
+
+
+## November 12, 15:08–15:09 — fullscreen, split and dock acceptance
+
+**User-supplied Car Preview screenshots** establish that Firefox's YouTube
+video is playing (visible frames and subtitles), browser fullscreen displays
+a video-only surface with an escape button, and the existing Map + Cinema
+mode shows live navigation and the website side by side. The user identified
+two specific remaining defects:
+
+- On tapping the **Maps dock icon**, Cinema's return shortcut disappears.
+  Root cause in source: Cinema is a built-in `CarScreen.App("cinema")`,
+  not an external `RunningSlot`; dock app slots only included media,
+  running apps, and pinned apps. On 800x480 there may only be two free
+  middle dock slots.
+- While a video was fullscreen, `CarUi` forcibly disabled the map/Cinema
+  split using `navigator.cinemaSplit && !navigator.cinemaVideoFullscreen`.
+  A fullscreen video therefore always expanded over the map instead of
+  remaining inside the Cinema pane, and the normal split control was
+  hidden with the site toolbar.
+
+**Fixes committed to `feature/cinema-adblock` (build/device unverified):**
+
+1. `CarNavigator` remembers whether Cinema has been opened during this
+   car connection. When returning to Maps, a dedicated Cinema dock slot
+   appears immediately after Map and before media/pinned shortcuts.
+   Tapping it calls `navigator.open("cinema")`, returning to the
+   existing composed browser session rather than loading a new page.
+   Off-screen turn instructions retain first dock priority.
+2. `CarUi` honors `navigator.cinemaSplit` independently of video fullscreen.
+   In split mode, fullscreen video remains bounded to the Cinema 56%
+   pane, with Maps occupying the left 44%. In single-pane mode, fullscreen
+   still uses the available screen beside the persistent left dock.
+3. `CinemaExitFullscreen` now also shows a two-pane icon, so the user
+   can toggle Map + Cinema **while already fullscreen**. Both GeckoView
+   and Android WebView share this overlay.
+4. Unit tests in `CarNavigatorCinemaTest` cover retaining the Cinema
+   shortcut after Home/Map navigation and preserving the split
+   preference across fullscreen transitions.
+
+**Car Preview / parked-car test after successful new build:**
+
+1. Open Firefox/YouTube and a video. Enable Map + Cinema, then press
+   YouTube fullscreen. The map must remain visible, with the video
+   filling the Cinema pane only. The car's dock should stay visible.
+2. While still fullscreen, use the new split icon to switch between
+   single-pane and split; the video must continue without restarting,
+   and exiting fullscreen must return to the YouTube page.
+3. Tap the **Map dock icon** to view Map alone. A dedicated Cinema
+   icon must now be visible in the dock. Tap it to return to the
+   **same** video and check playback position. No new webpage load.
+4. Repeat once with Android WebView to verify the same split/fullscreen
+   controls. Check at 800x480 and the actual head-unit viewport.
+5. Check parked-only safety: with the setting enabled, video
+   content must be concealed whenever the car is moving. Verify only
+   when parked or via a safe simulation, never by handling video
+   while driving.
+
+**Not yet established:** actual head-unit behavior, uninterrupted
+audio, exact player seek position after navigation, extension effects,
+and latest CI results. PR stays draft pending confirmation.
