@@ -8,6 +8,7 @@ import android.view.KeyEvent
 import io.github.sirionero.mycar.MyCarLog
 import io.github.sirionero.mycar.cinema.CinemaBrowserFactory
 import io.github.sirionero.mycar.cinema.CinemaBrowserSession
+import io.github.sirionero.mycar.cinema.CinemaGeckoAttemptGuard
 import org.mozilla.geckoview.AllowOrDeny
 import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoRuntime
@@ -118,6 +119,9 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         MyCarLog.i("gecko: requesting signed uBlock Origin initialization", "CINEMA")
         try {
             CinemaUBlock.ensure(context, runtime, adBlock, onReady = {
+                // The add-on either initialized successfully or returned a handled error.
+                // A native process exit before either callback leaves the durable checkpoint.
+                CinemaGeckoAttemptGuard.finish(context)
                 if (!result.isClosed) {
                     MyCarLog.i("gecko: add-on ready; loading website", "CINEMA")
                     runCatching { session.loadUri(url) }
@@ -127,12 +131,14 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
                         }
                 }
             }, onError = {
+                CinemaGeckoAttemptGuard.finish(context)
                 if (!result.isClosed) {
                     MyCarLog.w("gecko: add-on initialization failed: $it", "CINEMA")
                     onFailure(it)
                 }
             })
         } catch (failure: Exception) {
+            CinemaGeckoAttemptGuard.finish(context)
             MyCarLog.e("gecko: add-on initialization threw", failure, "CINEMA")
             onFailure("Firefox add-on initialization failed. Open the myCar log for details.")
         }
