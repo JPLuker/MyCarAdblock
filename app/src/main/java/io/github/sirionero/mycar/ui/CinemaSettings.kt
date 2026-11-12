@@ -188,7 +188,7 @@ internal fun CinemaSection() {
                     geckoStatus is CinemaGeckoInstaller.Status.Downloaded ->
                         R.string.settings_cinema_engine_gecko_downloaded
                     geckoStatus is CinemaGeckoInstaller.Status.Installing ->
-                        R.string.settings_cinema_engine_installing
+                        R.string.settings_cinema_engine_installing_short
                     geckoStatus is CinemaGeckoInstaller.Status.RestartRequired ->
                         R.string.settings_cinema_engine_restart_short
                     else -> R.string.settings_cinema_engine_gecko_pending
