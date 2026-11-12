@@ -101,6 +101,10 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
             }
             override fun onFullScreen(session: GeckoSession, fullScreen: Boolean) {
                 if (!result.isClosed) {
+                    // Distinguish a real Gecko document-fullscreen exit from a host
+                    // layout glitch. A TRUE -> FALSE pair immediately after a
+                    // split-mode resize is the regression we are investigating.
+                    MyCarLog.i("gecko: document fullscreen=$fullScreen", "CINEMA")
                     if (!fullScreen) onFullScreenAspect(null)
                     onFullScreen(fullScreen)
                 }
