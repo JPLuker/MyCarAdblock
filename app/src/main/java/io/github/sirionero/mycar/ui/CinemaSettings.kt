@@ -28,6 +28,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -61,11 +63,20 @@ import io.github.sirionero.mycar.cinema.CinemaGeckoInstaller
 internal fun CinemaSection() {
     val context = LocalContext.current
     val geckoStatus by CinemaGeckoInstaller.status.collectAsState()
+    // Android's unknown-app-source permission is changed on an external Settings screen.
+    // Snapshotting it only when status changes leaves the old "Allow install" label visible
+    // after the user returns. Refresh on each foreground resume instead.
+    var canInstallPackages by remember(context) {
+        mutableStateOf(context.packageManager.canRequestPackageInstalls())
+    }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        canInstallPackages = context.packageManager.canRequestPackageInstalls()
+        CinemaGeckoInstaller.refresh(context)
+    }
     // Signed debug APKs need the optional split ZIP from the exact same CI run.
     val testGeckoPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) CinemaGeckoInstaller.importDebugSplit(context, uri)
     }
-    LaunchedEffect(Unit) { CinemaGeckoInstaller.refresh(context) }
     val geckoInstalled = CinemaGeckoInstaller.ready(context)
     val sites by Cinema.sites.collectAsState()
     val parkedOnly by Cinema.parkedOnly.collectAsState()
@@ -180,14 +191,14 @@ internal fun CinemaSection() {
                     }
                     is CinemaGeckoInstaller.Status.Downloaded -> {
                         Button(onClick = {
-                            if (context.packageManager.canRequestPackageInstalls()) {
+                            if (canInstallPackages) {
                                 CinemaGeckoInstaller.install(context)
                             } else {
                                 CinemaGeckoInstaller.askInstallPermission(context)
                             }
                         }) {
                             Text(stringResource(
-                                if (context.packageManager.canRequestPackageInstalls()) R.string.settings_cinema_engine_install
+                                if (canInstallPackages) R.string.settings_cinema_engine_install
                                 else R.string.settings_cinema_engine_allow_install,
                             ))
                         }
