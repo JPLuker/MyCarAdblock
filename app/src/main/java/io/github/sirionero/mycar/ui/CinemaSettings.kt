@@ -87,7 +87,16 @@ internal fun CinemaSection() {
     }
     val geckoInstalled = CinemaGeckoInstaller.ready(context)
     val signedXpiStatus by CinemaSignedXpi.status.collectAsState()
+    val userExtensions by CinemaSignedXpi.installed.collectAsState()
+    val manageExtensionMessage by CinemaSignedXpi.managementMessage.collectAsState()
+    val extensionManagementBusy by CinemaSignedXpi.managementBusy.collectAsState()
     val extensionPermissionRequest by CinemaExtensionConsent.pending.collectAsState()
+    var removeExtensionAsk by remember { mutableStateOf<io.github.sirionero.mycar.cinema.CinemaInstalledExtension?>(null) }
+    LaunchedEffect(geckoInstalled) { if (geckoInstalled) CinemaSignedXpi.refresh(context) }
+    LaunchedEffect(signedXpiStatus) {
+        if (geckoInstalled && signedXpiStatus is CinemaSignedXpi.Status.Installed)
+            CinemaSignedXpi.refresh(context)
+    }
     val xpiPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) CinemaSignedXpi.importDocument(context, uri)
     }
@@ -300,7 +309,7 @@ internal fun CinemaSection() {
                 Button(
                     enabled = signedXpiStatus !is CinemaSignedXpi.Status.Reading &&
                         signedXpiStatus !is CinemaSignedXpi.Status.Installing,
-                    onClick = { xpiPicker.launch(arrayOf("application/x-xpinstall", "application/zip", "application/octet-stream")) },
+                    onClick = { xpiPicker.launch(arrayOf("*/*")) },
                 ) { Text(stringResource(R.string.settings_cinema_extension_import)) }
                 when (val state = signedXpiStatus) {
                     CinemaSignedXpi.Status.Reading -> Text(stringResource(R.string.settings_cinema_extension_reading))
@@ -315,6 +324,58 @@ internal fun CinemaSection() {
                         color = MaterialTheme.colorScheme.error,
                     )
                     else -> Unit
+                }
+                if (manageExtensionMessage != null) {
+                    Text(
+                        manageExtensionMessage ?: "",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+                Text(
+                    stringResource(R.string.settings_cinema_extension_list_header),
+                    style = MaterialTheme.typography.titleSmall,
+                )
+                if (userExtensions.isEmpty()) {
+                    Text(
+                        stringResource(R.string.settings_cinema_extension_list_empty),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                userExtensions.forEach { extension ->
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(extension.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
+                            Text(
+                                "${extension.version} · ${extension.id}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                        Switch(
+                            checked = extension.enabled,
+                            enabled = !extensionManagementBusy &&
+                                signedXpiStatus !is CinemaSignedXpi.Status.Installing,
+                            onCheckedChange = { CinemaSignedXpi.setEnabled(context, extension.id, it) },
+                        )
+                        IconButton(
+                            enabled = !extensionManagementBusy &&
+                                signedXpiStatus !is CinemaSignedXpi.Status.Installing,
+                            onClick = { removeExtensionAsk = extension },
+                        ) {
+                            Icon(
+                                Icons.Filled.Delete,
+                                contentDescription = stringResource(R.string.settings_cinema_extension_remove),
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -364,6 +425,28 @@ internal fun CinemaSection() {
             }
         }
         MoreSitesRow()
+    }
+
+    val deletingExtension = removeExtensionAsk
+    if (deletingExtension != null) {
+        AlertDialog(
+            onDismissRequest = { removeExtensionAsk = null },
+            title = { Text(stringResource(R.string.settings_cinema_extension_remove_title)) },
+            text = {
+                Text(stringResource(R.string.settings_cinema_extension_remove_detail, deletingExtension.name))
+            },
+            confirmButton = {
+                Button(onClick = {
+                    CinemaSignedXpi.uninstall(context, deletingExtension.id)
+                    removeExtensionAsk = null
+                }) { Text(stringResource(R.string.settings_cinema_extension_remove)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { removeExtensionAsk = null }) {
+                    Text(stringResource(R.string.common_cancel))
+                }
+            },
+        )
     }
 
     val pendingExtension = extensionPermissionRequest
