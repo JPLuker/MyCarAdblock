@@ -29,10 +29,20 @@ echo "$created"
 session=$(sed -n 's/.*\[\([0-9][0-9]*\)\].*/\1/p' <<< "$created")
 test -n "$session" || { echo "Could not create inherit-existing install session"; exit 1; }
 adb shell pm install-write -S "$SIZE" "$session" cinema_gecko-master.apk /data/local/tmp/cinema_gecko-master.apk
-committed=$(adb shell pm install-commit "$session" | tr -d '\r')
-session=""
+# pm install-commit returns a nonzero exit status on failure; preserve its output.
+# With set -e the assignment otherwise exits before recording the Android error.
+set +e
+committed=$(adb shell pm install-commit "$session" 2>&1 | tr -d '\r')
+result=${PIPESTATUS[0]}
+set -e
+echo "PackageInstaller commit exit code: $result"
 echo "$committed"
-[[ "$committed" == Success* ]] || { echo "Optional feature install commit failed"; exit 1; }
+session=""
+if (( result != 0 )) || [[ "$committed" != Success* ]]; then
+  echo "FAIL: Android rejected the optional master split"
+  adb shell pm path "$PKG" || true
+  exit 1
+fi
 adb shell pm path "$PKG" | grep -qi 'cinema_gecko' || {
   echo "Optional GeckoView feature master is absent after install."
   adb shell pm path "$PKG"
