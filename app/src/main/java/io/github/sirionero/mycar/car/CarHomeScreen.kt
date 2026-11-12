@@ -72,7 +72,7 @@ import kotlinx.coroutines.launch
  * full-width map once nothing is playing.
  */
 @Composable
-fun CarHome() {
+fun CarHome(forceMapOnly: Boolean = false) {
     val frame by CarEnvironment.frame.collectAsStateWithLifecycle()
     val navStatus by CarServices.nav.status.collectAsStateWithLifecycle()
     val phase by CarServices.media.phase.collectAsStateWithLifecycle()
@@ -140,7 +140,7 @@ fun CarHome() {
     LaunchedEffect(musicOn) { if (musicOn) CarServices.musicCame() }
     val reserved = starting && sideChoice == SidePaneChoice.MUSIC && sideApp == null && mediaApp != null &&
         phase != CarMedia.Phase.REJECTED
-    val splitScreen = panel != SidePanel.NONE && (sideApp != null || musicShown || reserved)
+    val splitScreen = !forceMapOnly && panel != SidePanel.NONE && (sideApp != null || musicShown || reserved)
     // The music beside the map at the size chosen for it (Small, Medium, Large): an app's own screen
     // there keeps its size.
     val playerSize by CarSettings.playerSize.collectAsStateWithLifecycle()
