@@ -40,7 +40,9 @@ android {
         applicationId = "io.github.sirionero.mycar"
         minSdk = 31
         targetSdk = 37
-        versionCode = 50
+        // Release CI supplies a monotonically increasing code, while normal local/debug
+        // builds remain compatible with upstream's current development version.
+        versionCode = project.findProperty("myCarVersionCode")?.toString()?.toIntOrNull() ?: 50
         // -PmyCarVersionName=0.1.99-test makes a build that thinks it's older, to try the updater.
         versionName = project.findProperty("myCarVersionName")?.toString() ?: "0.7.4-alpha"
         manifestPlaceholders["appLabel"] = "myCar"
