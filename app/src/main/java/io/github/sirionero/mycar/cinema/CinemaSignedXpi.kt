@@ -240,10 +240,5 @@ object CinemaSignedXpi {
             Status.Failed(error ?: "Firefox did not confirm extension installation.")
         }
         inProgress.set(false)
-        if (error == null && !id.isNullOrBlank()) {
-            // Refresh from the Gecko profile rather than trusting the just-imported filename.
-            // Signed XPI files are cached only until Gecko confirms installation.
-            // Caller supplies no context here; Settings refreshes when it resumes.
-        }
     }
 }
