@@ -107,6 +107,7 @@ internal fun CinemaSection() {
     val sponsorBlockEnabled by Cinema.sponsorBlockEnabled.collectAsState()
     val sponsorBlockError by Cinema.sponsorBlockError.collectAsState()
     val browserEngine by Cinema.browserEngine.collectAsState()
+    val backgroundAudio by Cinema.backgroundAudio.collectAsState()
     var warning by remember { mutableStateOf(false) }
     var resetAsk by remember { mutableStateOf(false) }
     var name by rememberSaveable { mutableStateOf("") }
@@ -135,6 +136,15 @@ internal fun CinemaSection() {
             icon = if (parkedOnly) Icons.Filled.PlayArrow else Icons.Filled.Warning,
             tint = if (parkedOnly) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
             trailing = { Switch(checked = parkedOnly, onCheckedChange = null) },
+        )
+        SettingsDivider()
+        SettingsRow(
+            stringResource(R.string.settings_cinema_background_audio),
+            Modifier.toggleable(backgroundAudio, role = Role.Switch) {
+                Cinema.setBackgroundAudio(it)
+            },
+            subtitle = stringResource(R.string.settings_cinema_background_audio_detail),
+            trailing = { Switch(checked = backgroundAudio, onCheckedChange = null) },
         )
         SettingsDivider()
         SettingsRow(
