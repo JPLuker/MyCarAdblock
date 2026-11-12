@@ -45,7 +45,7 @@ object CinemaGeckoInstaller {
     private const val ASSET = "myCar-gecko-arm64-v8a.zip"
     private const val ZIP_MAX_BYTES = 450L * 1024 * 1024
     private const val APK_MAX_BYTES = 400L * 1024 * 1024
-    private val APK_NAMES = setOf("cinema_gecko-master.apk", "cinema_gecko-config.arm64_v8a.apk")
+    private val APK_NAMES = setOf("cinema_gecko-master.apk", "cinema_gecko-arm64_v8a.apk")
     private const val CALLBACK_REQUEST = 7321
 
     private val flow = MutableStateFlow<Status>(Status.Idle)
