@@ -105,9 +105,16 @@ internal object LastExit {
      */
     private fun nativeFootnote(exit: ApplicationExitInfo): String = runCatching {
         val bytes = exit.traceInputStream?.use { input ->
-            val limited = input.readNBytes(4 * 1024 * 1024 + 1)
-            if (limited.size > 4 * 1024 * 1024) return@runCatching "\\n--- Native tombstone too large to include"
-            limited
+            val cap = 4 * 1024 * 1024
+            val output = java.io.ByteArrayOutputStream()
+            val buffer = ByteArray(64 * 1024)
+            while (output.size() <= cap) {
+                val count = input.read(buffer)
+                if (count < 0) break
+                output.write(buffer, 0, count)
+            }
+            if (output.size() > cap) return@runCatching "\n--- Native tombstone too large to include"
+            output.toByteArray()
         } ?: return@runCatching ""
         val top = Proto.fields(bytes)
         val crashedThread = top.varint(6)
@@ -115,7 +122,7 @@ internal object LastExit {
             .firstOrNull { it.varint(1) == crashedThread }?.message(2)
         buildString {
             top.message(10)?.let { signal ->
-                append("\\n--- Native signal: ")
+                append("\n--- Native signal: ")
                 append(signal.string(2).take(48))
                 append(" (")
                 append(signal.string(4).take(64))
@@ -125,7 +132,7 @@ internal object LastExit {
                 val frame = Proto.fields(raw)
                 val library = frame.string(6).substringAfterLast('/').take(96)
                 val function = frame.string(4).take(120)
-                append("\\n--- Native frame #")
+                append("\n--- Native frame #")
                 append(index)
                 append(": ")
                 append(library)
