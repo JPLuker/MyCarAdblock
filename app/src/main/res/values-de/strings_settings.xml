@@ -367,4 +367,6 @@
     <string name="cinema_exit_fullscreen">Vollbild beenden</string>
     <string name="settings_cinema_engine_restart_required">Firefox ist installiert. Beende myCar Debug in den Android-Einstellungen und öffne es erneut, bevor du Firefox auswählst.</string>
     <string name="settings_cinema_engine_restart_short">Neustart erforderlich</string>
+    <string name="settings_cinema_sponsorblock">SponsorBlock (Firefox)</string>
+    <string name="settings_cinema_sponsorblock_detail">Überspringt bekannte Sponsorensegmente in YouTube-Videos. Optional; erfordert Firefox GeckoView.</string>
 </resources>
