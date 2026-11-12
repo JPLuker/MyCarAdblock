@@ -196,4 +196,4 @@ jobs:
           api-level: 34
           arch: x86_64
           target: google_apis
-          script: bash tools/cinema-smoke.sh
+          script: bash tools/cinema-smoke.sh && bash tools/cinema-split-smoke.sh
