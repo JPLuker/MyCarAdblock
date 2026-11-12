@@ -41,6 +41,7 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
     val parkedOnly by Cinema.parkedOnly.collectAsState()
     val adBlockEnabled by Cinema.adBlockEnabled.collectAsState()
     val sponsorBlockEnabled by Cinema.sponsorBlockEnabled.collectAsState()
+    val backgroundAudio by Cinema.backgroundAudio.collectAsState()
     val allowed = !parkedOnly || rememberVideoAllowed()
     var browser by remember { mutableStateOf<CinemaBrowserSession?>(null) }
     var fieldText by remember { mutableStateOf<String?>(null) }
@@ -82,10 +83,9 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
     }
 
     // A hidden GeckoView keeps its open session and playback position; no navigation reload.
-    LaunchedEffect(active, browser) {
-        browser?.setVisible(active)
+    LaunchedEffect(active, browser, backgroundAudio) {
+        browser?.setVisible(active, backgroundAudio)
         if (!active) {
-            browser?.pause()
             browser?.view?.clearFocus()
             if (fullScreen) {
                 browser?.exitFullScreen()
