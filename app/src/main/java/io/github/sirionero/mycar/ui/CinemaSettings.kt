@@ -1,5 +1,7 @@
 package io.github.sirionero.mycar.ui
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -40,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import io.github.sirionero.mycar.BuildConfig
 import io.github.sirionero.mycar.R
 import io.github.sirionero.mycar.cinema.Cinema
 import io.github.sirionero.mycar.cinema.CinemaSite
@@ -57,6 +60,10 @@ import io.github.sirionero.mycar.cinema.CinemaGeckoInstaller
 internal fun CinemaSection() {
     val context = LocalContext.current
     val geckoStatus by CinemaGeckoInstaller.status.collectAsState()
+    // Signed debug APKs need the optional split ZIP from the exact same CI run.
+    val testGeckoPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) CinemaGeckoInstaller.importDebugSplit(context, uri)
+    }
     LaunchedEffect(Unit) { CinemaGeckoInstaller.refresh(context) }
     val geckoInstalled = geckoStatus is CinemaGeckoInstaller.Status.Installed || CinemaGeckoBridge.installed(context)
     val sites by Cinema.sites.collectAsState()
@@ -150,7 +157,10 @@ internal fun CinemaSection() {
                         }
                     }
                     CinemaGeckoInstaller.Status.Checking -> {
-                        Text(stringResource(R.string.settings_cinema_engine_checking))
+                        Text(stringResource(
+                            if (BuildConfig.DEBUG) R.string.settings_cinema_engine_importing
+                            else R.string.settings_cinema_engine_checking,
+                        ))
                         LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                         TextButton(onClick = { CinemaGeckoInstaller.cancel(context) }) {
                             Text(stringResource(R.string.common_cancel))
@@ -173,12 +183,30 @@ internal fun CinemaSection() {
                     CinemaGeckoInstaller.Status.Installing -> Text(stringResource(R.string.settings_cinema_engine_installing))
                     is CinemaGeckoInstaller.Status.Failed -> {
                         Text(status.reason, color = MaterialTheme.colorScheme.error)
-                        Button(onClick = { CinemaGeckoInstaller.download(context) }) {
+                        Button(onClick = {
+                            if (BuildConfig.DEBUG) testGeckoPicker.launch(arrayOf("application/zip", "application/octet-stream"))
+                            else CinemaGeckoInstaller.download(context)
+                        }) {
                             Text(stringResource(R.string.settings_cinema_engine_retry))
                         }
                     }
-                    else -> Button(onClick = { CinemaGeckoInstaller.download(context) }) {
-                        Text(stringResource(R.string.settings_cinema_engine_download))
+                    else -> {
+                        Button(onClick = {
+                            if (BuildConfig.DEBUG) testGeckoPicker.launch(arrayOf("application/zip", "application/octet-stream"))
+                            else CinemaGeckoInstaller.download(context)
+                        }) {
+                            Text(stringResource(
+                                if (BuildConfig.DEBUG) R.string.settings_cinema_engine_import_zip
+                                else R.string.settings_cinema_engine_download,
+                            ))
+                        }
+                        if (BuildConfig.DEBUG) {
+                            Text(
+                                stringResource(R.string.settings_cinema_engine_import_hint),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
             }
