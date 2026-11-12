@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="settings_cinema_background_audio">Background audio</string>
+    <string name="settings_cinema_background_audio_detail">Keep Firefox audio playing when you switch to Maps. Off by default.</string>
     <string name="settings_support_title">Back the voyage</string>
     <string name="settings_support_footer">myCar is free, with no ads and no tracking. Your backing keeps the ship afloat.</string>
     <string name="settings_usage_notes_title">Voyage notes</string>
