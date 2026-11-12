@@ -138,7 +138,11 @@
     <string name="settings_cinema_engine_import_hint">使用与此 APK 同一次 GitHub Actions 构建生成的 GeckoView ZIP。</string>
     <string name="settings_cinema_engine_importing">正在读取测试引擎 ZIP…</string>
     <string name="settings_cinema_engine_download">下载 Firefox 引擎</string>
-    <string name="settings_cinema_engine_gecko_pending">此版本暂不支持下载可选浏览器</string>
+    <string name="settings_cinema_engine_gecko_downloaded">ZIP 已就绪，可以安装</string>
+    <string name="settings_cinema_engine_signing_error">此 Firefox ZIP 与已安装的 myCar Debug 不匹配。</string>
+    <string name="settings_cinema_engine_signing_help">请使用同一次 Actions 构建的 APK 和 ZIP。可能需要卸载旧调试版，调试版设置将被清除。</string>
+    <string name="settings_cinema_engine_choose_matching_zip">选择匹配的 ZIP</string>
+    <string name="settings_cinema_engine_gecko_pending">未安装</string>
     <string name="settings_cinema_ad_block">拦截广告和追踪器</string>
     <string name="settings_cinema_ad_block_detail">在 Cinema 网站中拦截已知的广告和追踪服务器。部分视频广告仍可能出现。</string>
     <string name="settings_cinema_parked_only">仅停车时显示视频</string>
