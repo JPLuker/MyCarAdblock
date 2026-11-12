@@ -33,6 +33,7 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
     val context = LocalContext.current
     val navigator = LocalCarNavigator.current
     val parkedOnly by Cinema.parkedOnly.collectAsState()
+    val adBlockEnabled by Cinema.adBlockEnabled.collectAsState()
     val allowed = !parkedOnly || rememberVideoAllowed()
     var browser by remember { mutableStateOf<CinemaBrowserSession?>(null) }
     var fieldText by remember { mutableStateOf<String?>(null) }
@@ -40,6 +41,12 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
     var failure by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) { CarAudio.askAgainOnce(); CarAudio.captureNow() }
+
+    // Apply ON/OFF to the live Gecko profile without destroying the browser session.
+    // Changing this setting while a video is playing must not navigate to YouTube anew.
+    LaunchedEffect(browser, adBlockEnabled) {
+        browser?.setAdBlockEnabled(adBlockEnabled)
+    }
 
     DisposableEffect(browser, active) {
         if (!active) return@DisposableEffect onDispose { }
@@ -115,7 +122,13 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
                         instance.view
                     }
                 },
-                onRelease = { browser?.close(); browser = null },
+                onRelease = { releasedView ->
+                    // Only close the session that actually owns the released AndroidView.
+                    // Never tear down a newer session after a rapid engine/site switch.
+                    val released = browser?.takeIf { it.view === releasedView }
+                    released?.close()
+                    if (released != null) browser = null
+                },
             )
             if (fullScreen) {
                 Box(Modifier.align(androidx.compose.ui.Alignment.TopEnd)) {
