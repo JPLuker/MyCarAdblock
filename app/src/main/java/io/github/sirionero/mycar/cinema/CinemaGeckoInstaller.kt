@@ -38,6 +38,8 @@ object CinemaGeckoInstaller {
         data class Downloaded(val bytes: Long) : Status
         data object Installing : Status
         data object Installed : Status
+        /** Android has accepted a split, but the running process's class/native paths are stale. */
+        data object RestartRequired : Status
         data class Failed(val reason: String, val signingMismatch: Boolean = false) : Status
     }
 
@@ -57,6 +59,9 @@ object CinemaGeckoInstaller {
     private fun receipt(context: Context): File = File(directory(context), "verified.json")
 
     fun refresh(context: Context) {
+        // Returning to Settings after PackageInstaller reports success must not re-enable a
+        // new dynamic feature on the old process ClassLoader. Only a new process may do that.
+        if (flow.value is Status.RestartRequired) return
         if (CinemaGeckoBridge.installed(context)) {
             flow.value = Status.Installed
             return
@@ -71,6 +76,11 @@ object CinemaGeckoInstaller {
             }
         }
     }
+
+    fun ready(context: Context): Boolean =
+        CinemaGeckoBridge.installed(context) &&
+            flow.value !is Status.RestartRequired &&
+            flow.value !is Status.Installing
 
     /** Explicitly started from Settings on the phone, never automatically on first launch. */
     fun download(context: Context) {
@@ -267,8 +277,11 @@ object CinemaGeckoInstaller {
             PackageInstaller.STATUS_SUCCESS -> {
                 archive(context).delete()
                 receipt(context).delete()
-                flow.value = if (CinemaGeckoBridge.installed(context)) Status.Installed
-                    else Status.Failed("Android installed the engine. Restart myCar to finish enabling it.")
+                flow.value = if (CinemaGeckoBridge.installed(context)) {
+                    Status.RestartRequired
+                } else {
+                    Status.Failed("Android reported success but the feature is missing. Restart myCar.")
+                }
             }
             else -> {
                 val message = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE).orEmpty()
