@@ -190,7 +190,14 @@ internal fun CinemaSection() {
                             ))
                         }
                     }
-                    CinemaGeckoInstaller.Status.Installing -> Text(stringResource(R.string.settings_cinema_engine_installing))
+                    CinemaGeckoInstaller.Status.Installing ->
+                        Text(stringResource(R.string.settings_cinema_engine_installing))
+                    CinemaGeckoInstaller.Status.RestartRequired ->
+                        Text(
+                            stringResource(R.string.settings_cinema_engine_restart_required),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     is CinemaGeckoInstaller.Status.Failed -> {
                         Text(
                             if (status.signingMismatch) {
