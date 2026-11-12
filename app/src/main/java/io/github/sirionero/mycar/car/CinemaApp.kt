@@ -450,6 +450,15 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, active: Boolean, 
                     onRelease = { it.removeAllViews() },
                 )
             }
+            if (fullScreen != null) {
+                Box(Modifier.align(Alignment.TopEnd)) {
+                    CinemaExitFullscreen {
+                        fullScreen?.second?.onCustomViewHidden()
+                    fullScreen = null
+                        navigator.cinemaVideoFullscreen = false
+                    }
+                }
+            }
             if (offHomeNetwork) {
                 HomeNetworkCover(onRetry = {
                     offHomeNetwork = false
@@ -487,6 +496,33 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, active: Boolean, 
         }
     }
     LaunchedEffect(Unit) { MyCarLog.i("cinema: opening ${site.host}${if (site.desktop) " as on a computer" else ""}") }
+}
+
+/** A local escape control when a website hides its own UI in fullscreen.
+ * Unlike letting a web video take Android's entire window, the car's dock remains usable. */
+@Composable
+internal fun CinemaExitFullscreen(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier.padding(MyCarSpace.S),
+        contentAlignment = Alignment.CenterEnd,
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            shape = RoundedCornerShape(MyCarRadius.M),
+            modifier = Modifier.align(Alignment.TopEnd)
+                .size(CHROME_BAR)
+                .clickable(onClick = onClick),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    Icons.Filled.Close,
+                    stringResource(R.string.cinema_exit_fullscreen),
+                    Modifier.size(22.dp),
+                )
+            }
+        }
+    }
 }
 
 /** The slim bar over a site: back a page, its name, and Close back to the sites. */
