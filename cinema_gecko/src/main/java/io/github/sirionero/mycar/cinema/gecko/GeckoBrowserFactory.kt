@@ -5,6 +5,7 @@ import android.content.ContextWrapper
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.ViewGroup
 import java.util.concurrent.atomic.AtomicBoolean
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.ExtractedTextRequest
@@ -39,6 +40,7 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         onVisited: (String) -> Unit,
         onKeyboard: (String?) -> Unit,
         onFullScreen: (Boolean) -> Unit,
+        onFullScreenAspect: (Float?) -> Unit,
         onFailure: (String) -> Unit,
     ): CinemaBrowserSession {
         MyCarLog.i("gecko: starting optional runtime; packaged GeckoView=${BuildConfig.GECKOVIEW_VERSION}", "CINEMA")
@@ -49,7 +51,14 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
             .viewportMode(if (desktop) GeckoSessionSettings.VIEWPORT_MODE_DESKTOP else GeckoSessionSettings.VIEWPORT_MODE_MOBILE)
             .build()
         val session = GeckoSession(options)
-        val view = GeckoView(context)
+        // Compose's AndroidView can change bounds as the car toggles split/fullscreen.
+        // Match its measured viewport exactly, not GeckoView's default WRAP_CONTENT.
+        val view = GeckoView(context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            )
+        }
         val result = RunningSession(context.applicationContext, runtime, session, view, url, onKeyboard, onFailure)
         session.navigationDelegate = object : GeckoSession.NavigationDelegate {
             // Cinema has one visible browser surface. Links that request a separate tab
@@ -91,7 +100,10 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
                 }
             }
             override fun onFullScreen(session: GeckoSession, fullScreen: Boolean) {
-                if (!result.isClosed) onFullScreen(fullScreen)
+                if (!result.isClosed) {
+                    if (!fullScreen) onFullScreenAspect(null)
+                    onFullScreen(fullScreen)
+                }
             }
             override fun onCrash(session: GeckoSession) {
                 if (!result.isClosed) {
@@ -106,6 +118,34 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
             }
             override fun onDeactivated(session: GeckoSession, mediaSession: MediaSession) {
                 if (result.activeMedia === mediaSession) result.activeMedia = null
+            }
+
+            override fun onFullscreen(
+                session: GeckoSession,
+                mediaSession: MediaSession,
+                enabled: Boolean,
+                meta: MediaSession.ElementMetadata?,
+            ) {
+                if (result.isClosed) return
+                // Mozilla Bug 1750416: a GeckoView confined to a sub-window can
+                // render video at the wrong fullscreen size. Gecko provides the
+                // actual video dimensions here, so the host can aspect-fit its
+                // *existing* GeckoView surface without restarting the webpage.
+                val aspect = if (enabled && meta != null &&
+                    meta.width > 0 && meta.height > 0
+                ) {
+                    (meta.width.toDouble() / meta.height.toDouble())
+                        .takeIf { it.isFinite() && it in 0.25..4.0 }
+                        ?.toFloat()
+                } else null
+                if (enabled) {
+                    MyCarLog.i(
+                        "gecko: fullscreen video metadata available=${aspect != null}; " +
+                            "recomputing Cinema pane viewport",
+                        "CINEMA",
+                    )
+                }
+                onFullScreenAspect(aspect)
             }
         }
         session.textInput.setDelegate(object : GeckoSession.TextInputDelegate {
