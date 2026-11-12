@@ -88,21 +88,21 @@
     <string name="settings_xonos_removed">Xonos went overboard from myCar: the Xonos app is back aboard, if it\'s on the phone.</string>
     <string name="settings_xonos_test_ok">Music Assistant %1$s, playing shanties as %2$s</string>
 
-    <string name="settings_cinema_footer">Video sites as tiles aboard, each opened in a browser made for video. Protected video (Netflix, DAZN, Prime Video, Disney+ and the like) most likely stays black aboard: Android hides it from a screen made into a video stream, as the helm is.</string>
-    <string name="settings_cinema_reset_title">Sail back to the suggested sites?</string>
-    <string name="settings_cinema_reset_text">Cinema sails back to %1$s.</string>
-    <string name="settings_cinema_reset_text_own">Cinema sails back to %1$s. Your own sites walk the plank: %2$s.</string>
+    <string name="settings_cinema_footer">Add websites to Cinema for playback aboard. Some protected streaming video may appear black.</string>
+    <string name="settings_cinema_reset_title">Restore the suggested ports of call?</string>
+    <string name="settings_cinema_reset_text">Restore the suggested sites: %1$s.</string>
+    <string name="settings_cinema_reset_text_own">Restore suggested sites (%1$s) and send your custom sites overboard (%2$s)?</string>
     <string name="settings_cinema_remove_title">Jettison %1$s?</string>
-    <string name="settings_cinema_remove_site_text">It goes overboard from Cinema. To haul it back, its address is typed in again.</string>
+    <string name="settings_cinema_remove_site_text">This site leaves Cinema. You can bring it aboard again later.</string>
     <string name="settings_cinema_remove">Jettison %1$s</string>
-    <string name="settings_cinema_protected">protected video, likely pitch black aboard</string>
+    <string name="settings_cinema_protected">protected video may not play aboard</string>
     <string name="settings_cinema_videos">Videos in this phone\'s hold</string>
-    <string name="settings_cinema_videos_ask">Allow myCar to show them aboard, under \"This phone\'s hold\"</string>
-    <string name="settings_cinema_videos_limited">Only the videos picked for myCar show aboard</string>
-    <string name="settings_cinema_videos_allowed">They show aboard, under \"This phone\'s hold\"</string>
-    <string name="settings_cinema_tv_footer">IPTV lists in the M3U format, from your provider, a public list or a TV server at home: each one is a tile in Cinema with its channels. They play on the phone\'s own player; protected channels (DRM) and multicast ones are left ashore.</string>
-    <string name="settings_cinema_tv_remove_text">Its address and its channels go overboard from myCar. To haul it back, the address is typed in again.</string>
-    <string name="settings_cinema_tv_loading">hauling aboard…</string>
+    <string name="settings_cinema_videos_ask">Allow videos from this phone to appear in Cinema.</string>
+    <string name="settings_cinema_videos_limited">Only selected videos are available in Cinema.</string>
+    <string name="settings_cinema_videos_allowed">Videos from this phone are available in Cinema.</string>
+    <string name="settings_cinema_tv_footer">Add an M3U playlist from a provider or your own server to browse its channels aboard. DRM-protected and multicast streams are not supported.</string>
+    <string name="settings_cinema_tv_remove_text">Remove this playlist and its channels from Cinema? You can add it again later.</string>
+    <string name="settings_cinema_tv_loading">Loading…</string>
 
     <string name="settings_phone_typing_close">Close the helm\'s keyboard</string>
     <string name="settings_phone_typing_label">Type for the helm</string>
