@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 /** Optional feature implementation, loaded only after Android confirms the Gecko split. */
 interface CinemaSignedXpiInstaller {
     fun install(context: Context, xpiFile: File, finished: (id: String?, error: String?) -> Unit)
+    fun cancel()
 }
 
 /**
@@ -85,10 +86,12 @@ object CinemaSignedXpi {
                 main.post {
                     state.value = Status.Installing
                     var finished = false
+                    var activeInstaller: CinemaSignedXpiInstaller? = null
                     val timeout = Runnable {
                         if (!finished) {
                             finished = true
                             CinemaExtensionConsent.decide(false)
+                            activeInstaller?.cancel()
                             complete(selectedFile, null, "Firefox extension installation timed out.")
                         }
                     }
@@ -96,6 +99,7 @@ object CinemaSignedXpi {
                     try {
                         val cls = Class.forName(FACTORY, true, app.classLoader)
                         val installer = cls.getDeclaredConstructor().newInstance() as CinemaSignedXpiInstaller
+                        activeInstaller = installer
                         installer.install(app, selectedFile) { id, error ->
                             main.post {
                                 if (!finished) {
