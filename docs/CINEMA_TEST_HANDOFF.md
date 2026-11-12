@@ -316,3 +316,36 @@ verification and a visual test.
 certificate/TLS self-tests and weather data only. It ends at
 12:56:00, with no `CINEMA`, `gecko:`, or playback events. It cannot
 corroborate or refute the later YouTube screenshot.
+
+
+## November 12 add-on implementation after first successful Firefox render
+
+Substantial source changes have been committed **after** the screenshot showing
+YouTube rendering in Firefox GeckoView. These changes have **not** passed
+independent CI or phone verification yet:
+
+- Changing ad blocking no longer recreates the Gecko browser/session. The
+  real, persistent uBlock Origin is enabled/disabled via GeckoView before
+  starting the initial page, and toggled without automatic navigation later.
+- Optional SponsorBlock (official Firefox add-on ID
+  `sponsorBlocker@ajay.app`, default OFF) has its own setting and daily
+  update check. Its install failure while enabling does not block browsing;
+  failed disabling is treated as an opt-out failure and prevents further
+  browsing under an unknown extension state.
+- Signed `.xpi` file import from Android's document picker, Mozilla
+  signature verification by GeckoView, explicit per-extension permission
+  review, extension list/enable/disable/uninstall, bounded private cache,
+  timeout cancellation and reserved curated IDs.
+- The shared Gecko permission delegate prevents the two official add-ons
+  and user-imported extensions from overwriting each other's prompts.
+- Additional runtime/session cleanup guards and Kotlin unit tests; source
+  parity of all new strings in the eight translated locales was checked,
+  but an actual Android/Gradle build was not available here.
+
+**See `docs/CINEMA_EXTENSIONS.md` for the complete security model,
+supported functionality, limits, and one-pass device test sequence.**
+
+Do not interpret the earlier successful Firefox screenshot as proof that
+this subsequent add-on batch builds, that SponsorBlock skips segments,
+that a user-signed XPI imports, or that uBlock's OFF state is correct.
+All of those are **pending**.
