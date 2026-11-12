@@ -50,30 +50,51 @@ internal object CinemaUBlock {
             MyCarLog.i("gecko: extension list returned", "CINEMA")
             val existing = extensions?.firstOrNull { it.id == EXTENSION_ID }
             if (existing != null && existing.metaData.enabled == enabled) {
+                MyCarLog.i("gecko: signed uBlock Origin already ${if (enabled) "enabled" else "disabled"}", "CINEMA")
                 if (enabled) checkForUpdate(context, controller, existing)
                 onReady()
             } else if (existing != null) {
+                MyCarLog.i("gecko: ${if (enabled) "enabling" else "disabling"} persisted signed uBlock Origin", "CINEMA")
                 val action = if (enabled) {
                     controller.enable(existing, WebExtensionController.EnableSource.USER)
                 } else {
                     controller.disable(existing, WebExtensionController.EnableSource.USER)
                 }
                 action.accept({ toggled ->
-                    if (toggled == null) {
-                        onError("uBlock Origin did not return an updated extension.")
+                    if (toggled == null || toggled.metaData.enabled != enabled) {
+                        onError("Firefox did not confirm the requested uBlock Origin state.")
                     } else {
+                        MyCarLog.i("gecko: signed uBlock Origin ${if (enabled) "enabled" else "disabled"}", "CINEMA")
                         if (enabled) checkForUpdate(context, controller, toggled)
                         onReady()
                     }
                 }, { failure -> onError("uBlock Origin could not be toggled: ${failure?.message ?: "unknown error"}") })
             } else if (!enabled) {
+                MyCarLog.i("gecko: uBlock Origin not installed; blocking OFF confirmed", "CINEMA")
                 onReady()
             } else {
                 MyCarLog.i("gecko: requesting Mozilla-signed uBO XPI", "CINEMA")
                 controller.install(OFFICIAL_XPI, WebExtensionController.INSTALLATION_METHOD_MANAGER)
                     .accept({ extension ->
                         if (extension?.id == EXTENSION_ID) {
-                            onReady()
+                            if (extension.metaData.enabled) {
+                                MyCarLog.i("gecko: signed uBlock Origin installed and enabled", "CINEMA")
+                                onReady()
+                            } else {
+                                // Successful download alone is not sufficient: extension might
+                                // be installed disabled. Enable it before loading any page.
+                                controller.enable(extension, WebExtensionController.EnableSource.USER)
+                                    .accept({ activated ->
+                                        if (activated != null && activated.metaData.enabled) {
+                                            MyCarLog.i("gecko: signed uBlock Origin activated after install", "CINEMA")
+                                            onReady()
+                                        } else {
+                                            onError("uBlock Origin installed but could not be enabled.")
+                                        }
+                                    }, { failure ->
+                                        onError("uBlock Origin was installed but enabling it failed: ${failure?.message ?: "unknown error"}")
+                                    })
+                            }
                         } else {
                             if (extension != null) controller.uninstall(extension)
                             onError("The downloaded add-on was not uBlock Origin.")
