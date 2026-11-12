@@ -107,6 +107,19 @@ jobs:
           cp "$map" "build/myCar-${GITHUB_REF_NAME}-mapping.txt"
           echo "mapping=build/myCar-${GITHUB_REF_NAME}-mapping.txt" >> "$GITHUB_OUTPUT"
 
+      - name: Verify release artifact set and write checksums
+        run: |
+          set -euo pipefail
+          test -s build/myCar-release.apk
+          test -s build/myCar-gecko-arm64-v8a.zip
+          test -s "build/myCar-${GITHUB_REF_NAME}-mapping.txt"
+          (
+            cd build
+            sha256sum myCar-release.apk myCar-gecko-arm64-v8a.zip \
+              "myCar-${GITHUB_REF_NAME}-mapping.txt" > SHA256SUMS.txt
+            sha256sum --check SHA256SUMS.txt
+          )
+
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
@@ -114,6 +127,7 @@ jobs:
             ${{ steps.apk.outputs.path }}
             ${{ steps.apk.outputs.mapping }}
             build/myCar-gecko-arm64-v8a.zip
+            build/SHA256SUMS.txt
           # The hand-written notes go first; GitHub adds the full changelog link under them.
           body_path: .github/release-notes.md
           generate_release_notes: true
