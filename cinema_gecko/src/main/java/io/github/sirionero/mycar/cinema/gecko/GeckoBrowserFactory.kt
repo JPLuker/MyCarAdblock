@@ -74,6 +74,15 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
             }
         }
         session.contentDelegate = object : GeckoSession.ContentDelegate {
+            override fun onFirstContentfulPaint(session: GeckoSession) {
+                // The Gecko thread has survived native startup and rendered real content.
+                // This is the earliest safe point to clear a *native* startup checkpoint.
+                // Extension readiness alone proved too early in physical crash logs.
+                if (!result.isClosed) {
+                    MyCarLog.i("gecko: first contentful paint; native startup checkpoint cleared", "CINEMA")
+                    CinemaGeckoAttemptGuard.finish(context)
+                }
+            }
             override fun onFullScreen(session: GeckoSession, fullScreen: Boolean) = onFullScreen(fullScreen)
             override fun onCrash(session: GeckoSession) {
                 MyCarLog.w("gecko: content process crashed; Java host is still running", "CINEMA")
@@ -131,7 +140,6 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
             }
         }
         if (!handler.postDelayed(timeout, 30_000L)) {
-            CinemaGeckoAttemptGuard.finish(context)
             onFailure("Firefox could not schedule add-on initialization. Use Android WebView.")
             return result
         }
@@ -143,7 +151,6 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
             CinemaUBlock.ensure(context, runtime, adBlock, onReady = {
                 if (completed.compareAndSet(false, true)) {
                     handler.removeCallbacks(timeout)
-                    CinemaGeckoAttemptGuard.finish(context)
                     if (!result.isClosed) {
                         MyCarLog.i("gecko: add-on ready; loading website", "CINEMA")
                         runCatching { session.loadUri(url) }
@@ -156,7 +163,6 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
             }, onError = { reason ->
                 if (completed.compareAndSet(false, true)) {
                     handler.removeCallbacks(timeout)
-                    CinemaGeckoAttemptGuard.finish(context)
                     if (!result.isClosed) {
                         MyCarLog.w("gecko: add-on initialization failed: $reason", "CINEMA")
                         onFailure(reason)
@@ -166,7 +172,6 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         } catch (failure: Exception) {
             if (completed.compareAndSet(false, true)) {
                 handler.removeCallbacks(timeout)
-                CinemaGeckoAttemptGuard.finish(context)
                 MyCarLog.e("gecko: add-on initialization threw", failure, "CINEMA")
                 if (!result.isClosed) {
                     onFailure("Firefox add-on initialization failed. Open the myCar log for details.")
