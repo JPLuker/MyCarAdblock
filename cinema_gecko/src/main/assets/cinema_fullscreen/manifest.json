@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "name": "myCar Cinema fullscreen alignment",
+  "version": "1.0.0",
+  "description": "Centers YouTube fullscreen video and captions inside narrow car-display panes.",
+  "browser_specific_settings": {
+    "gecko": { "id": "cinema-fullscreen@mycar.internal" }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://youtube.com/*", "*://*.youtube.com/*", "*://youtube-nocookie.com/*", "*://*.youtube-nocookie.com/*"],
+      "js": ["alignment.js"],
+      "all_frames": true,
+      "run_at": "document_idle"
+    }
+  ]
+}
