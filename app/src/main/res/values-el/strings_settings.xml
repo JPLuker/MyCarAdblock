@@ -367,4 +367,6 @@
     <string name="cinema_exit_fullscreen">Έξοδος από πλήρη οθόνη</string>
     <string name="settings_cinema_engine_restart_required">Το Firefox εγκαταστάθηκε. Κάντε αναγκαστική διακοπή του myCar Debug από τις ρυθμίσεις Android και ανοίξτε το ξανά.</string>
     <string name="settings_cinema_engine_restart_short">Επανεκκίνηση για ενεργοποίηση</string>
+    <string name="settings_cinema_sponsorblock">SponsorBlock (Firefox)</string>
+    <string name="settings_cinema_sponsorblock_detail">Παραλείπει γνωστά χορηγούμενα τμήματα στα βίντεο YouTube. Προαιρετικό· απαιτεί Firefox GeckoView.</string>
 </resources>
