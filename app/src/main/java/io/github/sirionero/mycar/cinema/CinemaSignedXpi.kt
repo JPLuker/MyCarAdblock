@@ -61,6 +61,9 @@ object CinemaSignedXpi {
     val installed: StateFlow<List<CinemaInstalledExtension>> = installedFlow.asStateFlow()
     private val managementMessageFlow = MutableStateFlow<String?>(null)
     val managementMessage: StateFlow<String?> = managementMessageFlow.asStateFlow()
+    private val managementBusyFlow = MutableStateFlow(false)
+    val managementBusy: StateFlow<Boolean> = managementBusyFlow.asStateFlow()
+    private val managing = AtomicBoolean(false)
     private val inProgress = AtomicBoolean(false)
     private val main = Handler(Looper.getMainLooper())
 
@@ -167,11 +170,14 @@ object CinemaSignedXpi {
     }
 
     fun setEnabled(context: Context, id: String, enabled: Boolean) {
-        if (!CinemaExtensionManagementPolicy.userManaged(id)) return
+        if (!CinemaExtensionManagementPolicy.userManaged(id) || !managing.compareAndSet(false, true)) return
+        managementBusyFlow.value = true
         runInstaller(context) { installer, app ->
             installer.setEnabled(app, id, enabled) { error ->
                 main.post {
                     managementMessageFlow.value = error
+                    managing.set(false)
+                    managementBusyFlow.value = false
                     refresh(app)
                 }
             }
@@ -179,11 +185,14 @@ object CinemaSignedXpi {
     }
 
     fun uninstall(context: Context, id: String) {
-        if (!CinemaExtensionManagementPolicy.userManaged(id)) return
+        if (!CinemaExtensionManagementPolicy.userManaged(id) || !managing.compareAndSet(false, true)) return
+        managementBusyFlow.value = true
         runInstaller(context) { installer, app ->
             installer.uninstall(app, id) { error ->
                 main.post {
                     managementMessageFlow.value = error
+                    managing.set(false)
+                    managementBusyFlow.value = false
                     refresh(app)
                 }
             }
@@ -202,6 +211,8 @@ object CinemaSignedXpi {
         } catch (failure: Exception) {
             MyCarLog.e("cinema: extension management could not start", failure, tag = "CINEMA")
             managementMessageFlow.value = "Firefox extension management is unavailable."
+            managing.set(false)
+            managementBusyFlow.value = false
         }
     }
 
