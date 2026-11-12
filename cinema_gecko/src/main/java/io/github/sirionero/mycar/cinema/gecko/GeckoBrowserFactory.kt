@@ -119,7 +119,7 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
                 if (reason == GeckoSession.TextInputDelegate.RESTART_REASON_BLUR) {
                     if (!result.isClosed) onKeyboard(null)
                 } else {
-                    onKeyboard(result.readInput())
+                    if (!result.isClosed) onKeyboard(result.readInput())
                 }
             }
         })
@@ -342,12 +342,13 @@ private class RunningSession(
             }
     }
 
-    private fun connection() = session.textInput.onCreateInputConnection(EditorInfo())
+    private fun connection() = if (isClosed) null else session.textInput.onCreateInputConnection(EditorInfo())
 
     fun readInput(): String = connection()
         ?.getExtractedText(ExtractedTextRequest(), 0)?.text?.toString().orEmpty()
 
     override fun setText(text: String) {
+        if (isClosed) return
         // The on-car keyboard supplies whole strings. Replace the current selection atomically
         // through Gecko's real input connection, not by injecting JavaScript into page content.
         connection()?.apply {
@@ -359,6 +360,7 @@ private class RunningSession(
     }
 
     override fun submitText() {
+        if (isClosed) return
         val input = connection()
         if (input?.performEditorAction(EditorInfo.IME_ACTION_GO) != true &&
             input?.performEditorAction(EditorInfo.IME_ACTION_DONE) != true) {
@@ -370,8 +372,8 @@ private class RunningSession(
         onKeyboard(null)
     }
 
-    override fun goBack() { if (hasBack) session.goBack() }
-    override fun reload() = session.reload()
+    override fun goBack() { if (!isClosed && hasBack) session.goBack() }
+    override fun reload() { if (!isClosed) session.reload() }
     // Inactive GeckoSession is a render-visibility hint, not an HTML video pause.
     override fun pause() {
         if (!isClosed) runCatching { activeMedia?.pause() }
@@ -387,7 +389,7 @@ private class RunningSession(
         view.visibility = if (visible) View.VISIBLE else View.INVISIBLE
     }
 
-    override fun exitFullScreen() { session.exitFullScreen() }
+    override fun exitFullScreen() { if (!isClosed) session.exitFullScreen() }
     override fun close() {
         if (isClosed) return
         isClosed = true
