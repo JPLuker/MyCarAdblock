@@ -39,6 +39,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -101,12 +102,17 @@ import kotlin.math.absoluteValue
 
 /** Cinema full screen, from the app grid: the phone's videos, the TV lists and the sites, or the one open. */
 @Composable
-internal fun CinemaScreen() {
+internal fun CinemaScreen(active: Boolean = true) {
     val context = LocalContext.current
     // Leaving Cinema, the music that was playing when it opened goes on (a film stopped it).
-    DisposableEffect(Unit) {
-        val music = CinemaMusic.opened()
-        onDispose { CinemaMusic.closed(music) }
+    // The whole Cinema screen stays composed as a parked page behind other car screens.
+    // Only audio focus follows foreground visibility; the browser instance is retained.
+    DisposableEffect(active) {
+        if (!active) onDispose { }
+        else {
+            val music = CinemaMusic.opened()
+            onDispose { CinemaMusic.closed(music) }
+        }
     }
     val sites by Cinema.sites.collectAsState()
     val preferredEngine by Cinema.browserEngine.collectAsState()
@@ -162,9 +168,9 @@ internal fun CinemaScreen() {
         else -> key(open.url, preferredEngine) {
             val engine = CinemaBrowserPolicy.active(preferredEngine, CinemaGeckoBridge.installed(context))
             if (engine == CinemaBrowserEngine.FIREFOX_GECKOVIEW) {
-                CinemaGeckoSiteView(open, startAt = startPage, onClose = { openUrl = null })
+                CinemaGeckoSiteView(open, startAt = startPage, active = active, onClose = { openUrl = null })
             } else {
-                CinemaSiteView(open, startAt = startPage, onClose = { openUrl = null })
+                CinemaSiteView(open, startAt = startPage, active = active, onClose = { openUrl = null })
             }
         }
     }
@@ -268,7 +274,7 @@ private fun InitialTile(site: CinemaSite, size: androidx.compose.ui.unit.Dp) {
  * full-screen video first, then steps back through the site, then goes back to the sites.
  */
 @Composable
-private fun CinemaSiteView(site: CinemaSite, startAt: String?, onClose: () -> Unit) {
+private fun CinemaSiteView(site: CinemaSite, startAt: String?, active: Boolean, onClose: () -> Unit) {
     val context = LocalContext.current
     val navigator = LocalCarNavigator.current
     val ring = String.format("#%06X", MaterialTheme.colorScheme.primary.toArgb() and 0xFFFFFF)
@@ -292,8 +298,9 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, onClose: () -> Un
     // Opened by the driver: a "no" earlier in the drive is asked once more (once a drive).
     LaunchedEffect(Unit) { CarAudio.askAgainOnce(); CarAudio.captureNow() }
 
-    DisposableEffect(web) {
-        navigator.backInterceptor = {
+    DisposableEffect(web, active) {
+        if (!active) return@DisposableEffect onDispose { }
+        val back: () -> Boolean = {
             val video = fullScreen
             val view = web
             when {
@@ -312,15 +319,36 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, onClose: () -> Un
                 }
             }
         }
+        navigator.backInterceptor = back
         // The car taking its speakers back for good (the radio): the site's video pauses, as the
         // player's film does. It has no media session for the phone's pause to reach, and ran on.
         val pause = web?.let(CinemaNow::pausePage)
         if (pause != null) CinemaNow.pause = pause
         onDispose {
-            navigator.backInterceptor = null
-            fullScreen?.second?.onCustomViewHidden()
+            if (navigator.backInterceptor === back) navigator.backInterceptor = null
             if (pause != null && CinemaNow.pause === pause) CinemaNow.pause = null
         }
+    }
+
+    // A switch to the map, apps, or settings pauses the video but does NOT destroy or reload
+    // its DOM. Returning uses the same Android WebView and the same currentTime/seek position.
+    // WebView.onPause is per-instance; do not pauseTimers(), which freezes unrelated pages.
+    LaunchedEffect(active, web) {
+        val view = web ?: return@LaunchedEffect
+        if (active) {
+            view.onResume()
+        } else {
+            CinemaNow.pausePage(view).invoke()
+            view.onPause()
+            fieldText = null
+            fullScreen?.second?.onCustomViewHidden()
+            fullScreen = null
+            navigator.cinemaVideoFullscreen = false
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose { navigator.cinemaVideoFullscreen = false }
     }
 
     // The computer layout chosen on the phone meanwhile: asked for again as one.
@@ -334,7 +362,13 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, onClose: () -> Un
 
     Column(Modifier.fillMaxSize()) {
         if (fullScreen == null) {
-            CinemaBar(site.name, onBack = { web?.takeIf { it.canGoBack() }?.goBack() ?: onClose() }, onClose = onClose)
+            CinemaBar(
+                site.name,
+                onBack = { web?.takeIf { it.canGoBack() }?.goBack() ?: onClose() },
+                onClose = onClose,
+                split = navigator.cinemaSplit,
+                onToggleSplit = navigator::toggleCinemaSplit,
+            )
         }
         Box(Modifier.weight(1f).fillMaxWidth()) {
             key(generation) {
@@ -369,13 +403,20 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, onClose: () -> Un
                             onGone = {
                                 web = null
                                 fullScreen = null
+                                navigator.cinemaVideoFullscreen = false
                                 fieldText = null
                                 generation++
                             },
                         )
                         webChromeClient = CinemaChrome(
-                            onShow = { view, callback -> fullScreen = view to callback },
-                            onHide = { fullScreen = null },
+                            onShow = { view, callback ->
+                                fullScreen = view to callback
+                                navigator.cinemaVideoFullscreen = true
+                            },
+                            onHide = {
+                                fullScreen = null
+                                navigator.cinemaVideoFullscreen = false
+                            },
                             onIcon = { SiteIcons.offer(ctx, site.host, it) },
                         )
                         addJavascriptInterface(
@@ -446,7 +487,13 @@ private fun CinemaSiteView(site: CinemaSite, startAt: String?, onClose: () -> Un
 
 /** The slim bar over a site: back a page, its name, and Close back to the sites. */
 @Composable
-internal fun CinemaBar(title: String, onBack: () -> Unit, onClose: () -> Unit) {
+internal fun CinemaBar(
+    title: String,
+    onBack: () -> Unit,
+    onClose: () -> Unit,
+    split: Boolean = false,
+    onToggleSplit: (() -> Unit)? = null,
+) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerLow,
         contentColor = MaterialTheme.colorScheme.onSurface,
@@ -467,6 +514,15 @@ internal fun CinemaBar(title: String, onBack: () -> Unit, onClose: () -> Unit) {
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
+            if (onToggleSplit != null) {
+                TextButton(onClick = onToggleSplit) {
+                    Text(
+                        stringResource(if (split) R.string.cinema_full_width else R.string.cinema_map_split),
+                        style = MaterialTheme.typography.labelSmall,
+                        maxLines = 1,
+                    )
+                }
+            }
             Box(
                 Modifier.fillMaxHeight().width(CHROME_BAR + MyCarSpace.S).clickable(onClick = onClose),
                 contentAlignment = Alignment.Center,
