@@ -416,11 +416,15 @@ private class RunningSession(
                 fullscreenAlignmentTimeout = timeout
                 handler.postDelayed(timeout, 8_000L)
                 CinemaFullscreenAlignment.ensure(runtime) {
-                    if (settled.compareAndSet(false, true)) {
-                        handler.removeCallbacks(timeout)
-                        fullscreenAlignmentTimeout = null
-                        fullscreenAlignmentReady = true
-                        if (!isClosed) startNavigationOnce()
+                    // GeckoResult callbacks can arrive off the UI thread; GeckoSession
+                    // navigation and the shared Compose session are main-thread state.
+                    handler.post {
+                        if (settled.compareAndSet(false, true)) {
+                            handler.removeCallbacks(timeout)
+                            fullscreenAlignmentTimeout = null
+                            fullscreenAlignmentReady = true
+                            if (!isClosed) startNavigationOnce()
+                        }
                     }
                 }
             }
