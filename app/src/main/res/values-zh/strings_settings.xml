@@ -361,4 +361,5 @@
     <string name="music_needs_qobuz">需要订阅 Qobuz。</string>
     <string name="cinema_map_split">地图 + Cinema</string>
     <string name="cinema_full_width">全屏宽度</string>
+    <string name="cinema_exit_fullscreen">退出全屏</string>
 </resources>
