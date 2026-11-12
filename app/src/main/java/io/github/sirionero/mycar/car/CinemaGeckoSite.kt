@@ -29,7 +29,7 @@ import io.github.sirionero.mycar.cinema.CinemaSite
  * An absent/crashed split can never prevent the normal WebView from opening the same site.
  */
 @Composable
-internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, onClose: () -> Unit) {
+internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boolean, onClose: () -> Unit) {
     val context = LocalContext.current
     val navigator = LocalCarNavigator.current
     val parkedOnly by Cinema.parkedOnly.collectAsState()
@@ -41,10 +41,11 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, onClose: ()
 
     LaunchedEffect(Unit) { CarAudio.askAgainOnce(); CarAudio.captureNow() }
 
-    DisposableEffect(browser) {
-        val pause = browser?.let { active -> { active.pause() } }
+    DisposableEffect(browser, active) {
+        if (!active) return@DisposableEffect onDispose { }
+        val pause = browser?.let { session -> { session.pause() } }
         if (pause != null) CinemaNow.pause = pause
-        navigator.backInterceptor = {
+        val back: () -> Boolean = {
             val current = browser
             when {
                 fullScreen -> { browser?.exitFullScreen(); fullScreen = false; true }
@@ -52,17 +53,37 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, onClose: ()
                 else -> { onClose(); true }
             }
         }
+        navigator.backInterceptor = back
         onDispose {
-            navigator.backInterceptor = null
+            if (navigator.backInterceptor === back) navigator.backInterceptor = null
             if (pause != null && CinemaNow.pause === pause) CinemaNow.pause = null
         }
     }
 
+    // A hidden GeckoView keeps its open session and playback position; no navigation reload.
+    LaunchedEffect(active, browser) {
+        if (!active) {
+            browser?.pause()
+            if (fullScreen) {
+                browser?.exitFullScreen()
+                fullScreen = false
+            }
+            fieldText = null
+            navigator.cinemaVideoFullscreen = false
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose { navigator.cinemaVideoFullscreen = false }
+    }
+
     Column(Modifier.fillMaxSize()) {
         if (!fullScreen) {
-            CinemaBar(site.name,
+            CinemaBar(
+                site.name,
                 onBack = { if (browser?.canGoBack == true) browser?.goBack() else onClose() },
                 onClose = onClose,
+                split = navigator.cinemaSplit,
+                onToggleSplit = navigator::toggleCinemaSplit,
             )
         }
         Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -76,7 +97,10 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, onClose: ()
                         adBlock = Cinema.adBlockEnabled.value,
                         onVisited = { url -> CinemaContinue.site(context, site, url) },
                         onKeyboard = { fieldText = it },
-                        onFullScreen = { fullScreen = it },
+                        onFullScreen = {
+                            fullScreen = it
+                            navigator.cinemaVideoFullscreen = it
+                        },
                         onFailure = { failure = it },
                     )
                     if (instance == null) {
