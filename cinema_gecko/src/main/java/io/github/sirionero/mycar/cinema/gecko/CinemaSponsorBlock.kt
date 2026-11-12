@@ -28,21 +28,7 @@ internal object CinemaSponsorBlock {
         onError: (String) -> Unit,
     ) {
         val controller = runtime.webExtensionController
-        controller.setPromptDelegate(object : WebExtensionController.PromptDelegate {
-            override fun onInstallPromptRequest(
-                extension: WebExtension,
-                permissions: Array<String>,
-                origins: Array<String>,
-                dataCollectionPermissions: Array<String>,
-            ): GeckoResult<WebExtension.PermissionPromptResponse> =
-                GeckoResult.fromValue(
-                    WebExtension.PermissionPromptResponse(
-                        enabled && extension.id == ID,
-                        false,
-                        false,
-                    ),
-                )
-        })
+        CinemaExtensionPrompts.allowOfficial(runtime, ID, enabled)
         controller.list().accept({ extensions ->
             val existing = extensions?.firstOrNull { it.id == ID }
             when {
