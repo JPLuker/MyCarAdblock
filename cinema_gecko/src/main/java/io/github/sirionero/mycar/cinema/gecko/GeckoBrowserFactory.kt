@@ -72,11 +72,12 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
                 perms: List<GeckoSession.PermissionDelegate.ContentPermission>,
                 hasUserGesture: Boolean,
             ) {
-                if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) onVisited(url)
+                if (!result.isClosed && url != null &&
+                    (url.startsWith("http://") || url.startsWith("https://"))) onVisited(url)
             }
 
             override fun onCanGoBack(session: GeckoSession, canGoBack: Boolean) {
-                result.hasBack = canGoBack
+                if (!result.isClosed) result.hasBack = canGoBack
             }
         }
         session.contentDelegate = object : GeckoSession.ContentDelegate {
@@ -84,20 +85,24 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
                 // The Gecko thread has survived native startup and rendered real content.
                 // This is the earliest safe point to clear a *native* startup checkpoint.
                 // Extension readiness alone proved too early in physical crash logs.
-                if (!result.isClosed) {
+                if (result.markFirstPaint()) {
                     MyCarLog.i("gecko: first contentful paint; native startup checkpoint cleared", "CINEMA")
                     CinemaGeckoAttemptGuard.finish(context)
                 }
             }
-            override fun onFullScreen(session: GeckoSession, fullScreen: Boolean) = onFullScreen(fullScreen)
+            override fun onFullScreen(session: GeckoSession, fullScreen: Boolean) {
+                if (!result.isClosed) onFullScreen(fullScreen)
+            }
             override fun onCrash(session: GeckoSession) {
-                MyCarLog.w("gecko: content process crashed; Java host is still running", "CINEMA")
-                onFailure("Firefox's page process stopped. Switch to Android WebView or try reopening this site.")
+                if (!result.isClosed) {
+                    MyCarLog.w("gecko: content process crashed; Java host is still running", "CINEMA")
+                    onFailure("Firefox's page process stopped. Switch to Android WebView or try reopening this site.")
+                }
             }
         }
         session.mediaSessionDelegate = object : MediaSession.Delegate {
             override fun onActivated(session: GeckoSession, mediaSession: MediaSession) {
-                result.activeMedia = mediaSession
+                if (!result.isClosed) result.activeMedia = mediaSession
             }
             override fun onDeactivated(session: GeckoSession, mediaSession: MediaSession) {
                 if (result.activeMedia === mediaSession) result.activeMedia = null
@@ -105,12 +110,14 @@ class GeckoBrowserFactory : CinemaBrowserFactory {
         }
         session.textInput.setDelegate(object : GeckoSession.TextInputDelegate {
             override fun showSoftInput(session: GeckoSession) {
-                onKeyboard(result.readInput())
+                if (!result.isClosed) onKeyboard(result.readInput())
             }
-            override fun hideSoftInput(session: GeckoSession) = onKeyboard(null)
+            override fun hideSoftInput(session: GeckoSession) {
+                if (!result.isClosed) onKeyboard(null)
+            }
             override fun restartInput(session: GeckoSession, reason: Int) {
                 if (reason == GeckoSession.TextInputDelegate.RESTART_REASON_BLUR) {
-                    onKeyboard(null)
+                    if (!result.isClosed) onKeyboard(null)
                 } else {
                     onKeyboard(result.readInput())
                 }
@@ -141,6 +148,14 @@ private class RunningSession(
 ) : CinemaBrowserSession {
     @Volatile var isClosed: Boolean = false
         private set
+    private var firstPaintReported = false
+
+    fun markFirstPaint(): Boolean {
+        if (isClosed || firstPaintReported) return false
+        firstPaintReported = true
+        return true
+    }
+
     var hasBack = false
     var activeMedia: MediaSession? = null
     override val canGoBack: Boolean get() = hasBack
@@ -358,9 +373,13 @@ private class RunningSession(
     override fun goBack() { if (hasBack) session.goBack() }
     override fun reload() = session.reload()
     // Inactive GeckoSession is a render-visibility hint, not an HTML video pause.
-    override fun pause() { activeMedia?.pause() }
+    override fun pause() {
+        if (!isClosed) runCatching { activeMedia?.pause() }
+            .onFailure { MyCarLog.w("gecko: media pause failed (${it.javaClass.simpleName})", "CINEMA") }
+    }
 
     override fun setVisible(visible: Boolean) {
+        if (isClosed) return
         if (!visible) pause()
         // GeckoSession#setActive is explicitly about rendering visibility, not navigation.
         // Keeping the GeckoSession and its GeckoView attached preserves the page/seek state.
@@ -374,10 +393,12 @@ private class RunningSession(
         isClosed = true
         pendingTimeout?.let(handler::removeCallbacks)
         pendingTimeout = null
-        onKeyboard(null)
         activeMedia = null
-        view.releaseSession()
-        session.close()
+        onKeyboard(null)
+        runCatching { view.releaseSession() }
+            .onFailure { MyCarLog.w("gecko: releaseSession failed (${it.javaClass.simpleName})", "CINEMA") }
+        runCatching { session.close() }
+            .onFailure { MyCarLog.w("gecko: session close failed (${it.javaClass.simpleName})", "CINEMA") }
     }
 }
 
