@@ -137,6 +137,9 @@
     <string name="settings_cinema_engine_allow_install">Разрешить установку из myCar</string>
     <string name="settings_cinema_engine_installing">Установка движка Firefox…</string>
     <string name="settings_cinema_engine_retry">Повторить загрузку</string>
+    <string name="settings_cinema_engine_import_zip">Выбрать тестовый ZIP</string>
+    <string name="settings_cinema_engine_import_hint">Используйте архив GeckoView из той же сборки GitHub Actions, что и этот APK.</string>
+    <string name="settings_cinema_engine_importing">Чтение тестового ZIP…</string>
     <string name="settings_cinema_engine_download">Скачать движок Firefox</string>
     <string name="settings_cinema_engine_gecko_pending">Загрузка дополнительного браузера пока недоступна в этой сборке</string>
     <string name="settings_cinema_ad_block">Блокировать рекламу и трекеры</string>
