@@ -135,6 +135,9 @@
     <string name="settings_cinema_engine_allow_install">Installationen durch myCar erlauben</string>
     <string name="settings_cinema_engine_installing">Firefox-Engine wird installiert…</string>
     <string name="settings_cinema_engine_retry">Download wiederholen</string>
+    <string name="settings_cinema_engine_import_zip">Test-Engine-ZIP auswählen</string>
+    <string name="settings_cinema_engine_import_hint">GeckoView-ZIP aus demselben GitHub-Actions-Build wie diese APK verwenden.</string>
+    <string name="settings_cinema_engine_importing">Test-Engine-ZIP wird eingelesen…</string>
     <string name="settings_cinema_engine_download">Firefox-Engine herunterladen</string>
     <string name="settings_cinema_engine_gecko_pending">Der optionale Browser-Download ist in diesem Build noch nicht verfügbar</string>
     <string name="settings_cinema_ad_block">Werbung und Tracker blockieren</string>
