@@ -65,6 +65,7 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
         browser?.setVisible(active)
         if (!active) {
             browser?.pause()
+            browser?.view?.clearFocus()
             if (fullScreen) {
                 browser?.exitFullScreen()
                 fullScreen = false
