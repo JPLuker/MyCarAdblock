@@ -375,4 +375,9 @@
     <string name="settings_cinema_extension_consent_title">允许此 Firefox 扩展？</string>
     <string name="settings_cinema_extension_consent_detail">安装前请检查扩展 ID、所需权限及网站访问范围。</string>
     <string name="settings_cinema_extension_consent_accept">安装扩展</string>
+    <string name="settings_cinema_extension_list_header">已安装扩展</string>
+    <string name="settings_cinema_extension_list_empty">未安装其他 Firefox 扩展。</string>
+    <string name="settings_cinema_extension_remove">移除</string>
+    <string name="settings_cinema_extension_remove_title">移除 Firefox 扩展？</string>
+    <string name="settings_cinema_extension_remove_detail">从 Firefox 卸载 %1$s？</string>
 </resources>
