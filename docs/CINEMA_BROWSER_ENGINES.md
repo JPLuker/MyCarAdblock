@@ -241,3 +241,32 @@ root cause, video playback, projection and split upgrades are verified.
 GeckoView native crash. Existing x86_64 emulator tests package installation of the
 architecture-independent split master, not native Firefox playback. **The new commits
 in this session have not yet been independently verified by CI or installed on a device.**
+
+
+## Correction: identical Gecko native crashes with blocking OFF (November 12, 11:06–11:11)
+
+This **supersedes** the earlier working hypothesis that the signed extension
+controller itself caused the process crash. Three real ARM64 device logs:
+- 11:06:36: blocking ON, extension list requested, SIGSEGV.
+- 11:07:38: blocking OFF, controller entirely bypassed, same SIGSEGV.
+- 11:10:57: blocking OFF, controller entirely bypassed, same SIGSEGV.
+
+All fault at `libxul.so+0x3f66680` with `SEGV_MAPERR` at address
+`0x8`. The Gecko native thread fails during startup independent of the
+application's extension call. Exact Mozilla symbol/function and root cause
+remain unknown. Do **not** ask for repeat tests of this same 159 build.
+
+The crash checkpoint therefore now guards **all Gecko startup attempts**, ON
+and OFF, and only clears after first contentful paint (or an explicit
+switch from Android WebView back to Firefox in Settings). This is containment,
+not a GeckoView crash fix.
+
+A standalone `experiment/gecko-158-startup` branch pins GeckoView
+`158.0.20261021001945` to compare with the candidate's 159 release.
+Both build workflows now verify `assets/omni.ja` and
+`libmozglue.so` in the optional package as well as previously checked
+`libxul.so` and `classes.dex`. These are package completeness tests, not
+proof of native runtime compatibility or functional ad blocking.
+
+See `docs/CINEMA_TEST_HANDOFF.md` for one-pass device testing after
+a successful experimental CI build. The production PR remains draft.
