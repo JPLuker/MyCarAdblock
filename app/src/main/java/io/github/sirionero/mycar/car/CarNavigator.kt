@@ -70,6 +70,21 @@ class CarNavigator(startId: String) {
 
     var backInterceptor: (() -> Boolean)? = null
 
+    /** Cinema stays composed while another screen is foregrounded. Its video is paused there. */
+    var cinemaSplit by mutableStateOf(false)
+        private set
+
+    /** Browser fullscreen expands over the map pane temporarily, not over the navigation dock. */
+    var cinemaVideoFullscreen by mutableStateOf(false)
+        internal set
+
+    /** Do not navigate Home just to resize Cinema: keep the browser instance and its page. */
+    fun toggleCinemaSplit() {
+        cinemaSplit = !cinemaSplit
+        if (cinemaSplit) mapPageRequests++
+    }
+
+
     /** Pushes a new step, unless it's the same screen already on top - tapping the button for
      * where you already are shouldn't grow the trail. */
     private fun push(screen: CarScreen, label: String) {
