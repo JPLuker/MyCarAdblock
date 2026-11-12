@@ -134,7 +134,9 @@ internal object LastExit {
                 val function = frame.string(4).take(120)
                 append("\n--- Native frame #")
                 append(index)
-                append(": ")
+                append(": pc 0x")
+                append(frame.varint(1).toString(16))
+                append(" ")
                 append(library)
                 if (function.isNotBlank()) {
                     append(" ")
