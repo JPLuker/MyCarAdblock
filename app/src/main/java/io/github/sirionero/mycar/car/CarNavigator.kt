@@ -74,9 +74,16 @@ class CarNavigator(startId: String) {
     var cinemaSplit by mutableStateOf(false)
         private set
 
-    /** Browser fullscreen expands over the map pane temporarily, not over the navigation dock. */
+    /** A previously opened Cinema gets a persistent dock shortcut when viewing Maps. */
+    var cinemaOpened by mutableStateOf(startId == "cinema")
+        private set
+
+    /** Video fullscreen applies inside Cinema's current pane, not to the entire car. */
     var cinemaVideoFullscreen by mutableStateOf(false)
         internal set
+
+    /** Remember that Cinema can be resumed after returning to Maps without reopening the page. */
+    fun markCinemaOpened() { cinemaOpened = true }
 
     /** Do not navigate Home just to resize Cinema: keep the browser instance and its page. */
     fun toggleCinemaSplit() {
@@ -238,7 +245,10 @@ class CarNavigator(startId: String) {
         if (replyTo == null) dashboard() else push(CarScreen.Notifications(replyTo), "Reply")
     }
 
-    fun open(id: String) { push(CarScreen.App(id), CarApps.find(id)?.label ?: id) }
+    fun open(id: String) {
+        if (id == "cinema") markCinemaOpened()
+        push(CarScreen.App(id), CarApps.find(id)?.label ?: id)
+    }
 
     /** Jumps straight to a step already on the trail, dropping everything after it - what
      * tapping a breadcrumb does. Index 0 (Home) is always on the trail, so this always succeeds. */
