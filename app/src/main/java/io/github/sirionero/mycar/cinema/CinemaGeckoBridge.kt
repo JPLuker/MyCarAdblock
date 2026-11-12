@@ -23,6 +23,8 @@ interface CinemaBrowserSession {
     fun setVisible(visible: Boolean)
     /** Apply the setting to the existing Firefox session without reloading its page. */
     fun setAdBlockEnabled(enabled: Boolean)
+    /** Toggle optional SponsorBlock without discarding playback. */
+    fun setSponsorBlockEnabled(enabled: Boolean)
     fun exitFullScreen()
     fun close()
 }
@@ -34,6 +36,7 @@ interface CinemaBrowserFactory {
         url: String,
         desktop: Boolean,
         adBlock: Boolean,
+        sponsorBlock: Boolean,
         onVisited: (String) -> Unit,
         onKeyboard: (String?) -> Unit,
         onFullScreen: (Boolean) -> Unit,
@@ -56,6 +59,7 @@ object CinemaGeckoBridge {
         url: String,
         desktop: Boolean,
         adBlock: Boolean,
+        sponsorBlock: Boolean,
         onVisited: (String) -> Unit,
         onKeyboard: (String?) -> Unit,
         onFullScreen: (Boolean) -> Unit,
@@ -75,7 +79,7 @@ object CinemaGeckoBridge {
         return runCatching {
             val clazz = Class.forName(FACTORY, true, context.classLoader)
             val factory = clazz.getDeclaredConstructor().newInstance() as CinemaBrowserFactory
-            factory.create(context, url, desktop, adBlock, onVisited, onKeyboard, onFullScreen, onFailure)
+            factory.create(context, url, desktop, adBlock, sponsorBlock, onVisited, onKeyboard, onFullScreen, onFailure)
         }.onFailure {
             // A normal Java/Kotlin failure did not kill the process; clear the checkpoint.
             // Only interrupted native/process exits must keep it for crash-loop protection.
