@@ -1,11 +1,11 @@
-# Cinema test handoff — ARM64 Gecko native startup
+# Cinema test handoff — ARM64 Gecko native startup in Car Preview
 
 **Branch:** `feature/cinema-adblock`  
 **PR:** [#1](https://github.com/JPLuker/MyCarAdblock/pull/1) — draft; not ready to merge or release.
 
 ## Current state
 
-The latest ARM64 device logs capture **three identical native crashes** on
+The latest ARM64 device logs, captured using **myCar's in-app Car Preview** on the phone, show **three identical native crashes** on
 November 12, 2026, with the same `libxul.so` program offset `0x3f66680`
 and SIGSEGV/SEGV_MAPERR null dereference at `0x8`:
 
@@ -36,8 +36,8 @@ The revised guard is committed and still requires device validation.
 The candidate branch `feature/cinema-adblock` remains on GeckoView
 `159.0.20261102144711`. A separate
 `experiment/gecko-158-startup` branch tests the last GeckoView 158 ARM64
-stable release `158.0.20261021001945`. Its CI build and physical-device
-behavior are not yet verified. If 158 behaves differently, that will
+stable release `158.0.20261021001945`. Its CI build and
+Car Preview behavior on the ARM64 phone are not yet verified. If 158 behaves differently, that will
 isolate a version regression versus an integration problem.
 
 ## One-time optional signing setup
@@ -58,10 +58,12 @@ If an older myCar Debug APK was signed with a temporary CI key, it cannot be upg
 uninstall **myCar Debug** once (this erases that debug app's data), then use the new build. Do
 not uninstall the separate production myCar app.
 
-## Minimal parked-device test
+## Minimal phone-only test using Car Preview
 
-1. Do not retest Gecko 159 on the existing build: ON and OFF have already
-   failed identically and repeat crashes interrupt the car host.
+1. You can conduct all Gecko startup and Cinema browser tests in **myCar Debug's
+   in-app Car Preview** on the ARM64 phone. No head-unit connection or drive
+   is required. Do not retest Gecko 159 on the existing build: ON and OFF
+   have already failed identically.
 2. For the controlled comparison, open
    [GitHub Actions > Build](https://github.com/JPLuker/MyCarAdblock/actions/workflows/build.yml)
    and select a **successful** run from `experiment/gecko-158-startup`.
@@ -76,8 +78,8 @@ not uninstall the separate production myCar app.
    If you choose an install-over-install instead, disclose that the old Gecko
    profile may still be present, so the result will not isolate the native
    engine as cleanly. Do not mix 159 and 158 base/split versions.
-4. While **parked**, choose Firefox, turn Cinema ad blocking OFF and open
-   a site **once**. If it still crashes, the next attempt should display
+4. Open **Car Preview in myCar Debug**, choose Cinema, select Firefox in
+   phone Settings and turn Cinema ad blocking OFF. Open a site **once**. If it still crashes, the next attempt should display
    the guarded fallback. Switch to Android WebView instead of repeatedly
    triggering the crash.
 5. Only if OFF renders correctly, turn ad blocking ON and open once.
@@ -104,7 +106,15 @@ filtering after an extension is installed. After that: test YouTube navigation, 
 on app switching, fullscreen exit, Maps/Cinema side-by-side, parked-only cover, car keyboard,
 release-signed split installation and upgrades on physical ARM64 hardware.
 
-**None of these physical-device checks is marked passed by this handoff.**
+**Testing boundary:** Car Preview on a real ARM64 phone exercises Gecko's native
+runtime, Cinema UI and rendering, so it is fully adequate to reproduce and
+investigate this startup SIGSEGV. It does **not** prove car head-unit
+projection, real steering wheel/rotary controls, vehicle speed/parked gating,
+or vehicle audio routing. Reserve those tests for later, after browser startup
+and playback are stable in preview.
+
+**No Gecko startup/playback checks have passed in Car Preview yet; later
+head-unit integration checks are also outstanding.**
 
 ## Install permission button (November 12)
 
