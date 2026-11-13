@@ -109,6 +109,7 @@ internal fun CinemaSection() {
     val browserEngine by Cinema.browserEngine.collectAsState()
     val backgroundAudio by Cinema.backgroundAudio.collectAsState()
     var warning by remember { mutableStateOf(false) }
+    var browserSettingsOpen by rememberSaveable { mutableStateOf(false) }
     var resetAsk by remember { mutableStateOf(false) }
     var name by rememberSaveable { mutableStateOf("") }
     var address by rememberSaveable { mutableStateOf("") }
@@ -148,6 +149,19 @@ internal fun CinemaSection() {
         )
         SettingsDivider()
         SettingsRow(
+            "Browser settings",
+            Modifier.clickable { browserSettingsOpen = !browserSettingsOpen },
+            subtitle = if (browserEngine == CinemaBrowserEngine.FIREFOX_GECKOVIEW)
+                "Firefox · Manage engine, blocking and extensions"
+            else "Android WebView · Manage engine and blocking",
+            trailing = {
+                Text(if (browserSettingsOpen) "Hide" else "Open",
+                    color = MaterialTheme.colorScheme.primary)
+            },
+        )
+        if (browserSettingsOpen) {
+        SettingsDivider()
+        SettingsRow(
             stringResource(R.string.settings_cinema_ad_block),
             Modifier.toggleable(adBlockEnabled, role = Role.Switch) { Cinema.setAdBlockEnabled(it) },
             subtitle = stringResource(
@@ -156,13 +170,6 @@ internal fun CinemaSection() {
                 else R.string.settings_cinema_ad_block_detail,
             ),
             trailing = { Switch(checked = adBlockEnabled, onCheckedChange = null) },
-        )
-        SettingsDivider()
-        SettingsRow(
-            stringResource(R.string.settings_cinema_sponsorblock),
-            Modifier.toggleable(sponsorBlockEnabled, role = Role.Switch) { Cinema.setSponsorBlockEnabled(it) },
-            subtitle = sponsorBlockError ?: stringResource(R.string.settings_cinema_sponsorblock_detail),
-            trailing = { Switch(checked = sponsorBlockEnabled, onCheckedChange = null) },
         )
         SettingsDivider()
         Text(
@@ -308,6 +315,15 @@ internal fun CinemaSection() {
                 }
             }
         }
+        if (browserEngine == CinemaBrowserEngine.FIREFOX_GECKOVIEW) {
+        SettingsDivider()
+        SettingsRow(
+            stringResource(R.string.settings_cinema_sponsorblock),
+            Modifier.toggleable(sponsorBlockEnabled, role = Role.Switch) { Cinema.setSponsorBlockEnabled(it) },
+            subtitle = sponsorBlockError ?: stringResource(R.string.settings_cinema_sponsorblock_detail),
+            trailing = { Switch(checked = sponsorBlockEnabled, onCheckedChange = null) },
+        )
+        }
         if (geckoInstalled) {
             SettingsDivider()
             Text(
@@ -405,6 +421,7 @@ internal fun CinemaSection() {
                     }
                 }
             }
+        }
         }
         SettingsDivider()
         PhoneVideosRow()
