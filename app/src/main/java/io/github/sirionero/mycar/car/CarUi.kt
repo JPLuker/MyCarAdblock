@@ -345,7 +345,6 @@ fun CarUi() {
                 // Map + Cinema, keep the 44/56 split even when the site enters fullscreen.
                 // The parked-only cover remains inside CinemaScreen in either layout.
                 val cinemaSplit = navigator.cinemaSplit
-                var mapSurfaceWidth by remember { mutableStateOf(0) }
                 // A page's dropdown belongs to the screen it was opened on.
                 LaunchedEffect(screen) { WebSelect.cancel() }
                 val safetyWarningSeen by CarSettings.hasSeenSafetyWarning.collectAsState()
@@ -373,17 +372,12 @@ fun CarUi() {
                             Modifier.fillMaxHeight()
                                 .fillMaxWidth(if (cinemaVisible && cinemaSplit) 0.44f else 1f)
                                 .align(Alignment.CenterStart)
-                                .onSizeChanged { mapSurfaceWidth = it.width }
-                                // Navigation embeds a separate Android rendering surface.
-                                // zIndex alone cannot reliably put that surface behind GeckoView
-                                // after Maps + Cinema collapses. Keep Maps composed but physically
-                                // park its surface outside the viewport while Cinema is solo.
-                                // The same map instance returns when split view is reopened.
-                                .offset {
-                                    IntOffset(
-                                        if (cinemaVisible && !cinemaSplit) -mapSurfaceWidth else 0,
-                                        0,
-                                    )
+                                // Keep the nav SurfaceView at its real layout coordinates.
+                                // Moving it offscreen broke its native surface bounds and
+                                // allowed the map to intrude into the left dock. Make the
+                                // retained map transparent only while Cinema owns full width.
+                                .graphicsLayer {
+                                    alpha = if (cinemaVisible && !cinemaSplit) 0f else 1f
                                 }
                                 .zIndex(if (cinemaVisible) -2f else -1f)
                                 .background(MaterialTheme.colorScheme.background),
