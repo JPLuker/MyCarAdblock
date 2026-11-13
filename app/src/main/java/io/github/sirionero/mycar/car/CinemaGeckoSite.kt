@@ -176,7 +176,8 @@ internal fun CinemaGeckoSiteView(site: CinemaSite, startAt: String?, active: Boo
                 },
             )
             if (fullScreen) {
-                Box(Modifier.align(Alignment.TopEnd)) {
+                // Leave the YouTube upper-right playback controls accessible.
+                Box(Modifier.align(Alignment.TopStart)) {
                     CinemaExitFullscreen(
                         split = navigator.cinemaSplit,
                         onToggleSplit = navigator::toggleCinemaSplit,
