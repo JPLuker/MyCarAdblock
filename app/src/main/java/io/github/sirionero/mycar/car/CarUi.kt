@@ -361,7 +361,7 @@ fun CarUi() {
                     // from the screen beside it, so there is nothing to give back while typing.
                     // Native map SurfaceView must never draw across the persistent dock.
                     CarDock(navigator)
-                    Box(Modifier.weight(1f).fillMaxHeight().graphicsLayer { clip = true }) {
+                    Box(Modifier.weight(1f).fillMaxHeight()) {
                         // Home never leaves the composition; other screens cover it. Dropping it
                         // would tear down the map's surface, and coming back would then show black
                         // while the nav app redrew on a new one.
@@ -386,7 +386,6 @@ fun CarUi() {
                                     )
                                 }
                                 .zIndex(if (cinemaVisible) -2f else -1f)
-                                .graphicsLayer { clip = true }
                                 .background(MaterialTheme.colorScheme.background),
                         ) {
                             CarHome(forceMapOnly = cinemaVisible && cinemaSplit)
@@ -397,7 +396,6 @@ fun CarUi() {
                                     .fillMaxWidth(if (cinemaSplit) 0.56f else 1f)
                                     .align(Alignment.CenterEnd)
                                     .zIndex(if (cinemaVisible) -1f else -2f)
-                                    .graphicsLayer { clip = true }
                                     .background(MaterialTheme.colorScheme.background),
                             ) {
                                 CinemaScreen(active = cinemaVisible)
