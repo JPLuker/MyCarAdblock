@@ -60,6 +60,8 @@ fun CarAppStage(
     frame: CarEnvironment.Frame,
     /** Inside the home screen's map pane: no title bar, the template gets the whole area. */
     embedded: Boolean = false,
+    /** Whether the native navigation surface should exist in this pane. */
+    surfaceVisible: Boolean = true,
     /** The title bar's button, at its right end: Stop for an app on its own screen; none if null. */
     endLabel: String? = stringResource(R.string.car_template_stop),
     /** Over the app's drawing and under the template's chrome, whose cards and buttons stay on top: Home's mini player. */
@@ -72,7 +74,7 @@ fun CarAppStage(
         Box(Modifier.fillMaxSize()) {
             // The app's own drawing goes underneath; everything else is the host's rendering of
             // the template it described, laid over the top.
-            if (status.surfaceRequested) {
+            if (status.surfaceRequested && surfaceVisible) {
                 AppSurface(connection, frame, template, Modifier.fillMaxSize())
             }
             // Not under a template that covers the map (a list, a search): composed there, its buttons
