@@ -382,7 +382,7 @@ fun CarUi() {
                                 .zIndex(if (cinemaVisible) -2f else -1f)
                                 .background(MaterialTheme.colorScheme.background),
                         ) {
-                            CarHome(forceMapOnly = cinemaVisible && cinemaSplit)
+                            CarHome(forceMapOnly = cinemaVisible && cinemaSplit, mapSurfaceVisible = !cinemaVisible || cinemaSplit)
                         }
                         if (cinemaEverOpened || cinemaVisible) {
                             Box(
