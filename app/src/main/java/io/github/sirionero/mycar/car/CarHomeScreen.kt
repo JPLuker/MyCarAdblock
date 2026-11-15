@@ -72,7 +72,7 @@ import kotlinx.coroutines.launch
  * full-width map once nothing is playing.
  */
 @Composable
-fun CarHome(forceMapOnly: Boolean = false) {
+fun CarHome(forceMapOnly: Boolean = false, mapSurfaceVisible: Boolean = true) {
     val frame by CarEnvironment.frame.collectAsStateWithLifecycle()
     val navStatus by CarServices.nav.status.collectAsStateWithLifecycle()
     val phase by CarServices.media.phase.collectAsStateWithLifecycle()
@@ -178,7 +178,7 @@ fun CarHome(forceMapOnly: Boolean = false) {
                 // it: that hole keeps to the panel's rounded clip, and the wallpaper covers the rest.
                 .then(if (split) Modifier.raisedPanel().background(MaterialTheme.colorScheme.surface) else Modifier),
         ) {
-            MapPane(navStatus, frame, inView, mini = miniNow.takeIf { miniPlayerShows(miniOn, navigator.miniPlayerHidden, musicShown, split, inView, panning) })
+            MapPane(navStatus, frame, inView, mapSurfaceVisible, mini = miniNow.takeIf { miniPlayerShows(miniOn, navigator.miniPlayerHidden, musicShown, split, inView, panning) })
         }
         // The column's panel at the screen's own density, outside the player's size: its corners, rim and
         // shadow match the map's at any size. Painted over at the corners for Plancia's web page.
@@ -209,14 +209,14 @@ fun CarHome(forceMapOnly: Boolean = false) {
 }
 
 @Composable
-private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame, inView: Boolean, mini: NowPlaying? = null) {
+private fun MapPane(status: CarAppConnection.Status, frame: CarEnvironment.Frame, inView: Boolean, surfaceVisible: Boolean = true, mini: NowPlaying? = null) {
     val navigator = LocalCarNavigator.current
     if (status.phase == CarAppConnection.Phase.RUNNING) {
         // The car's Back key reaches the map's app (its search results, a list of places) while
         // the map is the page in view; under another screen it goes on closing that screen.
         AppBackKey(CarServices.nav, active = inView)
         CarAppStage(
-            CarServices.nav, status, frame, embedded = true,
+            CarServices.nav, status, frame, embedded = true, surfaceVisible = surfaceVisible,
             // Over the map, under the app's own cards and buttons: they stay on top of it.
             overMap = { if (mini != null) MapMiniPlayer(mini, Modifier.fillMaxSize()) },
         ) { CarServices.stopNav() }
