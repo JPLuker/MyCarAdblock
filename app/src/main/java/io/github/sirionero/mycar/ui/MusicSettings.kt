@@ -47,6 +47,7 @@ import io.github.sirionero.mycar.xonos.Xonos
  */
 @Composable
 internal fun MusicSettings() {
+    PhoneMediaBlacklistSection()
     XonosPart()
     WebMusicPart(WebMusic.SPOTIFY)
     val added by WebMusic.added.collectAsState()
@@ -208,3 +209,42 @@ private fun Arrow() = Icon(
     contentDescription = null,
     tint = MaterialTheme.colorScheme.onSurfaceVariant,
 )
+
+/** Phone playback follows Android media sessions. Blacklisting affects the mirrored panel only. */
+@Composable
+private fun PhoneMediaBlacklistSection() {
+    val context = LocalContext.current
+    var blocked by remember { mutableStateOf(io.github.sirionero.mycar.media.PhoneMediaMirror.blocked(context)) }
+    var known by remember { mutableStateOf(emptySet<String>()) }
+    androidx.compose.runtime.LaunchedEffect(context) {
+        while (true) {
+            known = known + io.github.sirionero.mycar.media.PhoneMediaMirror.sessions(context).map { it.packageName }
+            kotlinx.coroutines.delay(1500)
+        }
+    }
+    SettingsSection("Phone media controls", footer = "The car follows the phone's active media session. Blocked apps will never appear in the mirrored player.") {
+        Text("Hide apps from the music panel", style = MaterialTheme.typography.titleSmall)
+        val packages = (known + blocked).sorted()
+        if (packages.isEmpty()) {
+            Text("Play music on your phone to discover apps you can exclude.", style = MaterialTheme.typography.bodySmall)
+        }
+        packages.forEach { pkg ->
+            val label = remember(pkg) {
+                runCatching {
+                    val info = context.packageManager.getApplicationInfo(pkg, 0)
+                    context.packageManager.getApplicationLabel(info).toString()
+                }.getOrDefault(pkg)
+            }
+            val excluded = pkg in blocked
+            SettingsRow(
+                label,
+                Modifier.toggleable(excluded, role = Role.Checkbox) {
+                    io.github.sirionero.mycar.media.PhoneMediaMirror.setBlocked(context, pkg, it)
+                    blocked = io.github.sirionero.mycar.media.PhoneMediaMirror.blocked(context)
+                },
+                subtitle = pkg,
+                trailing = { Checkbox(checked = excluded, onCheckedChange = null) },
+            )
+        }
+    }
+}
