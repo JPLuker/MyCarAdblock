@@ -223,6 +223,16 @@ private fun PhoneMediaBlacklistSection() {
         }
     }
     SettingsSection("Phone media controls", footer = "The car follows the phone's active media session. Blocked apps will never appear in the mirrored player.") {
+        if (!io.github.sirionero.mycar.media.PhoneMediaMirror.hasNotificationAccess(context)) {
+            SettingsRow(
+                "Enable notification access",
+                Modifier.clickable {
+                    context.startActivity(android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+                },
+                subtitle = "Required for Spotify and other phone media sessions",
+                trailing = { Arrow() },
+            )
+        }
         Text("Hide apps from the music panel", style = MaterialTheme.typography.titleSmall)
         val packages = (known + blocked).sorted()
         if (packages.isEmpty()) {
