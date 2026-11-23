@@ -101,7 +101,15 @@ fun CarHome(forceMapOnly: Boolean = false, mapSurfaceVisible: Boolean = true) {
     // and every width of the map is a new surface for its app (two hand-overs: Vela redraws the map).
     // Opening stays immediate; music closed by the driver (no music app any more) closes it at once.
     val mediaApp by CarServices.mediaApp.collectAsStateWithLifecycle()
-    val musicOn = phase == CarMedia.Phase.READY && now.isActive
+    val contextForMirror = LocalContext.current
+    var phonePlaying by remember { mutableStateOf(false) }
+    LaunchedEffect(contextForMirror) {
+        while (true) {
+            phonePlaying = io.github.sirionero.mycar.media.PhoneMediaMirror.current(contextForMirror)?.playbackState?.state == PlaybackState.STATE_PLAYING
+            delay(1000)
+        }
+    }
+    val musicOn = (phase == CarMedia.Phase.READY && now.isActive) || phonePlaying
     var musicShown by remember { mutableStateOf(musicOn) }
     LaunchedEffect(musicOn, mediaApp) {
         if (musicOn) musicShown = true
@@ -199,7 +207,7 @@ fun CarHome(forceMapOnly: Boolean = false, mapSurfaceVisible: Boolean = true) {
                     sideApp?.builtIn == BuiltInApps.Plancia -> AppPlaceholder("Plancia", null, side, builtInId = BuiltInApps.Plancia.id, raised = false)
                     panel == SidePanel.LYRICS -> SideLyrics(shownNow, side)
                     sideMedia != null -> SideMediaPane(sideMedia, shownNow, side)
-                    else -> GlassDockedPlayer(shownNow, side, startingApp = mediaApp?.label?.takeIf { reserved && !shownNow.isActive })
+                    else -> if (phonePlaying) io.github.sirionero.mycar.media.PhoneMediaMirrorPanel(side) else GlassDockedPlayer(shownNow, side, startingApp = mediaApp?.label?.takeIf { reserved && !shownNow.isActive })
                 }
             }
         }
