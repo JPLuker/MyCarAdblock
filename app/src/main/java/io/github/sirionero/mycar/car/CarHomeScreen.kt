@@ -104,15 +104,31 @@ fun CarHome(forceMapOnly: Boolean = false, mapSurfaceVisible: Boolean = true) {
     val contextForMirror = LocalContext.current
     var phoneSession by remember { mutableStateOf(false) }
     var phonePlaying by remember { mutableStateOf(false) }
+    var lastMirroredPackage by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(contextForMirror) {
         while (true) {
             val session = io.github.sirionero.mycar.media.PhoneMediaMirror.current(contextForMirror)
             phoneSession = session != null
             phonePlaying = session?.playbackState?.state == PlaybackState.STATE_PLAYING
+            val pkg = session?.packageName
+            if (pkg != lastMirroredPackage) {
+                io.github.sirionero.mycar.MyCarLog.i("phone media: selected session ${pkg ?: "none"}, state=${session?.playbackState?.state}")
+                lastMirroredPackage = pkg
+            }
             delay(1000)
         }
     }
     val musicOn = (phase == CarMedia.Phase.READY && now.isActive) || phoneSession
+    // A newly detected playing phone session should bring back the player even if the previous
+    // music app left the panel closed. Never repeatedly reopen it after the driver closes it.
+    var lastPlayingPackage by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(phonePlaying, lastMirroredPackage) {
+        if (phonePlaying && lastMirroredPackage != null && lastPlayingPackage != lastMirroredPackage) {
+            if (sideApp == null && navigator.sidePanel == SidePanel.NONE) navigator.showSidePane()
+            lastPlayingPackage = lastMirroredPackage
+        }
+        if (!phonePlaying) lastPlayingPackage = null
+    }
     var musicShown by remember { mutableStateOf(musicOn) }
     LaunchedEffect(musicOn, mediaApp) {
         if (musicOn) musicShown = true
