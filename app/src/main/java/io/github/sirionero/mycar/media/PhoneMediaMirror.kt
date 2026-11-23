@@ -2,6 +2,8 @@ package io.github.sirionero.mycar.media
 
 import android.content.ComponentName
 import android.content.Context
+import android.provider.Settings
+import android.text.TextUtils
 import android.media.MediaMetadata
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -44,11 +46,18 @@ object PhoneMediaMirror {
         if (blocked) updated.add(packageName) else updated.remove(packageName)
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).edit().putStringSet(BLOCKED, updated).apply()
     }
+    fun hasNotificationAccess(context: Context): Boolean {
+        val enabled = Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners") ?: return false
+        return enabled.split(':').any { ComponentName.unflattenFromString(it)?.packageName == context.packageName }
+    }
     fun allSessions(context: Context): List<MediaController> = try {
         context.getSystemService(MediaSessionManager::class.java)
             .getActiveSessions(ComponentName(context, MyCarNotificationListener::class.java))
 
-    } catch (_: SecurityException) { emptyList() }
+    } catch (e: SecurityException) {
+        io.github.sirionero.mycar.MyCarLog.w("phone media: notification listener access denied: ${e.message}")
+        emptyList()
+    }
     fun sessions(context: Context): List<MediaController> = allSessions(context).filter { it.packageName !in blocked(context) }
     fun current(context: Context): MediaController? {
         val all = sessions(context)
