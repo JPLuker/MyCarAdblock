@@ -218,7 +218,7 @@ private fun PhoneMediaBlacklistSection() {
     var known by remember { mutableStateOf(emptySet<String>()) }
     androidx.compose.runtime.LaunchedEffect(context) {
         while (true) {
-            known = known + io.github.sirionero.mycar.media.PhoneMediaMirror.sessions(context).map { it.packageName }
+            known = known + io.github.sirionero.mycar.media.PhoneMediaMirror.allSessions(context).map { it.packageName }
             kotlinx.coroutines.delay(1500)
         }
     }
