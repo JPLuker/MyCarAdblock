@@ -3,6 +3,13 @@ package io.github.sirionero.mycar.media
 import android.content.ComponentName
 import android.content.Context
 import android.media.MediaMetadata
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import android.media.session.MediaController
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
@@ -37,11 +44,12 @@ object PhoneMediaMirror {
         if (blocked) updated.add(packageName) else updated.remove(packageName)
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).edit().putStringSet(BLOCKED, updated).apply()
     }
-    fun sessions(context: Context): List<MediaController> = try {
+    fun allSessions(context: Context): List<MediaController> = try {
         context.getSystemService(MediaSessionManager::class.java)
             .getActiveSessions(ComponentName(context, MyCarNotificationListener::class.java))
-            .filter { it.packageName !in blocked(context) }
+
     } catch (_: SecurityException) { emptyList() }
+    fun sessions(context: Context): List<MediaController> = allSessions(context).filter { it.packageName !in blocked(context) }
     fun current(context: Context): MediaController? {
         val all = sessions(context)
         return all.firstOrNull { it.playbackState?.state == PlaybackState.STATE_PLAYING }
@@ -68,19 +76,24 @@ fun PhoneMediaMirrorPanel(modifier: Modifier = Modifier) {
     // revision intentionally triggers a refresh for track changes on the same session.
     val title = remember(revision) { metadata?.getString(MediaMetadata.METADATA_KEY_TITLE).orEmpty() }
     val artist = remember(revision) { metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST).orEmpty() }
+    val artwork: Bitmap? = remember(revision) { metadata?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART) ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_ART) }
+    val appName = remember(revision) { current?.packageName?.let { pkg -> runCatching { val info = context.packageManager.getApplicationInfo(pkg, 0); context.packageManager.getApplicationLabel(info).toString() }.getOrDefault(pkg) }.orEmpty() }
     Column(modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         if (current == null) {
             Text("No phone media playing")
         } else {
-            Text(title.ifBlank { "Phone media" })
+            if (artwork != null) Image(artwork.asImageBitmap(), contentDescription = "Album artwork", modifier = Modifier.size(120.dp), contentScale = ContentScale.Crop)
+            Spacer(Modifier.size(8.dp))
+            Text(appName, style = androidx.compose.material3.MaterialTheme.typography.labelMedium)
+            Text(title.ifBlank { "Phone media" }, maxLines = 2, overflow = TextOverflow.Ellipsis)
             if (artist.isNotBlank()) Text(artist)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Button(onClick = { current.transportControls.skipToPrevious() }) { Text("Previous") }
+                Button(enabled = state != null && (state.actions and PlaybackState.ACTION_SKIP_TO_PREVIOUS) != 0L, onClick = { current.transportControls.skipToPrevious() }) { Text("Previous") }
                 Button(onClick = {
                     if (state?.state == PlaybackState.STATE_PLAYING) current.transportControls.pause()
                     else current.transportControls.play()
                 }) { Text(if (state?.state == PlaybackState.STATE_PLAYING) "Pause" else "Play") }
-                Button(onClick = { current.transportControls.skipToNext() }) { Text("Next") }
+                Button(enabled = state != null && (state.actions and PlaybackState.ACTION_SKIP_TO_NEXT) != 0L, onClick = { current.transportControls.skipToNext() }) { Text("Next") }
             }
         }
     }
